@@ -32,7 +32,7 @@
 #include <sys/types.h>
 #endif
 
-#ifndef SNDFILE_H
+#ifndef SNDFILE2_H
 #include "sndfile2k/sndfile2k.h"
 #endif
 

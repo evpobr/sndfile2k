@@ -99,7 +99,7 @@ void count_open_files(void);
 void increment_open_file_count(void);
 void check_open_file_count_or_die(int lineno);
 
-#ifdef SNDFILE_H
+#ifdef SNDFILE2K_H
 
 static inline void sf_info_clear(SF_INFO *info)
 {
