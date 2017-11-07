@@ -1,0 +1,26 @@
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterUnion: true
+  AfterEnum: true
+  AfterStruct: true
+  AfterFunction: true
+  AfterControlStatement: true
+  BeforeCatch: true
+  BeforeElse: true
+IndentWidth: 4
+SortIncludes: false
+ColumnLimit: 80
+UseTab: Never
+AlignAfterOpenBracket: true
+AlignOperands: true
+AlwaysBreakAfterReturnType: None
+AllowShortFunctionsOnASingleLine: None
+AlignEscapedNewlinesLeft: true
+AlignTrailingComments: false
+AllowShortBlocksOnASingleLine: false
+AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+ReflowComments: false
+UseTab: Never
