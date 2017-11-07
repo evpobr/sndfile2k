@@ -770,8 +770,7 @@ SNDFILE2K_EXPORT void sf_write_sync(SNDFILE *sndfile);
  *      #including <sndfile.h>
  */
 
-#if (defined(ENABLE_SNDFILE_WINDOWS_PROTOTYPES) && 
-     ENABLE_SNDFILE_WINDOWS_PROTOTYPES)
+#if (defined(ENABLE_SNDFILE_WINDOWS_PROTOTYPES) && ENABLE_SNDFILE_WINDOWS_PROTOTYPES)
 SNDFILE2K_EXPORT SNDFILE *sf_wchar_open(LPCWSTR wpath, int mode,
                                         SF_INFO *sfinfo);
 #endif
