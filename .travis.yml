@@ -27,20 +27,6 @@ matrix:
             - libflac-dev
             - libasound2-dev
 
-    - os: osx
-      compiler: clang
-
-  exclude:
-    - os: osx
-      compiler: gcc
-
-before_install:
-  - |
-    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-      brew update
-      brew install autogen flac libogg libvorbis
-    fi
-
 install:
   - true
 
