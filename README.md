@@ -1,7 +1,7 @@
 # SndFile2K
 
 [![Build Status](https://secure.travis-ci.org/evpobr/sndfile2k.svg?branch=master)](http://travis-ci.org/evpobr/sndfile2k)
-[![Build status](https://ci.appveyor.com/api/projects/status/github/evpobr/sndfile2k?branch=master?svg=true)](https://ci.appveyor.com/project/evpobr/sndfile2k)
+[![Build status](https://ci.appveyor.com/api/projects/status/vbv4sy53ue9ftpyd/branch/master?svg=true)](https://ci.appveyor.com/project/evpobr/sndfile2k/branch/master)
 
 Fork of [libsndfile](http://www.mega-nerd.com/libsndfile/) library, a C library for reading and writing files containing sampled audio data.
 
