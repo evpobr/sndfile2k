@@ -26,5 +26,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Python based style checking script and git hook - coding style was changed.
 - Other unportable or obsolete scripts.
 - `Win32` directory. Test file inside was useless, since Windows is supported now.
+- Travis CI MacOS GCC test removed
 
 [Unreleased]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta1...HEAD
