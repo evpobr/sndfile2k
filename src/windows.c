@@ -23,10 +23,9 @@
 
 #include "config.h"
 
-#if OS_IS_WIN32
+#if (defined(_WIN32) || defined(__CYGWIN__))
 #include <windows.h>
 
-#define ENABLE_SNDFILE_WINDOWS_PROTOTYPES 1
 #include "sndfile2k/sndfile2k.h"
 #include "common.h"
 
@@ -34,7 +33,7 @@ extern int sf_errno;
 
 static void copy_filename(SF_PRIVATE *psf, LPCWSTR wpath);
 
-SNDFILE *sf_wchar_open(LPCWSTR wpath, int mode, SF_INFO *sfinfo)
+SNDFILE *sf_wchar_open(const wchar_t *wpath, int mode, SF_INFO *sfinfo)
 {
     SF_PRIVATE *psf;
     char utf8name[512];

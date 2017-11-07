@@ -362,11 +362,13 @@ typedef struct
 	**	They are basically the same as a windows file HANDLE.
 	*/
     void *handle, *hsaved;
-
-    int use_wchar;
 #else
     /* These fields can only be used in src/file_io.c. */
     int filedes, savedes;
+#endif
+
+#if (defined(_WIN32) || defined(__CYGWIN__))
+	int use_wchar;
 #endif
 
     int do_not_close_descriptor;

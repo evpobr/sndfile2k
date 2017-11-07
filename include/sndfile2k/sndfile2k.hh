@@ -83,8 +83,8 @@ public:
 	SndfileHandle(SF_VIRTUAL_IO &sfvirtual, void *user_data, int mode = SFM_READ,
 	              int format = 0, int channels = 0, int samplerate = 0);
 
-#ifdef ENABLE_SNDFILE_WINDOWS_PROTOTYPES
-	SndfileHandle(LPCWSTR wpath, int mode = SFM_READ,
+#if (defined(_WIN32) || defined(__CYGWIN__))
+	SndfileHandle(const wchar_t *wpath, int mode = SFM_READ,
 	              int format = 0, int channels = 0, int samplerate = 0);
 #endif
 
@@ -469,9 +469,9 @@ inline SNDFILE *SndfileHandle::takeOwnership(void)
 	return sf;
 }
 
-#ifdef ENABLE_SNDFILE_WINDOWS_PROTOTYPES
+#if (defined(_WIN32) || defined(__CYGWIN__))
 
-inline SndfileHandle::SndfileHandle(LPCWSTR wpath, int mode, int fmt, int chans,
+inline SndfileHandle::SndfileHandle(const wchar_t *wpath, int mode, int fmt, int chans,
                                     int srate)
 	: p(NULL)
 {

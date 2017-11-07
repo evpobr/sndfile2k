@@ -598,10 +598,28 @@ static int psf_open_fd(PSF_FILE *pfile)
         break;
     };
 
-    if (mode == 0)
-        fd = open(pfile->path.c, oflag);
-    else
-        fd = open(pfile->path.c, oflag, mode);
+	if (mode == 0)
+	{
+#if (defined(_WIN32) || defined(__CYGWIN__))
+		if (pfile->use_wchar)
+			fd = _wopen(pfile->path.wc, oflag);
+		else
+			fd = open(pfile->path.c, oflag);
+#else
+		fd = open(pfile->path.c, oflag);
+#endif
+	}
+	else
+	{
+#if (defined(_WIN32) || defined(__CYGWIN__))
+		if (pfile->use_wchar)
+			fd = _wopen(pfile->path.wc, oflag, mode);
+		else
+			fd = open(pfile->path.c, oflag, mode);
+#else
+		fd = open(pfile->path.c, oflag, mode);
+#endif
+	}
 
     return fd;
 }
