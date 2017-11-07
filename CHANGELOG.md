@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.0.0-beta1] - 2017-11-07
+
 ### Added
 - Tests sources which were generated are now in source tree. No `autogen` stuff requred, faster configuration and compilation.
 
@@ -29,3 +31,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Travis CI MacOS GCC test removed
 
 [Unreleased]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta1...HEAD
+[1.0.0-beta1]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-alpha1...v1.0.0-beta1
