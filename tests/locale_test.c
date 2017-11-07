@@ -117,7 +117,7 @@ static void utf8_test(void)
 
 static void locale_test(const LOCALE_DATA *ldata)
 {
-#ifndef HAVE_LOCALE_H || HAVE_SETLOCALE
+#if (!defined(HAVE_LOCALE_H) || !defined(HAVE_SETLOCALE))
     locname = filename = NULL;
     width = 0;
     return;
