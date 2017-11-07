@@ -90,8 +90,6 @@
 
 #define ARRAY_LEN(x) ((int)(sizeof(x) / sizeof((x)[0])))
 
-#define NOT(x) (!(x))
-
 #if COMPILER_IS_GCC
 #define SF_MAX(x, y)                                   \
     ({                                                 \

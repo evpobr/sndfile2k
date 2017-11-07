@@ -33,7 +33,6 @@ extern "C" {
 
 #define ARRAY_LEN(x) ((int)(sizeof(x)) / (sizeof((x)[0])))
 #define SIGNED_SIZEOF(x) ((int64_t)(sizeof(x)))
-#define NOT(x) (!(x))
 #define ABS(x) ((x) >= 0 ? (x) : -(x))
 
 #define PIPE_INDEX(x) ((x) + 500)

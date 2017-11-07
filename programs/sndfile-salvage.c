@@ -54,8 +54,6 @@
 
 #define BUFFER_LEN (1 << 16)
 
-#define NOT(x) (!(x))
-
 static void usage_exit(const char *progname);
 static void salvage_file(const char *broken_wav, const char *fixed_w64);
 
@@ -267,7 +265,7 @@ static void copy_data(int fd, SNDFILE *sndfile, int readsize)
     bufferlen = readsize * 1024;
     buffer = malloc(bufferlen);
 
-    while (NOT(done) && (readlen = read(fd, buffer, bufferlen)) >= 0)
+    while (!done && (readlen = read(fd, buffer, bufferlen)) >= 0)
     {
         if (readlen < bufferlen)
         {

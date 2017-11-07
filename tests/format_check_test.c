@@ -118,7 +118,7 @@ static void format_combo_test(void)
 
             check_is_valid = sf_format_check(&info);
 
-            exit_if_true(NOT(subtype_is_valid) && check_is_valid,
+            exit_if_true(!subtype_is_valid && check_is_valid,
                          "\n\nLine %d : Subtype is not valid but checks ok.\n",
                          __LINE__);
 
@@ -139,14 +139,14 @@ static void format_combo_test(void)
             };
 
             exit_if_true(
-                sndfile && NOT(check_is_valid),
+                sndfile && !(check_is_valid),
                 "\n\nError : Format was not valid but file opened correctly.\n"
                 "    Container : %s\n"
                 "    Codec     : %s\n\n",
                 major_fmt_info.name, subtype_fmt_info.name);
 
             exit_if_true(
-                NOT(sndfile) && check_is_valid,
+                !sndfile && check_is_valid,
                 "\n\nError : Format was valid but file failed to open.\n"
                 "    Container : %s\n"
                 "    Codec     : %s\n\n",
