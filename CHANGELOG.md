@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.0.0-beta1] - 2017-11-07
 
+### Fixed
+
+- Compiler errors
+- [CMake warning](https://cmake.org/cmake/help/latest/policy/CMP0063.html)
+
+## [1.0.0-alpha1] - 2017-11-07 [YANKED]
+
 ### Added
 - Tests sources which were generated are now in source tree. No `autogen` stuff requred, faster configuration and compilation.
 
