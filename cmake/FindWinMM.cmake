@@ -10,12 +10,22 @@ if(WINMM_INCLUDE_DIR)
     set(WINMM_FIND_QUIETLY TRUE)
 endif(WINMM_INCLUDE_DIR)
 
-find_path(WINMM_INCLUDE_DIR mmsystem.h HINTS ${WINMM_ROOT} PATH_SUFFIXES include)
-find_library(WINMM_LIBRARY NAMES winmm HINTS ${WINMM_ROOT} PATH_SUFFIXES lib)
-# Handle the QUIETLY and REQUIRED arguments and set WINMM_FOUND
-# to TRUE if all listed variables are TRUE.
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(WinMM DEFAULT_MSG WINMM_INCLUDE_DIR WINMM_LIBRARY)
+if(WIN32)
+
+  find_path(WINMM_INCLUDE_DIR "")
+  set(WINMM_LIBRARY winmm)
+
+else()
+
+  find_path(WINMM_INCLUDE_DIR mmsystem.h windows.h)
+  find_library(WINMM_LIBRARY winmm)
+
+endif()
+
+  # Handle the QUIETLY and REQUIRED arguments and set WINMM_FOUND
+  # to TRUE if all listed variables are TRUE.
+  include(FindPackageHandleStandardArgs)
+  find_package_handle_standard_args(WinMM DEFAULT_MSG WINMM_INCLUDE_DIR WINMM_LIBRARY)
 
 if (WINMM_FOUND)
 	set (WINMM_LIBRARIES ${WINMM_LIBRARY})

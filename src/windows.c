@@ -30,7 +30,9 @@
 
 extern int sf_errno;
 
-#ifndef __CYGWIN__
+#if defined(_WIN32) && !defined(__CYGWIN__)
+
+#include <windows.h>
 
 static void copy_filename(SF_PRIVATE *psf, LPCWSTR wpath);
 
