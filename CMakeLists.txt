@@ -166,7 +166,7 @@ set(COMMON
   src/ogg.c
   src/chanmap.c
   src/id3.c)
-if(WIN32)
+if(WIN32 OR CYGWIN)
   list(APPEND COMMON src/windows.c)
   if(BUILD_SHARED_LIBS)
     list(APPEND COMMON src/version-metadata.rc)
@@ -313,7 +313,7 @@ set_target_properties(sndfile2k
 
 if(BUILD_SHARED_LIBS)
 
-  if(WIN32)
+  if(WIN32 OR CYGWIN)
     set(VERSION_MAJOR ${CPACK_PACKAGE_VERSION_MAJOR})
     set(PACKAGE_NAME ${CPACK_PACKAGE_NAME})
     set(GEN_TOOL cmake)
@@ -367,8 +367,9 @@ if(BUILD_PROGRAMS)
       ${PROJECT_SOURCE_DIR}/src
       ${PROJECT_BINARY_DIR}/src)
   target_link_libraries(sndfile2k-play PUBLIC sndfile2k)
-  if(WIN32)
-    target_link_libraries(sndfile2k-play PRIVATE winmm.lib)
+  if(WIN32 OR CYGWIN)
+    target_include_directories(sndfile2k-play PRIVATE ${WINMM_INCLUDE_DIRS})
+    target_link_libraries(sndfile2k-play PRIVATE ${WINMM_LIBRARIES})
   # Maybe ALSA & Sndio are present in BeOS. They are not required
   # so skip them anyway.
   elseif((NOT BEOS) AND ALSA_FOUND)

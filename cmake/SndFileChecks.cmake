@@ -56,6 +56,10 @@ if(SQLITE3_FOUND)
   set(HAVE_SQLITE3 1)
 endif()
 
+if(BUILD_PROGRAMS AND (WIN32 OR CYGWIN))
+  find_package(WinMM REQUIRED)
+endif()
+
 check_include_file(byteswap.h       HAVE_BYTESWAP_H)
 check_include_file(direct.h         HAVE_DIRECT_H)
 check_include_file(inttypes.h       HAVE_INTTYPES_H)

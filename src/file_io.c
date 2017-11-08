@@ -45,6 +45,12 @@
 #include <sf_unistd.h>
 #endif
 
+#if (defined(_WIN32) || defined(__CYGWIN__))
+#ifdef HAVE_WCHAR_H
+#include <wchar.h>
+#endif
+#endif
+
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -426,7 +432,11 @@ sf_count_t psf_ftell(SF_PRIVATE *psf)
     if (psf->is_pipe)
         return psf->pipeoffset;
 
+#if _WIN32
+	pos = _lseeki64(psf->file.filedes, 0, SEEK_CUR);
+#else
     pos = lseek(psf->file.filedes, 0, SEEK_CUR);
+#endif
 
     if (pos == ((sf_count_t)-1))
     {
@@ -527,9 +537,13 @@ int psf_ftruncate(SF_PRIVATE *psf, sf_count_t len)
     if ((sizeof(off_t) < sizeof(sf_count_t)) && len > 0x7FFFFFFF)
         return -1;
 
+#ifdef _WIN32
+	retval = _chsize_s(psf->file.filedes, len);
+#else
     retval = ftruncate(psf->file.filedes, len);
+#endif
 
-    if (retval == -1)
+    if (retval != 0)
         psf_log_syserr(psf, errno);
 
     return retval;
@@ -598,28 +612,28 @@ static int psf_open_fd(PSF_FILE *pfile)
         break;
     };
 
-	if (mode == 0)
-	{
-#if (defined(_WIN32) || defined(__CYGWIN__))
-		if (pfile->use_wchar)
-			fd = _wopen(pfile->path.wc, oflag);
-		else
-			fd = open(pfile->path.c, oflag);
+    if (mode == 0)
+    {
+#if defined(_WIN32)
+        if (pfile->use_wchar)
+            fd = _wopen(pfile->path.wc, oflag);
+        else
+            fd = open(pfile->path.c, oflag);
 #else
-		fd = open(pfile->path.c, oflag);
+        fd = open(pfile->path.c, oflag);
 #endif
-	}
-	else
-	{
-#if (defined(_WIN32) || defined(__CYGWIN__))
-		if (pfile->use_wchar)
-			fd = _wopen(pfile->path.wc, oflag, mode);
-		else
-			fd = open(pfile->path.c, oflag, mode);
+    }
+    else
+    {
+#if defined(_WIN32)
+        if (pfile->use_wchar)
+            fd = _wopen(pfile->path.wc, oflag, mode);
+        else
+            fd = open(pfile->path.c, oflag, mode);
 #else
-		fd = open(pfile->path.c, oflag, mode);
+        fd = open(pfile->path.c, oflag, mode);
 #endif
-	}
+    }
 
     return fd;
 }

@@ -73,7 +73,7 @@
 #include <sys/ioctl.h>
 #include <sys/audioio.h>
 
-#elif (OS_IS_WIN32 == 1)
+#elif defined(_WIN32) || defined(__CYGWIN__)
 #include <windows.h>
 #include <mmsystem.h>
 

@@ -23,13 +23,14 @@
 
 #include "config.h"
 
-#if (defined(_WIN32) || defined(__CYGWIN__))
-#include <windows.h>
+#if defined(_WIN32) || defined(__CYGWIN__)
 
 #include "sndfile2k/sndfile2k.h"
 #include "common.h"
 
 extern int sf_errno;
+
+#ifndef __CYGWIN__
 
 static void copy_filename(SF_PRIVATE *psf, LPCWSTR wpath);
 
@@ -51,7 +52,6 @@ SNDFILE *sf_wchar_open(const wchar_t *wpath, int mode, SF_INFO *sfinfo)
         psf->file.path.wc[0] = 0;
 
     psf_log_printf(psf, "File : '%s' (utf-8 converted from ucs-2)\n", utf8name);
-
     copy_filename(psf, wpath);
     psf->file.use_wchar = SF_TRUE;
     psf->file.mode = mode;
@@ -88,5 +88,18 @@ static void copy_filename(SF_PRIVATE *psf, LPCWSTR wpath)
 
     return;
 }
+
+// CYGWIN
+#else
+
+SNDFILE *sf_wchar_open(const wchar_t *wpath, int mode, SF_INFO *sfinfo)
+{
+    char utf8name[512];
+
+    wcstombs(utf8name, wpath, sizeof(utf8name));
+    return sf_open(utf8name, mode, sfinfo);
+};
+
+#endif
 
 #endif

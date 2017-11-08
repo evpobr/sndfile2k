@@ -74,12 +74,28 @@
 #define S_IWOTH (0) /* write permission, other */
 #define S_IXOTH (0) /* execute/search permission, other */
 
-#ifndef S_ISFIFO
+#if !defined(S_ISFIFO)
+#if defined(_S_IFMT) && defined(_S_IFIFO)
 #define S_ISFIFO(mode) (((mode)&_S_IFMT) == _S_IFIFO)
+#else
+#define S_ISFIFO(mode) (0)
+#endif
 #endif
 
-#ifndef S_ISREG
+#if !defined(S_ISSOCK)
+#if defined(_S_IFMT) && defined(_S_ISOCK)
+#define S_ISSOCK(mode) (((mode)&_S_IFMT) == _S_ISOCK)
+#else
+#define S_ISSOCK(mode) (0)
+#endif
+#endif
+
+#if !defined(S_ISREG)
+#if defined(_S_IFREG)
 #define S_ISREG(mode) (((mode)&_S_IFREG) == _S_IFREG)
+#else
+#define S_ISREG(mode) (0)
+#endif
 #endif
 
 /*
