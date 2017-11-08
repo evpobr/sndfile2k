@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.0.0-beta2] - 2017-11-08
+
+### Fixed
+- Appveyor CI badge
+- EditorConfig rules
+- Small fixes
+- sndfile2k-info linking to winmm library
+
+### Changed
+- Unicode open function `sf_wchar_open` is always accessible under Win32 and Cygwin
+- Travis CI tests are faster now (OSX test are disabled)
+
 ## [1.0.0-beta1] - 2017-11-07
 
 ### Fixed
@@ -37,5 +49,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `Win32` directory. Test file inside was useless, since Windows is supported now.
 - Travis CI MacOS GCC test removed
 
-[Unreleased]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta1...HEAD
+[Unreleased]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta2...HEAD
 [1.0.0-beta1]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-alpha1...v1.0.0-beta1
+[1.0.0-beta2]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta1...v1.0.0-beta2
