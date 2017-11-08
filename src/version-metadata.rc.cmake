@@ -2,8 +2,8 @@
 
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
 1 VERSIONINFO
-	FILEVERSION		@WIN_RC_VERSION@,0
-	PRODUCTVERSION	@WIN_RC_VERSION@,0
+	FILEVERSION		@VER_FILEVERSION@
+	PRODUCTVERSION	@VER_PRODUCTVERSION@
 	FILEOS			VOS__WINDOWS32
 	FILETYPE		VFT_DLL
 	FILESUBTYPE		VFT2_UNKNOWN
@@ -15,13 +15,12 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
 		BLOCK "040904e4"
 		{
 			VALUE "FileDescription", "A library for reading and writing audio files."
-			VALUE "FileVersion", "@CLEAN_VERSION@.0\0"
-			VALUE "Full Version", "@PACKAGE_VERSION@"
-			VALUE "InternalName", "libsndfile"
-			VALUE "LegalCopyright", "Copyright (C) 1999-2012, Licensed LGPL"
-			VALUE "OriginalFilename", "libsndfile-1.dll"
-			VALUE "ProductName", "libsndfile-1 DLL"
-			VALUE "ProductVersion", "@CLEAN_VERSION@.0\0"
+			VALUE "FileVersion", "@VER_FILEVERSION_STR@\0"
+			VALUE "InternalName", "sndfile2k"
+			VALUE "LegalCopyright", "Copyright (C) 2017, Licensed LGPL"
+			VALUE "OriginalFilename", "@VER_ORIGINALFILENAME_STR@"
+			VALUE "ProductName", "SndFile2K"
+			VALUE "ProductVersion", "@VER_PRODUCTVERSION_STR@\0"
 			VALUE "Language", "Language Neutral"
 		}
 	}
