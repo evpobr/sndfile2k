@@ -45,7 +45,7 @@ extern "C" {
  * types.
  */
 
-enum
+typedef enum SF_FORMAT
 {
     // Major formats.
     SF_FORMAT_WAV = 0x010000,   // Microsoft WAV format (little endian default)
@@ -113,7 +113,7 @@ enum
     SF_FORMAT_SUBMASK = 0x0000FFFF,
     SF_FORMAT_TYPEMASK = 0x0FFF0000,
     SF_FORMAT_ENDMASK = 0x30000000
-};
+} SF_FORMAT;
 
 /*
  * The following are the valid command numbers for the sf_command()
@@ -121,7 +121,7 @@ enum
  * command.html in the doc directory of the source code distribution.
  */
 
-enum
+typedef enum SF_COMMAND
 {
     SFC_GET_LIB_VERSION = 0x1000,
     SFC_GET_LOG_INFO = 0x1001,
@@ -218,7 +218,7 @@ enum
      */
     SFC_SET_ADD_DITHER_ON_WRITE = 0x1070,
     SFC_SET_ADD_DITHER_ON_READ = 0x1071
-};
+} SF_COMMAND;
 
 /*
  * String types that can be set and read from files. Not all file types
@@ -226,7 +226,7 @@ enum
  * all string types.
  */
 
-enum
+typedef enum SF_STR_FIELD
 {
     SF_STR_TITLE = 0x01,
     SF_STR_COPYRIGHT = 0x02,
@@ -238,7 +238,7 @@ enum
     SF_STR_LICENSE = 0x08,
     SF_STR_TRACKNUMBER = 0x09,
     SF_STR_GENRE = 0x10
-};
+} SF_STR_FIELD;
 
 /*
  * Use the following as the start and end index when doing metadata
@@ -248,20 +248,26 @@ enum
 #define SF_STR_FIRST SF_STR_TITLE
 #define SF_STR_LAST SF_STR_GENRE
 
-enum
+typedef enum SF_BOOL
 {
     // True and false
     SF_FALSE = 0,
     SF_TRUE = 1,
+} SF_BOOL;
 
+typedef enum SF_FILEMODE
+{
     // Modes for opening files
     SFM_READ = 0x10,
     SFM_WRITE = 0x20,
     SFM_RDWR = 0x30,
+} SF_FILEMODE;
 
+typedef enum SF_AMBISONIC_MODE
+{
     SF_AMBISONIC_NONE = 0x40,
     SF_AMBISONIC_B_FORMAT = 0x41
-};
+} SF_AMBISONIC_MODE;
 
 /* 
  * Public error values. These are guaranteed to remain unchanged for the duration
@@ -270,20 +276,20 @@ enum
  * the library which can change at any time.
  */
 
-enum
+typedef enum SF_ERR
 {
     SF_ERR_NO_ERROR = 0,
     SF_ERR_UNRECOGNISED_FORMAT = 1,
     SF_ERR_SYSTEM = 2,
     SF_ERR_MALFORMED_FILE = 3,
     SF_ERR_UNSUPPORTED_ENCODING = 4
-};
+} SF_ERR;
 
 /*
  * Channel map values (used with SFC_SET/GET_CHANNEL_MAP).
  */
 
-enum
+typedef enum SF_CHANNEL_MAP
 {
     SF_CHANNEL_MAP_INVALID = 0,
     SF_CHANNEL_MAP_MONO = 1,
@@ -315,7 +321,7 @@ enum
     SF_CHANNEL_MAP_AMBISONIC_B_Z,
 
     SF_CHANNEL_MAP_MAX
-};
+} SF_CHANNEL_MAP;
 
 // A SNDFILE* pointer can be passed around much like stdio.h's FILE* pointer
 
@@ -338,7 +344,7 @@ typedef int64_t sf_count_t;
  * sf_open ().
  */
 
-struct SF_INFO
+typedef struct SF_INFO
 {
     sf_count_t frames;
     int samplerate;
@@ -346,9 +352,7 @@ struct SF_INFO
     int format;
     int sections;
     int seekable;
-};
-
-typedef struct SF_INFO SF_INFO;
+} SF_INFO;
 
 /*
  * The SF_FORMAT_INFO struct is used to retrieve information about the sound
@@ -359,7 +363,7 @@ typedef struct SF_INFO SF_INFO;
  * re-compilation of the application.
  */
 
-typedef struct
+typedef struct SF_FORMAT_INFO
 {
     int format;
     const char *name;
@@ -368,7 +372,7 @@ typedef struct
 
 // Enums and typedefs for adding dither on read and write.
 
-enum
+typedef enum SF_DITHER_TYPE
 {
     SFD_DEFAULT_LEVEL = 0,
     SFD_CUSTOM_LEVEL = 0x40000000,
@@ -376,9 +380,9 @@ enum
     SFD_NO_DITHER = 500,
     SFD_WHITE = 501,
     SFD_TRIANGULAR_PDF = 502
-};
+} SF_DITHER_TYPE;
 
-typedef struct
+typedef struct SF_DITHER_INFO
 {
     int type;
     double level;
@@ -390,7 +394,7 @@ typedef struct
  * larger file. See SFC_GET_EMBED_FILE_INFO.
  */
 
-typedef struct
+typedef struct SF_EMBED_FILE_INFO
 {
     sf_count_t offset;
     sf_count_t length;
@@ -398,7 +402,7 @@ typedef struct
 
 // Struct used to retrieve cue marker information from a file
 
-typedef struct
+typedef struct SF_CUE_POINT
 {
     int32_t indx;
     uint32_t position;
@@ -420,7 +424,7 @@ typedef SF_CUES_VAR(100) SF_CUES;
 
 // Structs used to retrieve music sample information from a file.
 
-enum
+typedef enum SF_LOOP_MODE
 {
 
     // The loop mode field in SF_INSTRUMENT will be one of the following.
@@ -428,9 +432,9 @@ enum
     SF_LOOP_FORWARD,
     SF_LOOP_BACKWARD,
     SF_LOOP_ALTERNATING
-};
+} SF_LOOP_MODE;
 
-typedef struct
+typedef struct SF_INSTRUMENT
 {
     int gain;
     char basenote, detune;
@@ -448,7 +452,7 @@ typedef struct
 } SF_INSTRUMENT;
 
 // Struct used to retrieve loop information from a file
-typedef struct
+typedef struct SF_LOOP_INFO
 {
     short time_sig_num; // any positive integer    > 0
     short time_sig_den; // any positive power of 2 > 0
@@ -496,13 +500,11 @@ struct                                          \
 // SF_BROADCAST_INFO is the above struct with coding_history field of 256 bytes
 typedef SF_BROADCAST_INFO_VAR(256) SF_BROADCAST_INFO;
 
-struct SF_CART_TIMER
+typedef struct SF_CART_TIMER
 {
     char usage[4];
     int32_t value;
-};
-
-typedef struct SF_CART_TIMER SF_CART_TIMER;
+} SF_CART_TIMER;
 
 #define SF_CART_INFO_VAR(p_tag_text_size) \
 struct                                    \
@@ -542,16 +544,15 @@ typedef sf_count_t (*sf_vio_write)(const void *ptr, sf_count_t count,
                                    void *user_data);
 typedef sf_count_t (*sf_vio_tell)(void *user_data);
 
-struct SF_VIRTUAL_IO
+typedef struct SF_VIRTUAL_IO
 {
     sf_vio_get_filelen get_filelen;
     sf_vio_seek seek;
     sf_vio_read read;
     sf_vio_write write;
     sf_vio_tell tell;
-};
+} SF_VIRTUAL_IO;
 
-typedef struct SF_VIRTUAL_IO SF_VIRTUAL_IO;
 
 #include "sndfile2k_export.h"
 
@@ -635,12 +636,12 @@ SNDFILE2K_EXPORT int sf_format_check(const SF_INFO *info);
  * On error all of these functions return -1.
  */
 
-enum
+typedef enum SF_SEEK_MODE
 {
     SF_SEEK_SET = SEEK_SET,
     SF_SEEK_CUR = SEEK_CUR,
     SF_SEEK_END = SEEK_END
-};
+} SF_SEEK_MODE;
 
 SNDFILE2K_EXPORT sf_count_t sf_seek(SNDFILE *sndfile, sf_count_t frames,
                                     int whence);
