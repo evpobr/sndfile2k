@@ -218,7 +218,7 @@ static sf_count_t dpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
 {
 	BUF_UNION ubuf;
 	XI_PRIVATE *pxi;
-	int total, bufferlen, len;
+    size_t total, bufferlen, len;
 
 	if ((pxi = psf->codec_data) == NULL)
 		return SFE_INTERNAL;
@@ -609,7 +609,7 @@ static size_t dpcm_read_dsc2f(SF_PRIVATE *psf, float *ptr, size_t len)
 	if ((pxi = psf->codec_data) == NULL)
 		return 0;
 
-	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80) : 1.0);
 
 	bufferlen = ARRAY_LEN(ubuf.ucbuf);
 
@@ -723,7 +723,7 @@ static size_t dpcm_read_dles2f(SF_PRIVATE *psf, float *ptr, size_t len)
 	if ((pxi = psf->codec_data) == NULL)
 		return 0;
 
-	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
 
 	bufferlen = ARRAY_LEN(ubuf.sbuf);
 
@@ -773,22 +773,22 @@ static size_t dpcm_read_dles2d(SF_PRIVATE *psf, double *ptr, size_t len)
 }
 
 static void s2dsc_array(XI_PRIVATE *pxi, const short *src, signed char *dest,
-                        int count);
+                        size_t count);
 static void i2dsc_array(XI_PRIVATE *pxi, const int *src, signed char *dest,
-                        int count);
+                        size_t count);
 static void f2dsc_array(XI_PRIVATE *pxi, const float *src, signed char *dest,
-                        int count, float normfact);
+                        size_t count, float normfact);
 static void d2dsc_array(XI_PRIVATE *pxi, const double *src, signed char *dest,
-                        int count, double normfact);
+                        size_t count, double normfact);
 
 static void s2dles_array(XI_PRIVATE *pxi, const short *src, short *dest,
-                         int count);
+                         size_t count);
 static void i2dles_array(XI_PRIVATE *pxi, const int *src, short *dest,
-                         int count);
+                         size_t count);
 static void f2dles_array(XI_PRIVATE *pxi, const float *src, short *dest,
-                         int count, float normfact);
+                         size_t count, float normfact);
 static void d2dles_array(XI_PRIVATE *pxi, const double *src, short *dest,
-                         int count, double normfact);
+                         size_t count, double normfact);
 
 static size_t dpcm_write_s2dsc(SF_PRIVATE *psf, const short *ptr, size_t len)
 {
@@ -857,7 +857,7 @@ static size_t dpcm_write_f2dsc(SF_PRIVATE *psf, const float *ptr, size_t len)
 	if ((pxi = psf->codec_data) == NULL)
 		return 0;
 
-	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7F) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x7F) : 1.0);
 
 	bufferlen = ARRAY_LEN(ubuf.ucbuf);
 
@@ -973,7 +973,7 @@ static size_t dpcm_write_f2dles(SF_PRIVATE *psf, const float *ptr, size_t len)
 	if ((pxi = psf->codec_data) == NULL)
 		return 0;
 
-	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0);
 
 	bufferlen = ARRAY_LEN(ubuf.sbuf);
 
@@ -1091,10 +1091,10 @@ static void dsc2d_array(XI_PRIVATE *pxi, signed char *src, size_t count,
 }
 
 static void s2dsc_array(XI_PRIVATE *pxi, const short *src, signed char *dest,
-                        int count)
+                        size_t count)
 {
 	signed char last_val, current;
-	int k;
+    size_t k;
 
 	last_val = pxi->last_16 >> 8;
 
@@ -1109,10 +1109,10 @@ static void s2dsc_array(XI_PRIVATE *pxi, const short *src, signed char *dest,
 }
 
 static void i2dsc_array(XI_PRIVATE *pxi, const int *src, signed char *dest,
-                        int count)
+                        size_t count)
 {
 	signed char last_val, current;
-	int k;
+    size_t k;
 
 	last_val = pxi->last_16 >> 8;
 
@@ -1127,16 +1127,16 @@ static void i2dsc_array(XI_PRIVATE *pxi, const int *src, signed char *dest,
 }
 
 static void f2dsc_array(XI_PRIVATE *pxi, const float *src, signed char *dest,
-                        int count, float normfact)
+                        size_t count, float normfact)
 {
 	signed char last_val, current;
-	int k;
+    size_t k;
 
 	last_val = pxi->last_16 >> 8;
 
 	for (k = 0; k < count; k++)
 	{
-		current = lrintf(src[k] * normfact);
+		current = (signed char)lrintf(src[k] * normfact);
 		dest[k] = current - last_val;
 		last_val = current;
 	};
@@ -1145,16 +1145,16 @@ static void f2dsc_array(XI_PRIVATE *pxi, const float *src, signed char *dest,
 }
 
 static void d2dsc_array(XI_PRIVATE *pxi, const double *src, signed char *dest,
-                        int count, double normfact)
+                        size_t count, double normfact)
 {
 	signed char last_val, current;
-	int k;
+    size_t k;
 
 	last_val = pxi->last_16 >> 8;
 
 	for (k = 0; k < count; k++)
 	{
-		current = lrint(src[k] * normfact);
+		current = (signed char)lrint(src[k] * normfact);
 		dest[k] = current - last_val;
 		last_val = current;
 	};
@@ -1230,10 +1230,10 @@ static void dles2d_array(XI_PRIVATE *pxi, short *src, size_t count,
 }
 
 static void s2dles_array(XI_PRIVATE *pxi, const short *src, short *dest,
-                         int count)
+                         size_t count)
 {
 	short diff, last_val;
-	int k;
+    size_t k;
 
 	last_val = pxi->last_16;
 
@@ -1248,10 +1248,10 @@ static void s2dles_array(XI_PRIVATE *pxi, const short *src, short *dest,
 }
 
 static void i2dles_array(XI_PRIVATE *pxi, const int *src, short *dest,
-                         int count)
+                         size_t count)
 {
 	short diff, last_val;
-	int k;
+    size_t k;
 
 	last_val = pxi->last_16;
 
@@ -1266,16 +1266,16 @@ static void i2dles_array(XI_PRIVATE *pxi, const int *src, short *dest,
 }
 
 static void f2dles_array(XI_PRIVATE *pxi, const float *src, short *dest,
-                         int count, float normfact)
+                         size_t count, float normfact)
 {
 	short diff, last_val, current;
-	int k;
+    size_t k;
 
 	last_val = pxi->last_16;
 
 	for (k = 0; k < count; k++)
 	{
-		current = lrintf(src[k] * normfact);
+		current = (short)lrintf(src[k] * normfact);
 		diff = current - last_val;
 		dest[k] = LE2H_16(diff);
 		last_val = current;
@@ -1285,16 +1285,16 @@ static void f2dles_array(XI_PRIVATE *pxi, const float *src, short *dest,
 }
 
 static void d2dles_array(XI_PRIVATE *pxi, const double *src, short *dest,
-                         int count, double normfact)
+                         size_t count, double normfact)
 {
 	short diff, last_val, current;
-	int k;
+    size_t k;
 
 	last_val = pxi->last_16;
 
 	for (k = 0; k < count; k++)
 	{
-		current = lrint(src[k] * normfact);
+		current = (short)lrint(src[k] * normfact);
 		diff = current - last_val;
 		dest[k] = LE2H_16(diff);
 		last_val = current;
