@@ -331,8 +331,8 @@ sf_count_t psf_fseek(SF_PRIVATE *psf, sf_count_t offset, int whence)
     return new_position;
 }
 
-sf_count_t psf_fread(void *ptr, sf_count_t bytes, sf_count_t items,
-                     SF_PRIVATE *psf)
+size_t psf_fread(void *ptr, size_t bytes, size_t items,
+                 SF_PRIVATE *psf)
 {
     sf_count_t total = 0;
     ssize_t count;
@@ -375,8 +375,8 @@ sf_count_t psf_fread(void *ptr, sf_count_t bytes, sf_count_t items,
     return total / bytes;
 }
 
-sf_count_t psf_fwrite(const void *ptr, sf_count_t bytes, sf_count_t items,
-                      SF_PRIVATE *psf)
+size_t psf_fwrite(const void *ptr, size_t bytes, size_t items,
+                  SF_PRIVATE *psf)
 {
     sf_count_t total = 0;
     ssize_t count;
@@ -460,7 +460,7 @@ static int psf_close_fd(int fd)
     return retval;
 }
 
-sf_count_t psf_fgets(char *buffer, sf_count_t bufsize, SF_PRIVATE *psf)
+sf_count_t psf_fgets(char *buffer, size_t bufsize, SF_PRIVATE *psf)
 {
     sf_count_t k = 0;
     sf_count_t count;
@@ -1015,11 +1015,11 @@ sf_count_t psf_fseek(SF_PRIVATE *psf, sf_count_t offset, int whence)
     return new_position;
 }
 
-sf_count_t psf_fread(void *ptr, sf_count_t bytes, sf_count_t items,
-                     SF_PRIVATE *psf)
+size_t psf_fread(void *ptr, size_t bytes, size_t items,
+                 SF_PRIVATE *psf)
 {
-    sf_count_t total = 0;
-    ssize_t count;
+    size_t total = 0;
+    size_t count;
     DWORD dwNumberOfBytesRead;
 
     if (psf->virtual_io)
@@ -1034,7 +1034,7 @@ sf_count_t psf_fread(void *ptr, sf_count_t bytes, sf_count_t items,
     while (items > 0)
     {
         /* Break the writes down to a sensible size. */
-        count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : (ssize_t)items;
+        count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : items;
 
         if (ReadFile(psf->file.handle, ((char *)ptr) + total, count,
                      &dwNumberOfBytesRead, 0) == 0)
@@ -1060,11 +1060,11 @@ sf_count_t psf_fread(void *ptr, sf_count_t bytes, sf_count_t items,
     return total / bytes;
 }
 
-sf_count_t psf_fwrite(const void *ptr, sf_count_t bytes, sf_count_t items,
-                      SF_PRIVATE *psf)
+size_t psf_fwrite(const void *ptr, size_t bytes, size_t items,
+                  SF_PRIVATE *psf)
 {
-    sf_count_t total = 0;
-    ssize_t count;
+    size_t total = 0;
+    size_t count;
     DWORD dwNumberOfBytesWritten;
 
     if (psf->virtual_io)
@@ -1150,7 +1150,7 @@ static int psf_close_handle(HANDLE handle)
     return 0;
 }
 
-sf_count_t psf_fgets(char *buffer, sf_count_t bufsize, SF_PRIVATE *psf)
+sf_count_t psf_fgets(char *buffer, size_t bufsize, SF_PRIVATE *psf)
 {
     sf_count_t k = 0;
     sf_count_t count;

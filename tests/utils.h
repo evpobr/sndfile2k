@@ -31,7 +31,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdarg.h>
 
-#define ARRAY_LEN(x) ((int)(sizeof(x)) / (sizeof((x)[0])))
+#define ARRAY_LEN(x) (sizeof(x)) / (sizeof((x)[0]))
 #define SIGNED_SIZEOF(x) ((int64_t)(sizeof(x)))
 #define ABS(x) ((x) >= 0 ? (x) : -(x))
 

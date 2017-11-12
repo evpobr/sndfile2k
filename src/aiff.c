@@ -219,7 +219,7 @@ static int aiff_write_header(SF_PRIVATE *psf, int calc_length);
 static int aiff_write_tailer(SF_PRIVATE *psf);
 static void aiff_write_strings(SF_PRIVATE *psf, int location);
 
-static int aiff_command(SF_PRIVATE *psf, int command, void *data, int datasize);
+static size_t aiff_command(SF_PRIVATE *psf, int command, void *data, size_t datasize);
 
 static const char *get_loop_mode_str(int16_t mode);
 
@@ -1810,8 +1810,8 @@ static void aiff_write_strings(SF_PRIVATE *psf, int location)
     return;
 }
 
-static int aiff_command(SF_PRIVATE *psf, int command, void *UNUSED(data),
-                        int UNUSED(datasize))
+static size_t aiff_command(SF_PRIVATE *psf, int command, void *UNUSED(data),
+                           size_t UNSUED(datasize))
 {
     AIFF_PRIVATE *paiff;
 

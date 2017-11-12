@@ -57,7 +57,7 @@ SF_PRIVATE *psf_allocate(void)
 
 static int psf_bump_header_allocation(SF_PRIVATE *psf, sf_count_t needed)
 {
-    sf_count_t newlen, smallest = INITIAL_HEADER_SIZE;
+    size_t newlen, smallest = INITIAL_HEADER_SIZE;
     void *ptr;
 
     newlen = (needed > psf->header.len) ? 2 * SF_MAX(needed, smallest)
@@ -72,7 +72,7 @@ static int psf_bump_header_allocation(SF_PRIVATE *psf, sf_count_t needed)
 
     if ((ptr = realloc(psf->header.ptr, newlen)) == NULL)
     {
-        psf_log_printf(psf, "realloc (%p, %D) failed\n", psf->header.ptr,
+        psf_log_printf(psf, "realloc (%p, %z) failed\n", psf->header.ptr,
                        newlen);
         psf->error = SFE_MALLOC_FAILED;
         return 1;
@@ -910,9 +910,9 @@ int psf_binheader_writef(SF_PRIVATE *psf, const char *format, ...)
      (((sf_count_t)(ptr)[4]) << 24) | (((sf_count_t)(ptr)[5]) << 16) | \
      (((sf_count_t)(ptr)[6]) << 8) | ((ptr)[7]))
 
-static int header_read(SF_PRIVATE *psf, void *ptr, int bytes)
+static size_t header_read(SF_PRIVATE *psf, void *ptr, size_t bytes)
 {
-    int count = 0;
+    size_t count = 0;
 
     if (psf->header.indx + bytes >= psf->header.len &&
         psf_bump_header_allocation(psf, bytes))
@@ -922,7 +922,7 @@ static int header_read(SF_PRIVATE *psf, void *ptr, int bytes)
     {
         count = psf_fread(psf->header.ptr + psf->header.end, 1,
                           bytes - (psf->header.end - psf->header.indx), psf);
-        if (count != bytes - (int)(psf->header.end - psf->header.indx))
+        if (count != bytes - (psf->header.end - psf->header.indx))
         {
             psf_log_printf(psf, "Error : psf_fread returned short count.\n");
             return count;
@@ -1677,25 +1677,29 @@ const char *str_of_endianness(int end)
     return "";
 }
 
-void psf_f2s_array(const float *src, short *dest, int count, int normalize)
+void psf_f2s_array(const float *src, short *dest, size_t count, int normalize)
 {
     float normfact;
 
     normfact = normalize ? (1.0 * 0x7FFF) : 1.0;
-    while (--count >= 0)
+    while (count)
+    {
+        count--;
         dest[count] = lrintf(src[count] * normfact);
+    }
 
     return;
 }
 
-void psf_f2s_clip_array(const float *src, short *dest, int count, int normalize)
+void psf_f2s_clip_array(const float *src, short *dest, size_t count, int normalize)
 {
     float normfact, scaled_value;
 
     normfact = normalize ? (1.0 * 0x8000) : 1.0;
 
-    while (--count >= 0)
+    while (count)
     {
+        count--;
         scaled_value = src[count] * normfact;
         if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFF))
         {
@@ -1714,26 +1718,30 @@ void psf_f2s_clip_array(const float *src, short *dest, int count, int normalize)
     return;
 }
 
-void psf_d2s_array(const double *src, short *dest, int count, int normalize)
+void psf_d2s_array(const double *src, short *dest, size_t count, int normalize)
 {
     double normfact;
 
     normfact = normalize ? (1.0 * 0x7FFF) : 1.0;
-    while (--count >= 0)
+    while (count)
+    {
+        count--;
         dest[count] = lrint(src[count] * normfact);
+    }
 
     return;
 }
 
-void psf_d2s_clip_array(const double *src, short *dest, int count,
+void psf_d2s_clip_array(const double *src, short *dest, size_t count,
                         int normalize)
 {
     double normfact, scaled_value;
 
     normfact = normalize ? (1.0 * 0x8000) : 1.0;
 
-    while (--count >= 0)
+    while (count)
     {
+        count--;
         scaled_value = src[count] * normfact;
         if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFF))
         {
@@ -1752,25 +1760,29 @@ void psf_d2s_clip_array(const double *src, short *dest, int count,
     return;
 }
 
-void psf_f2i_array(const float *src, int *dest, int count, int normalize)
+void psf_f2i_array(const float *src, int *dest, size_t count, int normalize)
 {
     float normfact;
 
     normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0;
-    while (--count >= 0)
+    while (count)
+    {
+        count--;
         dest[count] = lrintf(src[count] * normfact);
+    }
 
     return;
 }
 
-void psf_f2i_clip_array(const float *src, int *dest, int count, int normalize)
+void psf_f2i_clip_array(const float *src, int *dest, size_t count, int normalize)
 {
     float normfact, scaled_value;
 
     normfact = normalize ? (8.0 * 0x10000000) : 1.0;
 
-    while (--count >= 0)
+    while (count)
     {
+        count--;
         scaled_value = src[count] * normfact;
         if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
         {
@@ -1789,25 +1801,29 @@ void psf_f2i_clip_array(const float *src, int *dest, int count, int normalize)
     return;
 }
 
-void psf_d2i_array(const double *src, int *dest, int count, int normalize)
+void psf_d2i_array(const double *src, int *dest, size_t count, int normalize)
 {
     double normfact;
 
     normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0;
-    while (--count >= 0)
+    while (count)
+    {
+        count--;
         dest[count] = lrint(src[count] * normfact);
+    }
 
     return;
 }
 
-void psf_d2i_clip_array(const double *src, int *dest, int count, int normalize)
+void psf_d2i_clip_array(const double *src, int *dest, size_t count, int normalize)
 {
     double normfact, scaled_value;
 
     normfact = normalize ? (8.0 * 0x10000000) : 1.0;
 
-    while (--count >= 0)
+    while (count)
     {
+        count--;
         scaled_value = src[count] * normfact;
         if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
         {

@@ -83,24 +83,24 @@ typedef int convert_func(SF_PRIVATE *psf, int, void *, int, int, float **);
 static int vorbis_read_header(SF_PRIVATE *psf, int log_data);
 static int vorbis_write_header(SF_PRIVATE *psf, int calc_length);
 static int vorbis_close(SF_PRIVATE *psf);
-static int vorbis_command(SF_PRIVATE *psf, int command, void *data,
-                          int datasize);
+static size_t vorbis_command(SF_PRIVATE *psf, int command, void *data,
+                          size_t datasize);
 static int vorbis_byterate(SF_PRIVATE *psf);
 static sf_count_t vorbis_seek(SF_PRIVATE *psf, int mode, sf_count_t offset);
-static sf_count_t vorbis_read_s(SF_PRIVATE *psf, short *ptr, sf_count_t len);
-static sf_count_t vorbis_read_i(SF_PRIVATE *psf, int *ptr, sf_count_t len);
-static sf_count_t vorbis_read_f(SF_PRIVATE *psf, float *ptr, sf_count_t len);
-static sf_count_t vorbis_read_d(SF_PRIVATE *psf, double *ptr, sf_count_t len);
-static sf_count_t vorbis_write_s(SF_PRIVATE *psf, const short *ptr,
-                                 sf_count_t len);
-static sf_count_t vorbis_write_i(SF_PRIVATE *psf, const int *ptr,
-                                 sf_count_t len);
-static sf_count_t vorbis_write_f(SF_PRIVATE *psf, const float *ptr,
-                                 sf_count_t len);
-static sf_count_t vorbis_write_d(SF_PRIVATE *psf, const double *ptr,
-                                 sf_count_t len);
-static sf_count_t vorbis_read_sample(SF_PRIVATE *psf, void *ptr,
-                                     sf_count_t lens, convert_func *transfn);
+static size_t vorbis_read_s(SF_PRIVATE *psf, short *ptr, size_t len);
+static size_t vorbis_read_i(SF_PRIVATE *psf, int *ptr, size_t len);
+static size_t vorbis_read_f(SF_PRIVATE *psf, float *ptr, size_t len);
+static size_t vorbis_read_d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t vorbis_write_s(SF_PRIVATE *psf, const short *ptr,
+                             size_t len);
+static size_t vorbis_write_i(SF_PRIVATE *psf, const int *ptr,
+                             size_t len);
+static size_t vorbis_write_f(SF_PRIVATE *psf, const float *ptr,
+                             size_t len);
+static size_t vorbis_write_d(SF_PRIVATE *psf, const double *ptr,
+                             size_t len);
+static size_t vorbis_read_sample(SF_PRIVATE *psf, void *ptr,
+                                 size_t lens, convert_func *transfn);
 static sf_count_t vorbis_length(SF_PRIVATE *psf);
 
 typedef struct
@@ -636,8 +636,8 @@ int ogg_vorbis_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int vorbis_command(SF_PRIVATE *psf, int command, void *data,
-                          int datasize)
+static size_t vorbis_command(SF_PRIVATE *psf, int command, void *data,
+                             size_t datasize)
 {
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
 
@@ -739,12 +739,12 @@ static int vorbis_rdouble(SF_PRIVATE *UNUSED(psf), int samples, void *vptr,
     return i;
 }
 
-static sf_count_t vorbis_read_sample(SF_PRIVATE *psf, void *ptr,
-                                     sf_count_t lens, convert_func *transfn)
+static size_t vorbis_read_sample(SF_PRIVATE *psf, void *ptr,
+                                 size_t lens, convert_func *transfn)
 {
     VORBIS_PRIVATE *vdata = psf->codec_data;
     OGG_PRIVATE *odata = psf->container_data;
-    int len, samples, i = 0;
+    size_t len, samples, i = 0;
     float **pcm;
 
     len = lens / psf->sf.channels;
@@ -842,22 +842,22 @@ static sf_count_t vorbis_read_sample(SF_PRIVATE *psf, void *ptr,
     return i;
 }
 
-static sf_count_t vorbis_read_s(SF_PRIVATE *psf, short *ptr, sf_count_t lens)
+static size_t vorbis_read_s(SF_PRIVATE *psf, short *ptr, size_t lens)
 {
     return vorbis_read_sample(psf, (void *)ptr, lens, vorbis_rshort);
 }
 
-static sf_count_t vorbis_read_i(SF_PRIVATE *psf, int *ptr, sf_count_t lens)
+static size_t vorbis_read_i(SF_PRIVATE *psf, int *ptr, size_t lens)
 {
     return vorbis_read_sample(psf, (void *)ptr, lens, vorbis_rint);
 }
 
-static sf_count_t vorbis_read_f(SF_PRIVATE *psf, float *ptr, sf_count_t lens)
+static size_t vorbis_read_f(SF_PRIVATE *psf, float *ptr, size_t lens)
 {
     return vorbis_read_sample(psf, (void *)ptr, lens, vorbis_rfloat);
 }
 
-static sf_count_t vorbis_read_d(SF_PRIVATE *psf, double *ptr, sf_count_t lens)
+static size_t vorbis_read_d(SF_PRIVATE *psf, double *ptr, size_t lens)
 {
     return vorbis_read_sample(psf, (void *)ptr, lens, vorbis_rdouble);
 }
@@ -906,13 +906,13 @@ static void vorbis_write_samples(SF_PRIVATE *psf, OGG_PRIVATE *odata,
     vdata->loc += in_frames;
 }
 
-static sf_count_t vorbis_write_s(SF_PRIVATE *psf, const short *ptr,
-                                 sf_count_t lens)
+static size_t vorbis_write_s(SF_PRIVATE *psf, const short *ptr,
+                             size_t lens)
 {
-    int i, m, j = 0;
+    size_t i, m, j = 0;
     OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
-    int in_frames = lens / psf->sf.channels;
+    size_t in_frames = lens / psf->sf.channels;
     float **buffer = vorbis_analysis_buffer(&vdata->vdsp, in_frames);
     for (i = 0; i < in_frames; i++)
         for (m = 0; m < psf->sf.channels; m++)
@@ -923,10 +923,10 @@ static sf_count_t vorbis_write_s(SF_PRIVATE *psf, const short *ptr,
     return lens;
 }
 
-static sf_count_t vorbis_write_i(SF_PRIVATE *psf, const int *ptr,
-                                 sf_count_t lens)
+static size_t vorbis_write_i(SF_PRIVATE *psf, const int *ptr,
+                             size_t lens)
 {
-    int i, m, j = 0;
+    size_t i, m, j = 0;
     OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
     int in_frames = lens / psf->sf.channels;
@@ -940,13 +940,13 @@ static sf_count_t vorbis_write_i(SF_PRIVATE *psf, const int *ptr,
     return lens;
 }
 
-static sf_count_t vorbis_write_f(SF_PRIVATE *psf, const float *ptr,
-                                 sf_count_t lens)
+static size_t vorbis_write_f(SF_PRIVATE *psf, const float *ptr,
+                             size_t lens)
 {
-    int i, m, j = 0;
+    size_t i, m, j = 0;
     OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
-    int in_frames = lens / psf->sf.channels;
+    size_t in_frames = lens / psf->sf.channels;
     float **buffer = vorbis_analysis_buffer(&vdata->vdsp, in_frames);
     for (i = 0; i < in_frames; i++)
         for (m = 0; m < psf->sf.channels; m++)
@@ -957,13 +957,13 @@ static sf_count_t vorbis_write_f(SF_PRIVATE *psf, const float *ptr,
     return lens;
 }
 
-static sf_count_t vorbis_write_d(SF_PRIVATE *psf, const double *ptr,
-                                 sf_count_t lens)
+static size_t vorbis_write_d(SF_PRIVATE *psf, const double *ptr,
+                             size_t lens)
 {
-    int i, m, j = 0;
+    size_t i, m, j = 0;
     OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
-    int in_frames = lens / psf->sf.channels;
+    size_t in_frames = lens / psf->sf.channels;
     float **buffer = vorbis_analysis_buffer(&vdata->vdsp, in_frames);
     for (i = 0; i < in_frames; i++)
         for (m = 0; m < psf->sf.channels; m++)

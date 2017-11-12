@@ -98,7 +98,7 @@ static void test_oki_adpcm_block(void)
     if (ARRAY_LEN(adpcm.pcm) < ARRAY_LEN(test_pcm))
     {
         printf("\n\nLine %d : ARRAY_LEN (adpcm->pcm) > ARRAY_LEN (test_pcm) "
-               "(%d > %d).\n\n",
+               "(%zu > %zu).\n\n",
                __LINE__, ARRAY_LEN(adpcm.pcm), ARRAY_LEN(test_pcm));
         exit(1);
     };
@@ -123,7 +123,7 @@ static void test_oki_adpcm_block(void)
 
     if (adpcm.code_count * 2 != ARRAY_LEN(test_pcm))
     {
-        printf("\n\nLine %d : %d * 2 != %d\n\n", __LINE__, adpcm.code_count * 2,
+        printf("\n\nLine %d : %d * 2 != %zu\n\n", __LINE__, adpcm.code_count * 2,
                ARRAY_LEN(test_pcm));
         exit(1);
     };
@@ -151,7 +151,7 @@ static void test_oki_adpcm_block(void)
 
     if (adpcm.pcm_count != 2 * ARRAY_LEN(test_codes))
     {
-        printf("\n\nLine %d : %d * 2 != %d\n\n", __LINE__, adpcm.pcm_count,
+        printf("\n\nLine %d : %d * 2 != %zu\n\n", __LINE__, adpcm.pcm_count,
                2 * ARRAY_LEN(test_codes));
         exit(1);
     };

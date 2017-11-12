@@ -68,8 +68,8 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign,
 static int rf64_write_header(SF_PRIVATE *psf, int calc_length);
 static int rf64_write_tailer(SF_PRIVATE *psf);
 static int rf64_close(SF_PRIVATE *psf);
-static int rf64_command(SF_PRIVATE *psf, int command, void *UNUSED(data),
-                        int datasize);
+static size_t rf64_command(SF_PRIVATE *psf, int command, void *UNUSED(data),
+                           size_t datasize);
 
 static int rf64_set_chunk(SF_PRIVATE *psf, const SF_CHUNK_INFO *chunk_info);
 static SF_CHUNK_ITERATOR *rf64_next_chunk_iterator(SF_PRIVATE *psf,
@@ -923,8 +923,8 @@ static int rf64_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static int rf64_command(SF_PRIVATE *psf, int command, void *UNUSED(data),
-                        int datasize)
+static size_t rf64_command(SF_PRIVATE *psf, int command, void *UNUSED(data),
+                           size_t datasize)
 {
     WAVLIKE_PRIVATE *wpriv;
 

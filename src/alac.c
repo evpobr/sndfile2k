@@ -76,18 +76,18 @@ static int alac_writer_init(SF_PRIVATE *psf);
 
 static sf_count_t alac_reader_calc_frames(SF_PRIVATE *psf, ALAC_PRIVATE *plac);
 
-static sf_count_t alac_read_s(SF_PRIVATE *psf, short *ptr, sf_count_t len);
-static sf_count_t alac_read_i(SF_PRIVATE *psf, int *ptr, sf_count_t len);
-static sf_count_t alac_read_f(SF_PRIVATE *psf, float *ptr, sf_count_t len);
-static sf_count_t alac_read_d(SF_PRIVATE *psf, double *ptr, sf_count_t len);
+static size_t alac_read_s(SF_PRIVATE *psf, short *ptr, size_t len);
+static size_t alac_read_i(SF_PRIVATE *psf, int *ptr, size_t len);
+static size_t alac_read_f(SF_PRIVATE *psf, float *ptr, size_t len);
+static size_t alac_read_d(SF_PRIVATE *psf, double *ptr, size_t len);
 
-static sf_count_t alac_write_s(SF_PRIVATE *psf, const short *ptr,
-                               sf_count_t len);
-static sf_count_t alac_write_i(SF_PRIVATE *psf, const int *ptr, sf_count_t len);
-static sf_count_t alac_write_f(SF_PRIVATE *psf, const float *ptr,
-                               sf_count_t len);
-static sf_count_t alac_write_d(SF_PRIVATE *psf, const double *ptr,
-                               sf_count_t len);
+static size_t alac_write_s(SF_PRIVATE *psf, const short *ptr,
+                           size_t len);
+static size_t alac_write_i(SF_PRIVATE *psf, const int *ptr, size_t len);
+static size_t alac_write_f(SF_PRIVATE *psf, const float *ptr,
+                           size_t len);
+static size_t alac_write_d(SF_PRIVATE *psf, const double *ptr,
+                           size_t len);
 
 static sf_count_t alac_seek(SF_PRIVATE *psf, int mode, sf_count_t offset);
 
@@ -183,7 +183,7 @@ static int alac_close(SF_PRIVATE *psf)
     {
         ALAC_ENCODER *penc = &plac->encoder;
         SF_CHUNK_INFO chunk_info;
-        sf_count_t readcount;
+        size_t readcount;
         uint8_t kuki_data[1024];
         uint32_t pakt_size = 0, saved_partial_block_frames;
 
@@ -504,12 +504,12 @@ static int alac_encode_block(ALAC_PRIVATE *plac)
  * ALAC read functions.
  */
 
-static sf_count_t alac_read_s(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+static size_t alac_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
 {
     ALAC_PRIVATE *plac;
     int *iptr;
-    int k, readcount;
-    sf_count_t total = 0;
+    size_t k, readcount;
+    size_t total = 0;
 
     if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
         return 0;
@@ -537,12 +537,12 @@ static sf_count_t alac_read_s(SF_PRIVATE *psf, short *ptr, sf_count_t len)
     return total;
 }
 
-static sf_count_t alac_read_i(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+static size_t alac_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
 {
     ALAC_PRIVATE *plac;
     int *iptr;
-    int k, readcount;
-    sf_count_t total = 0;
+    size_t k, readcount;
+    size_t total = 0;
 
     if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
         return 0;
@@ -570,12 +570,12 @@ static sf_count_t alac_read_i(SF_PRIVATE *psf, int *ptr, sf_count_t len)
     return total;
 }
 
-static sf_count_t alac_read_f(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+static size_t alac_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
 {
     ALAC_PRIVATE *plac;
     int *iptr;
-    int k, readcount;
-    sf_count_t total = 0;
+    size_t k, readcount;
+    size_t total = 0;
     float normfact;
 
     if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
@@ -606,12 +606,12 @@ static sf_count_t alac_read_f(SF_PRIVATE *psf, float *ptr, sf_count_t len)
     return total;
 }
 
-static sf_count_t alac_read_d(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+static size_t alac_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
 {
     ALAC_PRIVATE *plac;
     int *iptr;
-    int k, readcount;
-    sf_count_t total = 0;
+    size_t k, readcount;
+    size_t total = 0;
     double normfact;
 
     if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
@@ -700,13 +700,13 @@ static sf_count_t alac_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
  * ALAC Write Functions.
  */
 
-static sf_count_t alac_write_s(SF_PRIVATE *psf, const short *ptr,
-                               sf_count_t len)
+static size_t alac_write_s(SF_PRIVATE *psf, const short *ptr,
+                           size_t len)
 {
     ALAC_PRIVATE *plac;
     int *iptr;
-    int k, writecount;
-    sf_count_t total = 0;
+    size_t k, writecount;
+    size_t total = 0;
 
     if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
         return 0;
@@ -734,12 +734,12 @@ static sf_count_t alac_write_s(SF_PRIVATE *psf, const short *ptr,
     return total;
 }
 
-static sf_count_t alac_write_i(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
+static size_t alac_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
 {
     ALAC_PRIVATE *plac;
     int *iptr;
-    int k, writecount;
-    sf_count_t total = 0;
+    size_t k, writecount;
+    size_t total = 0;
 
     if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
         return 0;
@@ -767,14 +767,14 @@ static sf_count_t alac_write_i(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
     return total;
 }
 
-static sf_count_t alac_write_f(SF_PRIVATE *psf, const float *ptr,
-                               sf_count_t len)
+static size_t alac_write_f(SF_PRIVATE *psf, const float *ptr,
+                           size_t len)
 {
     ALAC_PRIVATE *plac;
-    void (*convert)(const float *, int *t, int, int);
+    void (*convert)(const float *, int *t, size_t, int);
     int *iptr;
-    int writecount;
-    sf_count_t total = 0;
+    size_t writecount;
+    size_t total = 0;
 
     if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
         return 0;
@@ -803,14 +803,14 @@ static sf_count_t alac_write_f(SF_PRIVATE *psf, const float *ptr,
     return total;
 }
 
-static sf_count_t alac_write_d(SF_PRIVATE *psf, const double *ptr,
-                               sf_count_t len)
+static size_t alac_write_d(SF_PRIVATE *psf, const double *ptr,
+                           size_t len)
 {
     ALAC_PRIVATE *plac;
-    void (*convert)(const double *, int *t, int, int);
+    void (*convert)(const double *, int *t, size_t, int);
     int *iptr;
-    int writecount;
-    sf_count_t total = 0;
+    size_t writecount;
+    size_t total = 0;
 
     if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
         return 0;

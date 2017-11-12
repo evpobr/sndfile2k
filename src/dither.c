@@ -58,151 +58,144 @@
 
 typedef struct
 {
-    int read_short_dither_bits, read_int_dither_bits;
-    int write_short_dither_bits, write_int_dither_bits;
-    double read_float_dither_scale, read_double_dither_bits;
-    double write_float_dither_scale, write_double_dither_bits;
+	int read_short_dither_bits, read_int_dither_bits;
+	int write_short_dither_bits, write_int_dither_bits;
+	double read_float_dither_scale, read_double_dither_bits;
+	double write_float_dither_scale, write_double_dither_bits;
 
-    sf_count_t (*read_short)(SF_PRIVATE *psf, short *ptr, sf_count_t len);
-    sf_count_t (*read_int)(SF_PRIVATE *psf, int *ptr, sf_count_t len);
-    sf_count_t (*read_float)(SF_PRIVATE *psf, float *ptr, sf_count_t len);
-    sf_count_t (*read_double)(SF_PRIVATE *psf, double *ptr, sf_count_t len);
+	size_t (*read_short)(SF_PRIVATE *psf, short *ptr, size_t len);
+	size_t (*read_int)(SF_PRIVATE *psf, int *ptr, size_t len);
+	size_t (*read_float)(SF_PRIVATE *psf, float *ptr, size_t len);
+	size_t (*read_double)(SF_PRIVATE *psf, double *ptr, size_t len);
 
-    sf_count_t (*write_short)(SF_PRIVATE *psf, const short *ptr,
-                              sf_count_t len);
-    sf_count_t (*write_int)(SF_PRIVATE *psf, const int *ptr, sf_count_t len);
-    sf_count_t (*write_float)(SF_PRIVATE *psf, const float *ptr,
-                              sf_count_t len);
-    sf_count_t (*write_double)(SF_PRIVATE *psf, const double *ptr,
-                               sf_count_t len);
+	size_t (*write_short)(SF_PRIVATE *psf, const short *ptr, size_t len);
+	size_t (*write_int)(SF_PRIVATE *psf, const int *ptr, size_t len);
+	size_t (*write_float)(SF_PRIVATE *psf, const float *ptr, size_t len);
+	size_t (*write_double)(SF_PRIVATE *psf, const double *ptr, size_t len);
 
-    double buffer[SF_BUFFER_LEN / sizeof(double)];
+	double buffer[SF_BUFFER_LEN / sizeof(double)];
 } DITHER_DATA;
 
-static sf_count_t dither_read_short(SF_PRIVATE *psf, short *ptr,
-                                    sf_count_t len);
-static sf_count_t dither_read_int(SF_PRIVATE *psf, int *ptr, sf_count_t len);
+static size_t dither_read_short(SF_PRIVATE *psf, short *ptr, size_t len);
+static size_t dither_read_int(SF_PRIVATE *psf, int *ptr, size_t len);
 
-static sf_count_t dither_write_short(SF_PRIVATE *psf, const short *ptr,
-                                     sf_count_t len);
-static sf_count_t dither_write_int(SF_PRIVATE *psf, const int *ptr,
-                                   sf_count_t len);
-static sf_count_t dither_write_float(SF_PRIVATE *psf, const float *ptr,
-                                     sf_count_t len);
-static sf_count_t dither_write_double(SF_PRIVATE *psf, const double *ptr,
-                                      sf_count_t len);
+static size_t dither_write_short(SF_PRIVATE *psf, const short *ptr, size_t len);
+static size_t dither_write_int(SF_PRIVATE *psf, const int *ptr, size_t len);
+static size_t dither_write_float(SF_PRIVATE *psf, const float *ptr, size_t len);
+static size_t dither_write_double(SF_PRIVATE *psf, const double *ptr,
+                                  size_t len);
 
 int dither_init(SF_PRIVATE *psf, int mode)
 {
-    DITHER_DATA *pdither;
+	DITHER_DATA *pdither;
 
-    pdither = psf->dither; /* This may be NULL. */
+	pdither = psf->dither; /* This may be NULL. */
 
-    /* Turn off dither on read. */
-    if (mode == SFM_READ && psf->read_dither.type == SFD_NO_DITHER)
-    {
-        if (pdither == NULL)
-            return 0; /* Dither is already off, so just return. */
+	/* Turn off dither on read. */
+	if (mode == SFM_READ && psf->read_dither.type == SFD_NO_DITHER)
+	{
+		if (pdither == NULL)
+			return 0; /* Dither is already off, so just return. */
 
-        if (pdither->read_short)
-            psf->read_short = pdither->read_short;
-        if (pdither->read_int)
-            psf->read_int = pdither->read_int;
-        if (pdither->read_float)
-            psf->read_float = pdither->read_float;
-        if (pdither->read_double)
-            psf->read_double = pdither->read_double;
-        return 0;
-    };
+		if (pdither->read_short)
+			psf->read_short = pdither->read_short;
+		if (pdither->read_int)
+			psf->read_int = pdither->read_int;
+		if (pdither->read_float)
+			psf->read_float = pdither->read_float;
+		if (pdither->read_double)
+			psf->read_double = pdither->read_double;
+		return 0;
+	};
 
-    /* Turn off dither on write. */
-    if (mode == SFM_WRITE && psf->write_dither.type == SFD_NO_DITHER)
-    {
-        if (pdither == NULL)
-            return 0; /* Dither is already off, so just return. */
+	/* Turn off dither on write. */
+	if (mode == SFM_WRITE && psf->write_dither.type == SFD_NO_DITHER)
+	{
+		if (pdither == NULL)
+			return 0; /* Dither is already off, so just return. */
 
-        if (pdither->write_short)
-            psf->write_short = pdither->write_short;
-        if (pdither->write_int)
-            psf->write_int = pdither->write_int;
-        if (pdither->write_float)
-            psf->write_float = pdither->write_float;
-        if (pdither->write_double)
-            psf->write_double = pdither->write_double;
-        return 0;
-    };
+		if (pdither->write_short)
+			psf->write_short = pdither->write_short;
+		if (pdither->write_int)
+			psf->write_int = pdither->write_int;
+		if (pdither->write_float)
+			psf->write_float = pdither->write_float;
+		if (pdither->write_double)
+			psf->write_double = pdither->write_double;
+		return 0;
+	};
 
-    /* Turn on dither on read if asked. */
-    if (mode == SFM_READ && psf->read_dither.type != 0)
-    {
-        if (pdither == NULL)
-            pdither = psf->dither = calloc(1, sizeof(DITHER_DATA));
-        if (pdither == NULL)
-            return SFE_MALLOC_FAILED;
+	/* Turn on dither on read if asked. */
+	if (mode == SFM_READ && psf->read_dither.type != 0)
+	{
+		if (pdither == NULL)
+			pdither = psf->dither = calloc(1, sizeof(DITHER_DATA));
+		if (pdither == NULL)
+			return SFE_MALLOC_FAILED;
 
-        switch (SF_CODEC(psf->sf.format))
-        {
-        case SF_FORMAT_DOUBLE:
-        case SF_FORMAT_FLOAT:
-            pdither->read_int = psf->read_int;
-            psf->read_int = dither_read_int;
-            break;
+		switch (SF_CODEC(psf->sf.format))
+		{
+		case SF_FORMAT_DOUBLE:
+		case SF_FORMAT_FLOAT:
+			pdither->read_int = psf->read_int;
+			psf->read_int = dither_read_int;
+			break;
 
-        case SF_FORMAT_PCM_32:
-        case SF_FORMAT_PCM_24:
-        case SF_FORMAT_PCM_16:
-        case SF_FORMAT_PCM_S8:
-        case SF_FORMAT_PCM_U8:
-            pdither->read_short = psf->read_short;
-            psf->read_short = dither_read_short;
-            break;
+		case SF_FORMAT_PCM_32:
+		case SF_FORMAT_PCM_24:
+		case SF_FORMAT_PCM_16:
+		case SF_FORMAT_PCM_S8:
+		case SF_FORMAT_PCM_U8:
+			pdither->read_short = psf->read_short;
+			psf->read_short = dither_read_short;
+			break;
 
-        default:
-            break;
-        };
-    };
+		default:
+			break;
+		};
+	};
 
-    /* Turn on dither on write if asked. */
-    if (mode == SFM_WRITE && psf->write_dither.type != 0)
-    {
-        if (pdither == NULL)
-            pdither = psf->dither = calloc(1, sizeof(DITHER_DATA));
-        if (pdither == NULL)
-            return SFE_MALLOC_FAILED;
+	/* Turn on dither on write if asked. */
+	if (mode == SFM_WRITE && psf->write_dither.type != 0)
+	{
+		if (pdither == NULL)
+			pdither = psf->dither = calloc(1, sizeof(DITHER_DATA));
+		if (pdither == NULL)
+			return SFE_MALLOC_FAILED;
 
-        switch (SF_CODEC(psf->sf.format))
-        {
-        case SF_FORMAT_DOUBLE:
-        case SF_FORMAT_FLOAT:
-            pdither->write_int = psf->write_int;
-            psf->write_int = dither_write_int;
-            break;
+		switch (SF_CODEC(psf->sf.format))
+		{
+		case SF_FORMAT_DOUBLE:
+		case SF_FORMAT_FLOAT:
+			pdither->write_int = psf->write_int;
+			psf->write_int = dither_write_int;
+			break;
 
-        case SF_FORMAT_PCM_32:
-        case SF_FORMAT_PCM_24:
-        case SF_FORMAT_PCM_16:
-        case SF_FORMAT_PCM_S8:
-        case SF_FORMAT_PCM_U8:
-            break;
+		case SF_FORMAT_PCM_32:
+		case SF_FORMAT_PCM_24:
+		case SF_FORMAT_PCM_16:
+		case SF_FORMAT_PCM_S8:
+		case SF_FORMAT_PCM_U8:
+			break;
 
-        default:
-            break;
-        };
+		default:
+			break;
+		};
 
-        pdither->write_short = psf->write_short;
-        psf->write_short = dither_write_short;
+		pdither->write_short = psf->write_short;
+		psf->write_short = dither_write_short;
 
-        pdither->write_int = psf->write_int;
-        psf->write_int = dither_write_int;
+		pdither->write_int = psf->write_int;
+		psf->write_int = dither_write_int;
 
-        pdither->write_float = psf->write_float;
-        psf->write_float = dither_write_float;
+		pdither->write_float = psf->write_float;
+		psf->write_float = dither_write_float;
 
-        pdither->write_double = psf->write_double;
-        psf->write_double = dither_write_double;
-    };
+		pdither->write_double = psf->write_double;
+		psf->write_double = dither_write_double;
+	};
 
-    return 0;
+	return 0;
 }
 
 static void dither_short(const short *in, short *out, int frames, int channels);
@@ -212,251 +205,248 @@ static void dither_float(const float *in, float *out, int frames, int channels);
 static void dither_double(const double *in, double *out, int frames,
                           int channels);
 
-static sf_count_t dither_read_short(SF_PRIVATE *UNUSED(psf), short *UNUSED(ptr),
-                                    sf_count_t len)
+static size_t dither_read_short(SF_PRIVATE *UNUSED(psf), short *UNUSED(ptr),
+                                size_t len)
 {
-    return len;
+	return len;
 }
 
-static sf_count_t dither_read_int(SF_PRIVATE *UNUSED(psf), int *UNUSED(ptr),
-                                  sf_count_t len)
+static size_t dither_read_int(SF_PRIVATE *UNUSED(psf), int *UNUSED(ptr),
+                              size_t len)
 {
-    return len;
+	return len;
 }
 
-static sf_count_t dither_write_short(SF_PRIVATE *psf, const short *ptr,
-                                     sf_count_t len)
+static size_t dither_write_short(SF_PRIVATE *psf, const short *ptr, size_t len)
 {
-    DITHER_DATA *pdither;
-    int bufferlen, writecount, thiswrite;
-    sf_count_t total = 0;
+	DITHER_DATA *pdither;
+	size_t bufferlen, writecount, thiswrite;
+	size_t total = 0;
 
-    if ((pdither = psf->dither) == NULL)
-    {
-        psf->error = SFE_DITHER_BAD_PTR;
-        return 0;
-    };
+	if ((pdither = psf->dither) == NULL)
+	{
+		psf->error = SFE_DITHER_BAD_PTR;
+		return 0;
+	};
 
-    switch (SF_CODEC(psf->sf.format))
-    {
-    case SF_FORMAT_PCM_S8:
-    case SF_FORMAT_PCM_U8:
-    case SF_FORMAT_DPCM_8:
-        break;
+	switch (SF_CODEC(psf->sf.format))
+	{
+	case SF_FORMAT_PCM_S8:
+	case SF_FORMAT_PCM_U8:
+	case SF_FORMAT_DPCM_8:
+		break;
 
-    default:
-        return pdither->write_short(psf, ptr, len);
-    };
+	default:
+		return pdither->write_short(psf, ptr, len);
+	};
 
-    bufferlen = sizeof(pdither->buffer) / sizeof(short);
+	bufferlen = sizeof(pdither->buffer) / sizeof(short);
 
-    while (len > 0)
-    {
-        writecount = (len >= bufferlen) ? bufferlen : (int)len;
-        writecount /= psf->sf.channels;
-        writecount *= psf->sf.channels;
+	while (len > 0)
+	{
+		writecount = (len >= bufferlen) ? bufferlen : len;
+		writecount /= psf->sf.channels;
+		writecount *= psf->sf.channels;
 
-        dither_short(ptr, (short *)pdither->buffer,
-                     writecount / psf->sf.channels, psf->sf.channels);
+		dither_short(ptr, (short *)pdither->buffer,
+		             writecount / psf->sf.channels, psf->sf.channels);
 
-        thiswrite =
-            pdither->write_short(psf, (short *)pdither->buffer, writecount);
-        total += thiswrite;
-        len -= thiswrite;
-        if (thiswrite < writecount)
-            break;
-    };
+		thiswrite =
+		    pdither->write_short(psf, (short *)pdither->buffer, writecount);
+		total += thiswrite;
+		len -= thiswrite;
+		if (thiswrite < writecount)
+			break;
+	};
 
-    return total;
+	return total;
 }
 
-static sf_count_t dither_write_int(SF_PRIVATE *psf, const int *ptr,
-                                   sf_count_t len)
+static size_t dither_write_int(SF_PRIVATE *psf, const int *ptr, size_t len)
 {
-    DITHER_DATA *pdither;
-    int bufferlen, writecount, thiswrite;
-    sf_count_t total = 0;
+	DITHER_DATA *pdither;
+	size_t bufferlen, writecount, thiswrite;
+	size_t total = 0;
 
-    if ((pdither = psf->dither) == NULL)
-    {
-        psf->error = SFE_DITHER_BAD_PTR;
-        return 0;
-    };
+	if ((pdither = psf->dither) == NULL)
+	{
+		psf->error = SFE_DITHER_BAD_PTR;
+		return 0;
+	};
 
-    switch (SF_CODEC(psf->sf.format))
-    {
-    case SF_FORMAT_PCM_S8:
-    case SF_FORMAT_PCM_U8:
-    case SF_FORMAT_PCM_16:
-    case SF_FORMAT_PCM_24:
-        break;
+	switch (SF_CODEC(psf->sf.format))
+	{
+	case SF_FORMAT_PCM_S8:
+	case SF_FORMAT_PCM_U8:
+	case SF_FORMAT_PCM_16:
+	case SF_FORMAT_PCM_24:
+		break;
 
-    case SF_FORMAT_DPCM_8:
-    case SF_FORMAT_DPCM_16:
-        break;
+	case SF_FORMAT_DPCM_8:
+	case SF_FORMAT_DPCM_16:
+		break;
 
-    default:
-        return pdither->write_int(psf, ptr, len);
-    };
+	default:
+		return pdither->write_int(psf, ptr, len);
+	};
 
-    bufferlen = sizeof(pdither->buffer) / sizeof(int);
+	bufferlen = sizeof(pdither->buffer) / sizeof(int);
 
-    while (len > 0)
-    {
-        writecount = (len >= bufferlen) ? bufferlen : (int)len;
-        writecount /= psf->sf.channels;
-        writecount *= psf->sf.channels;
+	while (len > 0)
+	{
+		writecount = (len >= bufferlen) ? bufferlen : len;
+		writecount /= psf->sf.channels;
+		writecount *= psf->sf.channels;
 
-        dither_int(ptr, (int *)pdither->buffer, writecount / psf->sf.channels,
-                   psf->sf.channels);
+		dither_int(ptr, (int *)pdither->buffer, writecount / psf->sf.channels,
+		           psf->sf.channels);
 
-        thiswrite = pdither->write_int(psf, (int *)pdither->buffer, writecount);
-        total += thiswrite;
-        len -= thiswrite;
-        if (thiswrite < writecount)
-            break;
-    };
+		thiswrite = pdither->write_int(psf, (int *)pdither->buffer, writecount);
+		total += thiswrite;
+		len -= thiswrite;
+		if (thiswrite < writecount)
+			break;
+	};
 
-    return total;
+	return total;
 }
 
-static sf_count_t dither_write_float(SF_PRIVATE *psf, const float *ptr,
-                                     sf_count_t len)
+static size_t dither_write_float(SF_PRIVATE *psf, const float *ptr, size_t len)
 {
-    DITHER_DATA *pdither;
-    int bufferlen, writecount, thiswrite;
-    sf_count_t total = 0;
+	DITHER_DATA *pdither;
+	size_t bufferlen, writecount, thiswrite;
+	size_t total = 0;
 
-    if ((pdither = psf->dither) == NULL)
-    {
-        psf->error = SFE_DITHER_BAD_PTR;
-        return 0;
-    };
+	if ((pdither = psf->dither) == NULL)
+	{
+		psf->error = SFE_DITHER_BAD_PTR;
+		return 0;
+	};
 
-    switch (SF_CODEC(psf->sf.format))
-    {
-    case SF_FORMAT_PCM_S8:
-    case SF_FORMAT_PCM_U8:
-    case SF_FORMAT_PCM_16:
-    case SF_FORMAT_PCM_24:
-        break;
+	switch (SF_CODEC(psf->sf.format))
+	{
+	case SF_FORMAT_PCM_S8:
+	case SF_FORMAT_PCM_U8:
+	case SF_FORMAT_PCM_16:
+	case SF_FORMAT_PCM_24:
+		break;
 
-    case SF_FORMAT_DPCM_8:
-    case SF_FORMAT_DPCM_16:
-        break;
+	case SF_FORMAT_DPCM_8:
+	case SF_FORMAT_DPCM_16:
+		break;
 
-    default:
-        return pdither->write_float(psf, ptr, len);
-    };
+	default:
+		return pdither->write_float(psf, ptr, len);
+	};
 
-    bufferlen = sizeof(pdither->buffer) / sizeof(float);
+	bufferlen = sizeof(pdither->buffer) / sizeof(float);
 
-    while (len > 0)
-    {
-        writecount = (len >= bufferlen) ? bufferlen : (float)len;
-        writecount /= psf->sf.channels;
-        writecount *= psf->sf.channels;
+	while (len > 0)
+	{
+		writecount = (len >= bufferlen) ? bufferlen : len;
+		writecount /= psf->sf.channels;
+		writecount *= psf->sf.channels;
 
-        dither_float(ptr, (float *)pdither->buffer,
-                     writecount / psf->sf.channels, psf->sf.channels);
+		dither_float(ptr, (float *)pdither->buffer,
+		             writecount / psf->sf.channels, psf->sf.channels);
 
-        thiswrite =
-            pdither->write_float(psf, (float *)pdither->buffer, writecount);
-        total += thiswrite;
-        len -= thiswrite;
-        if (thiswrite < writecount)
-            break;
-    };
+		thiswrite =
+		    pdither->write_float(psf, (float *)pdither->buffer, writecount);
+		total += thiswrite;
+		len -= thiswrite;
+		if (thiswrite < writecount)
+			break;
+	};
 
-    return total;
+	return total;
 }
 
-static sf_count_t dither_write_double(SF_PRIVATE *psf, const double *ptr,
-                                      sf_count_t len)
+static size_t dither_write_double(SF_PRIVATE *psf, const double *ptr,
+                                  size_t len)
 {
-    DITHER_DATA *pdither;
-    int bufferlen, writecount, thiswrite;
-    sf_count_t total = 0;
+	DITHER_DATA *pdither;
+	size_t bufferlen, writecount, thiswrite;
+	size_t total = 0;
 
-    if ((pdither = psf->dither) == NULL)
-    {
-        psf->error = SFE_DITHER_BAD_PTR;
-        return 0;
-    };
+	if ((pdither = psf->dither) == NULL)
+	{
+		psf->error = SFE_DITHER_BAD_PTR;
+		return 0;
+	};
 
-    switch (SF_CODEC(psf->sf.format))
-    {
-    case SF_FORMAT_PCM_S8:
-    case SF_FORMAT_PCM_U8:
-    case SF_FORMAT_PCM_16:
-    case SF_FORMAT_PCM_24:
-        break;
+	switch (SF_CODEC(psf->sf.format))
+	{
+	case SF_FORMAT_PCM_S8:
+	case SF_FORMAT_PCM_U8:
+	case SF_FORMAT_PCM_16:
+	case SF_FORMAT_PCM_24:
+		break;
 
-    case SF_FORMAT_DPCM_8:
-    case SF_FORMAT_DPCM_16:
-        break;
+	case SF_FORMAT_DPCM_8:
+	case SF_FORMAT_DPCM_16:
+		break;
 
-    default:
-        return pdither->write_double(psf, ptr, len);
-    };
+	default:
+		return pdither->write_double(psf, ptr, len);
+	};
 
-    bufferlen = sizeof(pdither->buffer) / sizeof(double);
+	bufferlen = sizeof(pdither->buffer) / sizeof(double);
 
-    while (len > 0)
-    {
-        writecount = (len >= bufferlen) ? bufferlen : (double)len;
-        writecount /= psf->sf.channels;
-        writecount *= psf->sf.channels;
+	while (len > 0)
+	{
+		writecount = (len >= bufferlen) ? bufferlen : len;
+		writecount /= psf->sf.channels;
+		writecount *= psf->sf.channels;
 
-        dither_double(ptr, (double *)pdither->buffer,
-                      writecount / psf->sf.channels, psf->sf.channels);
+		dither_double(ptr, (double *)pdither->buffer,
+		              writecount / psf->sf.channels, psf->sf.channels);
 
-        thiswrite =
-            pdither->write_double(psf, (double *)pdither->buffer, writecount);
-        total += thiswrite;
-        len -= thiswrite;
-        if (thiswrite < writecount)
-            break;
-    };
+		thiswrite =
+		    pdither->write_double(psf, (double *)pdither->buffer, writecount);
+		total += thiswrite;
+		len -= thiswrite;
+		if (thiswrite < writecount)
+			break;
+	};
 
-    return total;
+	return total;
 }
 
 static void dither_short(const short *in, short *out, int frames, int channels)
 {
-    int ch, k;
+	int ch, k;
 
-    for (ch = 0; ch < channels; ch++)
-        for (k = ch; k < channels * frames; k += channels)
-            out[k] = in[k];
+	for (ch = 0; ch < channels; ch++)
+		for (k = ch; k < channels * frames; k += channels)
+			out[k] = in[k];
 }
 
 static void dither_int(const int *in, int *out, int frames, int channels)
 {
-    int ch, k;
+	int ch, k;
 
-    for (ch = 0; ch < channels; ch++)
-        for (k = ch; k < channels * frames; k += channels)
-            out[k] = in[k];
+	for (ch = 0; ch < channels; ch++)
+		for (k = ch; k < channels * frames; k += channels)
+			out[k] = in[k];
 }
 
 static void dither_float(const float *in, float *out, int frames, int channels)
 {
-    int ch, k;
+	int ch, k;
 
-    for (ch = 0; ch < channels; ch++)
-        for (k = ch; k < channels * frames; k += channels)
-            out[k] = in[k];
+	for (ch = 0; ch < channels; ch++)
+		for (k = ch; k < channels * frames; k += channels)
+			out[k] = in[k];
 }
 
 static void dither_double(const double *in, double *out, int frames,
                           int channels)
 {
-    int ch, k;
+	int ch, k;
 
-    for (ch = 0; ch < channels; ch++)
-        for (k = ch; k < channels * frames; k += channels)
-            out[k] = in[k];
+	for (ch = 0; ch < channels; ch++)
+		for (k = ch; k < channels * frames; k += channels)
+			out[k] = in[k];
 }
 
 #if 0
@@ -467,7 +457,8 @@ static void dither_double(const double *in, double *out, int frames,
 ** Also maybe need separate state info for each channel!!!!
 */
 
-int DO_NOT_USE_sf_dither_short(const SF_DITHER_INFO *dither, const short *in, short *out, int frames, int channels)
+int DO_NOT_USE_sf_dither_short(const SF_DITHER_INFO *dither, const short *in,
+                               short *out, int frames, int channels)
 {
 	int ch, k;
 
@@ -490,7 +481,8 @@ int DO_NOT_USE_sf_dither_short(const SF_DITHER_INFO *dither, const short *in, sh
 	return 0;
 }
 
-int DO_NOT_USE_sf_dither_int(const SF_DITHER_INFO *dither, const int *in, int *out, int frames, int channels)
+int DO_NOT_USE_sf_dither_int(const SF_DITHER_INFO *dither, const int *in,
+                             int *out, int frames, int channels)
 {
 	int ch, k;
 
@@ -513,7 +505,8 @@ int DO_NOT_USE_sf_dither_int(const SF_DITHER_INFO *dither, const int *in, int *o
 	return 0;
 }
 
-int DO_NOT_USE_sf_dither_float(const SF_DITHER_INFO *dither, const float *in, float *out, int frames, int channels)
+int DO_NOT_USE_sf_dither_float(const SF_DITHER_INFO *dither, const float *in,
+                               float *out, int frames, int channels)
 {
 	int ch, k;
 
@@ -536,7 +529,8 @@ int DO_NOT_USE_sf_dither_float(const SF_DITHER_INFO *dither, const float *in, fl
 	return 0;
 }
 
-int DO_NOT_USE_sf_dither_double(const SF_DITHER_INFO *dither, const double *in, double *out, int frames, int channels)
+int DO_NOT_USE_sf_dither_double(const SF_DITHER_INFO *dither, const double *in,
+                                double *out, int frames, int channels)
 {
 	int ch, k;
 

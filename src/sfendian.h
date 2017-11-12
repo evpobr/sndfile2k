@@ -32,6 +32,7 @@
 #define CPU_IS_X86_64 0
 #endif
 
+#include <stdlib.h>
 #include <stdint.h>
 #include <inttypes.h>
 
@@ -285,40 +286,44 @@ static inline int16_t psf_get_be16(uint8_t *ptr, int offset)
 ** Generic functions for performing endian swapping on integer arrays.
 */
 
-static inline void endswap_short_array(short *ptr, int len)
+static inline void endswap_short_array(short *ptr, size_t len)
 {
     short temp;
 
-    while (--len >= 0)
+    while (len)
     {
+        len--;
         temp = ptr[len];
         ptr[len] = ENDSWAP_16(temp);
     };
 } /* endswap_short_array */
 
-static inline void endswap_short_copy(short *dest, const short *src, int len)
+static inline void endswap_short_copy(short *dest, const short *src, size_t len)
 {
-    while (--len >= 0)
+    while (len)
     {
+        len--;
         dest[len] = ENDSWAP_16(src[len]);
     };
 } /* endswap_short_copy */
 
-static inline void endswap_int_array(int *ptr, int len)
+static inline void endswap_int_array(int *ptr, size_t len)
 {
     int temp;
 
-    while (--len >= 0)
+    while (len)
     {
+        len--;
         temp = ptr[len];
         ptr[len] = ENDSWAP_32(temp);
     };
 } /* endswap_int_array */
 
-static inline void endswap_int_copy(int *dest, const int *src, int len)
+static inline void endswap_int_copy(int *dest, const int *src, size_t len)
 {
-    while (--len >= 0)
+    while (len)
     {
+        len--;
         dest[len] = ENDSWAP_32(src[len]);
     };
 } /* endswap_int_copy */
@@ -326,24 +331,26 @@ static inline void endswap_int_copy(int *dest, const int *src, int len)
 /*========================================================================================
 */
 
-static inline void endswap_int64_t_array(int64_t *ptr, int len)
+static inline void endswap_int64_t_array(int64_t *ptr, size_t len)
 {
     int64_t value;
 
-    while (--len >= 0)
+    while (len)
     {
+        len--;
         value = ptr[len];
         ptr[len] = ENDSWAP_64(value);
     };
 } /* endswap_int64_t_array */
 
 static inline void endswap_int64_t_copy(int64_t *dest, const int64_t *src,
-                                        int len)
+                                        size_t len)
 {
     int64_t value;
 
-    while (--len >= 0)
+    while (len)
     {
+        len--;
         value = src[len];
         dest[len] = ENDSWAP_64(value);
     };

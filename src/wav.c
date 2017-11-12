@@ -144,7 +144,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign,
 static int wav_write_header(SF_PRIVATE *psf, int calc_length);
 
 static int wav_write_tailer(SF_PRIVATE *psf);
-static int wav_command(SF_PRIVATE *psf, int command, void *data, int datasize);
+static size_t wav_command(SF_PRIVATE *psf, int command, void *data, size_t datasize);
 static int wav_close(SF_PRIVATE *psf);
 
 static int wav_read_smpl_chunk(SF_PRIVATE *psf, uint32_t chunklen);
@@ -1353,8 +1353,8 @@ static int wav_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static int wav_command(SF_PRIVATE *psf, int command, void *UNUSED(data),
-                       int datasize)
+static size_t wav_command(SF_PRIVATE *psf, int command, void *UNUSED(data),
+                          size_t datasize)
 {
     WAVLIKE_PRIVATE *wpriv;
 

@@ -100,7 +100,7 @@ static int caf_close(SF_PRIVATE *psf);
 static int caf_read_header(SF_PRIVATE *psf);
 static int caf_write_header(SF_PRIVATE *psf, int calc_length);
 static int caf_write_tailer(SF_PRIVATE *psf);
-static int caf_command(SF_PRIVATE *psf, int command, void *data, int datasize);
+static size_t caf_command(SF_PRIVATE *psf, int command, void *data, size_t datasize);
 static int caf_read_chanmap(SF_PRIVATE *psf, sf_count_t chunk_size);
 static int caf_read_strings(SF_PRIVATE *psf, sf_count_t chunk_size);
 static void caf_write_strings(SF_PRIVATE *psf, int location);
@@ -235,8 +235,8 @@ static int caf_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static int caf_command(SF_PRIVATE *psf, int command, void *UNUSED(data),
-                       int UNUSED(datasize))
+static size_t caf_command(SF_PRIVATE *psf, int command, void *UNUSED(data),
+                          size_t UNUSED(datasize))
 {
     CAF_PRIVATE *pcaf;
 
@@ -594,7 +594,7 @@ static int caf_read_header(SF_PRIVATE *psf)
             }
             else if (chunk_size > psf->filelength - psf->header.indx)
             {
-                psf_log_printf(psf, "%M : %D (should be < %D)\n", marker,
+                psf_log_printf(psf, "%M : %D (should be < %z)\n", marker,
                                chunk_size, psf->filelength - psf->header.indx);
                 return SFE_MALFORMED_FILE;
             };
