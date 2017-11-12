@@ -536,9 +536,9 @@ static int paf24_read_block(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
 	return 1;
 }
 
-static int paf24_read(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24, int *ptr, int len)
+static size_t paf24_read(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24, int *ptr, size_t len)
 {
-	int count, total = 0;
+    size_t count, total = 0;
 
 	while (total < len)
 	{
@@ -727,10 +727,10 @@ static int paf24_write_block(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
 	return 1;
 }
 
-static int paf24_write(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24, const int *ptr,
-                       int len)
+static size_t paf24_write(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24, const int *ptr,
+                          size_t len)
 {
-	int count, total = 0;
+    size_t count, total = 0;
 
 	while (total < len)
 	{
