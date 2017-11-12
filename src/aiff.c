@@ -1811,7 +1811,7 @@ static void aiff_write_strings(SF_PRIVATE *psf, int location)
 }
 
 static size_t aiff_command(SF_PRIVATE *psf, int command, void *UNUSED(data),
-                           size_t UNSUED(datasize))
+                           size_t UNUSED(datasize))
 {
     AIFF_PRIVATE *paiff;
 
