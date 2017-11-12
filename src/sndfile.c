@@ -1072,7 +1072,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         if (psf->float_int_mult && psf->float_max < 0.0)
             /* Scale to prevent wrap-around distortion. */
             psf->float_max =
-                (32768.0 / 32767.0) * psf_calc_signal_max(psf, SF_FALSE);
+            (float)((32768.0 / 32767.0) * psf_calc_signal_max(psf, SF_FALSE));
         return old_value;
 
     case SFC_SET_SCALE_INT_FLOAT_WRITE:

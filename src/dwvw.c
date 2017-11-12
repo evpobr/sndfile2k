@@ -257,7 +257,7 @@ static size_t dwvw_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
 		return 0;
 	pdwvw = (DWVW_PRIVATE *)psf->codec_data;
 
-	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0);
 
 	iptr = ubuf.ibuf;
 	bufferlen = ARRAY_LEN(ubuf.ibuf);
@@ -664,7 +664,7 @@ static size_t dwvw_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
 		return 0;
 	pdwvw = (DWVW_PRIVATE *)psf->codec_data;
 
-	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : 1.0);
 
 	iptr = ubuf.ibuf;
 	bufferlen = ARRAY_LEN(ubuf.ibuf);

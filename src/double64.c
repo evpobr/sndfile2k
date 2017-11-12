@@ -451,12 +451,12 @@ static void double64_peak_update(SF_PRIVATE *psf, const double *buffer,
 
 	for (chan = 0; chan < psf->sf.channels; chan++)
 	{
-		fmaxval = fabs(buffer[chan]);
+		fmaxval = (float)fabs(buffer[chan]);
 		position = 0;
 		for (k = chan; k < count; k += psf->sf.channels)
 			if (fmaxval < fabs(buffer[k]))
 			{
-				fmaxval = fabs(buffer[k]);
+				fmaxval = (float)fabs(buffer[k]);
 				position = k;
 			};
 
@@ -508,7 +508,7 @@ static void d2s_array(const double *src, size_t count, short *dest,
 	while (count)
 	{
         count--;
-		dest[count] = lrint(scale * src[count]);
+		dest[count] = (short)lrint(scale * src[count]);
 	};
 }
 
@@ -525,7 +525,7 @@ static void d2s_clip_array(const double *src, size_t count, short *dest,
 		else if (CPU_CLIPS_NEGATIVE == 0 && tmp < -32768.0)
 			dest[count] = SHRT_MIN;
 		else
-			dest[count] = lrint(tmp);
+			dest[count] = (short)lrint(tmp);
 	};
 }
 
@@ -544,7 +544,7 @@ static void d2i_clip_array(const double *src, size_t count, int *dest,
 	while (count)
 	{
         count--;
-		float tmp = scale * src[count];
+		float tmp = (float)(scale * src[count]);
 
 		if (CPU_CLIPS_POSITIVE == 0 && tmp > (1.0 * INT_MAX))
 			dest[count] = INT_MAX;
@@ -560,7 +560,7 @@ static inline void d2f_array(const double *src, size_t count, float *dest)
 	while (count)
 	{
         count--;
-		dest[count] = src[count];
+		dest[count] = (float)src[count];
 	};
 }
 

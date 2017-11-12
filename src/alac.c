@@ -581,7 +581,7 @@ static size_t alac_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
-    normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0;
+    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0);
 
     while (len > 0)
     {

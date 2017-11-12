@@ -620,7 +620,7 @@ static size_t paf24_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
 	ppaf24 = (PAF24_PRIVATE *)psf->codec_data;
 
 	normfact =
-	    (psf->norm_float == SF_TRUE) ? (1.0 / 0x80000000) : (1.0 / 0x100);
+        (float)((psf->norm_float == SF_TRUE) ? (1.0 / 0x80000000) : (1.0 / 0x100));
 
 	iptr = ubuf.ibuf;
 	bufferlen = ARRAY_LEN(ubuf.ibuf);
@@ -819,7 +819,7 @@ static size_t paf24_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
 	ppaf24 = (PAF24_PRIVATE *)psf->codec_data;
 
 	normfact =
-	    (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : (1.0 / 0x100);
+        (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : (1.0 / 0x100));
 
 	iptr = ubuf.ibuf;
 	bufferlen = ARRAY_LEN(ubuf.ibuf);

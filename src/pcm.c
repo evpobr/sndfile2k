@@ -320,7 +320,7 @@ static inline void sc2s_array(signed char *src, size_t count, short *dest)
 {
 	while (count)
 	{
-        count--;
+		count--;
 		dest[count] = ((uint16_t)src[count]) << 8;
 	};
 }
@@ -329,7 +329,7 @@ static inline void uc2s_array(unsigned char *src, size_t count, short *dest)
 {
 	while (count)
 	{
-        count--;
+		count--;
 		dest[count] = (((uint32_t)src[count]) - 0x80) << 8;
 	};
 }
@@ -341,7 +341,7 @@ static inline void let2s_array(tribyte *src, size_t count, short *dest)
 	ucptr = ((unsigned char *)src) + 3 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		dest[count] = LET2H_16_PTR(ucptr);
 	};
@@ -354,7 +354,7 @@ static inline void bet2s_array(tribyte *src, size_t count, short *dest)
 	ucptr = ((unsigned char *)src) + 3 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		dest[count] = BET2H_16_PTR(ucptr);
 	};
@@ -366,7 +366,7 @@ static inline void lei2s_array(int *src, size_t count, short *dest)
 
 	while (count)
 	{
-        count--;
+		count--;
 		value = LE2H_32(src[count]);
 		dest[count] = value >> 16;
 	};
@@ -378,7 +378,7 @@ static inline void bei2s_array(int *src, size_t count, short *dest)
 
 	while (count)
 	{
-        count--;
+		count--;
 		value = BE2H_32(src[count]);
 		dest[count] = value >> 16;
 	};
@@ -388,7 +388,7 @@ static inline void sc2i_array(signed char *src, size_t count, int *dest)
 {
 	while (count)
 	{
-        count--;
+		count--;
 		dest[count] = arith_shift_left((int)src[count], 24);
 	};
 }
@@ -397,7 +397,7 @@ static inline void uc2i_array(unsigned char *src, size_t count, int *dest)
 {
 	while (count)
 	{
-        count--;
+		count--;
 		dest[count] = arith_shift_left(((int)src[count]) - 128, 24);
 	};
 }
@@ -408,7 +408,7 @@ static inline void bes2i_array(short *src, size_t count, int *dest)
 
 	while (count)
 	{
-        count--;
+		count--;
 		value = BE2H_16(src[count]);
 		dest[count] = arith_shift_left(value, 16);
 	};
@@ -420,7 +420,7 @@ static inline void les2i_array(short *src, size_t count, int *dest)
 
 	while (count)
 	{
-        count--;
+		count--;
 		value = LE2H_16(src[count]);
 		dest[count] = arith_shift_left(value, 16);
 	};
@@ -433,7 +433,7 @@ static inline void bet2i_array(tribyte *src, size_t count, int *dest)
 	ucptr = ((unsigned char *)src) + 3 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		dest[count] = psf_get_be24(ucptr, 0);
 	};
@@ -446,7 +446,7 @@ static inline void let2i_array(tribyte *src, size_t count, int *dest)
 	ucptr = ((unsigned char *)src) + 3 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		dest[count] = psf_get_le24(ucptr, 0);
 	};
@@ -455,21 +455,21 @@ static inline void let2i_array(tribyte *src, size_t count, int *dest)
 static inline void sc2f_array(signed char *src, size_t count, float *dest,
                               float normfact)
 {
-    while (count)
-    {
-        count--;
-        dest[count] = ((float)src[count]) * normfact;
-    }
+	while (count)
+	{
+		count--;
+		dest[count] = ((float)src[count]) * normfact;
+	}
 }
 
 static inline void uc2f_array(unsigned char *src, size_t count, float *dest,
                               float normfact)
 {
-    while (count)
-    {
-        count--;
-        dest[count] = (((int)src[count]) - 128) * normfact;
-    }
+	while (count)
+	{
+		count--;
+		dest[count] = (((int)src[count]) - 128) * normfact;
+	}
 }
 
 static inline void les2f_array(short *src, size_t count, float *dest,
@@ -479,7 +479,7 @@ static inline void les2f_array(short *src, size_t count, float *dest,
 
 	while (count)
 	{
-        count--;
+		count--;
 		value = src[count];
 		value = LE2H_16(value);
 		dest[count] = ((float)value) * normfact;
@@ -493,7 +493,7 @@ static inline void bes2f_array(short *src, size_t count, float *dest,
 
 	while (count)
 	{
-        count--;
+		count--;
 		value = src[count];
 		value = BE2H_16(value);
 		dest[count] = ((float)value) * normfact;
@@ -509,7 +509,7 @@ static inline void let2f_array(tribyte *src, size_t count, float *dest,
 	ucptr = ((unsigned char *)src) + 3 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		value = psf_get_le24(ucptr, 0);
 		dest[count] = ((float)value) * normfact;
@@ -525,7 +525,7 @@ static inline void bet2f_array(tribyte *src, size_t count, float *dest,
 	ucptr = ((unsigned char *)src) + 3 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		value = psf_get_be24(ucptr, 0);
 		dest[count] = ((float)value) * normfact;
@@ -539,7 +539,7 @@ static inline void lei2f_array(int *src, size_t count, float *dest,
 
 	while (count)
 	{
-        count--;
+		count--;
 		value = src[count];
 		value = LE2H_32(value);
 		dest[count] = ((float)value) * normfact;
@@ -553,7 +553,7 @@ static inline void bei2f_array(int *src, size_t count, float *dest,
 
 	while (count)
 	{
-        count--;
+		count--;
 		value = src[count];
 		value = BE2H_32(value);
 		dest[count] = ((float)value) * normfact;
@@ -563,21 +563,21 @@ static inline void bei2f_array(int *src, size_t count, float *dest,
 static inline void sc2d_array(signed char *src, size_t count, double *dest,
                               double normfact)
 {
-    while (count)
-    {
-        count--;
-        dest[count] = ((double)src[count]) * normfact;
-    }
+	while (count)
+	{
+		count--;
+		dest[count] = ((double)src[count]) * normfact;
+	}
 }
 
 static inline void uc2d_array(unsigned char *src, size_t count, double *dest,
                               double normfact)
 {
-    while (count)
-    {
-        count--;
-        dest[count] = (((int)src[count]) - 128) * normfact;
-    }
+	while (count)
+	{
+		count--;
+		dest[count] = (((int)src[count]) - 128) * normfact;
+	}
 }
 
 static inline void les2d_array(short *src, size_t count, double *dest,
@@ -587,7 +587,7 @@ static inline void les2d_array(short *src, size_t count, double *dest,
 
 	while (count)
 	{
-        count--;
+		count--;
 		value = src[count];
 		value = LE2H_16(value);
 		dest[count] = ((double)value) * normfact;
@@ -601,7 +601,7 @@ static inline void bes2d_array(short *src, size_t count, double *dest,
 
 	while (count)
 	{
-        count--;
+		count--;
 		value = src[count];
 		value = BE2H_16(value);
 		dest[count] = ((double)value) * normfact;
@@ -617,7 +617,7 @@ static inline void let2d_array(tribyte *src, size_t count, double *dest,
 	ucptr = ((unsigned char *)src) + 3 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		value = psf_get_le24(ucptr, 0);
 		dest[count] = ((double)value) * normfact;
@@ -633,7 +633,7 @@ static inline void bet2d_array(tribyte *src, size_t count, double *dest,
 	ucptr = ((unsigned char *)src) + 3 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		value = psf_get_be24(ucptr, 0);
 		dest[count] = ((double)value) * normfact;
@@ -647,7 +647,7 @@ static inline void lei2d_array(int *src, size_t count, double *dest,
 
 	while (count)
 	{
-        count--;
+		count--;
 		value = src[count];
 		value = LE2H_32(value);
 		dest[count] = ((double)value) * normfact;
@@ -661,7 +661,7 @@ static inline void bei2d_array(int *src, size_t count, double *dest,
 
 	while (count)
 	{
-        count--;
+		count--;
 		value = src[count];
 		value = BE2H_32(value);
 		dest[count] = ((double)value) * normfact;
@@ -670,21 +670,21 @@ static inline void bei2d_array(int *src, size_t count, double *dest,
 
 static inline void s2sc_array(const short *src, signed char *dest, size_t count)
 {
-    while (count)
-    {
-        count--;
-        dest[count] = src[count] >> 8;
-    }
+	while (count)
+	{
+		count--;
+		dest[count] = src[count] >> 8;
+	}
 }
 
 static inline void s2uc_array(const short *src, unsigned char *dest,
                               size_t count)
 {
-    while (count)
-    {
-        count--;
-        dest[count] = (src[count] >> 8) + 0x80;
-    }
+	while (count)
+	{
+		count--;
+		dest[count] = (src[count] >> 8) + 0x80;
+	}
 }
 
 static inline void s2let_array(const short *src, tribyte *dest, size_t count)
@@ -694,11 +694,11 @@ static inline void s2let_array(const short *src, tribyte *dest, size_t count)
 	ucptr = ((unsigned char *)dest) + 3 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		ucptr[0] = 0;
-		ucptr[1] = src[count];
-		ucptr[2] = src[count] >> 8;
+		ucptr[1] = (unsigned char)src[count];
+		ucptr[2] = (unsigned char)(src[count] >> 8);
 	};
 }
 
@@ -709,11 +709,11 @@ static inline void s2bet_array(const short *src, tribyte *dest, size_t count)
 	ucptr = ((unsigned char *)dest) + 3 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		ucptr[2] = 0;
-		ucptr[1] = src[count];
-		ucptr[0] = src[count] >> 8;
+		ucptr[1] = (unsigned char)src[count];
+		ucptr[0] = (unsigned char)(src[count] >> 8);
 	};
 }
 
@@ -724,12 +724,12 @@ static inline void s2lei_array(const short *src, int *dest, size_t count)
 	ucptr = ((unsigned char *)dest) + 4 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 4;
 		ucptr[0] = 0;
 		ucptr[1] = 0;
-		ucptr[2] = src[count];
-		ucptr[3] = src[count] >> 8;
+		ucptr[2] = (unsigned char)src[count];
+		ucptr[3] = (unsigned char)(src[count] >> 8);
 	};
 }
 
@@ -740,10 +740,10 @@ static inline void s2bei_array(const short *src, int *dest, size_t count)
 	ucptr = ((unsigned char *)dest) + 4 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 4;
 		ucptr[0] = src[count] >> 8;
-		ucptr[1] = src[count];
+		ucptr[1] = (unsigned char)src[count];
 		ucptr[2] = 0;
 		ucptr[3] = 0;
 	};
@@ -751,20 +751,20 @@ static inline void s2bei_array(const short *src, int *dest, size_t count)
 
 static inline void i2sc_array(const int *src, signed char *dest, size_t count)
 {
-    while (count)
-    {
-        count--;
-        dest[count] = (src[count] >> 24);
-    }
+	while (count)
+	{
+		count--;
+		dest[count] = (src[count] >> 24);
+	}
 }
 
 static inline void i2uc_array(const int *src, unsigned char *dest, size_t count)
 {
-    while (count)
-    {
-        count--;
-        dest[count] = ((src[count] >> 24) + 128);
-    }
+	while (count)
+	{
+		count--;
+		dest[count] = ((src[count] >> 24) + 128);
+	}
 }
 
 static inline void i2bes_array(const int *src, short *dest, size_t count)
@@ -774,7 +774,7 @@ static inline void i2bes_array(const int *src, short *dest, size_t count)
 	ucptr = ((unsigned char *)dest) + 2 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 2;
 		ucptr[0] = src[count] >> 24;
 		ucptr[1] = src[count] >> 16;
@@ -788,7 +788,7 @@ static inline void i2les_array(const int *src, short *dest, size_t count)
 	ucptr = ((unsigned char *)dest) + 2 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 2;
 		ucptr[0] = src[count] >> 16;
 		ucptr[1] = src[count] >> 24;
@@ -803,7 +803,7 @@ static inline void i2let_array(const int *src, tribyte *dest, size_t count)
 	ucptr = ((unsigned char *)dest) + 3 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		value = src[count] >> 8;
 		ucptr[0] = value;
@@ -820,7 +820,7 @@ static inline void i2bet_array(const int *src, tribyte *dest, size_t count)
 	ucptr = ((unsigned char *)dest) + 3 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		value = src[count] >> 8;
 		ucptr[2] = value;
@@ -833,7 +833,7 @@ static size_t pcm_read_sc2s(SF_PRIVATE *psf, short *ptr, size_t len)
 {
 	BUF_UNION ubuf;
 	size_t bufferlen, readcount;
-    size_t total = 0;
+	size_t total = 0;
 
 	bufferlen = ARRAY_LEN(ubuf.scbuf);
 
@@ -856,7 +856,7 @@ static size_t pcm_read_uc2s(SF_PRIVATE *psf, short *ptr, size_t len)
 {
 	BUF_UNION ubuf;
 	size_t bufferlen, readcount;
-    size_t total = 0;
+	size_t total = 0;
 
 	bufferlen = ARRAY_LEN(ubuf.ucbuf);
 
@@ -902,7 +902,7 @@ static size_t pcm_read_bet2s(SF_PRIVATE *psf, short *ptr, size_t len)
 {
 	BUF_UNION ubuf;
 	size_t bufferlen, readcount;
-    size_t total = 0;
+	size_t total = 0;
 
 	bufferlen = sizeof(ubuf.ucbuf) / SIZEOF_TRIBYTE;
 
@@ -925,7 +925,7 @@ static size_t pcm_read_let2s(SF_PRIVATE *psf, short *ptr, size_t len)
 {
 	BUF_UNION ubuf;
 	size_t bufferlen, readcount;
-    size_t total = 0;
+	size_t total = 0;
 
 	bufferlen = sizeof(ubuf.ucbuf) / SIZEOF_TRIBYTE;
 
@@ -948,7 +948,7 @@ static size_t pcm_read_bei2s(SF_PRIVATE *psf, short *ptr, size_t len)
 {
 	BUF_UNION ubuf;
 	size_t bufferlen, readcount;
-    size_t total = 0;
+	size_t total = 0;
 
 	bufferlen = ARRAY_LEN(ubuf.ibuf);
 
@@ -1158,7 +1158,7 @@ static size_t pcm_read_sc2f(SF_PRIVATE *psf, float *ptr, size_t len)
 	size_t total = 0;
 	float normfact;
 
-	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80) : 1.0);
 
 	bufferlen = ARRAY_LEN(ubuf.scbuf);
 
@@ -1184,7 +1184,7 @@ static size_t pcm_read_uc2f(SF_PRIVATE *psf, float *ptr, size_t len)
 	size_t total = 0;
 	float normfact;
 
-	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80) : 1.0);
 
 	bufferlen = ARRAY_LEN(ubuf.ucbuf);
 
@@ -1211,7 +1211,7 @@ static size_t pcm_read_bes2f(SF_PRIVATE *psf, float *ptr, size_t len)
 	size_t total = 0;
 	float normfact;
 
-	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
 
 	bufferlen = ARRAY_LEN(ubuf.sbuf);
 
@@ -1237,7 +1237,7 @@ static size_t pcm_read_les2f(SF_PRIVATE *psf, float *ptr, size_t len)
 	size_t total = 0;
 	float normfact;
 
-	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
 
 	bufferlen = ARRAY_LEN(ubuf.sbuf);
 
@@ -1265,7 +1265,7 @@ static size_t pcm_read_bet2f(SF_PRIVATE *psf, float *ptr, size_t len)
 
 	/* Special normfactor because tribyte value is read into an int. */
 	normfact =
-	    (psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0 / 256.0;
+	    (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0 / 256.0);
 
 	bufferlen = sizeof(ubuf.ucbuf) / SIZEOF_TRIBYTE;
 
@@ -1293,7 +1293,7 @@ static size_t pcm_read_let2f(SF_PRIVATE *psf, float *ptr, size_t len)
 
 	/* Special normfactor because tribyte value is read into an int. */
 	normfact =
-	    (psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0 / 256.0;
+	    (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0 / 256.0);
 
 	bufferlen = sizeof(ubuf.ucbuf) / SIZEOF_TRIBYTE;
 
@@ -1319,7 +1319,7 @@ static size_t pcm_read_bei2f(SF_PRIVATE *psf, float *ptr, size_t len)
 	size_t total = 0;
 	float normfact;
 
-	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0);
 
 	bufferlen = ARRAY_LEN(ubuf.ibuf);
 
@@ -1345,7 +1345,7 @@ static size_t pcm_read_lei2f(SF_PRIVATE *psf, float *ptr, size_t len)
 	size_t total = 0;
 	float normfact;
 
-	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0);
 
 	bufferlen = ARRAY_LEN(ubuf.ibuf);
 
@@ -1981,12 +1981,12 @@ static void f2sc_array(const float *src, signed char *dest, int count,
 {
 	float normfact;
 
-	normfact = normalize ? (1.0 * 0x7F) : 1.0;
+	normfact = (float)(normalize ? (1.0 * 0x7F) : 1.0);
 
 	while (count)
 	{
-        count--;
-		dest[count] = lrintf(src[count] * normfact);
+		count--;
+		dest[count] = (char)lrintf(src[count] * normfact);
 	};
 }
 
@@ -1995,11 +1995,11 @@ static void f2sc_clip_array(const float *src, signed char *dest, int count,
 {
 	float normfact, scaled_value;
 
-	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x1000000);
+	normfact = (float)(normalize ? (8.0 * 0x10000000) : (1.0 * 0x1000000));
 
 	while (count)
 	{
-        count--;
+		count--;
 		scaled_value = src[count] * normfact;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{
@@ -2048,12 +2048,12 @@ static void f2uc_array(const float *src, unsigned char *dest, size_t count,
 {
 	float normfact;
 
-	normfact = normalize ? (1.0 * 0x7F) : 1.0;
+	normfact = (float)(normalize ? (1.0 * 0x7F) : 1.0);
 
 	while (count)
 	{
-        count--;
-		dest[count] = lrintf(src[count] * normfact) + 128;
+		count--;
+		dest[count] = (unsigned char)lrintf(src[count] * normfact) + 128;
 	};
 }
 
@@ -2062,11 +2062,11 @@ static void f2uc_clip_array(const float *src, unsigned char *dest, size_t count,
 {
 	float normfact, scaled_value;
 
-	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x1000000);
+	normfact = (float)(normalize ? (8.0 * 0x10000000) : (1.0 * 0x1000000));
 
 	while (count)
 	{
-        count--;
+		count--;
 		scaled_value = src[count] * normfact;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{
@@ -2117,15 +2117,15 @@ static void f2bes_array(const float *src, short *dest, size_t count,
 	float normfact;
 	short value;
 
-	normfact = normalize ? (1.0 * 0x7FFF) : 1.0;
+	normfact = (float)(normalize ? (1.0 * 0x7FFF) : 1.0);
 	ucptr = ((unsigned char *)dest) + 2 * count;
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 2;
-		value = lrintf(src[count] * normfact);
-		ucptr[1] = value;
+		value = (short)lrintf(src[count] * normfact);
+		ucptr[1] = (unsigned char)value;
 		ucptr[0] = value >> 8;
 	};
 }
@@ -2137,12 +2137,12 @@ static void f2bes_clip_array(const float *src, short *dest, size_t count,
 	float normfact, scaled_value;
 	int value;
 
-	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x10000);
+	normfact = (float)(normalize ? (8.0 * 0x10000000) : (1.0 * 0x10000));
 	ucptr = ((unsigned char *)dest) + 2 * count;
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 2;
 		scaled_value = src[count] * normfact;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
@@ -2197,12 +2197,12 @@ static void f2les_array(const float *src, short *dest, size_t count,
 	float normfact;
 	int value;
 
-	normfact = normalize ? (1.0 * 0x7FFF) : 1.0;
+	normfact = (float)(normalize ? (1.0 * 0x7FFF) : 1.0);
 	ucptr = ((unsigned char *)dest) + 2 * count;
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 2;
 		value = lrintf(src[count] * normfact);
 		ucptr[0] = value;
@@ -2217,12 +2217,12 @@ static void f2les_clip_array(const float *src, short *dest, size_t count,
 	float normfact, scaled_value;
 	int value;
 
-	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x10000);
+	normfact = (float)(normalize ? (8.0 * 0x10000000) : (1.0 * 0x10000));
 	ucptr = ((unsigned char *)dest) + 2 * count;
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 2;
 		scaled_value = src[count] * normfact;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
@@ -2276,12 +2276,12 @@ static void f2let_array(const float *src, tribyte *dest, size_t count,
 	float normfact;
 	int value;
 
-	normfact = normalize ? (1.0 * 0x7FFFFF) : 1.0;
+	normfact = (float)(normalize ? (1.0 * 0x7FFFFF) : 1.0);
 	ucptr = ((unsigned char *)dest) + 3 * count;
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		value = lrintf(src[count] * normfact);
 		ucptr[0] = value;
@@ -2297,12 +2297,12 @@ static void f2let_clip_array(const float *src, tribyte *dest, size_t count,
 	float normfact, scaled_value;
 	int value;
 
-	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x100);
+	normfact = (float)(normalize ? (8.0 * 0x10000000) : (1.0 * 0x100));
 	ucptr = ((unsigned char *)dest) + 3 * count;
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		scaled_value = src[count] * normfact;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
@@ -2360,12 +2360,12 @@ static void f2bet_array(const float *src, tribyte *dest, size_t count,
 	float normfact;
 	int value;
 
-	normfact = normalize ? (1.0 * 0x7FFFFF) : 1.0;
+	normfact = (float)(normalize ? (1.0 * 0x7FFFFF) : 1.0);
 	ucptr = ((unsigned char *)dest) + 3 * count;
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		value = lrintf(src[count] * normfact);
 		ucptr[0] = value >> 16;
@@ -2381,12 +2381,12 @@ static void f2bet_clip_array(const float *src, tribyte *dest, size_t count,
 	float normfact, scaled_value;
 	int value;
 
-	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x100);
+	normfact = (float)(normalize ? (8.0 * 0x10000000) : (1.0 * 0x100));
 	ucptr = ((unsigned char *)dest) + 3 * count;
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		scaled_value = src[count] * normfact;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
@@ -2444,11 +2444,11 @@ static void f2bei_array(const float *src, int *dest, size_t count,
 	float normfact;
 	int value;
 
-	normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0;
+	normfact = (float)(normalize ? (1.0 * 0x7FFFFFFF) : 1.0);
 	ucptr = ((unsigned char *)dest) + 4 * count;
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 4;
 		value = lrintf(src[count] * normfact);
 		ucptr[0] = value >> 24;
@@ -2465,12 +2465,12 @@ static void f2bei_clip_array(const float *src, int *dest, size_t count,
 	float normfact, scaled_value;
 	int value;
 
-	normfact = normalize ? (8.0 * 0x10000000) : 1.0;
+	normfact = (float)(normalize ? (8.0 * 0x10000000) : 1.0);
 	ucptr = ((unsigned char *)dest) + 4 * count;
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 4;
 		scaled_value = src[count] * normfact;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= 1.0 * 0x7FFFFFFF)
@@ -2530,12 +2530,12 @@ static void f2lei_array(const float *src, int *dest, size_t count,
 	float normfact;
 	int value;
 
-	normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0;
+	normfact = (float)(normalize ? (1.0 * 0x7FFFFFFF) : 1.0);
 	ucptr = ((unsigned char *)dest) + 4 * count;
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 4;
 		value = lrintf(src[count] * normfact);
 		ucptr[0] = value;
@@ -2552,12 +2552,12 @@ static void f2lei_clip_array(const float *src, int *dest, size_t count,
 	float normfact, scaled_value;
 	int value;
 
-	normfact = normalize ? (8.0 * 0x10000000) : 1.0;
+	normfact = (float)(normalize ? (8.0 * 0x10000000) : 1.0);
 	ucptr = ((unsigned char *)dest) + 4 * count;
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 4;
 		scaled_value = src[count] * normfact;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
@@ -2619,8 +2619,8 @@ static void d2sc_array(const double *src, signed char *dest, size_t count,
 
 	while (count)
 	{
-        count--;
-		dest[count] = lrint(src[count] * normfact);
+		count--;
+		dest[count] = (char)lrint(src[count] * normfact);
 	};
 }
 
@@ -2633,7 +2633,7 @@ static void d2sc_clip_array(const double *src, signed char *dest, size_t count,
 
 	while (count)
 	{
-        count--;
+		count--;
 		scaled_value = src[count] * normfact;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{
@@ -2685,8 +2685,8 @@ static void d2uc_array(const double *src, unsigned char *dest, size_t count,
 
 	while (count)
 	{
-        count--;
-		dest[count] = lrint(src[count] * normfact) + 128;
+		count--;
+		dest[count] = (unsigned char)lrint(src[count] * normfact) + 128;
 	};
 }
 
@@ -2699,7 +2699,7 @@ static void d2uc_clip_array(const double *src, unsigned char *dest,
 
 	while (count)
 	{
-        count--;
+		count--;
 		scaled_value = src[count] * normfact;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{
@@ -2754,10 +2754,10 @@ static void d2bes_array(const double *src, short *dest, size_t count,
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 2;
-		value = lrint(src[count] * normfact);
-		ucptr[1] = value;
+		value = (short)lrint(src[count] * normfact);
+		ucptr[1] = (unsigned char)value;
 		ucptr[0] = value >> 8;
 	};
 }
@@ -2774,7 +2774,7 @@ static void d2bes_clip_array(const double *src, short *dest, size_t count,
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 2;
 		scaled_value = src[count] * normfact;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
@@ -2833,10 +2833,10 @@ static void d2les_array(const double *src, short *dest, size_t count,
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 2;
-		value = lrint(src[count] * normfact);
-		ucptr[0] = value;
+		value = (short)lrint(src[count] * normfact);
+		ucptr[0] = (unsigned char)value;
 		ucptr[1] = value >> 8;
 	};
 }
@@ -2853,7 +2853,7 @@ static void d2les_clip_array(const double *src, short *dest, size_t count,
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 2;
 		scaled_value = src[count] * normfact;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
@@ -2912,7 +2912,7 @@ static void d2let_array(const double *src, tribyte *dest, size_t count,
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		value = lrint(src[count] * normfact);
 		ucptr[0] = value;
@@ -2933,7 +2933,7 @@ static void d2let_clip_array(const double *src, tribyte *dest, size_t count,
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		scaled_value = src[count] * normfact;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
@@ -2996,7 +2996,7 @@ static void d2bet_array(const double *src, tribyte *dest, size_t count,
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		value = lrint(src[count] * normfact);
 		ucptr[2] = value;
@@ -3017,7 +3017,7 @@ static void d2bet_clip_array(const double *src, tribyte *dest, size_t count,
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 3;
 		scaled_value = src[count] * normfact;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
@@ -3080,7 +3080,7 @@ static void d2bei_array(const double *src, int *dest, size_t count,
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 4;
 		value = lrint(src[count] * normfact);
 		ucptr[0] = value >> 24;
@@ -3102,7 +3102,7 @@ static void d2bei_clip_array(const double *src, int *dest, size_t count,
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 4;
 		scaled_value = src[count] * normfact;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
@@ -3167,7 +3167,7 @@ static void d2lei_array(const double *src, int *dest, size_t count,
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 4;
 		value = lrint(src[count] * normfact);
 		ucptr[0] = value;
@@ -3189,7 +3189,7 @@ static void d2lei_clip_array(const double *src, int *dest, size_t count,
 
 	while (count)
 	{
-        count--;
+		count--;
 		ucptr -= 4;
 		scaled_value = src[count] * normfact;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))

@@ -217,7 +217,7 @@ static size_t vox_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
 		return 0;
 	pvox = (IMA_OKI_ADPCM *)psf->codec_data;
 
-	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
 
 	sptr = ubuf.sbuf;
 	bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -361,7 +361,7 @@ static size_t vox_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
 		return 0;
 	pvox = (IMA_OKI_ADPCM *)psf->codec_data;
 
-	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0);
 
 	sptr = ubuf.sbuf;
 	bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -369,7 +369,7 @@ static size_t vox_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
 	{
 		writecount = (len >= bufferlen) ? bufferlen : (int)len;
 		for (k = 0; k < writecount; k++)
-			sptr[k] = lrintf(normfact * ptr[total + k]);
+			sptr[k] = (short)lrintf(normfact * ptr[total + k]);
 		count = vox_write_block(psf, pvox, sptr, writecount);
 		total += count;
 		len -= writecount;
@@ -401,7 +401,7 @@ static size_t vox_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
 	{
 		writecount = (len >= bufferlen) ? bufferlen : len;
 		for (k = 0; k < writecount; k++)
-			sptr[k] = lrint(normfact * ptr[total + k]);
+			sptr[k] = (short)lrint(normfact * ptr[total + k]);
 		count = vox_write_block(psf, pvox, sptr, writecount);
 		total += count;
 		len -= writecount;

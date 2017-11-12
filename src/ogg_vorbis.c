@@ -386,7 +386,7 @@ static int vorbis_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
 
     /* The style of encoding should be selectable here, VBR quality mode. */
     ret = vorbis_encode_init_vbr(&vdata->vinfo, psf->sf.channels,
-                                 psf->sf.samplerate, vdata->quality);
+                                 psf->sf.samplerate, (float)vdata->quality);
 
 #if 0
 	ret = vorbis_encode_init(&vdata->vinfo, psf->sf.channels, psf->sf.samplerate,
@@ -681,16 +681,16 @@ static int vorbis_rshort(SF_PRIVATE *psf, int samples, void *vptr, int off,
     int i = 0, j, n;
     if (psf->float_int_mult)
     {
-        float inverse = 1.0 / psf->float_max;
+        float inverse = (float)(1.0 / psf->float_max);
         for (j = 0; j < samples; j++)
             for (n = 0; n < channels; n++)
-                ptr[i++] = lrintf((pcm[n][j] * inverse) * 32767.0f);
+                ptr[i++] = (short)lrintf((pcm[n][j] * inverse) * 32767.0f);
     }
     else
     {
         for (j = 0; j < samples; j++)
             for (n = 0; n < channels; n++)
-                ptr[i++] = lrintf(pcm[n][j] * 32767.0f);
+                ptr[i++] = (short)lrintf(pcm[n][j] * 32767.0f);
     }
     return i;
 }
@@ -703,7 +703,7 @@ static int vorbis_rint(SF_PRIVATE *psf, int samples, void *vptr, int off,
 
     if (psf->float_int_mult)
     {
-        float inverse = 1.0 / psf->float_max;
+        float inverse = (float)(1.0 / psf->float_max);
         for (j = 0; j < samples; j++)
             for (n = 0; n < channels; n++)
                 ptr[i++] = lrintf((pcm[n][j] * inverse) * 2147483647.0f);

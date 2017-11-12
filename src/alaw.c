@@ -438,7 +438,7 @@ static size_t alaw_read_alaw2f(SF_PRIVATE *psf, float *ptr, size_t len)
 	size_t total = 0;
 	float normfact;
 
-	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
 
 	bufferlen = ARRAY_LEN(ubuf.ucbuf);
 
@@ -539,7 +539,7 @@ static size_t alaw_write_f2alaw(SF_PRIVATE *psf, const float *ptr,
 	size_t total = 0;
 	float normfact;
 
-	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) / 16.0 : 1.0 / 16;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) / 16.0 : 1.0 / 16);
 
 	bufferlen = ARRAY_LEN(ubuf.ucbuf);
 

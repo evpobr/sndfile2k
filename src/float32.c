@@ -279,15 +279,15 @@ float float32_be_read(const unsigned char *cptr)
 	mantissa |= 0x800000;
 	exponent = exponent ? exponent - 127 : 0;
 
-	fvalue = mantissa ? ((float)mantissa) / ((float)0x800000) : 0.0;
+	fvalue = (float)(mantissa ? ((float)mantissa) / ((float)0x800000) : 0.0);
 
 	if (negative)
 		fvalue *= -1;
 
 	if (exponent > 0)
-		fvalue *= pow(2.0, exponent);
+		fvalue *= (float)pow(2.0, exponent);
 	else if (exponent < 0)
-		fvalue /= pow(2.0, abs(exponent));
+		fvalue /= (float)pow(2.0, abs(exponent));
 
 	return fvalue;
 }
@@ -307,15 +307,15 @@ float float32_le_read(const unsigned char *cptr)
 	mantissa |= 0x800000;
 	exponent = exponent ? exponent - 127 : 0;
 
-	fvalue = mantissa ? ((float)mantissa) / ((float)0x800000) : 0.0;
+	fvalue = (float)(mantissa ? ((float)mantissa) / ((float)0x800000) : 0.0);
 
 	if (negative)
 		fvalue *= -1;
 
 	if (exponent > 0)
-		fvalue *= pow(2.0, exponent);
+		fvalue *= (float)pow(2.0, exponent);
 	else if (exponent < 0)
-		fvalue /= pow(2.0, abs(exponent));
+		fvalue /= (float)pow(2.0, abs(exponent));
 
 	return fvalue;
 }
@@ -335,7 +335,7 @@ void float32_le_write(float in, unsigned char *out)
 		negative = 1;
 	};
 
-	in = frexp(in, &exponent);
+	in = (float)frexp(in, &exponent);
 
 	exponent += 126;
 
@@ -371,7 +371,7 @@ void float32_be_write(float in, unsigned char *out)
 		negative = 1;
 	};
 
-	in = frexp(in, &exponent);
+	in = (float)frexp(in, &exponent);
 
 	exponent += 126;
 
@@ -401,12 +401,12 @@ static void float32_peak_update(SF_PRIVATE *psf, const float *buffer,
 
 	for (chan = 0; chan < psf->sf.channels; chan++)
 	{
-		fmaxval = fabs(buffer[chan]);
+		fmaxval = (float)fabs(buffer[chan]);
 		position = 0;
 		for (k = chan; k < count; k += psf->sf.channels)
 			if (fmaxval < fabs(buffer[k]))
 			{
-				fmaxval = fabs(buffer[k]);
+				fmaxval = (float)fabs(buffer[k]);
 				position = k;
 			};
 
@@ -456,7 +456,7 @@ static void f2s_array(const float *src, size_t count, short *dest, float scale)
 	while (count)
 	{
         count--;
-		dest[count] = lrintf(scale * src[count]);
+		dest[count] = (short)lrintf(scale * src[count]);
 	};
 }
 
@@ -473,7 +473,7 @@ static void f2s_clip_array(const float *src, size_t count, short *dest,
 		else if (CPU_CLIPS_NEGATIVE == 0 && tmp < -32768.0)
 			dest[count] = SHRT_MIN;
 		else
-			dest[count] = lrintf(tmp);
+			dest[count] = (short)lrintf(tmp);
 	};
 }
 
@@ -538,7 +538,7 @@ static inline void d2f_array(const double *src, float *dest, size_t count)
 	while (count)
 	{
         count--;
-		dest[count] = src[count];
+		dest[count] = (float)src[count];
 	};
 }
 
@@ -552,7 +552,7 @@ static size_t host_read_f2s(SF_PRIVATE *psf, short *ptr, size_t len)
 
 	convert = (psf->add_clipping) ? f2s_clip_array : f2s_array;
 	bufferlen = ARRAY_LEN(ubuf.fbuf);
-	scale = (psf->float_int_mult == 0) ? 1.0 : 0x7FFF / psf->float_max;
+	scale = (float)((psf->float_int_mult == 0) ? 1.0 : 0x7FFF / psf->float_max);
 
 	while (len > 0)
 	{
@@ -584,7 +584,7 @@ static size_t host_read_f2i(SF_PRIVATE *psf, int *ptr, size_t len)
 
 	convert = (psf->add_clipping) ? f2i_clip_array : f2i_array;
 	bufferlen = ARRAY_LEN(ubuf.fbuf);
-	scale = (psf->float_int_mult == 0) ? 1.0 : 0x7FFFFFFF / psf->float_max;
+	scale = (float)((psf->float_int_mult == 0) ? 1.0 : 0x7FFFFFFF / psf->float_max);
 
 	while (len > 0)
 	{
@@ -669,7 +669,7 @@ static size_t host_write_s2f(SF_PRIVATE *psf, const short *ptr, size_t len)
 	float scale;
 
 	/* Erik */
-	scale = (psf->scale_int_float == 0) ? 1.0 : 1.0 / 0x8000;
+	scale = (float)((psf->scale_int_float == 0) ? 1.0 : 1.0 / 0x8000);
 	bufferlen = ARRAY_LEN(ubuf.fbuf);
 
 	while (len > 0)
@@ -702,7 +702,7 @@ static size_t host_write_i2f(SF_PRIVATE *psf, const int *ptr, size_t len)
 	size_t total = 0;
 	float scale;
 
-	scale = (psf->scale_int_float == 0) ? 1.0 : 1.0 / (8.0 * 0x10000000);
+	scale = (float)((psf->scale_int_float == 0) ? 1.0 : 1.0 / (8.0 * 0x10000000));
 	bufferlen = ARRAY_LEN(ubuf.fbuf);
 
 	while (len > 0)
@@ -799,7 +799,7 @@ static size_t replace_read_f2s(SF_PRIVATE *psf, short *ptr, size_t len)
 	float scale;
 
 	bufferlen = ARRAY_LEN(ubuf.fbuf);
-	scale = (psf->float_int_mult == 0) ? 1.0 : 0x7FFF / psf->float_max;
+	scale = (float)((psf->float_int_mult == 0) ? 1.0 : 0x7FFF / psf->float_max);
 
 	while (len > 0)
 	{
@@ -830,7 +830,7 @@ static size_t replace_read_f2i(SF_PRIVATE *psf, int *ptr, size_t len)
 	float scale;
 
 	bufferlen = ARRAY_LEN(ubuf.fbuf);
-	scale = (psf->float_int_mult == 0) ? 1.0 : 0x7FFF / psf->float_max;
+	scale = (float)((psf->float_int_mult == 0) ? 1.0 : 0x7FFF / psf->float_max);
 
 	while (len > 0)
 	{
@@ -921,7 +921,7 @@ static size_t replace_write_s2f(SF_PRIVATE *psf, const short *ptr, size_t len)
 	size_t total = 0;
 	float scale;
 
-	scale = (psf->scale_int_float == 0) ? 1.0 : 1.0 / 0x8000;
+	scale = (float)((psf->scale_int_float == 0) ? 1.0 : 1.0 / 0x8000);
 	bufferlen = ARRAY_LEN(ubuf.fbuf);
 
 	while (len > 0)
@@ -956,7 +956,7 @@ static size_t replace_write_i2f(SF_PRIVATE *psf, const int *ptr, size_t len)
 	size_t total = 0;
 	float scale;
 
-	scale = (psf->scale_int_float == 0) ? 1.0 : 1.0 / (8.0 * 0x10000000);
+	scale = (float)((psf->scale_int_float == 0) ? 1.0 : 1.0 / (8.0 * 0x10000000));
 	bufferlen = ARRAY_LEN(ubuf.fbuf);
 
 	while (len > 0)

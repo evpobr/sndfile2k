@@ -647,7 +647,7 @@ static size_t sds_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
 	if (psf->norm_float == SF_TRUE)
 		normfact = 1.0 / 0x80000000;
 	else
-		normfact = 1.0 / (1 << psds->bitwidth);
+		normfact = (float)(1.0 / (1 << psds->bitwidth));
 
 	iptr = ubuf.ibuf;
 	bufferlen = ARRAY_LEN(ubuf.ibuf);
@@ -1009,7 +1009,7 @@ static size_t sds_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
 	if (psf->norm_float == SF_TRUE)
 		normfact = 1.0 * 0x80000000;
 	else
-		normfact = 1.0 * (1 << psds->bitwidth);
+		normfact = (float)(1.0 * (1 << psds->bitwidth));
 
 	iptr = ubuf.ibuf;
 	bufferlen = ARRAY_LEN(ubuf.ibuf);
@@ -1017,7 +1017,7 @@ static size_t sds_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
 	{
 		writecount = (len >= bufferlen) ? bufferlen : len;
 		for (k = 0; k < writecount; k++)
-			iptr[k] = normfact * ptr[total + k];
+			iptr[k] = (int)(normfact * ptr[total + k]);
 		count = sds_write(psf, psds, iptr, writecount);
 		total += count;
 		len -= writecount;
@@ -1052,7 +1052,7 @@ static size_t sds_write_d(SF_PRIVATE *psf, const double *ptr,
 	{
 		writecount = (len >= bufferlen) ? bufferlen : len;
 		for (k = 0; k < writecount; k++)
-			iptr[k] = normfact * ptr[total + k];
+			iptr[k] = (int)(normfact * ptr[total + k]);
 		count = sds_write(psf, psds, iptr, writecount);
 		total += count;
 		len -= writecount;

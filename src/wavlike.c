@@ -403,7 +403,7 @@ int wavlike_read_fmt_chunk(SF_PRIVATE *psf, int fmtsize)
         else
         {
             char buffer[512];
-            unsigned bit;
+            size_t bit;
 
             wpriv->wavex_channelmask = wav_fmt->ext.channelmask;
 

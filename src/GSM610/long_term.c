@@ -753,47 +753,47 @@ Calculation_of_the_LTP_parameters(register int16_t *din, /* [0..39]      IN  */
 
         if (S0 > L_max)
         {
-            L_max = S0;
+            L_max = (int32_t)S0;
             Nc = lambda;
         }
         if (S1 > L_max)
         {
-            L_max = S1;
+            L_max = (int32_t)S1;
             Nc = lambda + 1;
         }
         if (S2 > L_max)
         {
-            L_max = S2;
+            L_max = (int32_t)S2;
             Nc = lambda + 2;
         }
         if (S3 > L_max)
         {
-            L_max = S3;
+            L_max = (int32_t)S3;
             Nc = lambda + 3;
         }
         if (S4 > L_max)
         {
-            L_max = S4;
+            L_max = (int32_t)S4;
             Nc = lambda + 4;
         }
         if (S5 > L_max)
         {
-            L_max = S5;
+            L_max = (int32_t)S5;
             Nc = lambda + 5;
         }
         if (S6 > L_max)
         {
-            L_max = S6;
+            L_max = (int32_t)S6;
             Nc = lambda + 6;
         }
         if (S7 > L_max)
         {
-            L_max = S7;
+            L_max = (int32_t)S7;
             Nc = lambda + 7;
         }
         if (S8 > L_max)
         {
-            L_max = S8;
+            L_max = (int32_t)S8;
             Nc = lambda + 8;
         }
     }
@@ -1125,7 +1125,7 @@ static void Fast_Calculation_of_the_LTP_parameters(
 	 *  Table 4.3a must be used to obtain the level DLB [i] for the
 	 *  quantization of the LTP gain b to get the coded version bc.
 	 */
-    lambda = L_max / L_power * 32768.0;
+    lambda = (int)(L_max / L_power * 32768.0);
     for (bc = 0; bc <= 2; ++bc)
         if (lambda <= gsm_DLB[bc])
             break;

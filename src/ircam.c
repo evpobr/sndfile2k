@@ -256,7 +256,7 @@ static int ircam_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     if (psf->is_pipe == SF_FALSE)
         psf_fseek(psf, 0, SEEK_SET);
 
-    samplerate = psf->sf.samplerate;
+    samplerate = (float)psf->sf.samplerate;
 
     switch (psf->endian)
     {

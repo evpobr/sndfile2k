@@ -429,7 +429,7 @@ static size_t msadpcm_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
 		return 0;
 	pms = (MSADPCM_PRIVATE *)psf->codec_data;
 
-	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
 	sptr = ubuf.sbuf;
 	bufferlen = ARRAY_LEN(ubuf.sbuf);
 	while (len > 0)
@@ -764,7 +764,7 @@ static size_t msadpcm_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
 		return 0;
 	pms = (MSADPCM_PRIVATE *)psf->codec_data;
 
-	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0;
+	normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0);
 
 	sptr = ubuf.sbuf;
 	bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -772,7 +772,7 @@ static size_t msadpcm_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
 	{
 		writecount = (len >= bufferlen) ? bufferlen : len;
 		for (k = 0; k < writecount; k++)
-			sptr[k] = lrintf(normfact * ptr[total + k]);
+			sptr[k] = (short)lrintf(normfact * ptr[total + k]);
 		count = msadpcm_write_block(psf, pms, sptr, writecount);
 		total += count;
 		len -= writecount;
@@ -803,7 +803,7 @@ static size_t msadpcm_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
 	{
 		writecount = (len >= bufferlen) ? bufferlen : len;
 		for (k = 0; k < writecount; k++)
-			sptr[k] = lrint(normfact * ptr[total + k]);
+			sptr[k] = (short)lrint(normfact * ptr[total + k]);
 		count = msadpcm_write_block(psf, pms, sptr, writecount);
 		total += count;
 		len -= writecount;

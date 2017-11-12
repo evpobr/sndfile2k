@@ -355,9 +355,9 @@ static sf_count_t flac_buffer_copy(SF_PRIVATE *psf)
 	case PFLAC_PCM_FLOAT:
 	{
 		float *retpcm = (float *)pflac->ptr;
-		float norm = (psf->norm_float == SF_TRUE)
+		float norm = (float)((psf->norm_float == SF_TRUE)
 		             ? 1.0 / (1 << (frame->header.bits_per_sample - 1))
-		             : 1.0;
+		             : 1.0);
 
 		for (i = 0; i < len && pflac->remain > 0; i++)
 		{
@@ -1376,7 +1376,7 @@ static void f2flac8_clip_array(const float *src, int32_t *dest, size_t count,
 {
 	float normfact, scaled_value;
 
-	normfact = normalize ? (8.0 * 0x10) : 1.0;
+	normfact = (float)(normalize ? (8.0 * 0x10) : 1.0);
 
 	while (count)
 	{
@@ -1403,7 +1403,7 @@ static void f2flac16_clip_array(const float *src, int32_t *dest, size_t count,
 {
 	float normfact, scaled_value;
 
-	normfact = normalize ? (8.0 * 0x1000) : 1.0;
+	normfact = (float)(normalize ? (8.0 * 0x1000) : 1.0);
 
 	while (count)
 	{
@@ -1428,7 +1428,7 @@ static void f2flac24_clip_array(const float *src, int32_t *dest, size_t count,
 {
 	float normfact, scaled_value;
 
-	normfact = normalize ? (8.0 * 0x100000) : 1.0;
+	normfact = (float)(normalize ? (8.0 * 0x100000) : 1.0);
 
 	while (count)
 	{
@@ -1454,7 +1454,7 @@ static void f2flac24_clip_array(const float *src, int32_t *dest, size_t count,
 static void f2flac8_array(const float *src, int32_t *dest, size_t count,
                           int normalize)
 {
-	float normfact = normalize ? (1.0 * 0x7F) : 1.0;
+	float normfact = (float)(normalize ? (1.0 * 0x7F) : 1.0);
 
     while (count)
     {
@@ -1466,7 +1466,7 @@ static void f2flac8_array(const float *src, int32_t *dest, size_t count,
 static void f2flac16_array(const float *src, int32_t *dest, size_t count,
                            int normalize)
 {
-	float normfact = normalize ? (1.0 * 0x7FFF) : 1.0;
+	float normfact = (float)(normalize ? (1.0 * 0x7FFF) : 1.0);
 
     while (count)
     {
@@ -1478,7 +1478,7 @@ static void f2flac16_array(const float *src, int32_t *dest, size_t count,
 static void f2flac24_array(const float *src, int32_t *dest, size_t count,
                            int normalize)
 {
-	float normfact = normalize ? (1.0 * 0x7FFFFF) : 1.0;
+	float normfact = (float)(normalize ? (1.0 * 0x7FFFFF) : 1.0);
 
     while (count)
     {

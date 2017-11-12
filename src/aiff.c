@@ -1999,8 +1999,8 @@ static int aiff_read_basc_chunk(SF_PRIVATE *psf, int datasize)
     psf->loop_info->num_beats = bc.numBeats;
 
     /* Can always be recalculated from other known fields. */
-    psf->loop_info->bpm = (1.0 / psf->sf.frames) * psf->sf.samplerate *
-                          ((bc.numBeats * 4.0) / bc.sigDenominator) * 60.0;
+    psf->loop_info->bpm = (float)((1.0 / psf->sf.frames) * psf->sf.samplerate *
+                          ((bc.numBeats * 4.0) / bc.sigDenominator) * 60.0);
     psf->loop_info->root_key = bc.rootNote;
 
     if (count < datasize)

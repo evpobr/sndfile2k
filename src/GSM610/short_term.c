@@ -249,10 +249,10 @@ static void Fast_Short_term_analysis_filtering(
             di += rpfi * ufi;
             sav = temp;
         }
-        *s = di;
+        *s = (int16_t)di;
     }
     for (i = 0; i < 8; i++)
-        u[i] = uf[i];
+        u[i] = (int16_t)uf[i];
 }
 #endif /* ! (defined (USE_FLOAT_MUL) && defined (FAST)) */
 
@@ -335,10 +335,10 @@ static void Fast_Short_term_synthesis_filtering(
                 temp = 32767.0;
             va[i + 1] = temp;
         }
-        *sr++ = va[0] = sri;
+        *sr++ = (int16_t)(va[0] = sri);
     }
     for (i = 0; i < 9; ++i)
-        v[i] = va[i];
+        v[i] = (int16_t)(va[i]);
 }
 
 #endif /* defined(FAST) && defined(USE_FLOAT_MUL) */

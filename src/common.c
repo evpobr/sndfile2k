@@ -558,26 +558,26 @@ static inline void header_put_le_int(SF_PRIVATE *psf, int x)
 
 static inline void header_put_be_8byte(SF_PRIVATE *psf, sf_count_t x)
 {
-    psf->header.ptr[psf->header.indx++] = (x >> 56);
-    psf->header.ptr[psf->header.indx++] = (x >> 48);
-    psf->header.ptr[psf->header.indx++] = (x >> 40);
-    psf->header.ptr[psf->header.indx++] = (x >> 32);
-    psf->header.ptr[psf->header.indx++] = (x >> 24);
-    psf->header.ptr[psf->header.indx++] = (x >> 16);
-    psf->header.ptr[psf->header.indx++] = (x >> 8);
-    psf->header.ptr[psf->header.indx++] = x;
+    psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 56);
+    psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 48);
+    psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 40);
+    psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 32);
+    psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 24);
+    psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 16);
+    psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 8);
+    psf->header.ptr[psf->header.indx++] = (unsigned char)x;
 }
 
 static inline void header_put_le_8byte(SF_PRIVATE *psf, sf_count_t x)
 {
-    psf->header.ptr[psf->header.indx++] = x;
-    psf->header.ptr[psf->header.indx++] = (x >> 8);
-    psf->header.ptr[psf->header.indx++] = (x >> 16);
-    psf->header.ptr[psf->header.indx++] = (x >> 24);
-    psf->header.ptr[psf->header.indx++] = (x >> 32);
-    psf->header.ptr[psf->header.indx++] = (x >> 40);
-    psf->header.ptr[psf->header.indx++] = (x >> 48);
-    psf->header.ptr[psf->header.indx++] = (x >> 56);
+    psf->header.ptr[psf->header.indx++] = (unsigned char)x;
+    psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 8);
+    psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 16);
+    psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 24);
+    psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 32);
+    psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 40);
+    psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 48);
+    psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 56);
 }
 
 #else
@@ -1681,11 +1681,11 @@ void psf_f2s_array(const float *src, short *dest, size_t count, int normalize)
 {
     float normfact;
 
-    normfact = normalize ? (1.0 * 0x7FFF) : 1.0;
+    normfact = (float)(normalize ? (1.0 * 0x7FFF) : 1.0);
     while (count)
     {
         count--;
-        dest[count] = lrintf(src[count] * normfact);
+        dest[count] = (short)lrintf(src[count] * normfact);
     }
 
     return;
@@ -1695,7 +1695,7 @@ void psf_f2s_clip_array(const float *src, short *dest, size_t count, int normali
 {
     float normfact, scaled_value;
 
-    normfact = normalize ? (1.0 * 0x8000) : 1.0;
+    normfact = (float)(normalize ? (1.0 * 0x8000) : 1.0);
 
     while (count)
     {
@@ -1712,7 +1712,7 @@ void psf_f2s_clip_array(const float *src, short *dest, size_t count, int normali
             continue;
         };
 
-        dest[count] = lrintf(scaled_value);
+        dest[count] = (short)lrintf(scaled_value);
     };
 
     return;
@@ -1726,7 +1726,7 @@ void psf_d2s_array(const double *src, short *dest, size_t count, int normalize)
     while (count)
     {
         count--;
-        dest[count] = lrint(src[count] * normfact);
+        dest[count] = (short)lrint(src[count] * normfact);
     }
 
     return;
@@ -1754,7 +1754,7 @@ void psf_d2s_clip_array(const double *src, short *dest, size_t count,
             continue;
         };
 
-        dest[count] = lrint(scaled_value);
+        dest[count] = (short)lrint(scaled_value);
     };
 
     return;
@@ -1764,7 +1764,7 @@ void psf_f2i_array(const float *src, int *dest, size_t count, int normalize)
 {
     float normfact;
 
-    normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0;
+    normfact = (float)(normalize ? (1.0 * 0x7FFFFFFF) : 1.0);
     while (count)
     {
         count--;
@@ -1778,7 +1778,7 @@ void psf_f2i_clip_array(const float *src, int *dest, size_t count, int normalize
 {
     float normfact, scaled_value;
 
-    normfact = normalize ? (8.0 * 0x10000000) : 1.0;
+    normfact = (float)(normalize ? (8.0 * 0x10000000) : 1.0);
 
     while (count)
     {
