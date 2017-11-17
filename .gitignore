@@ -64,3 +64,5 @@ CMakeSettings.json
 
 CmakeBuild/
 cmake-build/
+
+.vs/
