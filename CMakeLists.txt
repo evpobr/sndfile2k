@@ -10,12 +10,8 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED TRUE)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
-set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
-set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
-set(CPACK_PACKAGE_VERSION_STAGE "")
-set(CPACK_PACKAGE_VERSION_FULL "${PROJECT_VERSION}${CPACK_PACKAGE_VERSION_STAGE}")
+set(PACKAGE_NAME ${PROJECT_NAME})
+set(PACKAGE_VERSION ${PROJECT_VERSION})
 
 set(SNDFILE2K_SOVERSION_MAJOR 1)
 set(SNDFILE2K_SOVERSION_MINOR 0)
@@ -29,20 +25,6 @@ set(SNDFILE2K_SOVERSION "${SNDFILE2K_SOVERSION_MAJOR}.${SNDFILE2K_SOVERSION_MINO
 include(GNUInstallDirs)
 include(FeatureSummary)
 include(CMakeDependentOption)
-if(ENABLE_CPACK)
-  set(CPACK_PACKAGE_VENDOR "Erik de Castro Lopo")
-  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A library for reading and writing audio files")
-  set(SNDFILE_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
-  if(SNDFILE_SYSTEM_NAME MATCHES "Windows")
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-      set(SNDFILE_SYSTEM_NAME win64)
-    else()
-      set(SNDFILE_SYSTEM_NAME win32)
-    endif()
-  endif()
-  set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${CPACK_PACKAGE_VERSION_FULL}-${SNDFILE_SYSTEM_NAME})
-  include(CPack)
-endif(ENABLE_CPACK)
 
 #
 # Options
@@ -52,7 +34,6 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(BUILD_PROGRAMS "Build programs" ON)
 option(BUILD_EXAMPLES "Build examples" ON)
 option(BUILD_TESTING "Build tests" ON)
-option(ENABLE_CPACK "Enable CPack support" ON)
 option(DISABLE_EXTERNAL_LIBS "Disable use of FLAC, Ogg and Vorbis" OFF)
 option(ENABLE_EXPERIMENTAL "Enable experimental code" OFF)
 option(DISABLE_CPU_CLIP "Disable tricky cpu specific clipper" OFF)
@@ -76,7 +57,6 @@ add_feature_info(DISABLE_EXTERNAL_LIBS DISABLE_EXTERNAL_LIBS "disable use of FLA
 add_feature_info(ENABLE_EXPERIMENTAL ENABLE_EXPERIMENTAL "enable experimental code")
 add_feature_info(BUILD_TESTING BUILD_TESTING "build tests")
 add_feature_info(BUILD_REGTEST BUILD_REGTEST "build regtest")
-add_feature_info(ENABLE_CPACK ENABLE_CPACK "enable CPack support")
 add_feature_info(DISABLE_CPU_CLIP DISABLE_CPU_CLIP "Disable tricky cpu specific clipper")
 add_feature_info(ENABLE_PACKAGE_CONFIG ENABLE_PACKAGE_CONFIG "generate and install package config file")
 
@@ -674,7 +654,7 @@ if(BUILD_TESTING)
   target_link_libraries(sfversion sndfile2k)
   add_test(sfversion sfversion)
   set_tests_properties(sfversion PROPERTIES
-    PASS_REGULAR_EXPRESSION "sndfile2k-${CPACK_PACKAGE_VERSION_FULL}")
+    PASS_REGULAR_EXPRESSION "sndfile2k-${PROJECT_VERSION}")
 
   ### error_test
 

@@ -107,7 +107,7 @@
 #cmakedefine01 OS_IS_WIN32
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "@PROJECT_VERSION@"
+#define PACKAGE_NAME "@PACKAGE_NAME@"
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "@PROJECT_VERSION@"
