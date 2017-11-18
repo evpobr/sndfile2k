@@ -280,16 +280,13 @@ static void zero_data_test(const char *filename, int format)
 
 static void filesystem_full_test(int format)
 {
+#ifndef _WIN32
     SNDFILE *file;
     SF_INFO sfinfo;
     struct stat buf;
 
     const char *filename = "/dev/full", *errorstr;
 
-#ifdef _WIN32
-    /* Can't run this test on Win32 so return. */
-    return;
-#else
 
     /* Make sure errno is zero before doing anything else. */
     errno = 0;
@@ -316,7 +313,7 @@ static void filesystem_full_test(int format)
     if ((file = sf_open(filename, SFM_WRITE, &sfinfo)) != NULL)
     {
         printf("\n\nLine %d : Error, file should not have openned.\n",
-               __LINE__ - 1);
+            __LINE__ - 1);
         exit(1);
     };
 
@@ -326,11 +323,15 @@ static void filesystem_full_test(int format)
         strstr(errorstr, "device") == NULL)
     {
         printf("\n\nLine %d : Error bad error string : %s.\n", __LINE__ - 1,
-               errorstr);
+            errorstr);
         exit(1);
     };
 
     puts("ok");
+
+#else
+    /* Can't run this test on Win32 so return. */
+    return;
 #endif
 }
 
