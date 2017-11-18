@@ -509,7 +509,7 @@ int psf_is_pipe(SF_PRIVATE *psf)
 
 static sf_count_t psf_get_filelen_fd(int fd)
 {
-#if (SIZEOF_OFF_T == 4 && SIZEOF_SF_COUNT_T == 8 && defined(HAVE_FSTAT64))
+#ifdef _WIN32
     struct stat64 statbuf;
 
     if (fstat64(fd, &statbuf) == -1)
