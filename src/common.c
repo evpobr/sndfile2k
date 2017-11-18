@@ -554,8 +554,6 @@ static inline void header_put_le_int(SF_PRIVATE *psf, int x)
     psf->header.ptr[psf->header.indx++] = (x >> 24);
 }
 
-#if (SIZEOF_SF_COUNT_T == 8)
-
 static inline void header_put_be_8byte(SF_PRIVATE *psf, sf_count_t x)
 {
     psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 56);
@@ -579,10 +577,6 @@ static inline void header_put_le_8byte(SF_PRIVATE *psf, sf_count_t x)
     psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 48);
     psf->header.ptr[psf->header.indx++] = (unsigned char)(x >> 56);
 }
-
-#else
-#error "SIZEOF_SF_COUNT_T != 8"
-#endif
 
 int psf_binheader_writef(SF_PRIVATE *psf, const char *format, ...)
 {

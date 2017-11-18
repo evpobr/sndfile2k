@@ -127,9 +127,6 @@
 /* The size of `off_t', as computed by sizeof. */
 @SIZEOF_OFF_T_CODE@
 
-/* Set to sizeof (long) if unknown. */
-@SIZEOF_SF_COUNT_T_CODE@
-
 /* The size of `short', as computed by sizeof. */
 @SIZEOF_SHORT_CODE@
 
@@ -144,9 +141,6 @@
 
 /* The size of `wchar_t', as computed by sizeof. */
 @SIZEOF_WCHAR_T_CODE@
-
-/* Set to long if unknown. */
-#define TYPEOF_SF_COUNT_T @TYPEOF_SF_COUNT_T@
 
 /* Set to 1 to use the native windows API */
 #cmakedefine01 USE_WINDOWS_API
