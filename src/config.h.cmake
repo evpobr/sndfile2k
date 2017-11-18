@@ -55,6 +55,9 @@
 /* Define to 1 if you have the <io.h> header file. */
 #cmakedefine HAVE_IO_H
 
+/* Define if you have the <wchar.h> header file. */
+#cmakedefine HAVE_WCHAR_H
+
 /* Define if you have the <locale.h> header file. */
 #cmakedefine HAVE_LOCALE_H
 
