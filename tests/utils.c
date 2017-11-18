@@ -548,13 +548,12 @@ SNDFILE *test_open_file_or_die(const char *filename, int mode, SF_INFO *sfinfo,
         exit(1);
     };
 
-    if (OS_IS_WIN32)
-    {
-        /* Windows does not understand and ignores the S_IRGRP flag, but Wine
-		** gives a run time warning message, so just clear it.
-		*/
-        omode &= ~S_IRGRP;
-    };
+#ifdef _WIN32
+    /* Windows does not understand and ignores the S_IRGRP flag, but Wine
+    ** gives a run time warning message, so just clear it.
+    */
+    omode &= ~S_IRGRP;
+#endif
 
     if (allow_fd && ((++count) & 1) == 1)
     {
@@ -1189,7 +1188,7 @@ static int allowed_open_files = -1;
 
 void count_open_files(void)
 {
-#if OS_IS_WIN32
+#if _WIN32
     return;
 #else
     int k, count = 0;
@@ -1213,7 +1212,7 @@ void increment_open_file_count(void)
 
 void check_open_file_count_or_die(int lineno)
 {
-#if OS_IS_WIN32
+#if _WIN32
     (void)lineno;
     return;
 #else

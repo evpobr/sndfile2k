@@ -140,7 +140,6 @@ else(${LITTLE_ENDIAN})
 endif()
 
 if(WIN32)
-  set(OS_IS_WIN32 1)
   set(USE_WINDOWS_API 1)
   if(BUILD_SHARED_LIBS)
     set(WIN32_TARGET_DLL 1)

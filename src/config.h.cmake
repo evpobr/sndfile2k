@@ -103,9 +103,6 @@
 /* Set to 1 if compiling for OpenBSD */
 #cmakedefine01 OS_IS_OPENBSD
 
-/* Set to 1 if compiling for Win32 */
-#cmakedefine01 OS_IS_WIN32
-
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "@PACKAGE_NAME@"
 

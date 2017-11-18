@@ -43,7 +43,7 @@
 #include "utils.h"
 
 /* EMX is OS/2. */
-#if (OS_IS_WIN32) || defined(__EMX__)
+#if defined(_WIN32) || defined(__EMX__)
 
 int main(void)
 {

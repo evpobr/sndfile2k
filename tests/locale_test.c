@@ -32,7 +32,7 @@
 #include <locale.h>
 #endif
 
-#if OS_IS_WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif
 
@@ -52,7 +52,7 @@ int main(void)
 
 static void wchar_test(void)
 {
-#if OS_IS_WIN32
+#ifdef _WIN32
     SNDFILE *file;
     SF_INFO info;
     LPCWSTR filename = L"test.wav";
@@ -99,7 +99,7 @@ static void utf8_test(void)
         {"POSIX", 0, "posix.au", 8},
         {"pt_PT", 1, "concei\303\247\303\243o.au", 12},
 
-#if OS_IS_WIN32 == 0
+#ifndef _WIN32
         {"ja_JP", 1, "\343\201\212\343\201\257\343\202\210\343\201\206\343\201"
                      "\224\343\201\226\343\201\204\343\201\276\343\201\231.au",
          21},

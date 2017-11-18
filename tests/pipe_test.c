@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if (OS_IS_WIN32 || defined __OS2__ || !defined(HAVE_PIPE) || \
+#if (defined(_WIN32) || defined(__OS2__) || !defined(HAVE_PIPE) || \
      !defined(HAVE_WAITPID))
 
 int main(void)

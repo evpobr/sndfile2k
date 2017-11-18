@@ -554,7 +554,7 @@ static int opensoundsys_open_device(int channels, int srate)
  * point to data instead of short*. It plain sucks!
  */
 
-#if (OS_IS_WIN32 == 1)
+#if defined(_WIN32) || defined(__CYGWIN__)
 
 #define WIN32_BUFFER_LEN (1 << 15)
 
@@ -934,7 +934,7 @@ int main(int argc, char *argv[])
     {
         printf("\nUsage : %s <input sound file>\n\n", program_name(argv[0]));
         printf("Using %s.\n\n", sf_version_string());
-#if (OS_IS_WIN32 == 1)
+#if defined(_WIN32) || defined(__CYGWIN__)
         printf("This is a Unix style command line application which\n"
                "should be run in a MSDOS box or Command Shell window.\n\n");
         printf("Sleeping for 5 seconds before exiting.\n\n");
@@ -961,7 +961,7 @@ int main(int argc, char *argv[])
     sndio_play(argc, argv);
 #elif (defined(sun) && defined(unix))
     solaris_play(argc, argv);
-#elif (OS_IS_WIN32 == 1)
+#elif defined(_WIN32) || defined(__CYGWIN__)
     win32_play(argc, argv);
 #elif (defined(__MACH__) && defined(__APPLE__))
     printf("OS X 10.8 and later have a new Audio API.\n");

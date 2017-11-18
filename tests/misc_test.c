@@ -35,7 +35,7 @@
 #include <sf_unistd.h>
 #endif
 
-#if (defined(WIN32) || defined(_WIN32))
+#ifdef _WIN32
 #include <io.h>
 #include <direct.h>
 #endif
@@ -286,7 +286,7 @@ static void filesystem_full_test(int format)
 
     const char *filename = "/dev/full", *errorstr;
 
-#if (defined(WIN32) || defined(_WIN32))
+#ifdef _WIN32
     /* Can't run this test on Win32 so return. */
     return;
 #else
@@ -336,7 +336,7 @@ static void filesystem_full_test(int format)
 
 static void permission_test(const char *filename, int typemajor)
 {
-#if (OS_IS_WIN32)
+#ifdef _WIN32
     /* Avoid compiler warnings. */
     filename = filename;
     typemajor = typemajor;

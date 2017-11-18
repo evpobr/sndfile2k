@@ -28,7 +28,7 @@
 #include "sf_unistd.h"
 #endif
 
-#if OS_IS_WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif
 
@@ -232,7 +232,7 @@ static void error_close_test(void)
 
     if (sf_close(sndfile) == 0)
     {
-#if OS_IS_WIN32
+#ifdef _WIN32
         OSVERSIONINFOEX osvi;
 
         memset(&osvi, 0, sizeof(OSVERSIONINFOEX));
