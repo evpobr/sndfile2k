@@ -9,10 +9,12 @@ include(TestInline)
 include(ClipMode)
 include(TestLargeFiles)
 
-test_large_files(_LARGEFILES)
+if(NOT WIN32)
+  test_large_files(_LARGEFILES)
 
-if(LARGE_FILES_DEFINITIONS)
-  add_definitions(${LARGE_FILES_DEFINITIONS})
+  if(LARGE_FILES_DEFINITIONS)
+    add_definitions(${LARGE_FILES_DEFINITIONS})
+  endif()
 endif()
 
 if(WIN32)
