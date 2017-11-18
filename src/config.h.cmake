@@ -133,17 +133,11 @@
 /* The size of `int64_t', as computed by sizeof. */
 @SIZEOF_INT64_T_CODE@
 
-/* The size of `loff_t', as computed by sizeof. */
-@SIZEOF_LOFF_T_CODE@
-
 /* The size of `long', as computed by sizeof. */
 @SIZEOF_LONG_CODE@
 
 /* The size of `long long', as computed by sizeof. */
 @SIZEOF_LONG_LONG_CODE@
-
-/* The size of `off64_t', as computed by sizeof. */
-@SIZEOF_OFF64_T_CODE@
 
 /* The size of `off_t', as computed by sizeof. */
 @SIZEOF_OFF_T_CODE@
