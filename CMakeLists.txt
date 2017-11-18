@@ -322,9 +322,6 @@ if(BUILD_SHARED_LIBS)
     set(VER_FILEVERSION_STR ${SNDFILE2K_SOVERSION})
     set(VER_PRODUCTVERSION_STR ${PROJECT_VERSION})
 
-    set(VERSION_MAJOR ${CPACK_PACKAGE_VERSION_MAJOR})
-    set(PACKAGE_NAME ${CPACK_PACKAGE_NAME})
-
     # No idea why CMake adds SONAME for Cygwin, but not for MinGW.
     # But OriginalFilename field is required, so we need to handle it.
     if(CYGWIN AND (NOT WIN32))

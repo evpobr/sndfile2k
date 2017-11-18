@@ -106,26 +106,11 @@
 /* Set to 1 if compiling for Win32 */
 #cmakedefine01 OS_IS_WIN32
 
-/* Name of package */
-#define PACKAGE "@CPACK_PACKAGE_NAME@"
-
-/* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "@PACKAGE_BUGREPORT@"
-
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "@CPACK_PACKAGE_NAME@"
-
-/* Define to the full name and version of this package. */
-#define PACKAGE_STRING "@CPACK_PACKAGE_NAME@ @CPACK_PACKAGE_VERSION_FULL@"
-
-/* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "@CPACK_PACKAGE_NAME@"
-
-/* Define to the home page for this package. */
-#define PACKAGE_URL "@PACKAGE_URL@"
+#define PACKAGE_NAME "@PROJECT_VERSION@"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "@CPACK_PACKAGE_VERSION_FULL@"
+#define PACKAGE_VERSION "@PROJECT_VERSION@"
 
 /* The size of `int', as computed by sizeof. */
 @SIZEOF_INT_CODE@
