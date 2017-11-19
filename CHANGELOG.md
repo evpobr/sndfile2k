@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.0.0-beta3] - 2017-11-19
+
+### Fixed
+- CMake: fix public include directory (issue #6)
+
+### Changed
+- Typedef structs and enums
+- Small fixes
+
 ## [1.0.0-beta2] - 2017-11-08
 
 ### Fixed
@@ -49,6 +58,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `Win32` directory. Test file inside was useless, since Windows is supported now.
 - Travis CI MacOS GCC test removed
 
-[Unreleased]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta2...HEAD
+[Unreleased]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta3...HEAD
 [1.0.0-beta1]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-alpha1...v1.0.0-beta1
 [1.0.0-beta2]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta1...v1.0.0-beta2
+[1.0.0-beta2]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta2...v1.0.0-beta3
