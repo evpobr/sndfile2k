@@ -97,12 +97,15 @@ set(PC_PREFIX ${CMAKE_INSTALL_PREFIX})
 set(PC_EXEC_PREFIX "\$\{prefix\}")
 set(PC_LIBDIR "\$\{prefix\}/${CMAKE_INSTALL_LIBDIR}")
 set(PC_INCLUDEDIR "\$\{prefix\}/${CMAKE_INSTALL_INCLUDEDIR}")
+if(EXTERNAL_XIPH_LIBS)
+  set(PC_REQUIRES_PRIVATE "flac >= 1.3 vorbis >= 1.2 vorbisenc >= 1.2")
+endif()
 set(PC_VERSION ${PROJECT_VERSION})
 if(EXTERNAL_XIPH_LIBS)
-  set(PC_PRIVATE_LIBS "-lFLAC  -lvorbisenc")
+  set(PC_PRIVATE_LIBS "-lm")
 endif()
 
-configure_file(sndfile2k.pc.cmake sndfile2k.pc @ONLY)
+configure_file(sndfile2k.pc.in sndfile2k.pc @ONLY)
 
 #
 # sndfile2k
