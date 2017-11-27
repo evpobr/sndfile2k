@@ -15,8 +15,7 @@ set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/sndfile2k.git)
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO evpobr/sndfile2k
-    REF v1.0.0-beta3
-    SHA512 68ec3c4cdb8cbb9fc8046d34a7ea58bc8807dd65959673d0e625bd88b31bfe8484a07595991487e7b377d77f5eb5f8a3551394ca1a68403b2534ed69f0482b4f
+    HEAD_REF master
 )
 
 vcpkg_configure_cmake(

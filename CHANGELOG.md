@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.0.0-beta4] - 2017-11-27
+
+## Added
+
+- [Vcpkg](https://github.com/Microsoft/vcpkg) port in `packages/vcpkg` directory (issue #7)
+
+## Changed
+
+- Improve `pkg-config` module
+- Small fixes
+
 ## [1.0.0-beta3] - 2017-11-19
 
 ### Fixed
@@ -61,4 +72,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 [Unreleased]: https://github.com/evpobr/sndfile2k/compare/master...develop
 [1.0.0-beta1]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-alpha1...v1.0.0-beta1
 [1.0.0-beta2]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta1...v1.0.0-beta2
-[1.0.0-beta2]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta2...v1.0.0-beta3
+[1.0.0-beta3]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta2...v1.0.0-beta3
+[1.0.0-beta4]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta2...v1.0.0-beta4
