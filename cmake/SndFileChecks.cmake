@@ -168,7 +168,7 @@ if(ENABLE_EXPERIMENTAL)
 endif()
 
 test_inline()
-if(NOT DISABLE_CPU_CLIP)
+if(ENABLE_CPU_CLIP)
   clip_mode()
 endif()
 
