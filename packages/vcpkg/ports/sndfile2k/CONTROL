@@ -1,0 +1,4 @@
+Source: sndfile2k
+Version: 1.0.0-beta4
+Description: Fork of libsndfile library, a C library for reading and writing files containing sampled audio data
+Build-Depends: libflac, libvorbis

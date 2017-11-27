@@ -97,12 +97,15 @@ set(PC_PREFIX ${CMAKE_INSTALL_PREFIX})
 set(PC_EXEC_PREFIX "\$\{prefix\}")
 set(PC_LIBDIR "\$\{prefix\}/${CMAKE_INSTALL_LIBDIR}")
 set(PC_INCLUDEDIR "\$\{prefix\}/${CMAKE_INSTALL_INCLUDEDIR}")
+if(EXTERNAL_XIPH_LIBS)
+  set(PC_REQUIRES_PRIVATE "flac >= 1.3 vorbis >= 1.2 vorbisenc >= 1.2")
+endif()
 set(PC_VERSION ${PROJECT_VERSION})
 if(EXTERNAL_XIPH_LIBS)
-  set(PC_PRIVATE_LIBS "-lFLAC  -lvorbisenc")
+  set(PC_PRIVATE_LIBS "-lm")
 endif()
 
-configure_file(sndfile2k.pc.cmake sndfile2k.pc @ONLY)
+configure_file(sndfile2k.pc.in sndfile2k.pc @ONLY)
 
 #
 # sndfile2k
@@ -289,11 +292,14 @@ set_target_properties(sndfile2k
   PROPERTIES
     SOVERSION ${SNDFILE2K_SOVERSION_MAJOR}
     VERSION ${SNDFILE2K_SOVERSION}
-    DEFINE_SYMBOL SNDFILE2K_EXPORTS
-    C_VISIBILITY_PRESET hidden
-    VISIBILITY_INLINES_HIDDEN 1)
+    DEFINE_SYMBOL SNDFILE2K_EXPORTS)
 
 if(BUILD_SHARED_LIBS)
+
+  set_target_properties(sndfile2k
+    PROPERTIES
+      C_VISIBILITY_PRESET hidden
+      VISIBILITY_INLINES_HIDDEN 1)
 
   if(WIN32 OR CYGWIN)
     set(VER_FILEVERSION "${SNDFILE2K_SOVERSION_MAJOR},${SNDFILE2K_SOVERSION_MINOR},${SNDFILE2K_SOVERSION_PATCH},0")
