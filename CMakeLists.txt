@@ -42,6 +42,7 @@ if(MSVC OR MINGW)
   option(ENABLE_STATIC_RUNTIME "Enable static runtime" OFF)
 endif(MSVC OR MINGW)
 option(ENABLE_CMAKE_PACKAGE_CONFIG "Generate and install CMake package configuration files" ON)
+option(ENABLE_PKGCONFIG_FILE "Generate and install pkg-config file (sndfile2k.pc)" ON)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
@@ -60,6 +61,7 @@ add_feature_info(BUILD_TESTING BUILD_TESTING "build tests")
 add_feature_info(BUILD_REGTEST BUILD_REGTEST "build regtest")
 add_feature_info(DISABLE_CPU_CLIP DISABLE_CPU_CLIP "Disable tricky cpu specific clipper")
 add_feature_info(CMakePackageConfig ENABLE_CMAKE_PACKAGE_CONFIG "Generate and install CMake package configuration files")
+add_feature_info(PkgConfigFile ENABLE_PKGCONFIG_FILE "Generate and install pkg-config file (sndfile2k.pc)")
 
 if(MSVC OR MINGW)
   add_feature_info(ENABLE_STATIC_RUNTIME ENABLE_STATIC_RUNTIME "Enable static runtime")
@@ -592,7 +594,9 @@ elseif()
 
 endif()
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sndfile2k.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+if(ENABLE_PKGCONFIG_FILE)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sndfile2k.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+endif()
 
 #
 # Testing
