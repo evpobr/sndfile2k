@@ -25,6 +25,7 @@ set(SNDFILE2K_SOVERSION "${SNDFILE2K_SOVERSION_MAJOR}.${SNDFILE2K_SOVERSION_MINO
 include(GNUInstallDirs)
 include(FeatureSummary)
 include(CMakeDependentOption)
+include(CPack)
 
 #
 # Options
@@ -355,8 +356,7 @@ if(BUILD_PROGRAMS)
       ${PROJECT_BINARY_DIR}/src)
   target_link_libraries(sndfile2k-play PUBLIC sndfile2k)
   if(WIN32 OR CYGWIN)
-    target_include_directories(sndfile2k-play PRIVATE ${WINMM_INCLUDE_DIRS})
-    target_link_libraries(sndfile2k-play PRIVATE ${WINMM_LIBRARIES})
+    target_link_libraries(sndfile2k-play PRIVATE ${WINMM_LIBRARY})
   # Maybe ALSA & Sndio are present in BeOS. They are not required
   # so skip them anyway.
   elseif((NOT BEOS) AND ALSA_FOUND)
