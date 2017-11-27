@@ -41,7 +41,7 @@ option(DISABLE_CPU_CLIP "Disable tricky cpu specific clipper" OFF)
 if(MSVC OR MINGW)
   option(ENABLE_STATIC_RUNTIME "Enable static runtime" OFF)
 endif(MSVC OR MINGW)
-option(ENABLE_PACKAGE_CONFIG "Generate and install package config file" ON)
+option(ENABLE_CMAKE_PACKAGE_CONFIG "Generate and install CMake package configuration files" ON)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
@@ -59,7 +59,7 @@ add_feature_info(ENABLE_EXPERIMENTAL ENABLE_EXPERIMENTAL "enable experimental co
 add_feature_info(BUILD_TESTING BUILD_TESTING "build tests")
 add_feature_info(BUILD_REGTEST BUILD_REGTEST "build regtest")
 add_feature_info(DISABLE_CPU_CLIP DISABLE_CPU_CLIP "Disable tricky cpu specific clipper")
-add_feature_info(ENABLE_PACKAGE_CONFIG ENABLE_PACKAGE_CONFIG "generate and install package config file")
+add_feature_info(CMakePackageConfig ENABLE_CMAKE_PACKAGE_CONFIG "Generate and install CMake package configuration files")
 
 if(MSVC OR MINGW)
   add_feature_info(ENABLE_STATIC_RUNTIME ENABLE_STATIC_RUNTIME "Enable static runtime")
@@ -546,7 +546,7 @@ endif()
 # Installation
 #
 
-if(ENABLE_PACKAGE_CONFIG)
+if(ENABLE_CMAKE_PACKAGE_CONFIG)
 
   if(UNIX)
     set(CMAKE_INSTALL_PACKAGEDIR ${CMAKE_INSTALL_LIBDIR}/cmake/sndfile2k)
