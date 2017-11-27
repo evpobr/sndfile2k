@@ -5,12 +5,15 @@
 
 Fork of [libsndfile](http://www.mega-nerd.com/libsndfile/) library, a C library for reading and writing files containing sampled audio data.
 
+**Warning** this repo is experimental, most likely you want to use [libsndfile](http://www.mega-nerd.com/libsndfile/).
+
 ## Getting Started
 
 ### Prerequisites
 * C99 compatible compiler, GCC and Clang are fine. Visual Studio 2015 or higher supported under Windows.
 * [CMake >= 3.2](https://cmake.org/)
 * [Ogg](https://xiph.org/ogg/), [Vorbis](http://www.vorbis.com/) and [FLAC](https://xiph.org/flac/) development libraries (optional)
+* [Ninja build system](https://ninja-build.org/) (optional)
 
 ### Contributing
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
