@@ -8,11 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.0.0-beta4] - 2017-11-27
 
-## Added
+### Added
 
 - [Vcpkg](https://github.com/Microsoft/vcpkg) port in `packages/vcpkg` directory (issue #7)
 
-## Changed
+### Changed
 
 - Improve `pkg-config` module
 - Small fixes
