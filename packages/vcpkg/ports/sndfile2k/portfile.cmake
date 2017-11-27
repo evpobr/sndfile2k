@@ -10,6 +10,8 @@
 #   VCPKG_TARGET_ARCHITECTURE = target architecture (x64, x86, arm)
 #
 
+set(VCPKG_USE_HEAD_VERSION ON)
+
 include(vcpkg_common_functions)
 set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/sndfile2k.git)
 vcpkg_from_github(
