@@ -486,7 +486,7 @@ int main(int argc, char *argv[])
 
     if (do_all || strcmp(argv[1], "ogg_vorbis") == 0)
     {
-#ifdef HAVE_EXTERNAL_XIPH_LIBS
+#ifdef WITH_XIPH_CODECS
         {
             /* Don't do lcomp_test_XXX as the errors are too big. */
             sdlcomp_test_short("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS,

@@ -28,8 +28,8 @@
 /* Define if you have the <direct.h> header file. */
 #cmakedefine HAVE_DIRECT_H
 
-/* Will be defined if flac, ogg and vorbis are available. */
-#cmakedefine HAVE_EXTERNAL_XIPH_LIBS
+/* Define if FLAC and Vorbis support enabled. */
+#cmakedefine WITH_XIPH_CODECS
 
 /* Define if you have the `fstat' function. */
 #cmakedefine HAVE_FSTAT

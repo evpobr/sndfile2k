@@ -35,7 +35,6 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(BUILD_PROGRAMS "Build programs" ON)
 option(BUILD_EXAMPLES "Build examples" ON)
 option(BUILD_TESTING "Build tests" ON)
-option(DISABLE_EXTERNAL_LIBS "Disable use of FLAC, Ogg and Vorbis" OFF)
 option(ENABLE_EXPERIMENTAL "Enable experimental code" OFF)
 option(ENABLE_CPU_CLIP "Enable tricky cpu specific clipper" ON)
 if(MSVC OR MINGW)
@@ -52,10 +51,12 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
 include(${CMAKE_MODULE_PATH}/SndFileChecks.cmake)
 
+cmake_dependent_option(WITH_XIPH_CODECS "Enable use of Xiph.org Vorbis and FLAC codecs" ON "HAVE_EXTERNAL_XIPH_LIBS" OFF)
 cmake_dependent_option(BUILD_REGTEST "Build regtest" ON "HAVE_SQLITE3" OFF)
 
 add_feature_info(BUILD_SHARED_LIBS BUILD_SHARED_LIBS "build shared libraries")
-add_feature_info(DISABLE_EXTERNAL_LIBS DISABLE_EXTERNAL_LIBS "disable use of FLAC, Ogg and Vorbis")
+add_feature_info(WithVorbis WITH_XIPH_CODECS "Xiph Vorbis codec support")
+add_feature_info(WithFLAC WITH_XIPH_CODECS "Xiph FLAC codec support")
 add_feature_info(ENABLE_EXPERIMENTAL ENABLE_EXPERIMENTAL "enable experimental code")
 add_feature_info(BUILD_TESTING BUILD_TESTING "build tests")
 add_feature_info(BUILD_REGTEST BUILD_REGTEST "build regtest")
@@ -70,15 +71,15 @@ endif()
 set_package_properties(Ogg PROPERTIES TYPE RECOMMENDED
   URL "www.xiph.org/ogg/"
   DESCRIPTION "library for manipulating ogg bitstreams"
-  PURPOSE "Required to enable Vorbis, Speex and Opus support")
+  PURPOSE "Enables Xiph.org Vorbis and FLAC codecs support")
 set_package_properties(Vorbis PROPERTIES TYPE RECOMMENDED
   URL "www.vorbis.com/"
   DESCRIPTION "open source lossy audio codec"
-  PURPOSE "Enables Vorbis support")
+  PURPOSE "Enables Xiph.org Vorbis support")
 set_package_properties(FLAC PROPERTIES TYPE RECOMMENDED
   URL "www.xiph.org/flac/"
   DESCRIPTION "Free Lossless Audio Codec Library"
-  PURPOSE "Enables FLAC support")
+  PURPOSE "Enables Xiph.org FLAC codec support")
 set_package_properties(Speex PROPERTIES TYPE OPTIONAL
   URL "www.speex.org/"
   DESCRIPTION "an audio codec tuned for speech"
@@ -96,7 +97,7 @@ feature_summary(WHAT ALL)
 
 configure_file(src/config.h.cmake src/config.h)
 
-if(EXTERNAL_XIPH_LIBS)
+if(WITH_XIPH_CODECS)
   set(PC_REQUIRES_PRIVATE "flac >= 1.3 vorbis >= 1.2 vorbisenc >= 1.2")
 endif()
 set(PC_PRIVATE_LIBS "-lm")
@@ -270,7 +271,7 @@ if(LIBM_REQUIRED)
   target_link_libraries(sndfile2k PRIVATE ${M_LIBRARY})
 endif()
 
-if(NOT DISABLE_EXTERNAL_LIBS)
+if(WITH_XIPH_CODECS)
   target_link_libraries(sndfile2k PRIVATE ${EXTERNAL_XIPH_LIBS})
   target_include_directories(sndfile2k
     PRIVATE
