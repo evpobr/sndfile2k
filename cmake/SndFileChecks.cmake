@@ -38,9 +38,7 @@ if(OGG_FOUND AND VORBIS_FOUND AND FLAC_FOUND)
     ${FLAC_LIBRARIES})
 endif()
 
-if(ENABLE_EXPERIMENTAL)
-  find_package(Speex)
-endif()
+find_package(Speex)
 
 find_package(SQLite3)
 if(SQLITE3_FOUND)
