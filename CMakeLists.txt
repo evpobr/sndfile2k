@@ -272,10 +272,12 @@ if(LIBM_REQUIRED)
 endif()
 
 if(WITH_XIPH_CODECS)
-  target_link_libraries(sndfile2k PRIVATE ${EXTERNAL_XIPH_LIBS})
+  target_link_libraries(sndfile2k
+    PRIVATE
+      Ogg
+      ${EXTERNAL_XIPH_LIBS})
   target_include_directories(sndfile2k
     PRIVATE
-      ${OGG_INCLUDE_DIRS}
       ${VORBIS_INCLUDE_DIRS}
       ${FLAC_INCLUDE_DIRS})
   target_compile_definitions(sndfile2k PRIVATE ${FLAC_DEFINITIONS})

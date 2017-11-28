@@ -22,9 +22,16 @@ find_library(OGG_LIBRARY NAMES ogg ogg_static libogg libogg_static HINTS ${PC_OG
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Ogg DEFAULT_MSG OGG_INCLUDE_DIR OGG_LIBRARY)
 
-if (OGG_FOUND)
-	set (OGG_LIBRARIES ${OGG_LIBRARY})
-	set (OGG_INCLUDE_DIRS ${OGG_INCLUDE_DIR})
-endif (OGG_FOUND)
+if(OGG_FOUND)
+  set(OGG_LIBRARIES ${OGG_LIBRARY})
+  set(OGG_INCLUDE_DIRS ${OGG_INCLUDE_DIR})
+  if(NOT TARGET Ogg)
+    add_library(Ogg UNKNOWN IMPORTED)
+    set_target_properties(Ogg PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${OGG_INCLUDE_DIRS}"
+      IMPORTED_LOCATION "${OGG_LIBRARIES}")
+  endif()
+  
+endif(OGG_FOUND)
 
 mark_as_advanced(OGG_INCLUDE_DIR OGG_LIBRARY)
