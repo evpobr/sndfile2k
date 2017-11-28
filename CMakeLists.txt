@@ -274,11 +274,10 @@ endif()
 if(WITH_XIPH_CODECS)
   target_link_libraries(sndfile2k
     PRIVATE
-      Ogg
+      VorbisEnc
       ${EXTERNAL_XIPH_LIBS})
   target_include_directories(sndfile2k
     PRIVATE
-      ${VORBIS_INCLUDE_DIRS}
       ${FLAC_INCLUDE_DIRS})
   target_compile_definitions(sndfile2k PRIVATE ${FLAC_DEFINITIONS})
   if(ENABLE_EXPERIMENTAL)

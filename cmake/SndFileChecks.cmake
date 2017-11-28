@@ -27,14 +27,11 @@ if(NOT WIN32)
   endif(ALSA_FOUND)
 endif()
 
-find_package(Ogg)
 find_package(Vorbis)
 find_package(FLAC)
-if(OGG_FOUND AND VORBIS_FOUND AND FLAC_FOUND)
+if(VORBISENC_FOUND AND FLAC_FOUND)
   set(HAVE_EXTERNAL_XIPH_LIBS 1)
   set(EXTERNAL_XIPH_LIBS
-    ${OGG_LIBRARIES}
-    ${VORBIS_LIBRARIES}
     ${FLAC_LIBRARIES})
 endif()
 
