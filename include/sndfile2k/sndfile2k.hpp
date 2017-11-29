@@ -39,15 +39,13 @@
 ** license, but the LGPL still holds for the libsndfile library itself.
 */
 
-/*
-** sndfile.hh -- A lightweight C++ wrapper for the libsndfile API.
-**
-** All the methods are inlines and all functionality is contained in this
-** file. There is no separate implementation file.
-**
-** API documentation is in the doc/ directory of the source code tarball
-** and at http://www.mega-nerd.com/libsndfile/api.html.
-*/
+/** A lightweight C++ wrapper for the libsndfile API.
+ *
+ * \file sndfile2k.hpp
+ *
+ * All the methods are inlines and all functionality is contained in this
+ * file. There is no separate implementation file.
+ */
 
 #pragma once
 
@@ -56,6 +54,9 @@
 #include <string>
 #include <new> // for std::nothrow
 
+/** SndFile class.
+ *
+ */
 class SndfileHandle
 {
 private:
@@ -72,7 +73,9 @@ private:
 	SNDFILE_ref *p;
 
 public:
-	/* Default constructor */
+	/** SndFileHandle default constructor.
+	 *
+	 */
 	SndfileHandle(void) : p(NULL) {};
 	SndfileHandle(const char *path, int mode = SFM_READ,
 	              int format = 0, int channels = 0, int samplerate = 0);

@@ -19,7 +19,7 @@
 #include <cstdio>
 #include <cstring>
 
-#include "sndfile2k/sndfile2k.hh"
+#include "sndfile2k/sndfile2k.hpp"
 
 #define BUFFER_LEN (1024)
 

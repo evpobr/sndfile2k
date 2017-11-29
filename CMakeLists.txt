@@ -110,7 +110,7 @@ configure_file(sndfile2k.pc.in sndfile2k.pc @ONLY)
 
 # Public headers
 set(libsndfile2k_PUBLIC_HEADERS
-  include/sndfile2k/sndfile2k.hh
+  include/sndfile2k/sndfile2k.hpp
   include/sndfile2k/sndfile2k.h)
 
 # Private headers
