@@ -31,8 +31,6 @@ find_package(Vorbis)
 find_package(FLAC)
 if(VORBISENC_FOUND AND FLAC_FOUND)
   set(HAVE_EXTERNAL_XIPH_LIBS 1)
-  set(EXTERNAL_XIPH_LIBS
-    ${FLAC_LIBRARIES})
 endif()
 
 find_package(Speex)
