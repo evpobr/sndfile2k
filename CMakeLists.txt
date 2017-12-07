@@ -1336,3 +1336,7 @@ if(BUILD_TESTING)
   set_target_properties(${SNDFILE_TEST_TARGETS} PROPERTIES FOLDER Tests)
 
 endif()
+
+# Doxygen documentation
+
+configure_file(Doxyfile.in Doxyfile)
