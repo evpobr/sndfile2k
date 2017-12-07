@@ -151,9 +151,6 @@
 /* Target processor is big endian. */
 #cmakedefine WORDS_BIGENDIAN
 
-/* Define as `__inline' or '__inline__' if that's what the C compiler calls it, or to nothing if it is not supported. */
-@INLINE_CODE@
-
 #ifndef HAVE_SSIZE_T
 #define ssize_t intptr_t
 #endif

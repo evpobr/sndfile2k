@@ -5,7 +5,6 @@ include(CheckSymbolExists)
 include(CheckTypeSize)
 include(TestBigEndian)
 
-include(TestInline)
 include(ClipMode)
 include(TestLargeFiles)
 
@@ -156,7 +155,6 @@ if(ENABLE_EXPERIMENTAL)
   set(ENABLE_EXPERIMENTAL_CODE 1)
 endif()
 
-test_inline()
 if(ENABLE_CPU_CLIP)
   clip_mode()
 endif()
