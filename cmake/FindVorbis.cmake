@@ -14,7 +14,7 @@ if(VORBIS_FIND_QUIETLY)
   set(_FIND_OGG_ARG QUIET)
 endif()
 
-find_package(Ogg ${_FIND_OGG_ARG} REQUIRED)
+find_package(Ogg ${_FIND_OGG_ARG})
 
 find_package(PkgConfig QUIET)
 pkg_check_modules(PC_VORBIS QUIET vorbis)
