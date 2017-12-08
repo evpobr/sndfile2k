@@ -1055,7 +1055,7 @@ typedef enum SF_CHANNEL_MAP
  * Any created @c SNDFILE should be destroyed by sf_close() function to avoid
  * memory leaks.
  */
-typedef struct SNDFILE_tag SNDFILE;
+typedef struct sf_private_tag SNDFILE;
 
 /** Represents file offset type
  *
