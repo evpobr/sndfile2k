@@ -99,8 +99,6 @@ if(M_LIBRARY)
 endif()
 mark_as_advanced(M_LIBRARY)
 
-check_library_exists(sqlite3 sqlite3_close "" HAVE_SQLITE3)
-
 check_function_exists(fstat         HAVE_FSTAT)
 check_function_exists(fstat64       HAVE_FSTAT64)
 check_function_exists(fsync         HAVE_FSYNC)

@@ -52,14 +52,12 @@ include(${CMAKE_MODULE_PATH}/SndFileChecks.cmake)
 
 cmake_dependent_option(WITH_XIPH_CODECS "Enable use of Xiph.org Vorbis and FLAC codecs" ON "HAVE_EXTERNAL_XIPH_LIBS" OFF)
 cmake_dependent_option(ENABLE_EXPERIMENTAL "Enable experimental code" ON "OGG_FOUND AND SPEEX_FOUND" OFF)
-cmake_dependent_option(BUILD_REGTEST "Build regtest" ON "HAVE_SQLITE3" OFF)
 
 add_feature_info(BuildSharedLibs BUILD_SHARED_LIBS "build shared libraries")
 add_feature_info(WithVorbis WITH_XIPH_CODECS "Xiph Vorbis codec support")
 add_feature_info(WithFLAC WITH_XIPH_CODECS "Xiph FLAC codec support")
 add_feature_info(ExperimentalCode ENABLE_EXPERIMENTAL "enable experimental code")
 add_feature_info(BuildTesting BUILD_TESTING "build tests")
-add_feature_info(BuildRegtest BUILD_REGTEST "build regtest")
 add_feature_info(CPUClip ENABLE_CPU_CLIP "Enable tricky cpu specific clipper")
 add_feature_info(CMakePackageConfig ENABLE_CMAKE_PACKAGE_CONFIG "Generate and install CMake package configuration files")
 add_feature_info(PkgConfigFile ENABLE_PKGCONFIG_FILE "Generate and install pkg-config file (sndfile2k.pc)")
@@ -84,10 +82,6 @@ set_package_properties(Speex PROPERTIES TYPE OPTIONAL
   URL "www.speex.org/"
   DESCRIPTION "an audio codec tuned for speech"
   PURPOSE "Enables experemental Speex support")
-set_package_properties(SQLite3 PROPERTIES TYPE OPTIONAL
-  URL "www.sqlite.org/"
-  DESCRIPTION "light weight SQL database engine."
-  PURPOSE "Enables regtest")
 
 feature_summary(WHAT ALL)
 
@@ -516,29 +510,6 @@ if(BUILD_EXAMPLES)
     sndfilehandle)
 
   set_target_properties(${SNDFILE_EXAMPLE_TARGETS} PROPERTIES FOLDER Examples)
-
-endif()
-
-#
-# sndfile-regtest
-#
-
-if(BUILD_REGTEST)
-
-  set(sndfile_regtest_SOURCES
-    regtest/sndfile-regtest.c
-    regtest/database.c
-    regtest/checksum.c)
-  add_executable(sndfile-regtest ${sndfile_regtest_SOURCES})
-  target_include_directories(sndfile-regtest
-    PRIVATE
-      ${SQLITE3_INCLUDE_DIRS}
-      ${PROJECT_SOURCE_DIR}/src
-      ${PROJECT_BINARY_DIR}/src)
-  target_link_libraries(sndfile-regtest PUBLIC sndfile2k ${SQLITE3_LIBRARIES})
-  if(BUILD_SHARED_LIBS AND LIBM_REQUIRED)
-    target_link_libraries(sndfile-regtest PRIVATE ${M_LIBRARY})
-  endif()
 
 endif()
 
