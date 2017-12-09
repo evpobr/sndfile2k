@@ -25,9 +25,6 @@
 
 #pragma once
 
-#ifndef SNDFILE2K_H
-#define SNDFILE2K_H
-
 /* This is the version 1.0.X header file. */
 #define SNDFILE_1
 
@@ -2156,5 +2153,3 @@ SNDFILE2K_EXPORT int sf_get_chunk_data(const SF_CHUNK_ITERATOR *it,
 #ifdef __cplusplus
 } /* extern "C" */
 #endif /* __cplusplus */
-
-#endif /* SNDFILE2K_H */
