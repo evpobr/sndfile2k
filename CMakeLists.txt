@@ -151,7 +151,7 @@ endif()
 
 # File specific sources
 set(FILESPECIFIC
-  src/sndfile.c
+  src/sndfile2k.c
   src/aiff.c
   src/au.c
   src/avr.c
