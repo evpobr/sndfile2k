@@ -31,6 +31,7 @@ find_package(FLAC)
 if(VORBISENC_FOUND AND FLAC_FOUND)
   set(HAVE_EXTERNAL_XIPH_LIBS 1)
 endif()
+find_package(Speex)
 
 if(BUILD_PROGRAMS)
   if(WIN32)

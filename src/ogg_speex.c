@@ -35,7 +35,8 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if (ENABLE_EXPERIMENTAL_CODE && defined(WITH_XIPH_CODECS))
+#if (defined(ENABLE_EXPERIMENTAL_CODE) && (ENABLE_EXPERIMENTAL_CODE == 1) \
+     && defined(WITH_SPEEX))
 
 #include <ogg/ogg.h>
 
