@@ -32,13 +32,6 @@ if(VORBISENC_FOUND AND FLAC_FOUND)
   set(HAVE_EXTERNAL_XIPH_LIBS 1)
 endif()
 
-find_package(Speex)
-
-find_package(SQLite3)
-if(SQLITE3_FOUND)
-  set(HAVE_SQLITE3 1)
-endif()
-
 if(BUILD_PROGRAMS)
   if(WIN32)
     set(WINMM_LIBRARY "winmm")
