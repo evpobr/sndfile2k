@@ -51,13 +51,13 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
 include(${CMAKE_MODULE_PATH}/SndFileChecks.cmake)
 
-cmake_dependent_option(WITH_XIPH_CODECS "Enable use of Xiph.org Vorbis and FLAC codecs" ON "HAVE_EXTERNAL_XIPH_LIBS" OFF)
-cmake_dependent_option(WITH_SPEEX "Enable use of Xiph.org Speex codec" ON "ENABLE_EXPERIMENTAL AND SPEEX_FOUND" OFF)
+cmake_dependent_option(HAVE_XIPH_CODECS "Enable use of Xiph.org Vorbis and FLAC codecs" ON "HAVE_EXTERNAL_XIPH_LIBS" OFF)
+cmake_dependent_option(HAVE_SPEEX "Enable use of Xiph.org Speex codec" ON "ENABLE_EXPERIMENTAL AND SPEEX_FOUND" OFF)
 
 add_feature_info(BuildSharedLibs BUILD_SHARED_LIBS "build shared libraries")
-add_feature_info(WithVorbis WITH_XIPH_CODECS "Xiph Vorbis codec support")
-add_feature_info(WithFLAC WITH_XIPH_CODECS "Xiph FLAC codec support")
-add_feature_info(WithSpeex WITH_XIPH_CODECS "Xiph Speex codec support")
+add_feature_info(WithVorbis HAVE_XIPH_CODECS "Xiph Vorbis codec support")
+add_feature_info(WithFLAC HAVE_XIPH_CODECS "Xiph FLAC codec support")
+add_feature_info(WithSpeex HAVE_SPEEX "Xiph Speex codec support")
 add_feature_info(ExperimentalCode ENABLE_EXPERIMENTAL "enable experimental code")
 add_feature_info(BuildTesting BUILD_TESTING "build tests")
 add_feature_info(CPUClip ENABLE_CPU_CLIP "Enable tricky cpu specific clipper")
@@ -93,7 +93,7 @@ feature_summary(WHAT ALL)
 
 configure_file(src/config.h.cmake src/config.h)
 
-if(WITH_XIPH_CODECS)
+if(HAVE_XIPH_CODECS)
   set(PC_REQUIRES_PRIVATE "flac >= 1.3 vorbis >= 1.2 vorbisenc >= 1.2")
 endif()
 set(PC_PRIVATE_LIBS "-lm")
@@ -267,7 +267,7 @@ if(LIBM_REQUIRED)
   target_link_libraries(sndfile2k PRIVATE ${M_LIBRARY})
 endif()
 
-if(WITH_XIPH_CODECS)
+if(HAVE_XIPH_CODECS)
   target_link_libraries(sndfile2k
     PRIVATE
       VorbisEnc

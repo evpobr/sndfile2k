@@ -364,7 +364,7 @@ static void ogg_stereo_seek_test(const char *filename, int format)
 
 int main(void)
 {
-#ifdef WITH_XIPH_CODECS
+#ifdef HAVE_XIPH_CODECS
     {
         ogg_short_test();
         ogg_int_test();

@@ -36,7 +36,7 @@
 #include "common.h"
 
 #if (defined(ENABLE_EXPERIMENTAL_CODE) && (ENABLE_EXPERIMENTAL_CODE == 1) \
-     && defined(WITH_SPEEX))
+     && defined(HAVE_SPEEX))
 
 #include <ogg/ogg.h>
 
@@ -457,7 +457,7 @@ duration = audio_samples / rate
               = 3.947
 */
 
-#else /* ENABLE_EXPERIMENTAL_CODE && WITH_XIPH_CODECS */
+#else /* ENABLE_EXPERIMENTAL_CODE && HAVE_XIPH_CODECS */
 
 int ogg_speex_open(SF_PRIVATE *psf)
 {

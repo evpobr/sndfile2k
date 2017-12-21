@@ -552,7 +552,7 @@ int main(int argc, char **argv)
 
     if (do_all || !strcmp(argv[1], "flac"))
     {
-#ifdef WITH_XIPH_CODECS
+#ifdef HAVE_XIPH_CODECS
         {
             pcm_test_char("char.flac", SF_FORMAT_FLAC | SF_FORMAT_PCM_S8,
                           SF_TRUE);

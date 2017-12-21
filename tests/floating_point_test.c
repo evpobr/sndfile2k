@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
     float_scaled_test("alac_20.caf", allow_exit, SF_FALSE,
                       SF_FORMAT_CAF | SF_FORMAT_ALAC_20, -125.0);
 
-#ifdef WITH_XIPH_CODECS
+#ifdef HAVE_XIPH_CODECS
     float_scaled_test("flac_8.flac", allow_exit, SF_FALSE,
                       SF_FORMAT_FLAC | SF_FORMAT_PCM_S8, -39.0);
     float_scaled_test("flac_16.flac", allow_exit, SF_FALSE,
@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
     double_scaled_test("alac_32.caf", allow_exit, SF_FALSE,
                        SF_FORMAT_CAF | SF_FORMAT_ALAC_32, -186.0);
 
-#ifdef WITH_XIPH_CODECS
+#ifdef HAVE_XIPH_CODECS
     double_scaled_test("flac_8.flac", allow_exit, SF_FALSE,
                        SF_FORMAT_FLAC | SF_FORMAT_PCM_S8, -39.0);
     double_scaled_test("flac_16.flac", allow_exit, SF_FALSE,

@@ -70,7 +70,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#ifdef WITH_XIPH_CODECS
+#ifdef HAVE_XIPH_CODECS
 
 #include <ogg/ogg.h>
 #include <vorbis/codec.h>
@@ -1303,7 +1303,7 @@ static sf_count_t vorbis_length(SF_PRIVATE *psf)
     return length;
 }
 
-#else /* WITH_XIPH_CODECS */
+#else /* HAVE_XIPH_CODECS */
 
 int ogg_vorbis_open(SF_PRIVATE *psf)
 {

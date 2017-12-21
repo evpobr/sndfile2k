@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 
     if (do_all || !strcmp(argv[1], "flac"))
     {
-#ifdef WITH_XIPH_CODECS
+#ifdef HAVE_XIPH_CODECS
         string_start_test("strings.flac", SF_FORMAT_FLAC);
 #else
         puts("    No FLAC tests because FLAC support was not compiled in.");
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 
     if (do_all || !strcmp(argv[1], "ogg"))
     {
-#ifdef WITH_XIPH_CODECS
+#ifdef HAVE_XIPH_CODECS
         string_start_test("vorbis.oga", SF_FORMAT_OGG);
 #else
         puts("    No Ogg/Vorbis tests because Ogg/Vorbis support was not "

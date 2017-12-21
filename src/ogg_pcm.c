@@ -35,7 +35,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if (ENABLE_EXPERIMENTAL_CODE && defined(WITH_XIPH_CODECS))
+#if (ENABLE_EXPERIMENTAL_CODE && defined(HAVE_XIPH_CODECS))
 
 #include <ogg/ogg.h>
 
@@ -134,7 +134,7 @@ static int opcm_close(SF_PRIVATE *UNUSED(psf))
     return 0;
 }
 
-#else /* ENABLE_EXPERIMENTAL_CODE && WITH_XIPH_CODECS */
+#else /* ENABLE_EXPERIMENTAL_CODE && HAVE_XIPH_CODECS */
 
 int ogg_pcm_open(SF_PRIVATE *psf)
 {

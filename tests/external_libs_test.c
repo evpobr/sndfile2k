@@ -44,7 +44,7 @@ int main(void)
     subtype_format_test();
     simple_format_test();
 
-#if defined(WITH_XIPH_CODECS)
+#if defined(HAVE_XIPH_CODECS)
     flac_subset_test();
 #endif
 
@@ -70,7 +70,7 @@ static void major_format_test(void)
         have_ogg = info.format == SF_FORMAT_OGG ? 1 : have_ogg;
     };
 
-#ifdef WITH_XIPH_CODECS
+#ifdef HAVE_XIPH_CODECS
     {
         exit_if_true(have_flac == 0,
                      "\n\nLine %d : FLAC should be available.\n\n", __LINE__);
@@ -110,7 +110,7 @@ static void subtype_format_test(void)
         have_vorbis = info.format == SF_FORMAT_VORBIS ? 1 : have_vorbis;
     };
 
-#ifdef WITH_XIPH_CODECS
+#ifdef HAVE_XIPH_CODECS
     exit_if_true(have_vorbis == 0,
                  "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__);
 #else
@@ -161,7 +161,7 @@ static void simple_format_test(void)
         };
     };
 
-#ifdef WITH_XIPH_CODECS
+#ifdef HAVE_XIPH_CODECS
     {
         exit_if_true(have_flac == 0,
                      "\n\nLine %d : FLAC should be available.\n\n", __LINE__);

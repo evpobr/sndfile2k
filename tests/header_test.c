@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
 
     if (do_all || !strcmp(argv[1], "flac"))
     {
-#ifdef WITH_XIPH_CODECS
+#ifdef HAVE_XIPH_CODECS
         update_header_before_write_test("header.flac", SF_FORMAT_FLAC);
 #else
         puts("    No FLAC tests because FLAC support was not compiled in.");

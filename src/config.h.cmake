@@ -29,10 +29,10 @@
 #cmakedefine HAVE_DIRECT_H
 
 /* Define if FLAC and Vorbis support enabled. */
-#cmakedefine WITH_XIPH_CODECS
+#cmakedefine HAVE_XIPH_CODECS
 
 /* Define if Speex support enabled. */
-#cmakedefine WITH_SPEEX
+#cmakedefine HAVE_SPEEX
 
 /* Define if you have the `fstat' function. */
 #cmakedefine HAVE_FSTAT
