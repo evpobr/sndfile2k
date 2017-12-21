@@ -1391,24 +1391,24 @@ typedef struct SF_VIRTUAL_IO
 *  @{
 */
 
-/** Opens the specified file using path
+/** Opens the specified sound file using path
  *
  * @param[in] path Path to the file
  * @param[in] mode File open mode
  * @param[in,out] sfinfo Format information
  *
- * The @c filename is byte encoded, but may be utf-8 on Linux, while on
+ * The @p path is byte encoded, but may be utf-8 on Linux, while on
  * Mac OS X it will use the filesystem character set. On Windows, there is
  * also a Windows specific sf_wchar_open() that takes a @c UTF16_BE encoded
  * filename.
  *
- * The @c filemode specifies the kind of access that is requested for the file,
+ * The @p emode specifies the kind of access that is requested for the file,
  * one of ::SF_FILEMODE values.
  *
  * When opening a file for read, the SF_INFO::format field should be set to 
- * zero before calling sf_open(). The only exception to this is the case of
- * @c RAW files where the caller has to set the @c samplerate, @c channels and
- * @c format fields to valid values. All other fields of the structure are
+ * zero before passing to sf_open(). The only exception to this is the case of
+ * @c RAW files where the caller has to set the @p samplerate, @p channels and
+ * @p format fields to valid values. All other fields of the structure are
  * filled in by the library.
  *
  * When opening a file for write, the caller must fill in structure members 
@@ -1424,7 +1424,7 @@ typedef struct SF_VIRTUAL_IO
  */
 SNDFILE2K_EXPORT SNDFILE *sf_open(const char *path, int mode, SF_INFO *sfinfo);
 
- /** Opens file using @c POSIX file descriptor
+/** Opens sound file using @c POSIX file descriptor
  *
  * @param[in] fd File descriptor
  * @param[in] mode File open mode
@@ -1469,7 +1469,7 @@ SNDFILE2K_EXPORT SNDFILE *sf_open_fd(int fd, int mode, SF_INFO *sfinfo,
  *  @{
  */
 
-/** Opens file using Virtual I/O context
+/** Opens sound file using Virtual I/O context
  *
  * @param[in] sfvirtual Virtual I/O context
  * @param[in] mode File open mode
@@ -1481,7 +1481,6 @@ SNDFILE2K_EXPORT SNDFILE *sf_open_fd(int fd, int mode, SF_INFO *sfinfo,
  *
  * Care should be taken to ensure that the mode of the file represented by the
  * descriptor matches the @c mode argument.
- *
  *
  * @return A valid pointer to a #SNDFILE object on success, @c NULL
  * otherwise.
@@ -1520,7 +1519,7 @@ SNDFILE2K_EXPORT SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, int mode,
  */
 SNDFILE2K_EXPORT int sf_error(SNDFILE *sndfile);
 
-/** Returns text description of  the current error code for the given ::SNDFILE
+/** Returns textual description of  the current error code for the given ::SNDFILE
  *
  * @param[in] sndfile Pointer to a sound file state
  *
@@ -1733,10 +1732,10 @@ SNDFILE2K_EXPORT int sf_current_byterate(SNDFILE *sndfile);
 SNDFILE2K_EXPORT sf_count_t sf_read_raw(SNDFILE *sndfile, void *ptr,
                                         sf_count_t bytes);
 
-/** Writes raw bytes from sound file
+/** Writes raw bytes to sound file
  *
  * @param[in] sndfile Pointer to a sound file state
- * @param[in] ptr Pointer to an allocated block memory.
+ * @param[in] ptr Pointer to an allocated block of memory.
  * @param[in] bytes Count of bytes to write
  *
  * @note This function is not for general use. No type conversion or
@@ -1772,7 +1771,7 @@ SNDFILE2K_EXPORT sf_count_t sf_write_raw(SNDFILE *sndfile, const void *ptr,
 /** Reads short (16-bit) frames from file
  *
  * @param[in] sndfile Pointer to a sound file state
- * @param[out] ptr Pointer to an allocated block memory.
+ * @param[out] ptr Pointer to an allocated block of memory.
  * @param[in] frames Count of frames to read
  *
  * @return Number of frames actually read.
@@ -1793,7 +1792,7 @@ SNDFILE2K_EXPORT sf_count_t sf_writef_short(SNDFILE *sndfile, const short *ptr,
 /** Reads integer (32-bit) frames from file
  *
  * @param[in] sndfile Pointer to a sound file state
- * @param[out] ptr Pointer to an allocated block memory.
+ * @param[out] ptr Pointer to an allocated block of memory.
  * @param[in] frames Count of frames to read
  *
  * @return Number of frames actually read.
@@ -1803,7 +1802,7 @@ SNDFILE2K_EXPORT sf_count_t sf_readf_int(SNDFILE *sndfile, int *ptr,
 /** Writes integer (32-bit) frames to file
  *
  * @param[in] sndfile Pointer to a sound file state
- * @param[in] ptr Pointer to an allocated block memory.
+ * @param[in] ptr Pointer to an allocated block of memory.
  * @param[in] frames Count of frames to write
  *
  * @return Number of frames actually written.
@@ -1814,7 +1813,7 @@ SNDFILE2K_EXPORT sf_count_t sf_writef_int(SNDFILE *sndfile, const int *ptr,
 /** Reads float (32-bit) frames from file
  *
  * @param[in] sndfile Pointer to a sound file state
- * @param[out] ptr Pointer to an allocated block memory.
+ * @param[out] ptr Pointer to an allocated block of memory.
  * @param[in] frames Count of frames to read
  *
  * @return Number of frames actually read.
@@ -1824,7 +1823,7 @@ SNDFILE2K_EXPORT sf_count_t sf_readf_float(SNDFILE *sndfile, float *ptr,
 /** Writes float (32-bit) frames to file
  *
  * @param[in] sndfile Pointer to a sound file state
- * @param[in] ptr Pointer to an allocated block memory.
+ * @param[in] ptr Pointer to an allocated block of memory.
  * @param[in] frames Count of frames to write
  *
  * @return Number of frames actually written.
@@ -1835,7 +1834,7 @@ SNDFILE2K_EXPORT sf_count_t sf_writef_float(SNDFILE *sndfile, const float *ptr,
 /** Reads double (64-bit) frames from file
  *
  * @param[in] sndfile Pointer to a sound file state
- * @param[out] ptr Pointer to an allocated block memory.
+ * @param[out] ptr Pointer to an allocated block of memory.
  * @param[in] frames Count of frames to read
  *
  * @return Number of frames actually read.
@@ -1845,7 +1844,7 @@ SNDFILE2K_EXPORT sf_count_t sf_readf_double(SNDFILE *sndfile, double *ptr,
 /** Writes double (64-bit) frames to file
  *
  * @param[in] sndfile Pointer to a sound file state
- * @param[in] ptr Pointer to an allocated block memory.
+ * @param[in] ptr Pointer to an allocated block of memory.
  * @param[in] frames Count of frames to write
  *
  * @return Number of frames actually written.
@@ -1880,7 +1879,7 @@ SNDFILE2K_EXPORT sf_count_t sf_writef_double(SNDFILE *sndfile,
 /** Reads short (16-bit) samples from file
  *
  * @param[in] sndfile Pointer to a sound file state
- * @param[out] ptr Pointer to an allocated block memory.
+ * @param[out] ptr Pointer to an allocated block of memory.
  * @param[in] items Count of samples to read
  *
  * @return Number of samples actually read.
@@ -1890,7 +1889,7 @@ SNDFILE2K_EXPORT sf_count_t sf_read_short(SNDFILE *sndfile, short *ptr,
 /** Writes short (16-bit) samples to file
  *
  * @param[in] sndfile Pointer to a sound file state
- * @param[in] ptr Pointer to an allocated block memory.
+ * @param[in] ptr Pointer to an allocated block of memory.
  * @param[in] items Count of samples to write
  *
  * @return Number of samples actually written.
@@ -1901,7 +1900,7 @@ SNDFILE2K_EXPORT sf_count_t sf_write_short(SNDFILE *sndfile, const short *ptr,
 /** Reads integer (32-bit) samples from file
  *
  * @param[in] sndfile Pointer to a sound file state
- * @param[out] ptr Pointer to an allocated block memory.
+ * @param[out] ptr Pointer to an allocated block of memory.
  * @param[in] items Count of samples to read
  *
  * @return Number of samples actually read.
@@ -1911,7 +1910,7 @@ SNDFILE2K_EXPORT sf_count_t sf_read_int(SNDFILE *sndfile, int *ptr,
 /** Writes integer (32-bit) samples to file
  *
  * @param[in] sndfile Pointer to a sound file state
- * @param[in] ptr Pointer to an allocated block memory.
+ * @param[in] ptr Pointer to an allocated block of memory.
  * @param[in] items Count of samples to write
  *
  * @return Number of samples actually written.
@@ -1922,7 +1921,7 @@ SNDFILE2K_EXPORT sf_count_t sf_write_int(SNDFILE *sndfile, const int *ptr,
 /** Reads float (32-bit) samples from file
  *
  * @param[in] sndfile Pointer to a sound file state
- * @param[out] ptr Pointer to an allocated block memory.
+ * @param[out] ptr Pointer to an allocated block of memory.
  * @param[in] items Count of samples to read
  *
  * @return Number of samples actually read.
@@ -1932,7 +1931,7 @@ SNDFILE2K_EXPORT sf_count_t sf_read_float(SNDFILE *sndfile, float *ptr,
 /** Writes float (32-bit) samples to file
  *
  * @param[in] sndfile Pointer to a sound file state
- * @param[in] ptr Pointer to an allocated block memory.
+ * @param[in] ptr Pointer to an allocated block of memory.
  * @param[in] items Count of samples to write
  *
  * @return Number of samples actually written.
@@ -1943,7 +1942,7 @@ SNDFILE2K_EXPORT sf_count_t sf_write_float(SNDFILE *sndfile, const float *ptr,
 /** Reads double (64-bit) samples from file
  *
  * @param[in] sndfile Pointer to a sound file state
- * @param[out] ptr Pointer to an allocated block memory.
+ * @param[out] ptr Pointer to an allocated block of memory.
  * @param[in] items Count of samples to read
  *
  * @return Number of samples actually read.
@@ -1953,7 +1952,7 @@ SNDFILE2K_EXPORT sf_count_t sf_read_double(SNDFILE *sndfile, double *ptr,
 /** Writes double (64-bit) samples to file
  *
  * @param[in] sndfile Pointer to a sound file state
- * @param[in] ptr Pointer to an allocated block memory.
+ * @param[in] ptr Pointer to an allocated block of memory.
  * @param[in] items Count of samples to write
  *
  * @return Number of samples actually written.
