@@ -9,5 +9,6 @@ var annotated_dup =
     [ "SF_INFO", "struct_s_f___i_n_f_o.html", "struct_s_f___i_n_f_o" ],
     [ "SF_INSTRUMENT", "struct_s_f___i_n_s_t_r_u_m_e_n_t.html", "struct_s_f___i_n_s_t_r_u_m_e_n_t" ],
     [ "SF_LOOP_INFO", "struct_s_f___l_o_o_p___i_n_f_o.html", "struct_s_f___l_o_o_p___i_n_f_o" ],
-    [ "SF_VIRTUAL_IO", "struct_s_f___v_i_r_t_u_a_l___i_o.html", "struct_s_f___v_i_r_t_u_a_l___i_o" ]
+    [ "SF_VIRTUAL_IO", "struct_s_f___v_i_r_t_u_a_l___i_o.html", "struct_s_f___v_i_r_t_u_a_l___i_o" ],
+    [ "SndfileHandle", "class_sndfile_handle.html", "class_sndfile_handle" ]
 ];

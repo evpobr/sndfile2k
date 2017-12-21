@@ -1,10 +1,11 @@
 var searchData=
 [
   ['sndfile2k',['SndFile2K',['../index.html',1,'']]],
-  ['samplerate',['samplerate',['../struct_s_f___i_n_f_o.html#acfd248e20ab1c58b57aafc7b16404a5f',1,'SF_INFO']]],
+  ['samplerate',['samplerate',['../struct_s_f___i_n_f_o.html#acfd248e20ab1c58b57aafc7b16404a5f',1,'SF_INFO::samplerate()'],['../class_sndfile_handle.html#a35bc814b03ba0cb72a78ce83204a1f87',1,'SndfileHandle::samplerate()']]],
   ['sections',['sections',['../struct_s_f___i_n_f_o.html#a5f4c7cb564c05f6c3eeac9164a806544',1,'SF_INFO']]],
-  ['seek',['seek',['../struct_s_f___v_i_r_t_u_a_l___i_o.html#aa8ac1ef2302a43acca58a02e809a815f',1,'SF_VIRTUAL_IO']]],
+  ['seek',['seek',['../struct_s_f___v_i_r_t_u_a_l___i_o.html#aa8ac1ef2302a43acca58a02e809a815f',1,'SF_VIRTUAL_IO::seek()'],['../class_sndfile_handle.html#a0751c210cba5d0d757ce801381743ef3',1,'SndfileHandle::seek()']]],
   ['seekable',['seekable',['../struct_s_f___i_n_f_o.html#ad8978123d4122e137e9500f65d28ac31',1,'SF_INFO']]],
+  ['setstring',['setString',['../class_sndfile_handle.html#a6fa21cda95c6016c9f2f133d2e94da8b',1,'SndfileHandle']]],
   ['sf_5fambisonic_5fb_5fformat',['SF_AMBISONIC_B_FORMAT',['../sndfile2k_8h.html#a34e6b9e37b1bcf2a2c740b2872fd766eacc10d88822766d1ff4843508443d96a8',1,'sndfile2k.h']]],
   ['sf_5fambisonic_5fmode',['SF_AMBISONIC_MODE',['../sndfile2k_8h.html#a34e6b9e37b1bcf2a2c740b2872fd766e',1,'sndfile2k.h']]],
   ['sf_5fambisonic_5fnone',['SF_AMBISONIC_NONE',['../sndfile2k_8h.html#a34e6b9e37b1bcf2a2c740b2872fd766eab411ae80d3ed5e8ad381d7616bcb4eb1',1,'sndfile2k.h']]],
@@ -227,6 +228,9 @@ var searchData=
   ['sfm_5frdwr',['SFM_RDWR',['../group__file-base.html#ggabdee833b39b04dc5ef55eda86f867879a1860040e1c905b2fe2dd7dded86d2544',1,'sndfile2k.h']]],
   ['sfm_5fread',['SFM_READ',['../group__file-base.html#ggabdee833b39b04dc5ef55eda86f867879a125531fe9c895237bccd35736370e815',1,'sndfile2k.h']]],
   ['sfm_5fwrite',['SFM_WRITE',['../group__file-base.html#ggabdee833b39b04dc5ef55eda86f867879a449991ce14cb1b9715cf444ffdb9e4a0',1,'sndfile2k.h']]],
-  ['sndfile',['SNDFILE',['../group__file-base.html#gac14209bc83d532b06a8cdf9ade6d544a',1,'sndfile2k.h']]],
-  ['sndfile2k_2eh',['sndfile2k.h',['../sndfile2k_8h.html',1,'']]]
+  ['sndfile',['SNDFILE',['../group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc',1,'sndfile2k.h']]],
+  ['sndfile2k_2eh',['sndfile2k.h',['../sndfile2k_8h.html',1,'']]],
+  ['sndfile2k_2ehpp',['sndfile2k.hpp',['../sndfile2k_8hpp.html',1,'']]],
+  ['sndfilehandle',['SndfileHandle',['../class_sndfile_handle.html',1,'SndfileHandle'],['../class_sndfile_handle.html#a90b0e918f3531329dfb4ab0988187add',1,'SndfileHandle::SndfileHandle(void)'],['../class_sndfile_handle.html#a60e5ec8dac736c5f3a2fdc95e7e9c70e',1,'SndfileHandle::SndfileHandle(const char *path, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#af782c1d529a09587c127272bd96cb42a',1,'SndfileHandle::SndfileHandle(std::string const &amp;path, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#a3cbcef78befb00c3ad7391754a9c0343',1,'SndfileHandle::SndfileHandle(int fd, bool close_desc, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#a4c0aa4c1c1403c8ee28287a40eda0ddc',1,'SndfileHandle::SndfileHandle(SF_VIRTUAL_IO &amp;sfvirtual, void *user_data, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#a028b40645921aee524de73848139b9bc',1,'SndfileHandle::SndfileHandle(const wchar_t *wpath, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#af9c8bc95a16a9cc913586623c29a3bcd',1,'SndfileHandle::SndfileHandle(const SndfileHandle &amp;orig)']]],
+  ['strerror',['strError',['../class_sndfile_handle.html#aa627abe4c4e9f8eb5ee3b7ab9de9eed3',1,'SndfileHandle']]]
 ];

@@ -22,7 +22,7 @@ var sndfile2k_8h =
     [ "sf_vio_seek", "group__file-virt.html#gad23e218718c16eae24b98d41976ac5d2", null ],
     [ "sf_vio_tell", "group__file-base.html#ga457595d4cdaf505525ff421aebe6eb5d", null ],
     [ "sf_vio_write", "group__file-virt.html#gaa1b1f82878422da550bfd70f2be3ded3", null ],
-    [ "SNDFILE", "group__file-base.html#gac14209bc83d532b06a8cdf9ade6d544a", null ],
+    [ "SNDFILE", "group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc", null ],
     [ "SF_AMBISONIC_MODE", "sndfile2k_8h.html#a34e6b9e37b1bcf2a2c740b2872fd766e", [
       [ "SF_AMBISONIC_NONE", "sndfile2k_8h.html#a34e6b9e37b1bcf2a2c740b2872fd766eab411ae80d3ed5e8ad381d7616bcb4eb1", null ],
       [ "SF_AMBISONIC_B_FORMAT", "sndfile2k_8h.html#a34e6b9e37b1bcf2a2c740b2872fd766eacc10d88822766d1ff4843508443d96a8", null ]

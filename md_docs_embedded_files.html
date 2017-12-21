@@ -104,7 +104,7 @@ $(document).ready(function(){initNavTree('md_docs_embedded_files.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>By using the open SNDFILE with a file descriptor function:</p>
-<div class="fragment"><div class="line"><a class="code" href="group__file-base.html#gac14209bc83d532b06a8cdf9ade6d544a">SNDFILE</a>* <a class="code" href="group__file-base.html#gad6635d6c4c00e16a48e14542a27efd91">sf_open_fd</a> (<span class="keywordtype">int</span> fd, <span class="keywordtype">int</span> mode, <a class="code" href="struct_s_f___i_n_f_o.html">SF_INFO</a> *sfinfo, <span class="keywordtype">int</span> close_desc) ;</div></div><!-- fragment --><p>it is possible to open sound files embedded within larger files. There are however a couple of caveats:</p>
+<div class="fragment"><div class="line"><a class="code" href="group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc">SNDFILE</a>* <a class="code" href="group__file-base.html#gad6635d6c4c00e16a48e14542a27efd91">sf_open_fd</a> (<span class="keywordtype">int</span> fd, <span class="keywordtype">int</span> mode, <a class="code" href="struct_s_f___i_n_f_o.html">SF_INFO</a> *sfinfo, <span class="keywordtype">int</span> close_desc) ;</div></div><!-- fragment --><p>it is possible to open sound files embedded within larger files. There are however a couple of caveats:</p>
 <ul>
 <li>Read/Write mode (SFM_RDWR) is not supported.</li>
 <li>Writing of embedded files is only supported at the end of the file.</li>

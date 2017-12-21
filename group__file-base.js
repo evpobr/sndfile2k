@@ -2,7 +2,7 @@ var group__file_base =
 [
     [ "Virtual I/O", "group__file-virt.html", "group__file-virt" ],
     [ "sf_vio_tell", "group__file-base.html#ga457595d4cdaf505525ff421aebe6eb5d", null ],
-    [ "SNDFILE", "group__file-base.html#gac14209bc83d532b06a8cdf9ade6d544a", null ],
+    [ "SNDFILE", "group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc", null ],
     [ "SF_FILEMODE", "group__file-base.html#gabdee833b39b04dc5ef55eda86f867879", [
       [ "SFM_READ", "group__file-base.html#ggabdee833b39b04dc5ef55eda86f867879a125531fe9c895237bccd35736370e815", null ],
       [ "SFM_WRITE", "group__file-base.html#ggabdee833b39b04dc5ef55eda86f867879a449991ce14cb1b9715cf444ffdb9e4a0", null ],

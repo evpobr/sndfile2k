@@ -134,8 +134,8 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga09d282e248951a83f66bc7e6c8dc7fc8"><td class="memItemLeft" align="right" valign="top">SNDFILE2K_EXPORT <a class="el" href="group__file-base.html#gac14209bc83d532b06a8cdf9ade6d544a">SNDFILE</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__file-virt.html#ga09d282e248951a83f66bc7e6c8dc7fc8">sf_open_virtual</a> (<a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html">SF_VIRTUAL_IO</a> *sfvirtual, int mode, <a class="el" href="struct_s_f___i_n_f_o.html">SF_INFO</a> *sfinfo, void *user_data)</td></tr>
-<tr class="memdesc:ga09d282e248951a83f66bc7e6c8dc7fc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens file using Virtual I/O context.  <a href="#ga09d282e248951a83f66bc7e6c8dc7fc8">More...</a><br /></td></tr>
+<tr class="memitem:ga09d282e248951a83f66bc7e6c8dc7fc8"><td class="memItemLeft" align="right" valign="top">SNDFILE2K_EXPORT <a class="el" href="group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc">SNDFILE</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__file-virt.html#ga09d282e248951a83f66bc7e6c8dc7fc8">sf_open_virtual</a> (<a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html">SF_VIRTUAL_IO</a> *sfvirtual, int mode, <a class="el" href="struct_s_f___i_n_f_o.html">SF_INFO</a> *sfinfo, void *user_data)</td></tr>
+<tr class="memdesc:ga09d282e248951a83f66bc7e6c8dc7fc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens sound file using Virtual I/O context.  <a href="#ga09d282e248951a83f66bc7e6c8dc7fc8">More...</a><br /></td></tr>
 <tr class="separator:ga09d282e248951a83f66bc7e6c8dc7fc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -238,7 +238,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">SNDFILE2K_EXPORT <a class="el" href="group__file-base.html#gac14209bc83d532b06a8cdf9ade6d544a">SNDFILE</a>* sf_open_virtual </td>
+          <td class="memname">SNDFILE2K_EXPORT <a class="el" href="group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc">SNDFILE</a>* sf_open_virtual </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html">SF_VIRTUAL_IO</a> *&#160;</td>
           <td class="paramname"><em>sfvirtual</em>, </td>
@@ -269,7 +269,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Opens file using Virtual I/O context. </p>
+<p>Opens sound file using Virtual I/O context. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sfvirtual</td><td>Virtual I/O context </td></tr>
@@ -279,10 +279,10 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p><a class="el" href="group__file-base.html#gad6635d6c4c00e16a48e14542a27efd91" title="Opens file using POSIX file descriptor. ">sf_open_fd()</a> is similar to <a class="el" href="group__file-base.html#gaa45351ce25bafc72c211045e6e9d8fb2" title="Opens the specified file using path. ">sf_open()</a>, but takes Virtual I/O context of already opened file instead of path.</p>
+<p><a class="el" href="group__file-base.html#gad6635d6c4c00e16a48e14542a27efd91" title="Opens sound file using POSIX file descriptor. ">sf_open_fd()</a> is similar to <a class="el" href="group__file-base.html#gaa45351ce25bafc72c211045e6e9d8fb2" title="Opens the specified sound file using path. ">sf_open()</a>, but takes Virtual I/O context of already opened file instead of path.</p>
 <p>Care should be taken to ensure that the mode of the file represented by the descriptor matches the <code>mode</code> argument.</p>
-<dl class="section return"><dt>Returns</dt><dd>A valid pointer to a <a class="el" href="group__file-base.html#gac14209bc83d532b06a8cdf9ade6d544a" title="Represents opened sound file. ">SNDFILE</a> object on success, <code>NULL</code> otherwise.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__file-base.html#gaa45351ce25bafc72c211045e6e9d8fb2" title="Opens the specified file using path. ">sf_open()</a>, <a class="el" href="group__file-base.html#ga6d604e78b41c345f0824b8abebdb97a5" title="Opens file using unicode filename. ">sf_wchar_open()</a>, <a class="el" href="group__file-base.html#gad6635d6c4c00e16a48e14542a27efd91" title="Opens file using POSIX file descriptor. ">sf_open_fd()</a> </dd>
+<dl class="section return"><dt>Returns</dt><dd>A valid pointer to a <a class="el" href="group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc" title="Represents opened sound file. ">SNDFILE</a> object on success, <code>NULL</code> otherwise.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__file-base.html#gaa45351ce25bafc72c211045e6e9d8fb2" title="Opens the specified sound file using path. ">sf_open()</a>, <a class="el" href="group__file-base.html#ga6d604e78b41c345f0824b8abebdb97a5" title="Opens file using unicode filename. ">sf_wchar_open()</a>, <a class="el" href="group__file-base.html#gad6635d6c4c00e16a48e14542a27efd91" title="Opens sound file using POSIX file descriptor. ">sf_open_fd()</a> </dd>
 <dd>
 <a class="el" href="sndfile2k_8h.html#a654c4c7efbf9db9017e7e4c5a2d9538c" title="Closes the SNDFILE object. ">sf_close()</a> </dd></dl>
 

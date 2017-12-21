@@ -7,5 +7,5 @@ var searchData=
   ['sf_5fvio_5fseek',['sf_vio_seek',['../group__file-virt.html#gad23e218718c16eae24b98d41976ac5d2',1,'sndfile2k.h']]],
   ['sf_5fvio_5ftell',['sf_vio_tell',['../group__file-base.html#ga457595d4cdaf505525ff421aebe6eb5d',1,'sndfile2k.h']]],
   ['sf_5fvio_5fwrite',['sf_vio_write',['../group__file-virt.html#gaa1b1f82878422da550bfd70f2be3ded3',1,'sndfile2k.h']]],
-  ['sndfile',['SNDFILE',['../group__file-base.html#gac14209bc83d532b06a8cdf9ade6d544a',1,'sndfile2k.h']]]
+  ['sndfile',['SNDFILE',['../group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc',1,'sndfile2k.h']]]
 ];

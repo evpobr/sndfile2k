@@ -9,5 +9,6 @@ var searchData=
   ['sf_5finfo',['SF_INFO',['../struct_s_f___i_n_f_o.html',1,'']]],
   ['sf_5finstrument',['SF_INSTRUMENT',['../struct_s_f___i_n_s_t_r_u_m_e_n_t.html',1,'']]],
   ['sf_5floop_5finfo',['SF_LOOP_INFO',['../struct_s_f___l_o_o_p___i_n_f_o.html',1,'']]],
-  ['sf_5fvirtual_5fio',['SF_VIRTUAL_IO',['../struct_s_f___v_i_r_t_u_a_l___i_o.html',1,'']]]
+  ['sf_5fvirtual_5fio',['SF_VIRTUAL_IO',['../struct_s_f___v_i_r_t_u_a_l___i_o.html',1,'']]],
+  ['sndfilehandle',['SndfileHandle',['../class_sndfile_handle.html',1,'']]]
 ];
