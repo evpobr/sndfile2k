@@ -6,6 +6,34 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.0.0-rc.1] - 2017-12-22
+
+### Added
+
+- Doxygen generated online documentation available at https://evpobr.github.io/sndfile2k
+- CMake `ENABLE_PKGCONFIG_FILE` option
+
+### Changed
+
+- CMake option `DISABLE_CPU_CLIP` name to `ENABLE_CPU_CLIP` and set to `ON` by default
+- CMake option `ENABLE_PACKAGE_CONFIG` name to `ENABLE_CMAKE_PACKAGE_CONFIG`
+- CMake option `DISABLE_EXTERNAL_LIBS` name to `HAVE_XIPH_CODECS`
+- CMake features names
+- `sndfile2k.hh` header renamed to `sndfile2k.hpp`
+- CMake Ogg, Vorbis and FLAC find modules improved
+- `SNDFILE` is now typedef of existing `sf_private_tag` struct
+
+### Fixed
+
+- CMake configuration when `ENABLE_EXPERIMENTAL` is activated but Speex library is not found
+- `SFC_GET_LOG_INFO` command return output. When data is NULL, 0 is returned now.
+- Some compiler warnings
+
+### Removed
+
+- [Vcpkg](https://github.com/Microsoft/vcpkg) port (issue #7)
+- `sndfile-regtest` program removed with SQLite3 dependency
+
 ## [1.0.0-beta4] - 2017-11-27
 
 ### Added
@@ -74,3 +102,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 [1.0.0-beta2]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta1...v1.0.0-beta2
 [1.0.0-beta3]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta2...v1.0.0-beta3
 [1.0.0-beta4]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta3...v1.0.0-beta4
+[1.0.0-rc.1]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta4...v1.0.0-rc.1
