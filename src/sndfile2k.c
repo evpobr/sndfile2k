@@ -1135,7 +1135,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
 
     case SFC_GET_LOG_INFO:
         if (data == NULL)
-            return SFE_BAD_COMMAND_PARAM;
+            return 0;
         snprintf(data, datasize, "%s", psf->parselog.buf);
         return strlen(data);
 
