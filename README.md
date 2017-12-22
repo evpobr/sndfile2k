@@ -5,6 +5,8 @@
 
 Fork of [libsndfile](http://www.mega-nerd.com/libsndfile/) library, a C library for reading and writing files containing sampled audio data.
 
+SndFile2K documentation is available [online](https://evpobr.github.io/sndfile2k).
+
 **Warning** this repo is experimental, most likely you want to use [libsndfile](http://www.mega-nerd.com/libsndfile/).
 
 ## Getting Started
