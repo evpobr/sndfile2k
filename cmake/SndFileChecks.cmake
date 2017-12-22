@@ -5,7 +5,6 @@ include(CheckSymbolExists)
 include(CheckTypeSize)
 include(TestBigEndian)
 
-include(TestInline)
 include(ClipMode)
 include(TestLargeFiles)
 
@@ -27,32 +26,19 @@ if(NOT WIN32)
   endif(ALSA_FOUND)
 endif()
 
-if(NOT DISABLE_EXTERNAL_LIBS)
-find_package(Ogg)
 find_package(Vorbis)
 find_package(FLAC)
-if(OGG_FOUND AND VORBIS_FOUND AND FLAC_FOUND)
-    set(HAVE_EXTERNAL_XIPH_LIBS 1)
-  set(EXTERNAL_XIPH_LIBS
-    ${OGG_LIBRARIES}
-    ${VORBIS_LIBRARIES}
-    ${FLAC_LIBRARIES})
-else()
-    set(DISABLE_EXTERNAL_LIBS ON)
+if(VORBISENC_FOUND AND FLAC_FOUND)
+  set(HAVE_EXTERNAL_XIPH_LIBS 1)
 endif()
-endif()
+find_package(Speex)
 
-if(ENABLE_EXPERIMENTAL)
-  find_package(Speex)
-endif()
-
-find_package(SQLite3)
-if(SQLITE3_FOUND)
-  set(HAVE_SQLITE3 1)
-endif()
-
-if(BUILD_PROGRAMS AND (WIN32 OR CYGWIN))
-  find_package(WinMM REQUIRED)
+if(BUILD_PROGRAMS)
+  if(WIN32)
+    set(WINMM_LIBRARY "winmm")
+  elseif(CYGWIN)
+    set(WINMM_LIBRARY "libwinmm")
+  endif()
 endif()
 
 check_include_file(byteswap.h       HAVE_BYTESWAP_H)
@@ -106,8 +92,6 @@ if(M_LIBRARY)
   endif()
 endif()
 mark_as_advanced(M_LIBRARY)
-
-check_library_exists(sqlite3 sqlite3_close "" HAVE_SQLITE3)
 
 check_function_exists(fstat         HAVE_FSTAT)
 check_function_exists(fstat64       HAVE_FSTAT64)
@@ -163,8 +147,7 @@ if(ENABLE_EXPERIMENTAL)
   set(ENABLE_EXPERIMENTAL_CODE 1)
 endif()
 
-test_inline()
-if(NOT DISABLE_CPU_CLIP)
+if(ENABLE_CPU_CLIP)
   clip_mode()
 endif()
 

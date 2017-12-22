@@ -40,13 +40,13 @@ static SF_FORMAT_INFO const simple_formats[] = {
 
     {SF_FORMAT_CAF | SF_FORMAT_PCM_16, "CAF (Apple 16 bit PCM)", "caf"},
 
-#ifdef HAVE_EXTERNAL_XIPH_LIBS
+#ifdef HAVE_XIPH_CODECS
     {SF_FORMAT_FLAC | SF_FORMAT_PCM_16, "FLAC 16 bit", "flac"},
 #endif
 
     {SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM, "OKI Dialogic VOX ADPCM", "vox"},
 
-#ifdef HAVE_EXTERNAL_XIPH_LIBS
+#ifdef HAVE_XIPH_CODECS
     {SF_FORMAT_OGG | SF_FORMAT_VORBIS, "Ogg Vorbis (Xiph Foundation)", "oga"},
 #endif
 
@@ -93,7 +93,7 @@ static SF_FORMAT_INFO const major_formats[] = {
     {SF_FORMAT_AU, "AU (Sun/NeXT)", "au"},
     {SF_FORMAT_AVR, "AVR (Audio Visual Research)", "avr"},
     {SF_FORMAT_CAF, "CAF (Apple Core Audio File)", "caf"},
-#ifdef HAVE_EXTERNAL_XIPH_LIBS
+#ifdef HAVE_XIPH_CODECS
     {SF_FORMAT_FLAC, "FLAC (Free Lossless Audio Codec)", "flac"},
 #endif
     {SF_FORMAT_HTK, "HTK (HMM Tool Kit)", "htk"},
@@ -101,7 +101,7 @@ static SF_FORMAT_INFO const major_formats[] = {
     {SF_FORMAT_MAT4, "MAT4 (GNU Octave 2.0 / Matlab 4.2)", "mat"},
     {SF_FORMAT_MAT5, "MAT5 (GNU Octave 2.1 / Matlab 5.0)", "mat"},
     {SF_FORMAT_MPC2K, "MPC (Akai MPC 2k)", "mpc"},
-#ifdef HAVE_EXTERNAL_XIPH_LIBS
+#ifdef HAVE_XIPH_CODECS
     {SF_FORMAT_OGG, "OGG (OGG Container format)", "oga"},
 #endif
     {SF_FORMAT_PAF, "PAF (Ensoniq PARIS)", "paf"},
@@ -174,7 +174,7 @@ static SF_FORMAT_INFO subtype_formats[] = {
     {SF_FORMAT_DPCM_16, "16 bit DPCM", NULL},
     {SF_FORMAT_DPCM_8, "8 bit DPCM", NULL},
 
-#ifdef HAVE_EXTERNAL_XIPH_LIBS
+#ifdef HAVE_XIPH_CODECS
     {SF_FORMAT_VORBIS, "Vorbis", NULL},
 #endif
 

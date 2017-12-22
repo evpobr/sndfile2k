@@ -56,10 +56,10 @@ int txw_open(SF_PRIVATE *psf)
 
 static int txw_read_header(SF_PRIVATE *psf);
 
-static sf_count_t txw_read_s(SF_PRIVATE *psf, short *ptr, sf_count_t len);
-static sf_count_t txw_read_i(SF_PRIVATE *psf, int *ptr, sf_count_t len);
-static sf_count_t txw_read_f(SF_PRIVATE *psf, float *ptr, sf_count_t len);
-static sf_count_t txw_read_d(SF_PRIVATE *psf, double *ptr, sf_count_t len);
+static size_t txw_read_s(SF_PRIVATE *psf, short *ptr, size_t len);
+static size_t txw_read_i(SF_PRIVATE *psf, int *ptr, size_t len);
+static size_t txw_read_f(SF_PRIVATE *psf, float *ptr, size_t len);
+static size_t txw_read_d(SF_PRIVATE *psf, double *ptr, size_t len);
 
 static sf_count_t txw_seek(SF_PRIVATE *psf, int mode, sf_count_t offset);
 
@@ -228,13 +228,12 @@ static int txw_read_header(SF_PRIVATE *psf)
     return 0;
 }
 
-static sf_count_t txw_read_s(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+static size_t txw_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     unsigned char *ucptr;
     short sample;
-    int k, bufferlen, readcount, count;
-    sf_count_t total = 0;
+    size_t k, bufferlen, readcount, count, total = 0;
 
     bufferlen = sizeof(ubuf.cbuf) / 3;
     bufferlen -= (bufferlen & 1);
@@ -260,13 +259,12 @@ static sf_count_t txw_read_s(SF_PRIVATE *psf, short *ptr, sf_count_t len)
     return total;
 }
 
-static sf_count_t txw_read_i(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+static size_t txw_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     unsigned char *ucptr;
     short sample;
-    int k, bufferlen, readcount, count;
-    sf_count_t total = 0;
+    size_t k, bufferlen, readcount, count, total = 0;
 
     bufferlen = sizeof(ubuf.cbuf) / 3;
     bufferlen -= (bufferlen & 1);
@@ -292,13 +290,12 @@ static sf_count_t txw_read_i(SF_PRIVATE *psf, int *ptr, sf_count_t len)
     return total;
 }
 
-static sf_count_t txw_read_f(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+static size_t txw_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     unsigned char *ucptr;
     short sample;
-    int k, bufferlen, readcount, count;
-    sf_count_t total = 0;
+    size_t k, bufferlen, readcount, count, total = 0;
     float normfact;
 
     if (psf->norm_float == SF_TRUE)
@@ -330,13 +327,12 @@ static sf_count_t txw_read_f(SF_PRIVATE *psf, float *ptr, sf_count_t len)
     return total;
 }
 
-static sf_count_t txw_read_d(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+static size_t txw_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     unsigned char *ucptr;
     short sample;
-    int k, bufferlen, readcount, count;
-    sf_count_t total = 0;
+    size_t k, bufferlen, readcount, count, total = 0;
     double normfact;
 
     if (psf->norm_double == SF_TRUE)

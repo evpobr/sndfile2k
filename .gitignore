@@ -62,7 +62,7 @@ compile_commands.json
 CTestTestfile.cmake
 CMakeSettings.json
 
-CmakeBuild/
-cmake-build/
+CmakeBuild*/
+cmake-build*/
 
 .vs/

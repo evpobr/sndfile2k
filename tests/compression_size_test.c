@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
         exit(0);
     };
 
-#if !defined(HAVE_EXTERNAL_XIPH_LIBS)
+#if !defined(HAVE_XIPH_CODECS)
     puts("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled "
          "in.");
     return 0;

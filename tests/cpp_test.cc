@@ -22,7 +22,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "sndfile2k/sndfile2k.hh"
+#include "sndfile2k/sndfile2k.hpp"
 
 #include "utils.h"
 

@@ -28,8 +28,11 @@
 /* Define if you have the <direct.h> header file. */
 #cmakedefine HAVE_DIRECT_H
 
-/* Will be defined if flac, ogg and vorbis are available. */
-#cmakedefine HAVE_EXTERNAL_XIPH_LIBS
+/* Define if FLAC and Vorbis support enabled. */
+#cmakedefine HAVE_XIPH_CODECS
+
+/* Define if Speex support enabled. */
+#cmakedefine HAVE_SPEEX
 
 /* Define if you have the `fstat' function. */
 #cmakedefine HAVE_FSTAT
@@ -150,9 +153,6 @@
 
 /* Target processor is big endian. */
 #cmakedefine WORDS_BIGENDIAN
-
-/* Define as `__inline' or '__inline__' if that's what the C compiler calls it, or to nothing if it is not supported. */
-@INLINE_CODE@
 
 #ifndef HAVE_SSIZE_T
 #define ssize_t intptr_t

@@ -35,7 +35,8 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if (ENABLE_EXPERIMENTAL_CODE && defined(HAVE_EXTERNAL_XIPH_LIBS))
+#if (defined(ENABLE_EXPERIMENTAL_CODE) && (ENABLE_EXPERIMENTAL_CODE == 1) \
+     && defined(HAVE_SPEEX))
 
 #include <ogg/ogg.h>
 
@@ -456,7 +457,7 @@ duration = audio_samples / rate
               = 3.947
 */
 
-#else /* ENABLE_EXPERIMENTAL_CODE && HAVE_EXTERNAL_XIPH_LIBS */
+#else /* ENABLE_EXPERIMENTAL_CODE && HAVE_XIPH_CODECS */
 
 int ogg_speex_open(SF_PRIVATE *psf)
 {

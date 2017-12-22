@@ -247,7 +247,7 @@ static void zero_data_test(const char *filename, int format)
     switch (format & SF_FORMAT_TYPEMASK)
     {
     case SF_FORMAT_OGG:
-#ifndef HAVE_EXTERNAL_XIPH_LIBS
+#ifndef HAVE_XIPH_CODECS
         return;
 #endif
         break;

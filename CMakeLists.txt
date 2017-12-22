@@ -25,6 +25,7 @@ set(SNDFILE2K_SOVERSION "${SNDFILE2K_SOVERSION_MAJOR}.${SNDFILE2K_SOVERSION_MINO
 include(GNUInstallDirs)
 include(FeatureSummary)
 include(CMakeDependentOption)
+include(CPack)
 
 #
 # Options
@@ -34,13 +35,13 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(BUILD_PROGRAMS "Build programs" ON)
 option(BUILD_EXAMPLES "Build examples" ON)
 option(BUILD_TESTING "Build tests" ON)
-option(DISABLE_EXTERNAL_LIBS "Disable use of FLAC, Ogg and Vorbis" OFF)
-option(ENABLE_EXPERIMENTAL "Enable experimental code" OFF)
-option(DISABLE_CPU_CLIP "Disable tricky cpu specific clipper" OFF)
+option(ENABLE_CPU_CLIP "Enable tricky cpu specific clipper" ON)
 if(MSVC OR MINGW)
   option(ENABLE_STATIC_RUNTIME "Enable static runtime" OFF)
 endif(MSVC OR MINGW)
-option(ENABLE_PACKAGE_CONFIG "Generate and install package config file" ON)
+option(ENABLE_CMAKE_PACKAGE_CONFIG "Generate and install CMake package configuration files" ON)
+option(ENABLE_PKGCONFIG_FILE "Generate and install pkg-config file (sndfile2k.pc)" ON)
+option(ENABLE_EXPERIMENTAL "Enable experimental code" OFF)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
@@ -50,15 +51,18 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
 include(${CMAKE_MODULE_PATH}/SndFileChecks.cmake)
 
-cmake_dependent_option(BUILD_REGTEST "Build regtest" ON "HAVE_SQLITE3" OFF)
+cmake_dependent_option(HAVE_XIPH_CODECS "Enable use of Xiph.org Vorbis and FLAC codecs" ON "HAVE_EXTERNAL_XIPH_LIBS" OFF)
+cmake_dependent_option(HAVE_SPEEX "Enable use of Xiph.org Speex codec" ON "ENABLE_EXPERIMENTAL AND SPEEX_FOUND" OFF)
 
-add_feature_info(BUILD_SHARED_LIBS BUILD_SHARED_LIBS "build shared libraries")
-add_feature_info(DISABLE_EXTERNAL_LIBS DISABLE_EXTERNAL_LIBS "disable use of FLAC, Ogg and Vorbis")
-add_feature_info(ENABLE_EXPERIMENTAL ENABLE_EXPERIMENTAL "enable experimental code")
-add_feature_info(BUILD_TESTING BUILD_TESTING "build tests")
-add_feature_info(BUILD_REGTEST BUILD_REGTEST "build regtest")
-add_feature_info(DISABLE_CPU_CLIP DISABLE_CPU_CLIP "Disable tricky cpu specific clipper")
-add_feature_info(ENABLE_PACKAGE_CONFIG ENABLE_PACKAGE_CONFIG "generate and install package config file")
+add_feature_info(BuildSharedLibs BUILD_SHARED_LIBS "build shared libraries")
+add_feature_info(WithVorbis HAVE_XIPH_CODECS "Xiph Vorbis codec support")
+add_feature_info(WithFLAC HAVE_XIPH_CODECS "Xiph FLAC codec support")
+add_feature_info(WithSpeex HAVE_SPEEX "Xiph Speex codec support")
+add_feature_info(ExperimentalCode ENABLE_EXPERIMENTAL "enable experimental code")
+add_feature_info(BuildTesting BUILD_TESTING "build tests")
+add_feature_info(CPUClip ENABLE_CPU_CLIP "Enable tricky cpu specific clipper")
+add_feature_info(CMakePackageConfig ENABLE_CMAKE_PACKAGE_CONFIG "Generate and install CMake package configuration files")
+add_feature_info(PkgConfigFile ENABLE_PKGCONFIG_FILE "Generate and install pkg-config file (sndfile2k.pc)")
 
 if(MSVC OR MINGW)
   add_feature_info(ENABLE_STATIC_RUNTIME ENABLE_STATIC_RUNTIME "Enable static runtime")
@@ -67,23 +71,19 @@ endif()
 set_package_properties(Ogg PROPERTIES TYPE RECOMMENDED
   URL "www.xiph.org/ogg/"
   DESCRIPTION "library for manipulating ogg bitstreams"
-  PURPOSE "Required to enable Vorbis, Speex and Opus support")
+  PURPOSE "Enables Xiph.org Vorbis and FLAC codecs support")
 set_package_properties(Vorbis PROPERTIES TYPE RECOMMENDED
   URL "www.vorbis.com/"
   DESCRIPTION "open source lossy audio codec"
-  PURPOSE "Enables Vorbis support")
+  PURPOSE "Enables Xiph.org Vorbis support")
 set_package_properties(FLAC PROPERTIES TYPE RECOMMENDED
   URL "www.xiph.org/flac/"
   DESCRIPTION "Free Lossless Audio Codec Library"
-  PURPOSE "Enables FLAC support")
+  PURPOSE "Enables Xiph.org FLAC codec support")
 set_package_properties(Speex PROPERTIES TYPE OPTIONAL
   URL "www.speex.org/"
   DESCRIPTION "an audio codec tuned for speech"
   PURPOSE "Enables experemental Speex support")
-set_package_properties(SQLite3 PROPERTIES TYPE OPTIONAL
-  URL "www.sqlite.org/"
-  DESCRIPTION "light weight SQL database engine."
-  PURPOSE "Enables regtest")
 
 feature_summary(WHAT ALL)
 
@@ -93,17 +93,10 @@ feature_summary(WHAT ALL)
 
 configure_file(src/config.h.cmake src/config.h)
 
-set(PC_PREFIX ${CMAKE_INSTALL_PREFIX})
-set(PC_EXEC_PREFIX "\$\{prefix\}")
-set(PC_LIBDIR "\$\{prefix\}/${CMAKE_INSTALL_LIBDIR}")
-set(PC_INCLUDEDIR "\$\{prefix\}/${CMAKE_INSTALL_INCLUDEDIR}")
-if(EXTERNAL_XIPH_LIBS)
+if(HAVE_XIPH_CODECS)
   set(PC_REQUIRES_PRIVATE "flac >= 1.3 vorbis >= 1.2 vorbisenc >= 1.2")
 endif()
-set(PC_VERSION ${PROJECT_VERSION})
-if(EXTERNAL_XIPH_LIBS)
-  set(PC_PRIVATE_LIBS "-lm")
-endif()
+set(PC_PRIVATE_LIBS "-lm")
 
 configure_file(sndfile2k.pc.in sndfile2k.pc @ONLY)
 
@@ -113,7 +106,7 @@ configure_file(sndfile2k.pc.in sndfile2k.pc @ONLY)
 
 # Public headers
 set(libsndfile2k_PUBLIC_HEADERS
-  include/sndfile2k/sndfile2k.hh
+  include/sndfile2k/sndfile2k.hpp
   include/sndfile2k/sndfile2k.h)
 
 # Private headers
@@ -160,7 +153,7 @@ endif()
 
 # File specific sources
 set(FILESPECIFIC
-  src/sndfile.c
+  src/sndfile2k.c
   src/aiff.c
   src/au.c
   src/avr.c
@@ -274,14 +267,11 @@ if(LIBM_REQUIRED)
   target_link_libraries(sndfile2k PRIVATE ${M_LIBRARY})
 endif()
 
-if(NOT DISABLE_EXTERNAL_LIBS)
-  target_link_libraries(sndfile2k PRIVATE ${EXTERNAL_XIPH_LIBS})
-  target_include_directories(sndfile2k
+if(HAVE_XIPH_CODECS)
+  target_link_libraries(sndfile2k
     PRIVATE
-      ${OGG_INCLUDE_DIRS}
-      ${VORBIS_INCLUDE_DIRS}
-      ${FLAC_INCLUDE_DIRS})
-  target_compile_definitions(sndfile2k PRIVATE ${FLAC_DEFINITIONS})
+      VorbisEnc
+      FLAC)
   if(ENABLE_EXPERIMENTAL)
     target_link_libraries(sndfile2k PRIVATE ${SPEEX_LIBRARIES})
     target_include_directories(sndfile2k PRIVATE ${SPEEX_INCLUDE_DIRS})
@@ -362,8 +352,7 @@ if(BUILD_PROGRAMS)
       ${PROJECT_BINARY_DIR}/src)
   target_link_libraries(sndfile2k-play PUBLIC sndfile2k)
   if(WIN32 OR CYGWIN)
-    target_include_directories(sndfile2k-play PRIVATE ${WINMM_INCLUDE_DIRS})
-    target_link_libraries(sndfile2k-play PRIVATE ${WINMM_LIBRARIES})
+    target_link_libraries(sndfile2k-play PRIVATE ${WINMM_LIBRARY})
   # Maybe ALSA & Sndio are present in BeOS. They are not required
   # so skip them anyway.
   elseif((NOT BEOS) AND ALSA_FOUND)
@@ -527,33 +516,10 @@ if(BUILD_EXAMPLES)
 endif()
 
 #
-# sndfile-regtest
-#
-
-if(BUILD_REGTEST)
-
-  set(sndfile_regtest_SOURCES
-    regtest/sndfile-regtest.c
-    regtest/database.c
-    regtest/checksum.c)
-  add_executable(sndfile-regtest ${sndfile_regtest_SOURCES})
-  target_include_directories(sndfile-regtest
-    PRIVATE
-      ${SQLITE3_INCLUDE_DIRS}
-      ${PROJECT_SOURCE_DIR}/src
-      ${PROJECT_BINARY_DIR}/src)
-  target_link_libraries(sndfile-regtest PUBLIC sndfile2k ${SQLITE3_LIBRARIES})
-  if(BUILD_SHARED_LIBS AND LIBM_REQUIRED)
-    target_link_libraries(sndfile-regtest PRIVATE ${M_LIBRARY})
-  endif()
-
-endif()
-
-#
 # Installation
 #
 
-if(ENABLE_PACKAGE_CONFIG)
+if(ENABLE_CMAKE_PACKAGE_CONFIG)
 
   if(UNIX)
     set(CMAKE_INSTALL_PACKAGEDIR ${CMAKE_INSTALL_LIBDIR}/cmake/sndfile2k)
@@ -599,7 +565,9 @@ elseif()
 
 endif()
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sndfile2k.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+if(ENABLE_PKGCONFIG_FILE)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sndfile2k.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+endif()
 
 #
 # Testing
@@ -1341,3 +1309,7 @@ if(BUILD_TESTING)
   set_target_properties(${SNDFILE_TEST_TARGETS} PROPERTIES FOLDER Tests)
 
 endif()
+
+# Doxygen documentation
+
+configure_file(Doxyfile.in Doxyfile)

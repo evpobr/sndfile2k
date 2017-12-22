@@ -36,7 +36,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#ifdef HAVE_EXTERNAL_XIPH_LIBS
+#ifdef HAVE_XIPH_CODECS
 
 #include <ogg/ogg.h>
 
@@ -250,7 +250,7 @@ static int ogg_page_classify(SF_PRIVATE *psf, const ogg_page *og)
     return 0;
 }
 
-#else /* HAVE_EXTERNAL_XIPH_LIBS */
+#else /* HAVE_XIPH_CODECS */
 
 int ogg_open(SF_PRIVATE *psf)
 {
