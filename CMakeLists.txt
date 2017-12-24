@@ -53,11 +53,13 @@ include(${CMAKE_MODULE_PATH}/SndFileChecks.cmake)
 
 cmake_dependent_option(HAVE_XIPH_CODECS "Enable use of Xiph.org Vorbis and FLAC codecs" ON "HAVE_EXTERNAL_XIPH_LIBS" OFF)
 cmake_dependent_option(HAVE_SPEEX "Enable use of Xiph.org Speex codec" ON "ENABLE_EXPERIMENTAL AND SPEEX_FOUND" OFF)
+cmake_dependent_option(BUILD_DOCUMENTATION "Enable use of Doxygen documentation generator" ON "Doxygen_FOUND;CMAKE_DOXYGEN_SUPPORTS_TARGETS" OFF)
 
 add_feature_info(BuildSharedLibs BUILD_SHARED_LIBS "build shared libraries")
 add_feature_info(WithVorbis HAVE_XIPH_CODECS "Xiph Vorbis codec support")
 add_feature_info(WithFLAC HAVE_XIPH_CODECS "Xiph FLAC codec support")
 add_feature_info(WithSpeex HAVE_SPEEX "Xiph Speex codec support")
+add_feature_info(WithDoxygen HAVE_DOXYGEN "Doxygen documentation generator")
 add_feature_info(ExperimentalCode ENABLE_EXPERIMENTAL "enable experimental code")
 add_feature_info(BuildTesting BUILD_TESTING "build tests")
 add_feature_info(CPUClip ENABLE_CPU_CLIP "Enable tricky cpu specific clipper")
@@ -84,6 +86,10 @@ set_package_properties(Speex PROPERTIES TYPE OPTIONAL
   URL "www.speex.org/"
   DESCRIPTION "an audio codec tuned for speech"
   PURPOSE "Enables experemental Speex support")
+set_package_properties(Doxygen PROPERTIES TYPE OPTIONAL
+  URL "www.doxygen.org/"
+  DESCRIPTION "generate documentation from source code"
+  PURPOSE "Enables documentation generation")
 
 feature_summary(WHAT ALL)
 
@@ -1312,4 +1318,14 @@ endif()
 
 # Doxygen documentation
 
-configure_file(Doxyfile.in Doxyfile)
+if(BUILD_DOCUMENTATION)
+  set(DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs)
+  set(DOXYGEN_JAVADOC_AUTOBRIEF YES)
+  set(DOXYGEN_OPTIMIZE_OUTPUT_FOR_C YES)
+  set(DOXYGEN_TYPEDEF_HIDES_STRUCT YES)
+  set(DOXYGEN_USE_MDFILE_AS_MAINPAGE INDEX.md)
+  doxygen_add_docs(docs
+    include/sndfile2k/sndfile2k.h
+    include/sndfile2k/sndfile2k.hpp
+    docs)
+endif()
