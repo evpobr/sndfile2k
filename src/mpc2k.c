@@ -57,8 +57,7 @@ int mpc2k_open(SF_PRIVATE *psf)
 {
     int error = 0;
 
-    if (psf->file.mode == SFM_READ ||
-        (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = mpc2k_read_header(psf)))
             return error;
@@ -123,17 +122,13 @@ static int mpc2k_write_header(SF_PRIVATE *psf, int calc_length)
     if (psf->is_pipe == SF_FALSE)
         psf_fseek(psf, 0, SEEK_SET);
 
-    snprintf(sample_name, sizeof(sample_name), "%s                    ",
-             psf->file.name.c);
+    snprintf(sample_name, sizeof(sample_name), "%s                    ", psf->file.name.c);
 
-    psf_binheader_writef(psf, "e11b", BHW1(1), BHW1(4), BHWv(sample_name),
-                         BHWz(HEADER_NAME_LEN));
-    psf_binheader_writef(psf, "e111", BHW1(100), BHW1(0),
-                         BHW1((psf->sf.channels - 1) & 1));
-    psf_binheader_writef(psf, "et4888", BHW4(0), BHW8(psf->sf.frames),
-                         BHW8(psf->sf.frames), BHW8(psf->sf.frames));
-    psf_binheader_writef(psf, "e112", BHW1(0), BHW1(1),
-                         BHW2((uint16_t)psf->sf.samplerate));
+    psf_binheader_writef(psf, "e11b", BHW1(1), BHW1(4), BHWv(sample_name), BHWz(HEADER_NAME_LEN));
+    psf_binheader_writef(psf, "e111", BHW1(100), BHW1(0), BHW1((psf->sf.channels - 1) & 1));
+    psf_binheader_writef(psf, "et4888", BHW4(0), BHW8(psf->sf.frames), BHW8(psf->sf.frames),
+                         BHW8(psf->sf.frames));
+    psf_binheader_writef(psf, "e112", BHW1(0), BHW1(1), BHW2((uint16_t)psf->sf.samplerate));
 
     /* Always 16 bit little endian data. */
     psf->bytewidth = 2;
@@ -159,8 +154,7 @@ static int mpc2k_read_header(SF_PRIVATE *psf)
     uint32_t sample_start, loop_end, sample_frames, loop_length;
     uint16_t sample_rate;
 
-    psf_binheader_readf(psf, "pebb", 0, bytes, 2, sample_name,
-                        make_size_t(HEADER_NAME_LEN));
+    psf_binheader_readf(psf, "pebb", 0, bytes, 2, sample_name, make_size_t(HEADER_NAME_LEN));
 
     if (bytes[0] != 1 || bytes[1] != 4)
         return SFE_MPC_NO_MARKER;
@@ -169,25 +163,23 @@ static int mpc2k_read_header(SF_PRIVATE *psf)
 
     psf_log_printf(psf, "MPC2000\n  Name         : %s\n", sample_name);
 
-    psf_binheader_readf(psf, "eb4444", bytes, 3, &sample_start, &loop_end,
-                        &sample_frames, &loop_length);
+    psf_binheader_readf(psf, "eb4444", bytes, 3, &sample_start, &loop_end, &sample_frames,
+                        &loop_length);
 
     psf->sf.channels = bytes[2] ? 2 : 1;
 
-    psf_log_printf(
-        psf, "  Level        : %d\n  Tune         : %d\n  Stereo       : %s\n",
-        bytes[0], bytes[1], bytes[2] ? "Yes" : "No");
+    psf_log_printf(psf, "  Level        : %d\n  Tune         : %d\n  Stereo       : %s\n", bytes[0],
+                   bytes[1], bytes[2] ? "Yes" : "No");
 
-    psf_log_printf(psf, "  Sample start : %d\n  Loop end     : %d\n  Frames    "
-                        "   : %d\n  Length       : %d\n",
+    psf_log_printf(psf,
+                   "  Sample start : %d\n  Loop end     : %d\n  Frames    "
+                   "   : %d\n  Length       : %d\n",
                    sample_start, loop_end, sample_frames, loop_length);
 
     psf_binheader_readf(psf, "eb2", bytes, 2, &sample_rate);
 
-    psf_log_printf(
-        psf,
-        "  Loop mode    : %s\n  Beats        : %d\n  Sample rate  : %d\nEnd\n",
-        bytes[0] ? "None" : "Fwd", bytes[1], sample_rate);
+    psf_log_printf(psf, "  Loop mode    : %s\n  Beats        : %d\n  Sample rate  : %d\nEnd\n",
+                   bytes[0] ? "None" : "Fwd", bytes[1], sample_rate);
 
     psf->sf.samplerate = sample_rate;
 

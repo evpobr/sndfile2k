@@ -89,8 +89,7 @@
 #ifdef HAVE_ALSA_ASOUNDLIB_H
 
 static snd_pcm_t *alsa_open(int channels, unsigned srate, int realtime);
-static int alsa_write_float(snd_pcm_t *alsa_dev, float *data, int frames,
-                            int channels);
+static int alsa_write_float(snd_pcm_t *alsa_dev, float *data, int frames, int channels);
 
 static void alsa_play(int argc, char *argv[])
 {
@@ -117,8 +116,7 @@ static void alsa_play(int argc, char *argv[])
             continue;
         };
 
-        if ((alsa_dev = alsa_open(sfinfo.channels, (unsigned)sfinfo.samplerate,
-                                  SF_FALSE)) == NULL)
+        if ((alsa_dev = alsa_open(sfinfo.channels, (unsigned)sfinfo.samplerate, SF_FALSE)) == NULL)
             continue;
 
         subformat = sfinfo.format & SF_FORMAT_SUBMASK;
@@ -138,15 +136,13 @@ static void alsa_play(int argc, char *argv[])
             {
                 for (m = 0; m < readcount; m++)
                     buffer[m] *= scale;
-                alsa_write_float(alsa_dev, buffer, BUFFER_LEN / sfinfo.channels,
-                                 sfinfo.channels);
+                alsa_write_float(alsa_dev, buffer, BUFFER_LEN / sfinfo.channels, sfinfo.channels);
             };
         }
         else
         {
             while ((readcount = sf_read_float(sndfile, buffer, BUFFER_LEN)))
-                alsa_write_float(alsa_dev, buffer, BUFFER_LEN / sfinfo.channels,
-                                 sfinfo.channels);
+                alsa_write_float(alsa_dev, buffer, BUFFER_LEN / sfinfo.channels, sfinfo.channels);
         };
 
         snd_pcm_drain(alsa_dev);
@@ -182,8 +178,7 @@ static snd_pcm_t *alsa_open(int channels, unsigned samplerate, int realtime)
 
     if ((err = snd_pcm_open(&alsa_dev, device, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
     {
-        fprintf(stderr, "cannot open audio device \"%s\" (%s)\n", device,
-                snd_strerror(err));
+        fprintf(stderr, "cannot open audio device \"%s\" (%s)\n", device, snd_strerror(err));
         goto catch_error;
     };
 
@@ -191,55 +186,50 @@ static snd_pcm_t *alsa_open(int channels, unsigned samplerate, int realtime)
 
     if ((err = snd_pcm_hw_params_malloc(&hw_params)) < 0)
     {
-        fprintf(stderr, "cannot allocate hardware parameter structure (%s)\n",
-                snd_strerror(err));
+        fprintf(stderr, "cannot allocate hardware parameter structure (%s)\n", snd_strerror(err));
         goto catch_error;
     };
 
     if ((err = snd_pcm_hw_params_any(alsa_dev, hw_params)) < 0)
     {
-        fprintf(stderr, "cannot initialize hardware parameter structure (%s)\n",
-                snd_strerror(err));
+        fprintf(stderr, "cannot initialize hardware parameter structure (%s)\n", snd_strerror(err));
         goto catch_error;
     };
 
-    if ((err = snd_pcm_hw_params_set_access(alsa_dev, hw_params,
-                                            SND_PCM_ACCESS_RW_INTERLEAVED)) < 0)
+    if ((err = snd_pcm_hw_params_set_access(alsa_dev, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED)) <
+        0)
     {
         fprintf(stderr, "cannot set access type (%s)\n", snd_strerror(err));
         goto catch_error;
     };
 
-    if ((err = snd_pcm_hw_params_set_format(alsa_dev, hw_params,
-                                            SND_PCM_FORMAT_FLOAT)) < 0)
+    if ((err = snd_pcm_hw_params_set_format(alsa_dev, hw_params, SND_PCM_FORMAT_FLOAT)) < 0)
     {
         fprintf(stderr, "cannot set sample format (%s)\n", snd_strerror(err));
         goto catch_error;
     };
 
-    if ((err = snd_pcm_hw_params_set_rate_near(alsa_dev, hw_params, &samplerate,
-                                               0)) < 0)
+    if ((err = snd_pcm_hw_params_set_rate_near(alsa_dev, hw_params, &samplerate, 0)) < 0)
     {
         fprintf(stderr, "cannot set sample rate (%s)\n", snd_strerror(err));
         goto catch_error;
     };
 
-    if ((err = snd_pcm_hw_params_set_channels(alsa_dev, hw_params, channels)) <
-        0)
+    if ((err = snd_pcm_hw_params_set_channels(alsa_dev, hw_params, channels)) < 0)
     {
         fprintf(stderr, "cannot set channel count (%s)\n", snd_strerror(err));
         goto catch_error;
     };
 
-    if ((err = snd_pcm_hw_params_set_buffer_size_near(alsa_dev, hw_params,
-                                                      &alsa_buffer_frames)) < 0)
+    if ((err = snd_pcm_hw_params_set_buffer_size_near(alsa_dev, hw_params, &alsa_buffer_frames)) <
+        0)
     {
         fprintf(stderr, "cannot set buffer size (%s)\n", snd_strerror(err));
         goto catch_error;
     };
 
-    if ((err = snd_pcm_hw_params_set_period_size_near(
-             alsa_dev, hw_params, &alsa_period_size, 0)) < 0)
+    if ((err = snd_pcm_hw_params_set_period_size_near(alsa_dev, hw_params, &alsa_period_size, 0)) <
+        0)
     {
         fprintf(stderr, "cannot set period size (%s)\n", snd_strerror(err));
         goto catch_error;
@@ -256,8 +246,8 @@ static snd_pcm_t *alsa_open(int channels, unsigned samplerate, int realtime)
     snd_pcm_hw_params_get_buffer_size(hw_params, &buffer_size);
     if (alsa_period_size == buffer_size)
     {
-        fprintf(stderr, "Can't use period equal to buffer size (%lu == %lu)",
-                alsa_period_size, buffer_size);
+        fprintf(stderr, "Can't use period equal to buffer size (%lu == %lu)", alsa_period_size,
+                buffer_size);
         goto catch_error;
     };
 
@@ -265,23 +255,20 @@ static snd_pcm_t *alsa_open(int channels, unsigned samplerate, int realtime)
 
     if ((err = snd_pcm_sw_params_malloc(&sw_params)) != 0)
     {
-        fprintf(stderr, "%s: snd_pcm_sw_params_malloc: %s", __func__,
-                snd_strerror(err));
+        fprintf(stderr, "%s: snd_pcm_sw_params_malloc: %s", __func__, snd_strerror(err));
         goto catch_error;
     };
 
     if ((err = snd_pcm_sw_params_current(alsa_dev, sw_params)) != 0)
     {
-        fprintf(stderr, "%s: snd_pcm_sw_params_current: %s", __func__,
-                snd_strerror(err));
+        fprintf(stderr, "%s: snd_pcm_sw_params_current: %s", __func__, snd_strerror(err));
         goto catch_error;
     };
 
     /* note: set start threshold to delay start until the ring buffer is full */
     snd_pcm_sw_params_current(alsa_dev, sw_params);
 
-    if ((err = snd_pcm_sw_params_set_start_threshold(alsa_dev, sw_params,
-                                                     buffer_size)) < 0)
+    if ((err = snd_pcm_sw_params_set_start_threshold(alsa_dev, sw_params, buffer_size)) < 0)
     {
         fprintf(stderr, "cannot set start threshold (%s)\n", snd_strerror(err));
         goto catch_error;
@@ -289,8 +276,7 @@ static snd_pcm_t *alsa_open(int channels, unsigned samplerate, int realtime)
 
     if ((err = snd_pcm_sw_params(alsa_dev, sw_params)) != 0)
     {
-        fprintf(stderr, "%s: snd_pcm_sw_params: %s", __func__,
-                snd_strerror(err));
+        fprintf(stderr, "%s: snd_pcm_sw_params: %s", __func__, snd_strerror(err));
         goto catch_error;
     };
 
@@ -309,8 +295,7 @@ catch_error:
     return alsa_dev;
 }
 
-static int alsa_write_float(snd_pcm_t *alsa_dev, float *data, int frames,
-                            int channels)
+static int alsa_write_float(snd_pcm_t *alsa_dev, float *data, int frames, int channels)
 {
     static int epipe_count = 0;
 
@@ -322,8 +307,7 @@ static int alsa_write_float(snd_pcm_t *alsa_dev, float *data, int frames,
 
     while (total < frames)
     {
-        retval =
-            snd_pcm_writei(alsa_dev, data + total * channels, frames - total);
+        retval = snd_pcm_writei(alsa_dev, data + total * channels, frames - total);
 
         if (retval >= 0)
         {
@@ -408,9 +392,8 @@ static int alsa_write_float(snd_pcm_t *alsa_dev, float *data, int frames,
  * Linux/OSS functions for playing a sound.
  */
 
-#if !defined(__ANDROID__) &&                              \
-    (defined(__linux__) || defined(__FreeBSD_kernel__) || \
-     defined(__FreeBSD__))
+#if !defined(__ANDROID__) && \
+    (defined(__linux__) || defined(__FreeBSD_kernel__) || defined(__FreeBSD__))
 
 static int opensoundsys_open_device(int channels, int srate);
 
@@ -438,8 +421,7 @@ static int opensoundsys_play(int argc, char *argv[])
             continue;
         };
 
-        audio_device =
-            opensoundsys_open_device(sfinfo.channels, sfinfo.samplerate);
+        audio_device = opensoundsys_open_device(sfinfo.channels, sfinfo.samplerate);
 
         subformat = sfinfo.format & SF_FORMAT_SUBMASK;
 
@@ -455,20 +437,17 @@ static int opensoundsys_play(int argc, char *argv[])
             else
                 scale = 32700.0 / scale;
 
-            while (
-                (readcount = sf_read_float(sndfile, float_buffer, BUFFER_LEN)))
+            while ((readcount = sf_read_float(sndfile, float_buffer, BUFFER_LEN)))
             {
                 for (m = 0; m < readcount; m++)
                     buffer[m] = scale * float_buffer[m];
-                writecount =
-                    write(audio_device, buffer, readcount * sizeof(short));
+                writecount = write(audio_device, buffer, readcount * sizeof(short));
             };
         }
         else
         {
             while ((readcount = sf_read_short(sndfile, buffer, BUFFER_LEN)))
-                writecount =
-                    write(audio_device, buffer, readcount * sizeof(short));
+                writecount = write(audio_device, buffer, readcount * sizeof(short));
         };
 
         if (ioctl(audio_device, SNDCTL_DSP_POST, 0) == -1)
@@ -581,13 +560,11 @@ static void win32_play_data(Win32_Audio_Data *audio_data)
     int thisread, readcount;
 
     /* fill a buffer if there is more data and we can read it sucessfully */
-    readcount = (audio_data->remaining > audio_data->bufferlen)
-                    ? audio_data->bufferlen
-                    : (int)audio_data->remaining;
+    readcount = (audio_data->remaining > audio_data->bufferlen) ? audio_data->bufferlen
+                                                                : (int)audio_data->remaining;
 
     thisread = (int)sf_read_short(
-        audio_data->sndfile,
-        (short *)(audio_data->whdr[audio_data->current].lpData), readcount);
+        audio_data->sndfile, (short *)(audio_data->whdr[audio_data->current].lpData), readcount);
 
     audio_data->remaining -= thisread;
 
@@ -595,12 +572,10 @@ static void win32_play_data(Win32_Audio_Data *audio_data)
     {
         /* Fix buffer length if this is only a partial block. */
         if (thisread < audio_data->bufferlen)
-            audio_data->whdr[audio_data->current].dwBufferLength =
-                thisread * sizeof(short);
+            audio_data->whdr[audio_data->current].dwBufferLength = thisread * sizeof(short);
 
         /* Queue the WAVEHDR */
-        waveOutWrite(audio_data->hwave,
-                     (LPWAVEHDR) & (audio_data->whdr[audio_data->current]),
+        waveOutWrite(audio_data->hwave, (LPWAVEHDR) & (audio_data->whdr[audio_data->current]),
                      sizeof(WAVEHDR));
 
         /* count another buffer in use */
@@ -615,9 +590,8 @@ static void win32_play_data(Win32_Audio_Data *audio_data)
     return;
 }
 
-static void CALLBACK win32_audio_out_callback(HWAVEOUT hwave, UINT msg,
-                                              DWORD_PTR data, DWORD param1,
-                                              DWORD param2)
+static void CALLBACK win32_audio_out_callback(HWAVEOUT hwave, UINT msg, DWORD_PTR data,
+                                              DWORD param1, DWORD param2)
 {
     Win32_Audio_Data *audio_data;
 
@@ -662,15 +636,13 @@ static void win32_play(int argc, char *argv[])
     {
         printf("Playing %s\n", argv[k]);
 
-        if (!(audio_data.sndfile =
-                  sf_open(argv[k], SFM_READ, &(audio_data.sfinfo))))
+        if (!(audio_data.sndfile = sf_open(argv[k], SFM_READ, &(audio_data.sfinfo))))
         {
             puts(sf_strerror(NULL));
             continue;
         };
 
-        audio_data.remaining =
-            audio_data.sfinfo.frames * audio_data.sfinfo.channels;
+        audio_data.remaining = audio_data.sfinfo.frames * audio_data.sfinfo.channels;
         audio_data.current = 0;
 
         InitializeCriticalSection(&audio_data.mutex);
@@ -687,9 +659,9 @@ static void win32_play(int argc, char *argv[])
 
         wf.nAvgBytesPerSec = wf.nBlockAlign * wf.nSamplesPerSec;
 
-        error = waveOutOpen(&(audio_data.hwave), WAVE_MAPPER, &wf,
-                            (DWORD_PTR)win32_audio_out_callback,
-                            (DWORD_PTR)&audio_data, CALLBACK_FUNCTION);
+        error =
+            waveOutOpen(&(audio_data.hwave), WAVE_MAPPER, &wf, (DWORD_PTR)win32_audio_out_callback,
+                        (DWORD_PTR)&audio_data, CALLBACK_FUNCTION);
         if (error)
         {
             puts("waveOutOpen failed.");
@@ -698,8 +670,7 @@ static void win32_play(int argc, char *argv[])
         };
 
         audio_data.whdr[0].lpData = (char *)audio_data.buffer;
-        audio_data.whdr[1].lpData =
-            ((char *)audio_data.buffer) + sizeof(audio_data.buffer) / 2;
+        audio_data.whdr[1].lpData = ((char *)audio_data.buffer) + sizeof(audio_data.buffer) / 2;
 
         audio_data.whdr[0].dwBufferLength = sizeof(audio_data.buffer) / 2;
         audio_data.whdr[1].dwBufferLength = sizeof(audio_data.buffer) / 2;
@@ -711,20 +682,19 @@ static void win32_play(int argc, char *argv[])
         audio_data.bufferlen = sizeof(audio_data.buffer) / 2 / sizeof(short);
 
         /* Prepare the WAVEHDRs */
-        if ((error = waveOutPrepareHeader(
-                 audio_data.hwave, &(audio_data.whdr[0]), sizeof(WAVEHDR))))
+        if ((error =
+                 waveOutPrepareHeader(audio_data.hwave, &(audio_data.whdr[0]), sizeof(WAVEHDR))))
         {
             printf("waveOutPrepareHeader [0] failed : %08X\n", error);
             waveOutClose(audio_data.hwave);
             continue;
         };
 
-        if ((error = waveOutPrepareHeader(
-                 audio_data.hwave, &(audio_data.whdr[1]), sizeof(WAVEHDR))))
+        if ((error =
+                 waveOutPrepareHeader(audio_data.hwave, &(audio_data.whdr[1]), sizeof(WAVEHDR))))
         {
             printf("waveOutPrepareHeader [1] failed : %08X\n", error);
-            waveOutUnprepareHeader(audio_data.hwave, &(audio_data.whdr[0]),
-                                   sizeof(WAVEHDR));
+            waveOutUnprepareHeader(audio_data.hwave, &(audio_data.whdr[0]), sizeof(WAVEHDR));
             waveOutClose(audio_data.hwave);
             continue;
         };
@@ -744,10 +714,8 @@ static void win32_play(int argc, char *argv[])
             win32_play_data(&audio_data);
         };
 
-        waveOutUnprepareHeader(audio_data.hwave, &(audio_data.whdr[0]),
-                               sizeof(WAVEHDR));
-        waveOutUnprepareHeader(audio_data.hwave, &(audio_data.whdr[1]),
-                               sizeof(WAVEHDR));
+        waveOutUnprepareHeader(audio_data.hwave, &(audio_data.whdr[0]), sizeof(WAVEHDR));
+        waveOutUnprepareHeader(audio_data.hwave, &(audio_data.whdr[1]), sizeof(WAVEHDR));
 
         waveOutClose(audio_data.hwave);
         audio_data.hwave = 0;
@@ -889,8 +857,7 @@ static void solaris_play(int argc, char *argv[])
             read_count = sf_read_short(sndfile, buffer, BUFFER_LEN);
             if (read_count < BUFFER_LEN)
             {
-                memset(&(buffer[read_count]), 0,
-                       (BUFFER_LEN - read_count) * sizeof(short));
+                memset(&(buffer[read_count]), 0, (BUFFER_LEN - read_count) * sizeof(short));
                 /* Tell the main application to terminate. */
                 done = SF_TRUE;
             };
@@ -901,8 +868,7 @@ static void solaris_play(int argc, char *argv[])
             while (output_count > 0)
             {
                 /* write as much data as possible */
-                write_count =
-                    write(audio_fd, &(buffer[start_count]), output_count);
+                write_count = write(audio_fd, &(buffer[start_count]), output_count);
                 if (write_count > 0)
                 {
                     output_count -= write_count;

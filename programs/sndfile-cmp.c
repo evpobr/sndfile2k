@@ -53,13 +53,11 @@ static int comparison_error(const char *what, sf_count_t frame_offset)
     char buffer[128];
 
     if (frame_offset >= 0)
-        snprintf(buffer, sizeof(buffer), " (at frame offset %" PRId64 ")",
-                 frame_offset);
+        snprintf(buffer, sizeof(buffer), " (at frame offset %" PRId64 ")", frame_offset);
     else
         buffer[0] = 0;
 
-    printf("%s: %s of files %s and %s differ%s.\n", progname, what, filename1,
-           filename2, buffer);
+    printf("%s: %s of files %s and %s differ%s.\n", progname, what, filename1, filename2, buffer);
     return 1;
 } /* comparison_error */
 
@@ -116,8 +114,7 @@ static int compare(void)
         {
             if (buf1[i] != buf2[i])
             {
-                retval =
-                    comparison_error("PCM data", offset + i / sfinfo1.channels);
+                retval = comparison_error("PCM data", offset + i / sfinfo1.channels);
                 goto out;
             };
         };

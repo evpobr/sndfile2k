@@ -105,8 +105,8 @@ int main(int argc, char *argv[])
 
         if (sfinfo_in.channels != sfinfo_out.channels)
         {
-            printf("\nError : File '%s' has %d channels (should have %d).\n\n",
-                   argv[k], sfinfo_in.channels, sfinfo_out.channels);
+            printf("\nError : File '%s' has %d channels (should have %d).\n\n", argv[k],
+                   sfinfo_in.channels, sfinfo_out.channels);
             exit(1);
         };
     };

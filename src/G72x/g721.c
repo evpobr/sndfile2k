@@ -70,9 +70,8 @@ static short _witab[16] = {-12,  18,  41,  64,  112, 198, 355, 1122,
  * term averages are computed and then compared to give an indication
  * how stationary (steady state) the signal is.
  */
-static short _fitab[16] = {0,     0,     0,     0x200, 0x200, 0x200,
-                           0x600, 0xE00, 0xE00, 0x600, 0x200, 0x200,
-                           0x200, 0,     0,     0};
+static short _fitab[16] = {0,     0,     0,     0x200, 0x200, 0x200, 0x600, 0xE00,
+                           0xE00, 0x600, 0x200, 0x200, 0x200, 0,     0,     0};
 
 /*
  * g721_encoder ()
@@ -108,8 +107,7 @@ int g721_encoder(int sl, G72x_STATE *state_ptr)
 
     dqsez = sr + sez - se; /* pole prediction diff. */
 
-    update(4, y, arith_shift_left(_witab[i], 5), _fitab[i], dq, sr, dqsez,
-           state_ptr);
+    update(4, y, arith_shift_left(_witab[i], 5), _fitab[i], dq, sr, dqsez, state_ptr);
 
     return i;
 }
@@ -145,8 +143,7 @@ int g721_decoder(int i, G72x_STATE *state_ptr)
 
     dqsez = sr - se + sez; /* pole prediction diff. */
 
-    update(4, y, arith_shift_left(_witab[i], 5), _fitab[i], dq, sr, dqsez,
-           state_ptr);
+    update(4, y, arith_shift_left(_witab[i], 5), _fitab[i], dq, sr, dqsez, state_ptr);
 
     /* sr was 14-bit dynamic range */
     return arith_shift_left(sr, 2);

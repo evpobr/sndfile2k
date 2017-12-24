@@ -41,13 +41,11 @@
 #include "g72x_priv.h"
 
 static G72x_STATE *g72x_state_new(void);
-static int unpack_bytes(int bits, int blocksize, const unsigned char *block,
-                        short *samples);
+static int unpack_bytes(int bits, int blocksize, const unsigned char *block, short *samples);
 static int pack_bytes(int bits, const short *samples, unsigned char *block);
 
-static short power2[15] = {1,     2,     4,      8,      0x10,
-                           0x20,  0x40,  0x80,   0x100,  0x200,
-                           0x400, 0x800, 0x1000, 0x2000, 0x4000};
+static short power2[15] = {1,     2,     4,     8,     0x10,   0x20,   0x40,  0x80,
+                           0x100, 0x200, 0x400, 0x800, 0x1000, 0x2000, 0x4000};
 
 /*
  * quan ()
@@ -81,8 +79,7 @@ static int fmult(int an, int srn)
 
     anmag = (an > 0) ? an : ((-an) & 0x1FFF);
     anexp = quan(anmag, power2, 15) - 6;
-    anmant =
-        (anmag == 0) ? 32 : (anexp >= 0) ? anmag >> anexp : anmag << -anexp;
+    anmant = (anmag == 0) ? 32 : (anexp >= 0) ? anmag >> anexp : anmag << -anexp;
     wanexp = anexp + ((srn >> 6) & 0xF) - 13;
 
     /*
@@ -94,8 +91,7 @@ static int fmult(int an, int srn)
 
     wanmant = (anmant * (srn & 0x3F)) >> 4;
 
-    retval =
-        (wanexp >= 0) ? ((wanmant << wanexp) & 0x7FFF) : (wanmant >> -wanexp);
+    retval = (wanexp >= 0) ? ((wanmant << wanexp) & 0x7FFF) : (wanmant >> -wanexp);
 
     return (((an ^ srn) < 0) ? -retval : retval);
 }
@@ -135,8 +131,7 @@ void private_init_state(G72x_STATE *state_ptr)
     state_ptr->td = 0;
 } /* private_init_state */
 
-struct g72x_state *g72x_reader_init(int codec, int *blocksize,
-                                    int *samplesperblock)
+struct g72x_state *g72x_reader_init(int codec, int *blocksize, int *samplesperblock)
 {
     G72x_STATE *pstate;
 
@@ -193,8 +188,7 @@ struct g72x_state *g72x_reader_init(int codec, int *blocksize,
     return pstate;
 } /* g72x_reader_init */
 
-struct g72x_state *g72x_writer_init(int codec, int *blocksize,
-                                    int *samplesperblock)
+struct g72x_state *g72x_writer_init(int codec, int *blocksize, int *samplesperblock)
 {
     G72x_STATE *pstate;
 
@@ -250,8 +244,7 @@ struct g72x_state *g72x_writer_init(int codec, int *blocksize,
     return pstate;
 } /* g72x_writer_init */
 
-int g72x_decode_block(G72x_STATE *pstate, const unsigned char *block,
-                      short *samples)
+int g72x_decode_block(G72x_STATE *pstate, const unsigned char *block, short *samples)
 {
     int k, count;
 
@@ -564,9 +557,8 @@ void update(int code_size, /* distinguish 723_40 with others */
     else
     {
         expon = quan(mag, power2, 15);
-        state_ptr->dq[0] = (dq >= 0)
-                               ? (expon << 6) + ((mag << 6) >> expon)
-                               : (expon << 6) + ((mag << 6) >> expon) - 0x400;
+        state_ptr->dq[0] = (dq >= 0) ? (expon << 6) + ((mag << 6) >> expon)
+                                     : (expon << 6) + ((mag << 6) >> expon) - 0x400;
     }
 
     state_ptr->sr[1] = state_ptr->sr[0];
@@ -611,8 +603,7 @@ void update(int code_size, /* distinguish 723_40 with others */
         state_ptr->ap += (0x200 - state_ptr->ap) >> 4;
     else if (state_ptr->td == 1)
         state_ptr->ap += (0x200 - state_ptr->ap) >> 4;
-    else if (abs((state_ptr->dms << 2) - state_ptr->dml) >=
-             (state_ptr->dml >> 3))
+    else if (abs((state_ptr->dms << 2) - state_ptr->dml) >= (state_ptr->dml >> 3))
         state_ptr->ap += (0x200 - state_ptr->ap) >> 4;
     else
         state_ptr->ap += (-state_ptr->ap) >> 4;
@@ -623,8 +614,7 @@ void update(int code_size, /* distinguish 723_40 with others */
 /*------------------------------------------------------------------------------
 */
 
-static int unpack_bytes(int bits, int blocksize, const unsigned char *block,
-                        short *samples)
+static int unpack_bytes(int bits, int blocksize, const unsigned char *block, short *samples)
 {
     unsigned int in_buffer = 0;
     unsigned char in_byte;

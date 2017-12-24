@@ -76,15 +76,13 @@ int psf_store_string(SF_PRIVATE *psf, int str_type, const char *str)
 
     if (k == 0 && psf->strings.storage_used != 0)
     {
-        psf_log_printf(
-            psf, "SFE_STR_WEIRD : k == 0 && psf->strings.storage_used != 0\n");
+        psf_log_printf(psf, "SFE_STR_WEIRD : k == 0 && psf->strings.storage_used != 0\n");
         return SFE_STR_WEIRD;
     };
 
     if (k != 0 && psf->strings.storage_used == 0)
     {
-        psf_log_printf(
-            psf, "SFE_STR_WEIRD : k != 0 && psf->strings.storage_used == 0\n");
+        psf_log_printf(psf, "SFE_STR_WEIRD : k != 0 && psf->strings.storage_used == 0\n");
         return SFE_STR_WEIRD;
     };
 
@@ -105,11 +103,10 @@ int psf_store_string(SF_PRIVATE *psf, int str_type, const char *str)
 				 * libsndfile-X.Y.Z component, then add it.
 				 */
                 if (strlen(str) == 0)
-                    snprintf(new_str, sizeof(new_str), "%s-%s", PACKAGE_NAME,
-                             PACKAGE_VERSION);
+                    snprintf(new_str, sizeof(new_str), "%s-%s", PACKAGE_NAME, PACKAGE_VERSION);
                 else
-                    snprintf(new_str, sizeof(new_str), "%s (%s-%s)", str,
-                             PACKAGE_NAME, PACKAGE_VERSION);
+                    snprintf(new_str, sizeof(new_str), "%s (%s-%s)", str, PACKAGE_NAME,
+                             PACKAGE_VERSION);
             }
             else
                 snprintf(new_str, sizeof(new_str), "%s", str);
@@ -195,8 +192,7 @@ int psf_location_string_count(const SF_PRIVATE *psf, int location)
     int k, count = 0;
 
     for (k = 0; k < SF_MAX_STRINGS; k++)
-        if (psf->strings.data[k].type > 0 &&
-            psf->strings.data[k].flags & location)
+        if (psf->strings.data[k].type > 0 && psf->strings.data[k].flags & location)
             count++;
 
     return count;

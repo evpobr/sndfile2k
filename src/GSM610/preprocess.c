@@ -27,8 +27,7 @@
  *	     S.S.v.v.v.v.v.v.v.v.v.v.v.v.0.0
  */
 
-void Gsm_Preprocess(struct gsm_state *S, int16_t *s,
-                    int16_t *so) /* [0..159] 	IN/OUT	*/
+void Gsm_Preprocess(struct gsm_state *S, int16_t *s, int16_t *so) /* [0..159] 	IN/OUT	*/
 {
 
     int16_t z1 = S->z1;
@@ -77,8 +76,7 @@ void Gsm_Preprocess(struct gsm_state *S, int16_t *s,
         /*   Execution of a 31 bv 16 bits multiplication */
 
         msp = SASR_L(L_z2, 15);
-        lsp = L_z2 - arith_shift_left((int32_t)msp,
-                                      15); /* gsm_L_sub (L_z2,(msp<<15)) ; */
+        lsp = L_z2 - arith_shift_left((int32_t)msp, 15); /* gsm_L_sub (L_z2,(msp<<15)) ; */
 
         L_s2 += GSM_MULT_R(lsp, 32735);
         L_temp = (int32_t)msp * 32735; /* GSM_L_MULT (msp,32735) >> 1 ;*/

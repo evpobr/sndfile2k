@@ -44,22 +44,22 @@
 #include "ALACAudioTypes.h"
 #include "EndianPortable.h"
 
-typedef enum { false = 0, true = 1 } bool;
+typedef enum
+{
+    false = 0,
+    true = 1
+} bool;
 
 static void GetConfig(ALAC_ENCODER *p, ALACSpecificConfig *config);
 
-static int32_t EncodeStereo(ALAC_ENCODER *p, struct BitBuffer *bitstream,
-                            const int32_t *input, uint32_t stride,
-                            uint32_t channelIndex, uint32_t numSamples);
-static int32_t EncodeStereoFast(ALAC_ENCODER *p, struct BitBuffer *bitstream,
-                                const int32_t *input, uint32_t stride,
-                                uint32_t channelIndex, uint32_t numSamples);
+static int32_t EncodeStereo(ALAC_ENCODER *p, struct BitBuffer *bitstream, const int32_t *input,
+                            uint32_t stride, uint32_t channelIndex, uint32_t numSamples);
+static int32_t EncodeStereoFast(ALAC_ENCODER *p, struct BitBuffer *bitstream, const int32_t *input,
+                                uint32_t stride, uint32_t channelIndex, uint32_t numSamples);
 static int32_t EncodeStereoEscape(ALAC_ENCODER *p, struct BitBuffer *bitstream,
-                                  const int32_t *input, uint32_t stride,
-                                  uint32_t numSamples);
-static int32_t EncodeMono(ALAC_ENCODER *p, struct BitBuffer *bitstream,
-                          const int32_t *input, uint32_t stride,
-                          uint32_t channelIndex, uint32_t numSamples);
+                                  const int32_t *input, uint32_t stride, uint32_t numSamples);
+static int32_t EncodeMono(ALAC_ENCODER *p, struct BitBuffer *bitstream, const int32_t *input,
+                          uint32_t stride, uint32_t channelIndex, uint32_t numSamples);
 
 // Note: in C you can't typecast to a 2-dimensional array pointer but that's what we need when
 // picking which coefs to use so we declare this typedef b/c we *can* typecast to this type
@@ -216,8 +216,8 @@ void alac_set_fastmode(ALAC_ENCODER *p, int32_t fast)
 	- encode a channel pair
 */
 static int32_t EncodeStereo(ALAC_ENCODER *p, struct BitBuffer *bitstream,
-                            const int32_t *inputBuffer, uint32_t stride,
-                            uint32_t channelIndex, uint32_t numSamples)
+                            const int32_t *inputBuffer, uint32_t stride, uint32_t channelIndex,
+                            uint32_t numSamples)
 {
     BitBuffer workBits;
     BitBuffer startBits =
@@ -242,8 +242,8 @@ static int32_t EncodeStereo(ALAC_ENCODER *p, struct BitBuffer *bitstream,
     int32_t bestRes;
 
     // make sure we handle this bit-depth before we get going
-    RequireAction((p->mBitDepth == 16) || (p->mBitDepth == 20) ||
-                      (p->mBitDepth == 24) || (p->mBitDepth == 32),
+    RequireAction((p->mBitDepth == 16) || (p->mBitDepth == 20) || (p->mBitDepth == 24) ||
+                      (p->mBitDepth == 32),
                   return kALAC_ParamError;);
 
     // reload coefs pointers for this channel pair
@@ -288,48 +288,44 @@ static int32_t EncodeStereo(ALAC_ENCODER *p, struct BitBuffer *bitstream,
         switch (p->mBitDepth)
         {
         case 16:
-            mix16(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV,
-                  numSamples / dilate, mixBits, mixRes);
+            mix16(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples / dilate, mixBits,
+                  mixRes);
             break;
         case 20:
-            mix20(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV,
-                  numSamples / dilate, mixBits, mixRes);
+            mix20(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples / dilate, mixBits,
+                  mixRes);
             break;
         case 24:
             // includes extraction of shifted-off bytes
-            mix24(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV,
-                  numSamples / dilate, mixBits, mixRes, p->mShiftBufferUV,
-                  bytesShifted);
+            mix24(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples / dilate, mixBits,
+                  mixRes, p->mShiftBufferUV, bytesShifted);
             break;
         case 32:
             // includes extraction of shifted-off bytes
-            mix32(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV,
-                  numSamples / dilate, mixBits, mixRes, p->mShiftBufferUV,
-                  bytesShifted);
+            mix32(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples / dilate, mixBits,
+                  mixRes, p->mShiftBufferUV, bytesShifted);
             break;
         }
 
         BitBufferInit(&workBits, p->mWorkBuffer, p->mMaxOutputBytes);
 
         // run the dynamic predictors
-        pc_block(p->mMixBufferU, p->mPredictorU, numSamples / dilate,
-                 coefsU[numU - 1], numU, chanBits, DENSHIFT_DEFAULT);
-        pc_block(p->mMixBufferV, p->mPredictorV, numSamples / dilate,
-                 coefsV[numV - 1], numV, chanBits, DENSHIFT_DEFAULT);
+        pc_block(p->mMixBufferU, p->mPredictorU, numSamples / dilate, coefsU[numU - 1], numU,
+                 chanBits, DENSHIFT_DEFAULT);
+        pc_block(p->mMixBufferV, p->mPredictorV, numSamples / dilate, coefsV[numV - 1], numV,
+                 chanBits, DENSHIFT_DEFAULT);
 
         // run the lossless compressor on each channel
-        set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0,
-                      numSamples / dilate, numSamples / dilate,
-                      MAX_RUN_DEFAULT);
-        status = dyn_comp(&agParams, p->mPredictorU, &workBits,
-                          numSamples / dilate, chanBits, &bits1);
+        set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0, numSamples / dilate,
+                      numSamples / dilate, MAX_RUN_DEFAULT);
+        status =
+            dyn_comp(&agParams, p->mPredictorU, &workBits, numSamples / dilate, chanBits, &bits1);
         RequireNoErr(status, goto Exit;);
 
-        set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0,
-                      numSamples / dilate, numSamples / dilate,
-                      MAX_RUN_DEFAULT);
-        status = dyn_comp(&agParams, p->mPredictorV, &workBits,
-                          numSamples / dilate, chanBits, &bits2);
+        set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0, numSamples / dilate,
+                      numSamples / dilate, MAX_RUN_DEFAULT);
+        status =
+            dyn_comp(&agParams, p->mPredictorV, &workBits, numSamples / dilate, chanBits, &bits2);
         RequireNoErr(status, goto Exit;);
 
         // look for best match
@@ -347,22 +343,20 @@ static int32_t EncodeStereo(ALAC_ENCODER *p, struct BitBuffer *bitstream,
     switch (p->mBitDepth)
     {
     case 16:
-        mix16(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples,
-              mixBits, mixRes);
+        mix16(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples, mixBits, mixRes);
         break;
     case 20:
-        mix20(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples,
-              mixBits, mixRes);
+        mix20(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples, mixBits, mixRes);
         break;
     case 24:
         // also extracts the shifted off bytes into the shift buffers
-        mix24(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples,
-              mixBits, mixRes, p->mShiftBufferUV, bytesShifted);
+        mix24(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples, mixBits, mixRes,
+              p->mShiftBufferUV, bytesShifted);
         break;
     case 32:
         // also extracts the shifted off bytes into the shift buffers
-        mix32(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples,
-              mixBits, mixRes, p->mShiftBufferUV, bytesShifted);
+        mix32(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples, mixBits, mixRes,
+              p->mShiftBufferUV, bytesShifted);
         break;
     }
 
@@ -379,19 +373,18 @@ static int32_t EncodeStereo(ALAC_ENCODER *p, struct BitBuffer *bitstream,
         // run the predictor over the same data multiple times to help it converge
         for (uint32_t converge = 0; converge < 8; converge++)
         {
-            pc_block(p->mMixBufferU, p->mPredictorU, numSamples / dilate,
-                     coefsU[numUV - 1], numUV, chanBits, DENSHIFT_DEFAULT);
-            pc_block(p->mMixBufferV, p->mPredictorV, numSamples / dilate,
-                     coefsV[numUV - 1], numUV, chanBits, DENSHIFT_DEFAULT);
+            pc_block(p->mMixBufferU, p->mPredictorU, numSamples / dilate, coefsU[numUV - 1], numUV,
+                     chanBits, DENSHIFT_DEFAULT);
+            pc_block(p->mMixBufferV, p->mPredictorV, numSamples / dilate, coefsV[numUV - 1], numUV,
+                     chanBits, DENSHIFT_DEFAULT);
         }
 
         dilate = 8;
 
-        set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0,
-                      numSamples / dilate, numSamples / dilate,
-                      MAX_RUN_DEFAULT);
-        status = dyn_comp(&agParams, p->mPredictorU, &workBits,
-                          numSamples / dilate, chanBits, &bits1);
+        set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0, numSamples / dilate,
+                      numSamples / dilate, MAX_RUN_DEFAULT);
+        status =
+            dyn_comp(&agParams, p->mPredictorU, &workBits, numSamples / dilate, chanBits, &bits1);
 
         if ((bits1 * dilate + 16 * numUV) < minBits1)
         {
@@ -399,11 +392,10 @@ static int32_t EncodeStereo(ALAC_ENCODER *p, struct BitBuffer *bitstream,
             numU = numUV;
         }
 
-        set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0,
-                      numSamples / dilate, numSamples / dilate,
-                      MAX_RUN_DEFAULT);
-        status = dyn_comp(&agParams, p->mPredictorV, &workBits,
-                          numSamples / dilate, chanBits, &bits2);
+        set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0, numSamples / dilate,
+                      numSamples / dilate, MAX_RUN_DEFAULT);
+        status =
+            dyn_comp(&agParams, p->mPredictorV, &workBits, numSamples / dilate, chanBits, &bits2);
 
         if ((bits2 * dilate + 16 * numUV) < minBits2)
         {
@@ -413,13 +405,12 @@ static int32_t EncodeStereo(ALAC_ENCODER *p, struct BitBuffer *bitstream,
     }
 
     // test for escape hatch if best calculated compressed size turns out to be more than the input size
-    minBits = minBits1 + minBits2 + (8 /* mixRes/maxRes/etc. */ * 8) +
-              ((partialFrame == true) ? 32 : 0);
+    minBits =
+        minBits1 + minBits2 + (8 /* mixRes/maxRes/etc. */ * 8) + ((partialFrame == true) ? 32 : 0);
     if (bytesShifted != 0)
         minBits += (numSamples * (bytesShifted * 8) * 2);
 
-    escapeBits = (numSamples * p->mBitDepth * 2) +
-                 ((partialFrame == true) ? 32 : 0) +
+    escapeBits = (numSamples * p->mBitDepth * 2) + ((partialFrame == true) ? 32 : 0) +
                  (2 * 8); /* 2 common header bytes */
 
     doEscape = (minBits >= escapeBits) ? true : false;
@@ -459,9 +450,8 @@ static int32_t EncodeStereo(ALAC_ENCODER *p, struct BitBuffer *bitstream,
             {
                 uint32_t shiftedVal;
 
-                shiftedVal =
-                    ((uint32_t)p->mShiftBufferUV[indx + 0] << bitShift) |
-                    (uint32_t)p->mShiftBufferUV[indx + 1];
+                shiftedVal = ((uint32_t)p->mShiftBufferUV[indx + 0] << bitShift) |
+                             (uint32_t)p->mShiftBufferUV[indx + 1];
                 BitBufferWrite(bitstream, shiftedVal, bitShift * 2);
             }
         }
@@ -471,62 +461,55 @@ static int32_t EncodeStereo(ALAC_ENCODER *p, struct BitBuffer *bitstream,
         //		   of only using "U" buffers for the U-channel and "V" buffers for the V-channel
         if (mode == 0)
         {
-            pc_block(p->mMixBufferU, p->mPredictorU, numSamples,
-                     coefsU[numU - 1], numU, chanBits, DENSHIFT_DEFAULT);
+            pc_block(p->mMixBufferU, p->mPredictorU, numSamples, coefsU[numU - 1], numU, chanBits,
+                     DENSHIFT_DEFAULT);
         }
         else
         {
-            pc_block(p->mMixBufferU, p->mPredictorV, numSamples,
-                     coefsU[numU - 1], numU, chanBits, DENSHIFT_DEFAULT);
-            pc_block(p->mPredictorV, p->mPredictorU, numSamples, NULL, 31,
-                     chanBits, 0);
+            pc_block(p->mMixBufferU, p->mPredictorV, numSamples, coefsU[numU - 1], numU, chanBits,
+                     DENSHIFT_DEFAULT);
+            pc_block(p->mPredictorV, p->mPredictorU, numSamples, NULL, 31, chanBits, 0);
         }
 
-        set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0, numSamples,
-                      numSamples, MAX_RUN_DEFAULT);
-        status = dyn_comp(&agParams, p->mPredictorU, bitstream, numSamples,
-                          chanBits, &bits1);
+        set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0, numSamples, numSamples,
+                      MAX_RUN_DEFAULT);
+        status = dyn_comp(&agParams, p->mPredictorU, bitstream, numSamples, chanBits, &bits1);
         RequireNoErr(status, goto Exit;);
 
         // run the dynamic predictor and lossless compression for the "right" channel
         if (mode == 0)
         {
-            pc_block(p->mMixBufferV, p->mPredictorV, numSamples,
-                     coefsV[numV - 1], numV, chanBits, DENSHIFT_DEFAULT);
+            pc_block(p->mMixBufferV, p->mPredictorV, numSamples, coefsV[numV - 1], numV, chanBits,
+                     DENSHIFT_DEFAULT);
         }
         else
         {
-            pc_block(p->mMixBufferV, p->mPredictorU, numSamples,
-                     coefsV[numV - 1], numV, chanBits, DENSHIFT_DEFAULT);
-            pc_block(p->mPredictorU, p->mPredictorV, numSamples, NULL, 31,
-                     chanBits, 0);
+            pc_block(p->mMixBufferV, p->mPredictorU, numSamples, coefsV[numV - 1], numV, chanBits,
+                     DENSHIFT_DEFAULT);
+            pc_block(p->mPredictorU, p->mPredictorV, numSamples, NULL, 31, chanBits, 0);
         }
 
-        set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0, numSamples,
-                      numSamples, MAX_RUN_DEFAULT);
-        status = dyn_comp(&agParams, p->mPredictorV, bitstream, numSamples,
-                          chanBits, &bits2);
+        set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0, numSamples, numSamples,
+                      MAX_RUN_DEFAULT);
+        status = dyn_comp(&agParams, p->mPredictorV, bitstream, numSamples, chanBits, &bits2);
         RequireNoErr(status, goto Exit;);
 
         /*	if we happened to create a compressed packet that was actually bigger than an escape packet would be,
 			chuck it and do an escape packet
 		*/
-        minBits =
-            BitBufferGetPosition(bitstream) - BitBufferGetPosition(&startBits);
+        minBits = BitBufferGetPosition(bitstream) - BitBufferGetPosition(&startBits);
         if (minBits >= escapeBits)
         {
             *bitstream = startBits; // reset bitstream state
             doEscape = true;
-            printf("compressed frame too big: %u vs. %u \n", minBits,
-                   escapeBits);
+            printf("compressed frame too big: %u vs. %u \n", minBits, escapeBits);
         }
     }
 
     if (doEscape == true)
     {
         /* escape */
-        status =
-            EncodeStereoEscape(p, bitstream, inputBuffer, stride, numSamples);
+        status = EncodeStereoEscape(p, bitstream, inputBuffer, stride, numSamples);
 
 #if VERBOSE_DEBUG
         DebugMsg("escape!: %u vs %u\n", minBits, escapeBits);
@@ -542,8 +525,8 @@ Exit:
 	- encode a channel pair without the search loop for maximum possible speed
 */
 static int32_t EncodeStereoFast(ALAC_ENCODER *p, struct BitBuffer *bitstream,
-                                const int32_t *inputBuffer, uint32_t stride,
-                                uint32_t channelIndex, uint32_t numSamples)
+                                const int32_t *inputBuffer, uint32_t stride, uint32_t channelIndex,
+                                uint32_t numSamples)
 {
     BitBuffer startBits =
         *bitstream; // squirrel away current bit position in case we decide to use escape hatch
@@ -565,8 +548,8 @@ static int32_t EncodeStereoFast(ALAC_ENCODER *p, struct BitBuffer *bitstream,
     int32_t status;
 
     // make sure we handle this bit-depth before we get going
-    RequireAction((p->mBitDepth == 16) || (p->mBitDepth == 20) ||
-                      (p->mBitDepth == 24) || (p->mBitDepth == 32),
+    RequireAction((p->mBitDepth == 16) || (p->mBitDepth == 20) || (p->mBitDepth == 24) ||
+                      (p->mBitDepth == 32),
                   return kALAC_ParamError;);
 
     // reload coefs pointers for this channel pair
@@ -605,22 +588,20 @@ static int32_t EncodeStereoFast(ALAC_ENCODER *p, struct BitBuffer *bitstream,
     switch (p->mBitDepth)
     {
     case 16:
-        mix16(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples,
-              mixBits, mixRes);
+        mix16(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples, mixBits, mixRes);
         break;
     case 20:
-        mix20(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples,
-              mixBits, mixRes);
+        mix20(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples, mixBits, mixRes);
         break;
     case 24:
         // also extracts the shifted off bytes into the shift buffers
-        mix24(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples,
-              mixBits, mixRes, p->mShiftBufferUV, bytesShifted);
+        mix24(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples, mixBits, mixRes,
+              p->mShiftBufferUV, bytesShifted);
         break;
     case 32:
         // also extracts the shifted off bytes into the shift buffers
-        mix32(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples,
-              mixBits, mixRes, p->mShiftBufferUV, bytesShifted);
+        mix32(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples, mixBits, mixRes,
+              p->mShiftBufferUV, bytesShifted);
         break;
     }
 
@@ -667,23 +648,21 @@ static int32_t EncodeStereoFast(ALAC_ENCODER *p, struct BitBuffer *bitstream,
 
     // run the dynamic predictor and lossless compression for the "left" channel
     // - note: we always use mode 0 in the "fast" path so we don't need the code for mode != 0
-    pc_block(p->mMixBufferU, p->mPredictorU, numSamples, coefsU[numU - 1], numU,
-             chanBits, DENSHIFT_DEFAULT);
+    pc_block(p->mMixBufferU, p->mPredictorU, numSamples, coefsU[numU - 1], numU, chanBits,
+             DENSHIFT_DEFAULT);
 
-    set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0, numSamples,
-                  numSamples, MAX_RUN_DEFAULT);
-    status = dyn_comp(&agParams, p->mPredictorU, bitstream, numSamples,
-                      chanBits, &bits1);
+    set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0, numSamples, numSamples,
+                  MAX_RUN_DEFAULT);
+    status = dyn_comp(&agParams, p->mPredictorU, bitstream, numSamples, chanBits, &bits1);
     RequireNoErr(status, goto Exit;);
 
     // run the dynamic predictor and lossless compression for the "right" channel
-    pc_block(p->mMixBufferV, p->mPredictorV, numSamples, coefsV[numV - 1], numV,
-             chanBits, DENSHIFT_DEFAULT);
+    pc_block(p->mMixBufferV, p->mPredictorV, numSamples, coefsV[numV - 1], numV, chanBits,
+             DENSHIFT_DEFAULT);
 
-    set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0, numSamples,
-                  numSamples, MAX_RUN_DEFAULT);
-    status = dyn_comp(&agParams, p->mPredictorV, bitstream, numSamples,
-                      chanBits, &bits2);
+    set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0, numSamples, numSamples,
+                  MAX_RUN_DEFAULT);
+    status = dyn_comp(&agParams, p->mPredictorV, bitstream, numSamples, chanBits, &bits2);
     RequireNoErr(status, goto Exit;);
 
     // do bit requirement calculations
@@ -691,13 +670,12 @@ static int32_t EncodeStereoFast(ALAC_ENCODER *p, struct BitBuffer *bitstream,
     minBits2 = bits2 + (numV * sizeof(int16_t) * 8);
 
     // test for escape hatch if best calculated compressed size turns out to be more than the input size
-    minBits = minBits1 + minBits2 + (8 /* mixRes/maxRes/etc. */ * 8) +
-              ((partialFrame == true) ? 32 : 0);
+    minBits =
+        minBits1 + minBits2 + (8 /* mixRes/maxRes/etc. */ * 8) + ((partialFrame == true) ? 32 : 0);
     if (bytesShifted != 0)
         minBits += (numSamples * (bytesShifted * 8) * 2);
 
-    escapeBits = (numSamples * p->mBitDepth * 2) +
-                 ((partialFrame == true) ? 32 : 0) +
+    escapeBits = (numSamples * p->mBitDepth * 2) + ((partialFrame == true) ? 32 : 0) +
                  (2 * 8); /* 2 common header bytes */
 
     doEscape = (minBits >= escapeBits) ? true : false;
@@ -707,13 +685,11 @@ static int32_t EncodeStereoFast(ALAC_ENCODER *p, struct BitBuffer *bitstream,
         /*	if we happened to create a compressed packet that was actually bigger than an escape packet would be,
 			chuck it and do an escape packet
 		*/
-        minBits =
-            BitBufferGetPosition(bitstream) - BitBufferGetPosition(&startBits);
+        minBits = BitBufferGetPosition(bitstream) - BitBufferGetPosition(&startBits);
         if (minBits >= escapeBits)
         {
             doEscape = true;
-            printf("compressed frame too big: %u vs. %u\n", minBits,
-                   escapeBits);
+            printf("compressed frame too big: %u vs. %u\n", minBits, escapeBits);
         }
     }
 
@@ -725,12 +701,10 @@ static int32_t EncodeStereoFast(ALAC_ENCODER *p, struct BitBuffer *bitstream,
         *bitstream = startBits;
 
         // write escape frame
-        status =
-            EncodeStereoEscape(p, bitstream, inputBuffer, stride, numSamples);
+        status = EncodeStereoEscape(p, bitstream, inputBuffer, stride, numSamples);
 
 #if VERBOSE_DEBUG
-        DebugMsg("escape!: %u vs %u\n", minBits,
-                 (numSamples * p->mBitDepth * 2));
+        DebugMsg("escape!: %u vs %u\n", minBits, (numSamples * p->mBitDepth * 2));
 #endif
     }
 
@@ -743,8 +717,7 @@ Exit:
 	- encode stereo escape frame
 */
 static int32_t EncodeStereoEscape(ALAC_ENCODER *p, struct BitBuffer *bitstream,
-                                  const int32_t *inputBuffer, uint32_t stride,
-                                  uint32_t numSamples)
+                                  const int32_t *inputBuffer, uint32_t stride, uint32_t numSamples)
 {
     uint8_t partialFrame;
     uint32_t indx;
@@ -778,8 +751,8 @@ static int32_t EncodeStereoEscape(ALAC_ENCODER *p, struct BitBuffer *bitstream,
         break;
     case 24:
         // mix24 () with mixres param = 0 means de-interleave so use it to simplify things
-        mix24(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples,
-              0, 0, p->mShiftBufferUV, 0);
+        mix24(inputBuffer, stride, p->mMixBufferU, p->mMixBufferV, numSamples, 0, 0,
+              p->mShiftBufferUV, 0);
         for (indx = 0; indx < numSamples; indx++)
         {
             BitBufferWrite(bitstream, p->mMixBufferU[indx] >> 8, 24);
@@ -802,9 +775,8 @@ static int32_t EncodeStereoEscape(ALAC_ENCODER *p, struct BitBuffer *bitstream,
 	EncodeMono ()
 	- encode a mono input buffer
 */
-static int32_t EncodeMono(ALAC_ENCODER *p, struct BitBuffer *bitstream,
-                          const int32_t *inputBuffer, uint32_t stride,
-                          uint32_t channelIndex, uint32_t numSamples)
+static int32_t EncodeMono(ALAC_ENCODER *p, struct BitBuffer *bitstream, const int32_t *inputBuffer,
+                          uint32_t stride, uint32_t channelIndex, uint32_t numSamples)
 {
     BitBuffer startBits =
         *bitstream; // squirrel away copy of current state in case we need to go back and do an escape packet
@@ -827,8 +799,8 @@ static int32_t EncodeMono(ALAC_ENCODER *p, struct BitBuffer *bitstream,
     int32_t status = ALAC_noErr;
 
     // make sure we handle this bit-depth before we get going
-    RequireAction((p->mBitDepth == 16) || (p->mBitDepth == 20) ||
-                      (p->mBitDepth == 24) || (p->mBitDepth == 32),
+    RequireAction((p->mBitDepth == 16) || (p->mBitDepth == 20) || (p->mBitDepth == 24) ||
+                      (p->mBitDepth == 32),
                   return kALAC_ParamError;);
 
     // reload coefs array from previous frame
@@ -902,18 +874,17 @@ static int32_t EncodeMono(ALAC_ENCODER *p, struct BitBuffer *bitstream,
 
         dilate = 32;
         for (uint32_t converge = 0; converge < 7; converge++)
-            pc_block(p->mMixBufferU, p->mPredictorU, numSamples / dilate,
-                     coefsU[numU - 1], numU, chanBits, DENSHIFT_DEFAULT);
+            pc_block(p->mMixBufferU, p->mPredictorU, numSamples / dilate, coefsU[numU - 1], numU,
+                     chanBits, DENSHIFT_DEFAULT);
 
         dilate = 8;
-        pc_block(p->mMixBufferU, p->mPredictorU, numSamples / dilate,
-                 coefsU[numU - 1], numU, chanBits, DENSHIFT_DEFAULT);
+        pc_block(p->mMixBufferU, p->mPredictorU, numSamples / dilate, coefsU[numU - 1], numU,
+                 chanBits, DENSHIFT_DEFAULT);
 
-        set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0,
-                      numSamples / dilate, numSamples / dilate,
-                      MAX_RUN_DEFAULT);
-        status = dyn_comp(&agParams, p->mPredictorU, &workBits,
-                          numSamples / dilate, chanBits, &bits1);
+        set_ag_params(&agParams, MB0, (pbFactor * PB0) / 4, KB0, numSamples / dilate,
+                      numSamples / dilate, MAX_RUN_DEFAULT);
+        status =
+            dyn_comp(&agParams, p->mPredictorU, &workBits, numSamples / dilate, chanBits, &bits1);
         RequireNoErr(status, goto Exit;);
 
         numBits = (dilate * bits1) + (16 * numU);
@@ -926,13 +897,11 @@ static int32_t EncodeMono(ALAC_ENCODER *p, struct BitBuffer *bitstream,
 
     // test for escape hatch if best calculated compressed size turns out to be more than the input size
     // - first, add bits for the header bytes mixRes/maxRes/shiftU/filterU
-    minBits +=
-        (4 /* mixRes/maxRes/etc. */ * 8) + ((partialFrame == true) ? 32 : 0);
+    minBits += (4 /* mixRes/maxRes/etc. */ * 8) + ((partialFrame == true) ? 32 : 0);
     if (bytesShifted != 0)
         minBits += (numSamples * (bytesShifted * 8));
 
-    escapeBits = (numSamples * p->mBitDepth) +
-                 ((partialFrame == true) ? 32 : 0) +
+    escapeBits = (numSamples * p->mBitDepth) + ((partialFrame == true) ? 32 : 0) +
                  (2 * 8); /* 2 common header bytes */
 
     doEscape = (minBits >= escapeBits) ? true : false;
@@ -961,26 +930,23 @@ static int32_t EncodeMono(ALAC_ENCODER *p, struct BitBuffer *bitstream,
         }
 
         // run the dynamic predictor with the best result
-        pc_block(p->mMixBufferU, p->mPredictorU, numSamples, coefsU[numU - 1],
-                 numU, chanBits, DENSHIFT_DEFAULT);
+        pc_block(p->mMixBufferU, p->mPredictorU, numSamples, coefsU[numU - 1], numU, chanBits,
+                 DENSHIFT_DEFAULT);
 
         // do lossless compression
         set_standard_ag_params(&agParams, numSamples, numSamples);
-        status = dyn_comp(&agParams, p->mPredictorU, bitstream, numSamples,
-                          chanBits, &bits1);
+        status = dyn_comp(&agParams, p->mPredictorU, bitstream, numSamples, chanBits, &bits1);
         //AssertNoErr (status) ;
 
         /*	if we happened to create a compressed packet that was actually bigger than an escape packet would be,
 			chuck it and do an escape packet
 		*/
-        minBits =
-            BitBufferGetPosition(bitstream) - BitBufferGetPosition(&startBits);
+        minBits = BitBufferGetPosition(bitstream) - BitBufferGetPosition(&startBits);
         if (minBits >= escapeBits)
         {
             *bitstream = startBits; // reset bitstream state
             doEscape = true;
-            printf("compressed frame too big: %u vs. %u\n", minBits,
-                   escapeBits);
+            printf("compressed frame too big: %u vs. %u\n", minBits, escapeBits);
         }
     }
 
@@ -1007,8 +973,7 @@ static int32_t EncodeMono(ALAC_ENCODER *p, struct BitBuffer *bitstream,
             break;
         case 24:
             // convert 24-bit data to 32-bit for simplicity
-            for (indx = 0, indx2 = 0; indx < numSamples;
-                 indx++, indx2 += stride)
+            for (indx = 0, indx2 = 0; indx < numSamples; indx++, indx2 += stride)
             {
                 p->mMixBufferU[indx] = inputBuffer[indx2] >> 8;
                 BitBufferWrite(bitstream, p->mMixBufferU[indx], 24);
@@ -1036,9 +1001,8 @@ Exit:
 	Encode ()
 	- encode the next block of samples
 */
-int32_t alac_encode(ALAC_ENCODER *p, uint32_t numSamples,
-                    const int32_t *theReadBuffer, unsigned char *theWriteBuffer,
-                    uint32_t *ioNumBytes)
+int32_t alac_encode(ALAC_ENCODER *p, uint32_t numSamples, const int32_t *theReadBuffer,
+                    unsigned char *theWriteBuffer, uint32_t *ioNumBytes)
 {
     uint32_t outputSize;
     BitBuffer bitstream;
@@ -1046,8 +1010,8 @@ int32_t alac_encode(ALAC_ENCODER *p, uint32_t numSamples,
     uint32_t numChannels = p->mNumChannels;
 
     // make sure we handle this bit-depth before we get going
-    RequireAction((p->mBitDepth == 16) || (p->mBitDepth == 20) ||
-                      (p->mBitDepth == 24) || (p->mBitDepth == 32),
+    RequireAction((p->mBitDepth == 16) || (p->mBitDepth == 20) || (p->mBitDepth == 24) ||
+                      (p->mBitDepth == 32),
                   return kALAC_ParamError;);
 
     // create a bit buffer structure pointing to our output buffer
@@ -1061,11 +1025,9 @@ int32_t alac_encode(ALAC_ENCODER *p, uint32_t numSamples,
 
         // encode stereo input buffer
         if (p->mFastMode == false)
-            status =
-                EncodeStereo(p, &bitstream, theReadBuffer, 2, 0, numSamples);
+            status = EncodeStereo(p, &bitstream, theReadBuffer, 2, 0, numSamples);
         else
-            status = EncodeStereoFast(p, &bitstream, theReadBuffer, 2, 0,
-                                      numSamples);
+            status = EncodeStereoFast(p, &bitstream, theReadBuffer, 2, 0, numSamples);
         RequireNoErr(status, goto Exit;);
     }
     else if (numChannels == 1)
@@ -1095,8 +1057,7 @@ int32_t alac_encode(ALAC_ENCODER *p, uint32_t numSamples,
 
         for (channelIndex = 0; channelIndex < numChannels;)
         {
-            tag = (sChannelMaps[numChannels - 1] &
-                   (0x7ul << (channelIndex * 3))) >>
+            tag = (sChannelMaps[numChannels - 1] & (0x7ul << (channelIndex * 3))) >>
                   (channelIndex * 3);
 
             BitBufferWrite(&bitstream, tag, 3);
@@ -1106,8 +1067,8 @@ int32_t alac_encode(ALAC_ENCODER *p, uint32_t numSamples,
                 // mono
                 BitBufferWrite(&bitstream, monoElementTag, 4);
 
-                status = EncodeMono(p, &bitstream, inputBuffer, numChannels,
-                                    channelIndex, numSamples);
+                status =
+                    EncodeMono(p, &bitstream, inputBuffer, numChannels, channelIndex, numSamples);
 
                 inputBuffer += 1;
                 channelIndex++;
@@ -1118,8 +1079,8 @@ int32_t alac_encode(ALAC_ENCODER *p, uint32_t numSamples,
                 // stereo
                 BitBufferWrite(&bitstream, stereoElementTag, 4);
 
-                status = EncodeStereo(p, &bitstream, inputBuffer, numChannels,
-                                      channelIndex, numSamples);
+                status =
+                    EncodeStereo(p, &bitstream, inputBuffer, numChannels, channelIndex, numSamples);
 
                 inputBuffer += 2;
                 channelIndex += 2;
@@ -1130,8 +1091,8 @@ int32_t alac_encode(ALAC_ENCODER *p, uint32_t numSamples,
                 // LFE channel (subwoofer)
                 BitBufferWrite(&bitstream, lfeElementTag, 4);
 
-                status = EncodeMono(p, &bitstream, inputBuffer, numChannels,
-                                    channelIndex, numSamples);
+                status =
+                    EncodeMono(p, &bitstream, inputBuffer, numChannels, channelIndex, numSamples);
 
                 inputBuffer += 1;
                 channelIndex++;
@@ -1211,8 +1172,7 @@ uint32_t alac_get_magic_cookie_size(uint32_t inNumChannels)
 {
     if (inNumChannels > 2)
     {
-        return sizeof(ALACSpecificConfig) + kChannelAtomSize +
-               sizeof(ALACAudioChannelLayout);
+        return sizeof(ALACSpecificConfig) + kChannelAtomSize + sizeof(ALACAudioChannelLayout);
     }
     else
     {
@@ -1224,8 +1184,7 @@ void alac_get_magic_cookie(ALAC_ENCODER *p, void *outCookie, uint32_t *ioSize)
 {
     ALACSpecificConfig theConfig = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     ALACAudioChannelLayout theChannelLayout = {0, 0, 0};
-    uint8_t theChannelAtom[kChannelAtomSize] = {0,   0,   0, 0, 'c', 'h',
-                                                'a', 'n', 0, 0, 0,   0};
+    uint8_t theChannelAtom[kChannelAtomSize] = {0, 0, 0, 0, 'c', 'h', 'a', 'n', 0, 0, 0, 0};
     uint32_t theCookieSize = sizeof(ALACSpecificConfig);
     uint8_t *theCookiePointer = (uint8_t *)outCookie;
 
@@ -1245,8 +1204,7 @@ void alac_get_magic_cookie(ALAC_ENCODER *p, void *outCookie, uint32_t *ioSize)
             theCookiePointer += sizeof(ALACSpecificConfig);
             memcpy(theCookiePointer, theChannelAtom, kChannelAtomSize);
             theCookiePointer += kChannelAtomSize;
-            memcpy(theCookiePointer, &theChannelLayout,
-                   sizeof(ALACAudioChannelLayout));
+            memcpy(theCookiePointer, &theChannelLayout, sizeof(ALACAudioChannelLayout));
         }
         *ioSize = theCookieSize;
     }
@@ -1260,15 +1218,13 @@ void alac_get_magic_cookie(ALAC_ENCODER *p, void *outCookie, uint32_t *ioSize)
 	alac_encoder_init ()
 	- initialize the encoder component with the current config
 */
-int32_t alac_encoder_init(ALAC_ENCODER *p, uint32_t samplerate,
-                          uint32_t channels, uint32_t format_flags,
-                          uint32_t frameSize)
+int32_t alac_encoder_init(ALAC_ENCODER *p, uint32_t samplerate, uint32_t channels,
+                          uint32_t format_flags, uint32_t frameSize)
 {
     int32_t status;
 
-    p->mFrameSize = (frameSize > 0 && frameSize <= ALAC_FRAME_LENGTH)
-                        ? frameSize
-                        : ALAC_FRAME_LENGTH;
+    p->mFrameSize =
+        (frameSize > 0 && frameSize <= ALAC_FRAME_LENGTH) ? frameSize : ALAC_FRAME_LENGTH;
 
     p->mOutputSampleRate = samplerate;
     p->mNumChannels = channels;
@@ -1298,8 +1254,7 @@ int32_t alac_encoder_init(ALAC_ENCODER *p, uint32_t samplerate,
     // the maximum output frame size can be no bigger than (samplesPerBlock * numChannels * ((10 + sampleSize)/8) + 1)
     // but note that this can be bigger than the input size!
     // - since we don't yet know what our input format will be, use our max allowed sample size in the calculation
-    p->mMaxOutputBytes =
-        p->mFrameSize * p->mNumChannels * ((10 + kMaxSampleSize) / 8) + 1;
+    p->mMaxOutputBytes = p->mFrameSize * p->mNumChannels * ((10 + kMaxSampleSize) / 8) + 1;
 
     status = ALAC_noErr;
 
@@ -1308,10 +1263,8 @@ int32_t alac_encoder_init(ALAC_ENCODER *p, uint32_t samplerate,
     {
         for (int32_t search = 0; search < kALACMaxSearches; search++)
         {
-            init_coefs(p->mCoefsU[channel][search], DENSHIFT_DEFAULT,
-                       kALACMaxCoefs);
-            init_coefs(p->mCoefsV[channel][search], DENSHIFT_DEFAULT,
-                       kALACMaxCoefs);
+            init_coefs(p->mCoefsU[channel][search], DENSHIFT_DEFAULT, kALACMaxCoefs);
+            init_coefs(p->mCoefsV[channel][search], DENSHIFT_DEFAULT, kALACMaxCoefs);
         }
     }
 
@@ -1322,8 +1275,7 @@ int32_t alac_encoder_init(ALAC_ENCODER *p, uint32_t samplerate,
 	alac_get_source_format ()
 	- given the input format, return one of our supported formats
 */
-void alac_get_source_format(ALAC_ENCODER *p,
-                            const AudioFormatDescription *source,
+void alac_get_source_format(ALAC_ENCODER *p, const AudioFormatDescription *source,
                             AudioFormatDescription *output)
 {
     (void)output;
@@ -1332,8 +1284,7 @@ void alac_get_source_format(ALAC_ENCODER *p,
     //		   to encode to 16-bit since the source was lossy in the first place
     // - note: if not a supported bit depth, find the closest supported bit depth to the input one
     if ((source->mFormatID != kALACFormatLinearPCM) ||
-        ((source->mFormatFlags & kALACFormatFlagIsFloat) != 0) ||
-        (source->mBitsPerChannel <= 16))
+        ((source->mFormatFlags & kALACFormatFlagIsFloat) != 0) || (source->mBitsPerChannel <= 16))
         p->mBitDepth = 16;
     else if (source->mBitsPerChannel <= 20)
         p->mBitDepth = 20;
@@ -1396,9 +1347,8 @@ static void AddFiller(BitBuffer *bits, int32_t numBytes)
         else
             BitBufferWrite(bits, numBytes, 4);
 
-        BitBufferWrite(
-            bits, 0x10,
-            8); // extension_type = FILL_DATA = b0001 or'ed with fill_nibble = b0000
+        BitBufferWrite(bits, 0x10,
+                       8); // extension_type = FILL_DATA = b0001 or'ed with fill_nibble = b0000
         for (indx = 0; indx < (numBytes - 1); indx++)
             BitBufferWrite(bits, 0xa5, 8); // fill_byte = b10100101 = 0xa5
     }

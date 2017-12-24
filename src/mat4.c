@@ -68,8 +68,7 @@ int mat4_open(SF_PRIVATE *psf)
 {
     int subformat, error = 0;
 
-    if (psf->file.mode == SFM_READ ||
-        (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = mat4_read_header(psf)))
             return error;
@@ -86,11 +85,9 @@ int mat4_open(SF_PRIVATE *psf)
             return SFE_NO_PIPE_WRITE;
 
         psf->endian = SF_ENDIAN(psf->sf.format);
-        if (CPU_IS_LITTLE_ENDIAN &&
-            (psf->endian == SF_ENDIAN_CPU || psf->endian == 0))
+        if (CPU_IS_LITTLE_ENDIAN && (psf->endian == SF_ENDIAN_CPU || psf->endian == 0))
             psf->endian = SF_ENDIAN_LITTLE;
-        else if (CPU_IS_BIG_ENDIAN &&
-                 (psf->endian == SF_ENDIAN_CPU || psf->endian == 0))
+        else if (CPU_IS_BIG_ENDIAN && (psf->endian == SF_ENDIAN_CPU || psf->endian == 0))
             psf->endian = SF_ENDIAN_BIG;
 
         if ((error = mat4_write_header(psf, SF_FALSE)))
@@ -167,24 +164,18 @@ static int mat4_write_header(SF_PRIVATE *psf, int calc_length)
 
     if (psf->endian == SF_ENDIAN_BIG)
     {
-        psf_binheader_writef(psf, "Em444", BHWm(MAT4_BE_DOUBLE), BHW4(1),
-                             BHW4(1), BHW4(0));
-        psf_binheader_writef(psf, "E4bd", BHW4(11), BHWv("samplerate"),
-                             BHWz(11), BHWd(samplerate));
-        psf_binheader_writef(psf, "tEm484", BHWm(encoding),
-                             BHW4(psf->sf.channels), BHW8(psf->sf.frames),
-                             BHW4(0));
+        psf_binheader_writef(psf, "Em444", BHWm(MAT4_BE_DOUBLE), BHW4(1), BHW4(1), BHW4(0));
+        psf_binheader_writef(psf, "E4bd", BHW4(11), BHWv("samplerate"), BHWz(11), BHWd(samplerate));
+        psf_binheader_writef(psf, "tEm484", BHWm(encoding), BHW4(psf->sf.channels),
+                             BHW8(psf->sf.frames), BHW4(0));
         psf_binheader_writef(psf, "E4b", BHW4(9), BHWv("wavedata"), BHWz(9));
     }
     else if (psf->endian == SF_ENDIAN_LITTLE)
     {
-        psf_binheader_writef(psf, "em444", BHWm(MAT4_LE_DOUBLE), BHW4(1),
-                             BHW4(1), BHW4(0));
-        psf_binheader_writef(psf, "e4bd", BHW4(11), BHWv("samplerate"),
-                             BHWz(11), BHWd(samplerate));
-        psf_binheader_writef(psf, "tem484", BHWm(encoding),
-                             BHW4(psf->sf.channels), BHW8(psf->sf.frames),
-                             BHW4(0));
+        psf_binheader_writef(psf, "em444", BHWm(MAT4_LE_DOUBLE), BHW4(1), BHW4(1), BHW4(0));
+        psf_binheader_writef(psf, "e4bd", BHW4(11), BHWv("samplerate"), BHWz(11), BHWd(samplerate));
+        psf_binheader_writef(psf, "tem484", BHWm(encoding), BHW4(psf->sf.channels),
+                             BHW8(psf->sf.frames), BHW4(0));
         psf_binheader_writef(psf, "e4b", BHW4(9), BHWv("wavedata"), BHWz(9));
     }
     else
@@ -231,8 +222,7 @@ static int mat4_read_header(SF_PRIVATE *psf)
         return SFE_UNIMPLEMENTED;
     }
 
-    psf_log_printf(psf, "GNU Octave 2.0 / MATLAB v4.2 format\nMarker : %s\n",
-                   marker_str);
+    psf_log_printf(psf, "GNU Octave 2.0 / MATLAB v4.2 format\nMarker : %s\n", marker_str);
 
     psf_binheader_readf(psf, "444", &rows, &cols, &imag);
 
@@ -289,8 +279,7 @@ static int mat4_read_header(SF_PRIVATE *psf)
     }
     else if (rows > SF_MAX_CHANNELS)
     {
-        psf_log_printf(psf, "*** Error : channel count %d > SF_MAX_CHANNELS.\n",
-                       rows);
+        psf_log_printf(psf, "*** Error : channel count %d > SF_MAX_CHANNELS.\n", rows);
         return SFE_CHANNEL_COUNT;
     };
 
@@ -329,8 +318,7 @@ static int mat4_read_header(SF_PRIVATE *psf)
         return SFE_UNIMPLEMENTED;
     };
 
-    if ((psf->filelength - psf->dataoffset) <
-        psf->sf.channels * psf->sf.frames * psf->bytewidth)
+    if ((psf->filelength - psf->dataoffset) < psf->sf.channels * psf->sf.frames * psf->bytewidth)
     {
         psf_log_printf(psf, "*** File seems to be truncated. %D <--> %D\n",
                        psf->filelength - psf->dataoffset,

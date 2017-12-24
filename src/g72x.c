@@ -125,8 +125,7 @@ int g72x_init(SF_PRIVATE *psf)
 
     if (psf->file.mode == SFM_READ)
     {
-        pg72x->private = g72x_reader_init(codec, &(pg72x->blocksize),
-                                          &(pg72x->samplesperblock));
+        pg72x->private = g72x_reader_init(codec, &(pg72x->blocksize), &(pg72x->samplesperblock));
         if (pg72x->private == NULL)
             return SFE_MALLOC_FAILED;
 
@@ -141,10 +140,8 @@ int g72x_init(SF_PRIVATE *psf)
 
         if (psf->datalength % pg72x->blocksize)
         {
-            psf_log_printf(
-                psf,
-                "*** Odd psf->datalength (%D) should be a multiple of %d\n",
-                psf->datalength, pg72x->blocksize);
+            psf_log_printf(psf, "*** Odd psf->datalength (%D) should be a multiple of %d\n",
+                           psf->datalength, pg72x->blocksize);
             pg72x->blocks_total = (psf->datalength / pg72x->blocksize) + 1;
         }
         else
@@ -158,8 +155,7 @@ int g72x_init(SF_PRIVATE *psf)
     }
     else if (psf->file.mode == SFM_WRITE)
     {
-        pg72x->private = g72x_writer_init(codec, &(pg72x->blocksize),
-                                          &(pg72x->samplesperblock));
+        pg72x->private = g72x_writer_init(codec, &(pg72x->blocksize), &(pg72x->samplesperblock));
         if (pg72x->private == NULL)
             return SFE_MALLOC_FAILED;
 
@@ -200,10 +196,8 @@ static int psf_g72x_decode_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x)
         return 1;
     };
 
-    if ((k = psf_fread(pg72x->block, 1, pg72x->bytesperblock, psf)) !=
-        pg72x->bytesperblock)
-        psf_log_printf(psf, "*** Warning : short read (%z != %z).\n", k,
-                       pg72x->bytesperblock);
+    if ((k = psf_fread(pg72x->block, 1, pg72x->bytesperblock, psf)) != pg72x->bytesperblock)
+        psf_log_printf(psf, "*** Warning : short read (%z != %z).\n", k, pg72x->bytesperblock);
 
     pg72x->blocksize = k;
     g72x_decode_block(pg72x->private, pg72x->block, pg72x->samples);
@@ -211,8 +205,7 @@ static int psf_g72x_decode_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x)
     return 1;
 }
 
-static size_t g72x_read_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x, short *ptr,
-                              size_t len)
+static size_t g72x_read_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x, short *ptr, size_t len)
 {
     size_t count, total = 0, indx = 0;
 
@@ -230,8 +223,7 @@ static size_t g72x_read_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x, short *ptr,
         count = pg72x->samplesperblock - pg72x->sample_curr;
         count = (len - indx > count) ? count : len - indx;
 
-        memcpy(&(ptr[indx]), &(pg72x->samples[pg72x->sample_curr]),
-               count * sizeof(short));
+        memcpy(&(ptr[indx]), &(pg72x->samples[pg72x->sample_curr]), count * sizeof(short));
         indx += count;
         pg72x->sample_curr += count;
         total = indx;
@@ -363,8 +355,7 @@ static size_t g72x_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static sf_count_t g72x_seek(SF_PRIVATE *psf, int UNUSED(mode),
-                            sf_count_t UNUSED(offset))
+static sf_count_t g72x_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t UNUSED(offset))
 {
     psf_log_printf(psf, "seek unsupported\n");
 
@@ -383,10 +374,8 @@ static int psf_g72x_encode_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x)
     g72x_encode_block(pg72x->private, pg72x->samples, pg72x->block);
 
     /* Write the block to disk. */
-    if ((k = psf_fwrite(pg72x->block, 1, pg72x->blocksize, psf)) !=
-        pg72x->blocksize)
-        psf_log_printf(psf, "*** Warning : short write (%d != %d).\n", k,
-                       pg72x->blocksize);
+    if ((k = psf_fwrite(pg72x->block, 1, pg72x->blocksize, psf)) != pg72x->blocksize)
+        psf_log_printf(psf, "*** Warning : short write (%d != %d).\n", k, pg72x->blocksize);
 
     pg72x->sample_curr = 0;
     pg72x->block_curr++;
@@ -397,8 +386,7 @@ static int psf_g72x_encode_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x)
     return 1;
 }
 
-static int g72x_write_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x,
-                            const short *ptr, int len)
+static int g72x_write_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x, const short *ptr, int len)
 {
     int count, total = 0, indx = 0;
 
@@ -409,8 +397,7 @@ static int g72x_write_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x,
         if (count > len - indx)
             count = len - indx;
 
-        memcpy(&(pg72x->samples[pg72x->sample_curr]), &(ptr[indx]),
-               count * sizeof(short));
+        memcpy(&(pg72x->samples[pg72x->sample_curr]), &(ptr[indx]), count * sizeof(short));
         indx += count;
         pg72x->sample_curr += count;
         total = indx;

@@ -78,8 +78,7 @@ int rx2_open(SF_PRIVATE *psf)
     };
 
     if (length != psf->filelength - 8)
-        psf_log_printf(psf, "%M : %d (should be %d)\n", marker, length,
-                       psf->filelength - 8);
+        psf_log_printf(psf, "%M : %d (should be %d)\n", marker, length, psf->filelength - 8);
     else
         psf_log_printf(psf, "%M : %d\n", marker, length);
 
@@ -139,8 +138,7 @@ int rx2_open(SF_PRIVATE *psf)
         case RECY_MARKER:
             psf_binheader_readf(psf, "E4", &length);
             psf_log_printf(psf, " %M : %d\n", marker, length);
-            psf_binheader_readf(psf, "j",
-                                (length + 1) & 0xFFFFFFFE); /* ?????? */
+            psf_binheader_readf(psf, "j", (length + 1) & 0xFFFFFFFE); /* ?????? */
             break;
 
         case CAT_MARKER:
@@ -168,8 +166,7 @@ int rx2_open(SF_PRIVATE *psf)
             break;
 
         case SLCL_MARKER:
-            psf_log_printf(psf, "  %M\n    (Offset, Next Offset, Type)\n",
-                           marker);
+            psf_log_printf(psf, "  %M\n    (Offset, Next Offset, Type)\n", marker);
             slce_count = 0;
             break;
 
@@ -177,8 +174,7 @@ int rx2_open(SF_PRIVATE *psf)
         {
             int len[4], indx;
 
-            psf_binheader_readf(psf, "E4444", &len[0], &len[1], &len[2],
-                                &len[3]);
+            psf_binheader_readf(psf, "E4444", &len[0], &len[1], &len[2], &len[3]);
 
             indx = ((len[3] & 0x0000FFFF) >> 8) & 3;
 
@@ -188,18 +184,15 @@ int rx2_open(SF_PRIVATE *psf)
                     indx =
                         3; /* 2 cases, where next slice offset = 1 -> disabled & enabled/hidden */
 
-                psf_log_printf(psf, "   %M : (%6d, ?: 0x%X, %s)\n", marker,
-                               len[1], (len[3] & 0xFFFF0000) >> 16,
-                               marker_type[indx]);
+                psf_log_printf(psf, "   %M : (%6d, ?: 0x%X, %s)\n", marker, len[1],
+                               (len[3] & 0xFFFF0000) >> 16, marker_type[indx]);
             }
             else
             {
                 slce_total += len[2];
 
-                psf_log_printf(psf,
-                               "   %M : (%6d, SLCE_next_ofs:%d, ?: 0x%X, %s)\n",
-                               marker, len[1], len[2],
-                               (len[3] & 0xFFFF0000) >> 16, marker_type[indx]);
+                psf_log_printf(psf, "   %M : (%6d, SLCE_next_ofs:%d, ?: 0x%X, %s)\n", marker,
+                               len[1], len[2], (len[3] & 0xFFFF0000) >> 16, marker_type[indx]);
             };
 
             slce_count++;
@@ -265,8 +258,7 @@ int rx2_open(SF_PRIVATE *psf)
     printf("SLCE samples : %d\n", slce_total);
 
     /* Two bytes per sample. */
-    printf("Comp Ratio   : %f:1\n",
-           (2.0 * slce_total * n_channels) / sdat_length);
+    printf("Comp Ratio   : %f:1\n", (2.0 * slce_total * n_channels) / sdat_length);
 
     puts(" ");
 

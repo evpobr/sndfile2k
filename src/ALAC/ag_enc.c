@@ -91,8 +91,7 @@ static inline int32_t ALWAYS_INLINE abs_func(int32_t a)
 #pragma mark -
 #endif
 
-static inline int32_t dyn_code(int32_t m, int32_t k, int32_t n,
-                               uint32_t *outNumBits)
+static inline int32_t dyn_code(int32_t m, int32_t k, int32_t n, uint32_t *outNumBits)
 {
     uint32_t divx, mod, de;
     uint32_t numBits;
@@ -127,9 +126,8 @@ static inline int32_t dyn_code(int32_t m, int32_t k, int32_t n,
     return (int32_t)value;
 }
 
-static inline int32_t dyn_code_32bit(int32_t maxbits, uint32_t m, uint32_t k,
-                                     uint32_t n, uint32_t *outNumBits,
-                                     uint32_t *outValue, uint32_t *overflow,
+static inline int32_t dyn_code_32bit(int32_t maxbits, uint32_t m, uint32_t k, uint32_t n,
+                                     uint32_t *outNumBits, uint32_t *outValue, uint32_t *overflow,
                                      uint32_t *overflowbits)
 {
     uint32_t divx, mod, de;
@@ -165,10 +163,8 @@ static inline int32_t dyn_code_32bit(int32_t maxbits, uint32_t m, uint32_t k,
     return didOverflow;
 }
 
-static inline void ALWAYS_INLINE dyn_jam_noDeref(unsigned char *out,
-                                                 uint32_t bitPos,
-                                                 uint32_t numBits,
-                                                 uint32_t value)
+static inline void ALWAYS_INLINE dyn_jam_noDeref(unsigned char *out, uint32_t bitPos,
+                                                 uint32_t numBits, uint32_t value)
 {
     uint32_t mask;
     uint32_t curr;
@@ -182,8 +178,7 @@ static inline void ALWAYS_INLINE dyn_jam_noDeref(unsigned char *out,
 
     mask =
         ~0u >>
-        (32 -
-         numBits); // mask must be created in two steps to avoid compiler sequencing ambiguity
+        (32 - numBits); // mask must be created in two steps to avoid compiler sequencing ambiguity
     mask <<= shift;
 
     value = (value << shift) & mask;
@@ -192,10 +187,8 @@ static inline void ALWAYS_INLINE dyn_jam_noDeref(unsigned char *out,
     psf_put_be32(out, bitPos >> 3, value);
 }
 
-static inline void ALWAYS_INLINE dyn_jam_noDeref_large(unsigned char *out,
-                                                       uint32_t bitPos,
-                                                       uint32_t numBits,
-                                                       uint32_t value)
+static inline void ALWAYS_INLINE dyn_jam_noDeref_large(unsigned char *out, uint32_t bitPos,
+                                                       uint32_t numBits, uint32_t value)
 {
     uint32_t w;
     uint32_t curr;
@@ -232,8 +225,8 @@ static inline void ALWAYS_INLINE dyn_jam_noDeref_large(unsigned char *out,
     psf_put_be32(out, bitPos >> 3, w);
 }
 
-int32_t dyn_comp(AGParamRecPtr params, int32_t *pc, BitBuffer *bitstream,
-                 int32_t numSamples, int32_t bitSize, uint32_t *outNumBits)
+int32_t dyn_comp(AGParamRecPtr params, int32_t *pc, BitBuffer *bitstream, int32_t numSamples,
+                 int32_t bitSize, uint32_t *outNumBits)
 {
     unsigned char *out;
     uint32_t bitPos, startPos;
@@ -283,8 +276,7 @@ int32_t dyn_comp(AGParamRecPtr params, int32_t *pc, BitBuffer *bitstream,
         n = (abs_func(del) << 1) - ((del >> 31) & 1) - zmode;
         //Assert (32-lead (n) <= bitSize) ;
 
-        if (dyn_code_32bit(bitSize, m, k, n, &numBits, &value, &overflow,
-                           &overflowbits))
+        if (dyn_code_32bit(bitSize, m, k, n, &numBits, &value, &overflow, &overflowbits))
         {
             dyn_jam_noDeref(out, bitPos, numBits, value);
             bitPos += numBits;
@@ -312,8 +304,7 @@ int32_t dyn_comp(AGParamRecPtr params, int32_t *pc, BitBuffer *bitstream,
 
         zmode = 0;
 
-        RequireAction(c <= (uint32_t)numSamples, status = kALAC_ParamError;
-                      goto Exit;);
+        RequireAction(c <= (uint32_t)numSamples, status = kALAC_ParamError; goto Exit;);
 
         if (((mb << MMULSHIFT) < QB) && (c < (uint32_t)numSamples))
         {

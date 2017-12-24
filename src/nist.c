@@ -44,8 +44,7 @@ int nist_open(SF_PRIVATE *psf)
 {
     int error;
 
-    if (psf->file.mode == SFM_READ ||
-        (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = nist_read_header(psf)))
             return error;
@@ -61,8 +60,7 @@ int nist_open(SF_PRIVATE *psf)
 
         psf->endian = SF_ENDIAN(psf->sf.format);
         if (psf->endian == 0 || psf->endian == SF_ENDIAN_CPU)
-            psf->endian =
-                (CPU_IS_BIG_ENDIAN) ? SF_ENDIAN_BIG : SF_ENDIAN_LITTLE;
+            psf->endian = (CPU_IS_BIG_ENDIAN) ? SF_ENDIAN_BIG : SF_ENDIAN_LITTLE;
 
         psf->blockwidth = psf->bytewidth * psf->sf.channels;
         psf->sf.frames = 0;
@@ -194,9 +192,7 @@ static int nist_read_header(SF_PRIVATE *psf)
         sscanf(cptr, "sample_byte_format -s%u %8s", &bytes, str) == 2)
     {
         if (bytes != strlen(str))
-            psf_log_printf(psf,
-                           "Weird sample_byte_format : strlen '%s' != %d\n",
-                           str, bytes);
+            psf_log_printf(psf, "Weird sample_byte_format : strlen '%s' != %d\n", str, bytes);
 
         if (bytes > 1)
         {
@@ -204,8 +200,7 @@ static int nist_read_header(SF_PRIVATE *psf)
                 psf->bytewidth = bytes;
             else if (psf->bytewidth - bytes != 0)
             {
-                psf_log_printf(psf, "psf->bytewidth (%d) != bytes (%d)\n",
-                               psf->bytewidth, bytes);
+                psf_log_printf(psf, "psf->bytewidth (%d) != bytes (%d)\n", psf->bytewidth, bytes);
                 return SFE_NIST_BAD_ENCODING;
             };
 
@@ -309,8 +304,7 @@ static int nist_write_header(SF_PRIVATE *psf, int calc_length)
             psf->datalength -= psf->filelength - psf->dataend;
 
         if (psf->bytewidth > 0)
-            psf->sf.frames =
-                psf->datalength / (psf->bytewidth * psf->sf.channels);
+            psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels);
     };
 
     if (psf->endian == SF_ENDIAN_BIG)
@@ -342,10 +336,10 @@ static int nist_write_header(SF_PRIVATE *psf, int calc_length)
     case SF_FORMAT_PCM_24:
     case SF_FORMAT_PCM_32:
         psf_asciiheader_printf(psf, "sample_n_bytes -i %d\n", psf->bytewidth);
-        psf_asciiheader_printf(psf, "sample_sig_bits -i %d\n",
-                               psf->bytewidth * 8);
-        psf_asciiheader_printf(psf, "sample_coding -s3 pcm\n"
-                                    "sample_byte_format -s%d %s\n",
+        psf_asciiheader_printf(psf, "sample_sig_bits -i %d\n", psf->bytewidth * 8);
+        psf_asciiheader_printf(psf,
+                               "sample_coding -s3 pcm\n"
+                               "sample_byte_format -s%d %s\n",
                                psf->bytewidth, end_str);
         break;
 
@@ -371,8 +365,7 @@ static int nist_write_header(SF_PRIVATE *psf, int calc_length)
     psf_asciiheader_printf(psf, "end_head\n");
 
     /* Zero fill to dataoffset. */
-    psf_binheader_writef(psf, "z",
-                         BHWz((size_t)(NIST_HEADER_LENGTH - psf->header.indx)));
+    psf_binheader_writef(psf, "z", BHWz((size_t)(NIST_HEADER_LENGTH - psf->header.indx)));
 
     psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
 

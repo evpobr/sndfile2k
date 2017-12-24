@@ -96,8 +96,7 @@ static void salvage_file(const char *broken_wav, const char *fixed_w64)
 
     if ((fd = open(broken_wav, O_RDONLY)) < 0)
     {
-        printf("Error : Not able to open file '%s' : %s\n", broken_wav,
-               strerror(errno));
+        printf("Error : Not able to open file '%s' : %s\n", broken_wav, strerror(errno));
         exit(1);
     };
 
@@ -275,8 +274,7 @@ static void copy_data(int fd, SNDFILE *sndfile, int readsize)
 
         if ((count = sf_write_raw(sndfile, buffer, readlen)) != readlen)
         {
-            printf("Error : sf_write_raw returned %" PRId64 " : %s\n", count,
-                   sf_strerror(sndfile));
+            printf("Error : sf_write_raw returned %" PRId64 " : %s\n", count, sf_strerror(sndfile));
             return;
         };
     };

@@ -54,11 +54,9 @@ static SF_FORMAT_INFO const simple_formats[] = {
 
     {SF_FORMAT_WAV | SF_FORMAT_FLOAT, "WAV (Microsoft 32 bit float)", "wav"},
 
-    {SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, "WAV (Microsoft 4 bit IMA ADPCM)",
-     "wav"},
+    {SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, "WAV (Microsoft 4 bit IMA ADPCM)", "wav"},
 
-    {SF_FORMAT_WAV | SF_FORMAT_MS_ADPCM, "WAV (Microsoft 4 bit MS ADPCM)",
-     "wav"},
+    {SF_FORMAT_WAV | SF_FORMAT_MS_ADPCM, "WAV (Microsoft 4 bit MS ADPCM)", "wav"},
 
     {SF_FORMAT_WAV | SF_FORMAT_PCM_U8, "WAV (Microsoft 8 bit PCM)", "wav"},
 
@@ -74,8 +72,7 @@ int psf_get_format_simple(SF_FORMAT_INFO *data)
     int indx;
 
     if (data->format < 0 ||
-        data->format >=
-            (SIGNED_SIZEOF(simple_formats) / SIGNED_SIZEOF(SF_FORMAT_INFO)))
+        data->format >= (SIGNED_SIZEOF(simple_formats) / SIGNED_SIZEOF(SF_FORMAT_INFO)))
         return SFE_BAD_COMMAND_PARAM;
 
     indx = data->format;
@@ -131,8 +128,7 @@ int psf_get_format_major(SF_FORMAT_INFO *data)
     int indx;
 
     if (data->format < 0 ||
-        data->format >=
-            (SIGNED_SIZEOF(major_formats) / SIGNED_SIZEOF(SF_FORMAT_INFO)))
+        data->format >= (SIGNED_SIZEOF(major_formats) / SIGNED_SIZEOF(SF_FORMAT_INFO)))
         return SFE_BAD_COMMAND_PARAM;
 
     indx = data->format;
@@ -194,8 +190,7 @@ int psf_get_format_subtype(SF_FORMAT_INFO *data)
     int indx;
 
     if (data->format < 0 ||
-        data->format >=
-            (SIGNED_SIZEOF(subtype_formats) / SIGNED_SIZEOF(SF_FORMAT_INFO)))
+        data->format >= (SIGNED_SIZEOF(subtype_formats) / SIGNED_SIZEOF(SF_FORMAT_INFO)))
     {
         data->format = 0;
         return SFE_BAD_COMMAND_PARAM;
@@ -215,9 +210,7 @@ int psf_get_format_info(SF_FORMAT_INFO *data)
     {
         format = SF_CONTAINER(data->format);
 
-        for (k = 0;
-             k < (SIGNED_SIZEOF(major_formats) / SIGNED_SIZEOF(SF_FORMAT_INFO));
-             k++)
+        for (k = 0; k < (SIGNED_SIZEOF(major_formats) / SIGNED_SIZEOF(SF_FORMAT_INFO)); k++)
         {
             if (format == major_formats[k].format)
             {
@@ -230,9 +223,7 @@ int psf_get_format_info(SF_FORMAT_INFO *data)
     {
         format = SF_CODEC(data->format);
 
-        for (k = 0; k < (SIGNED_SIZEOF(subtype_formats) /
-                         SIGNED_SIZEOF(SF_FORMAT_INFO));
-             k++)
+        for (k = 0; k < (SIGNED_SIZEOF(subtype_formats) / SIGNED_SIZEOF(SF_FORMAT_INFO)); k++)
         {
             if (format == subtype_formats[k].format)
             {
@@ -320,8 +311,7 @@ int psf_calc_max_all_channels(SF_PRIVATE *psf, double *peaks, int normalize)
     memset(peaks, 0, sizeof(double) * psf->sf.channels);
 
     // Brute force. Read the whole file and find the biggest sample for each channel.
-    position =
-        sf_seek((SNDFILE *)psf, 0, SEEK_CUR); /* Get current position in file */
+    position = sf_seek((SNDFILE *)psf, 0, SEEK_CUR); /* Get current position in file */
     sf_seek((SNDFILE *)psf, 0, SEEK_SET); /* Go to start of file. */
 
     len = ARRAY_LEN(ubuf.dbuf) - (ARRAY_LEN(ubuf.dbuf) % psf->sf.channels);
@@ -341,8 +331,7 @@ int psf_calc_max_all_channels(SF_PRIVATE *psf, double *peaks, int normalize)
         };
     };
 
-    sf_seek((SNDFILE *)psf, position,
-            SEEK_SET); /* Return to original position. */
+    sf_seek((SNDFILE *)psf, position, SEEK_SET); /* Return to original position. */
 
     sf_command((SNDFILE *)psf, SFC_SET_NORM_DOUBLE, NULL, save_state);
 

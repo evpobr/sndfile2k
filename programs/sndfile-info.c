@@ -62,8 +62,7 @@ int main(int argc, char *argv[])
 {
     int k;
 
-    if (argc < 2 || strcmp(argv[1], "--help") == 0 ||
-        strcmp(argv[1], "-h") == 0)
+    if (argc < 2 || strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-h") == 0)
         usage_exit(program_name(argv[0]));
 
     if (strcmp(argv[1], "--instrument") == 0)
@@ -315,23 +314,21 @@ static int instrument_dump(const char *filename)
 
     if (got_inst == SF_FALSE)
     {
-        printf("Error : File '%s' does not contain instrument data.\n\n",
-               filename);
+        printf("Error : File '%s' does not contain instrument data.\n\n", filename);
         return 1;
     };
 
     printf("Instrument : %s\n\n", filename);
     printf("  Gain        : %d\n", inst.gain);
     printf("  Base note   : %d\n", inst.basenote);
-    printf("  Velocity    : %d - %d\n", (int)inst.velocity_lo,
-           (int)inst.velocity_hi);
+    printf("  Velocity    : %d - %d\n", (int)inst.velocity_lo, (int)inst.velocity_hi);
     printf("  Key         : %d - %d\n", (int)inst.key_lo, (int)inst.key_hi);
     printf("  Loop points : %d\n", inst.loop_count);
 
     for (k = 0; k < inst.loop_count; k++)
-        printf("  %-2d    Mode : %s    Start : %6d   End : %6d   Count : %6d\n",
-               k, str_of_type(inst.loops[k].mode), inst.loops[k].start,
-               inst.loops[k].end, inst.loops[k].count);
+        printf("  %-2d    Mode : %s    Start : %6d   End : %6d   Count : %6d\n", k,
+               str_of_type(inst.loops[k].mode), inst.loops[k].start, inst.loops[k].end,
+               inst.loops[k].count);
 
     putchar('\n');
     return 0;
@@ -363,8 +360,7 @@ static int broadcast_dump(const char *filename)
 
     if (got_bext == SF_FALSE)
     {
-        printf("Error : File '%s' does not contain broadcast information.\n\n",
-               filename);
+        printf("Error : File '%s' does not contain broadcast information.\n\n", filename);
         return 1;
     };
 
@@ -376,31 +372,25 @@ static int broadcast_dump(const char *filename)
 	 *      of the audio sequence.
 	 */
 
-    time_ref_sec = ((pow(2.0, 32) * bext.time_reference_high) +
-                    (1.0 * bext.time_reference_low)) /
+    time_ref_sec = ((pow(2.0, 32) * bext.time_reference_high) + (1.0 * bext.time_reference_low)) /
                    sfinfo.samplerate;
 
-    printf("Description      : %.*s\n", (int)sizeof(bext.description),
-           bext.description);
-    printf("Originator       : %.*s\n", (int)sizeof(bext.originator),
-           bext.originator);
+    printf("Description      : %.*s\n", (int)sizeof(bext.description), bext.description);
+    printf("Originator       : %.*s\n", (int)sizeof(bext.originator), bext.originator);
     printf("Origination ref  : %.*s\n", (int)sizeof(bext.originator_reference),
            bext.originator_reference);
-    printf("Origination date : %.*s\n", (int)sizeof(bext.origination_date),
-           bext.origination_date);
-    printf("Origination time : %.*s\n", (int)sizeof(bext.origination_time),
-           bext.origination_time);
+    printf("Origination date : %.*s\n", (int)sizeof(bext.origination_date), bext.origination_date);
+    printf("Origination time : %.*s\n", (int)sizeof(bext.origination_time), bext.origination_time);
 
     if (bext.time_reference_high == 0 && bext.time_reference_low == 0)
         printf("Time ref         : 0\n");
     else
-        printf("Time ref         : 0x%x%08x (%.6f seconds)\n",
-               bext.time_reference_high, bext.time_reference_low, time_ref_sec);
+        printf("Time ref         : 0x%x%08x (%.6f seconds)\n", bext.time_reference_high,
+               bext.time_reference_low, time_ref_sec);
 
     printf("BWF version      : %d\n", bext.version);
     printf("UMID             : %.*s\n", (int)sizeof(bext.umid), bext.umid);
-    printf("Coding history   : %.*s\n", bext.coding_history_size,
-           bext.coding_history);
+    printf("Coding history   : %.*s\n", bext.coding_history_size, bext.coding_history);
 
     return 0;
 }
@@ -429,15 +419,13 @@ static int chanmap_dump(const char *filename)
         return 1;
     };
 
-    got_chanmap = sf_command(file, SFC_GET_CHANNEL_MAP_INFO, channel_map,
-                             sfinfo.channels * sizeof(int));
+    got_chanmap =
+        sf_command(file, SFC_GET_CHANNEL_MAP_INFO, channel_map, sfinfo.channels * sizeof(int));
     sf_close(file);
 
     if (got_chanmap == SF_FALSE)
     {
-        printf(
-            "Error : File '%s' does not contain channel map information.\n\n",
-            filename);
+        printf("Error : File '%s' does not contain channel map information.\n\n", filename);
         free(channel_map);
         return 1;
     };
@@ -517,8 +505,7 @@ static int cart_dump(const char *filename)
 
     if (got_cart == SF_FALSE)
     {
-        printf("Error : File '%s' does not contain cart information.\n\n",
-               filename);
+        printf("Error : File '%s' does not contain cart information.\n\n", filename);
         return 1;
     };
 
@@ -526,36 +513,26 @@ static int cart_dump(const char *filename)
     printf("Title          : %.*s\n", (int)sizeof(cart.title), cart.title);
     printf("Artist         : %.*s\n", (int)sizeof(cart.artist), cart.artist);
     printf("Cut id         : %.*s\n", (int)sizeof(cart.cut_id), cart.cut_id);
-    printf("Category       : %.*s\n", (int)sizeof(cart.category),
-           cart.category);
-    printf("Classification : %.*s\n", (int)sizeof(cart.classification),
-           cart.classification);
+    printf("Category       : %.*s\n", (int)sizeof(cart.category), cart.category);
+    printf("Classification : %.*s\n", (int)sizeof(cart.classification), cart.classification);
     printf("Out cue        : %.*s\n", (int)sizeof(cart.out_cue), cart.out_cue);
-    printf("Start date     : %.*s\n", (int)sizeof(cart.start_date),
-           cart.start_date);
-    printf("Start time     : %.*s\n", (int)sizeof(cart.start_time),
-           cart.start_time);
-    printf("End date       : %.*s\n", (int)sizeof(cart.end_date),
-           cart.end_date);
-    printf("End time       : %.*s\n", (int)sizeof(cart.end_time),
-           cart.end_time);
-    printf("App id         : %.*s\n", (int)sizeof(cart.producer_app_id),
-           cart.producer_app_id);
+    printf("Start date     : %.*s\n", (int)sizeof(cart.start_date), cart.start_date);
+    printf("Start time     : %.*s\n", (int)sizeof(cart.start_time), cart.start_time);
+    printf("End date       : %.*s\n", (int)sizeof(cart.end_date), cart.end_date);
+    printf("End time       : %.*s\n", (int)sizeof(cart.end_time), cart.end_time);
+    printf("App id         : %.*s\n", (int)sizeof(cart.producer_app_id), cart.producer_app_id);
     printf("App version    : %.*s\n", (int)sizeof(cart.producer_app_version),
            cart.producer_app_version);
-    printf("User defined   : %.*s\n", (int)sizeof(cart.user_def),
-           cart.user_def);
+    printf("User defined   : %.*s\n", (int)sizeof(cart.user_def), cart.user_def);
     printf("Level ref.     : %d\n", cart.level_reference);
     printf("Post timers    :\n");
 
     for (k = 0; k < ARRAY_LEN(cart.post_timers); k++)
         if (cart.post_timers[k].usage[0])
-            printf("  %d   %.*s    %d\n", k,
-                   (int)sizeof(cart.post_timers[k].usage),
+            printf("  %d   %.*s    %d\n", k, (int)sizeof(cart.post_timers[k].usage),
                    cart.post_timers[k].usage, cart.post_timers[k].value);
 
-    printf("Reserved       : %.*s\n", (int)sizeof(cart.reserved),
-           cart.reserved);
+    printf("Reserved       : %.*s\n", (int)sizeof(cart.reserved), cart.reserved);
     printf("Url            : %.*s\n", (int)sizeof(cart.url), cart.url);
     printf("Tag text       : %.*s\n", cart.tag_text_size, cart.tag_text);
 

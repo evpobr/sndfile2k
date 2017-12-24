@@ -18,7 +18,7 @@
 
 static void Weighting_filter(register int16_t *e, /* signal [-5..0.39.44] IN  */
                              int16_t *x /* signal [0..39]       OUT */
-                             )
+)
 /*
  *  The coefficients of the weighting filter are stored in a table
  *  (see table 4.4).  The following scaling is used:
@@ -49,7 +49,7 @@ static void Weighting_filter(register int16_t *e, /* signal [-5..0.39.44] IN  */
     {
         L_result = 8192 >> 1;
 
-/* for (i = 0 ; i <= 10 ; i++) {
+        /* for (i = 0 ; i <= 10 ; i++) {
 		 *	L_temp   = GSM_L_MULT(wt[k+i], gsm_H[i]) ;
 		 *	L_result = GSM_L_ADD(L_result, L_temp) ;
 		 * }
@@ -58,7 +58,7 @@ static void Weighting_filter(register int16_t *e, /* signal [-5..0.39.44] IN  */
 #undef STEP
 #define STEP(i, H) (e[k + i] * (int32_t)H)
 
-/*  Every one of these multiplications is done twice --
+        /*  Every one of these multiplications is done twice --
 		 *  but I don't see an elegant way to optimize this.
 		 *  Do you?
 		 */
@@ -76,10 +76,11 @@ static void Weighting_filter(register int16_t *e, /* signal [-5..0.39.44] IN  */
         L_result += STEP(9, -374);
         L_result += STEP(10, -134);
 #else
-        L_result += STEP(0, -134) + STEP(1, -374)
+        L_result += STEP(0, -134) +
+                    STEP(1, -374)
                     /* + STEP (2, 0)  */
-                    + STEP(3, 2054) + STEP(4, 5741) + STEP(5, 8192) +
-                    STEP(6, 5741) + STEP(7, 2054)
+                    + STEP(3, 2054) + STEP(4, 5741) + STEP(5, 8192) + STEP(6, 5741) +
+                    STEP(7, 2054)
                     /* + STEP (8, 0)  */
                     + STEP(9, -374) + STEP(10, -134);
 #endif
@@ -95,9 +96,7 @@ static void Weighting_filter(register int16_t *e, /* signal [-5..0.39.44] IN  */
 		 */
 
         L_result = SASR_L(L_result, 13);
-        x[k] =
-            (L_result < MIN_WORD ? MIN_WORD
-                                 : (L_result > MAX_WORD ? MAX_WORD : L_result));
+        x[k] = (L_result < MIN_WORD ? MIN_WORD : (L_result > MAX_WORD ? MAX_WORD : L_result));
     }
 }
 
@@ -106,7 +105,7 @@ static void Weighting_filter(register int16_t *e, /* signal [-5..0.39.44] IN  */
 static void RPE_grid_selection(int16_t *x, /* [0..39]  IN  */
                                int16_t *xM, /* [0..12]  OUT */
                                int16_t *Mc_out /*          OUT */
-                               )
+)
 /*
  *  The signal x[0..39] is used to select the RPE grid which is
  *  represented by Mc.
@@ -122,7 +121,7 @@ static void RPE_grid_selection(int16_t *x, /* [0..39]  IN  */
     EM = 0;
     Mc = 0;
 
-/* for (m = 0 ; m <= 3 ; m++) {
+    /* for (m = 0 ; m <= 3 ; m++) {
 	 *	L_result = 0 ;
 	 *
 	 *
@@ -279,7 +278,7 @@ static void APCM_quantization(int16_t *xM, /* [0..12]      IN  */
                               int16_t *mant_out, /*              OUT */
                               int16_t *expon_out, /*              OUT */
                               int16_t *xmaxc_out /*              OUT */
-                              )
+)
 {
     int i, itest;
 
@@ -366,10 +365,9 @@ static void APCM_quantization(int16_t *xM, /* [0..12]      IN  */
 
 /* 4.2.16 */
 
-static void
-APCM_inverse_quantization(register int16_t *xMc, /* [0..12]          IN  */
-                          int16_t mant, int16_t expon,
-                          register int16_t *xMp) /* [0..12]          OUT */
+static void APCM_inverse_quantization(register int16_t *xMc, /* [0..12]          IN  */
+                                      int16_t mant, int16_t expon,
+                                      register int16_t *xMp) /* [0..12]          OUT */
 /*
  *  This part is for decoding the RPE sequence of coded xMc [0..12]
  *  samples to obtain the xMp[0..12] array.  Table 4.6 is used to get
@@ -402,11 +400,10 @@ APCM_inverse_quantization(register int16_t *xMc, /* [0..12]          IN  */
 
 /* 4.2.17 */
 
-static void
-RPE_grid_positioning(int16_t Mc, /* grid position    IN  */
-                     register int16_t *xMp, /* [0..12]          IN  */
-                     register int16_t *ep /* [0..39]          OUT */
-                     )
+static void RPE_grid_positioning(int16_t Mc, /* grid position    IN  */
+                                 register int16_t *xMp, /* [0..12]          IN  */
+                                 register int16_t *ep /* [0..39]          OUT */
+)
 /*
  *  This procedure computes the reconstructed long term residual signal
  *  ep[0..39] for the LTP analysis filter.  The inputs are the Mc
@@ -483,10 +480,9 @@ void Gsm_RPE_Encoding(int16_t *e, /* -5..-1][0..39][40..44    IN/OUT */
     RPE_grid_positioning(*Mc, xMp, e);
 }
 
-void Gsm_RPE_Decoding(int16_t xmaxcr, int16_t Mcr,
-                      int16_t *xMcr, /* [0..12], 3 bits    IN  */
+void Gsm_RPE_Decoding(int16_t xmaxcr, int16_t Mcr, int16_t *xMcr, /* [0..12], 3 bits    IN  */
                       int16_t *erp /* [0..39]            OUT */
-                      )
+)
 {
     int16_t expon, mant;
     int16_t xMp[13];

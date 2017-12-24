@@ -212,7 +212,7 @@ static void Fast_Autocorrelation(int16_t *s, /* [0..159] IN/OUT  */
 
 static void Reflection_coefficients(int32_t *L_ACF, /* 0...8    IN  */
                                     register int16_t *r /* 0...7    OUT */
-                                    )
+)
 {
     register int i, m, n;
     register int16_t temp;
@@ -286,9 +286,8 @@ static void Reflection_coefficients(int32_t *L_ACF, /* 0...8    IN  */
 
 /* 4.2.6 */
 
-static void
-Transformation_to_Log_Area_Ratios(register int16_t *r /* 0..7	   IN/OUT */
-                                  )
+static void Transformation_to_Log_Area_Ratios(register int16_t *r /* 0..7	   IN/OUT */
+)
 /*
  *  The following scaling for r [..] and LAR [..] has been used:
  *
@@ -331,13 +330,12 @@ Transformation_to_Log_Area_Ratios(register int16_t *r /* 0..7	   IN/OUT */
 
 /* 4.2.7 */
 
-static void
-Quantization_and_coding(register int16_t *LAR /* [0..7]	IN/OUT	*/
-                        )
+static void Quantization_and_coding(register int16_t *LAR /* [0..7]	IN/OUT	*/
+)
 {
     register int16_t temp;
 
-/*  This procedure needs four tables ; the following equations
+    /*  This procedure needs four tables ; the following equations
 	 *  give the optimum scaling for the constants:
 	 *
 	 *  A [0..7] = integer (real_A [0..7] * 1024)
@@ -347,19 +345,19 @@ Quantization_and_coding(register int16_t *LAR /* [0..7]	IN/OUT	*/
 	 */
 
 #undef STEP
-#define STEP(A, B, MAC, MIC)                                   \
-    \
-temp = GSM_MULT(A, *LAR);                                      \
-    \
-temp = GSM_ADD(temp, B);                                       \
-    \
-temp = GSM_ADD(temp, 256);                                     \
-    \
-temp = SASR_W(temp, 9);                                        \
-    \
-*LAR = temp > MAC ? MAC - MIC : (temp < MIC ? 0 : temp - MIC); \
-    \
-LAR++;
+#define STEP(A, B, MAC, MIC)                                       \
+                                                                   \
+    temp = GSM_MULT(A, *LAR);                                      \
+                                                                   \
+    temp = GSM_ADD(temp, B);                                       \
+                                                                   \
+    temp = GSM_ADD(temp, 256);                                     \
+                                                                   \
+    temp = SASR_W(temp, 9);                                        \
+                                                                   \
+    *LAR = temp > MAC ? MAC - MIC : (temp < MIC ? 0 : temp - MIC); \
+                                                                   \
+    LAR++;
 
     STEP(20480, 0, 31, -32);
     STEP(20480, 0, 31, -32);
@@ -374,8 +372,7 @@ LAR++;
 #undef STEP
 }
 
-void Gsm_LPC_Analysis(struct gsm_state *S,
-                      int16_t *s, /* 0..159 signals   IN/OUT */
+void Gsm_LPC_Analysis(struct gsm_state *S, int16_t *s, /* 0..159 signals   IN/OUT */
                       int16_t *LARc) /* 0..7   LARc's    OUT    */
 {
     int32_t L_ACF[9];

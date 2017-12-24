@@ -68,17 +68,14 @@ struct g72x_state;
 
 /* External function definitions. */
 
-struct g72x_state *g72x_reader_init(int codec, int *blocksize,
-                                    int *samplesperblock);
-struct g72x_state *g72x_writer_init(int codec, int *blocksize,
-                                    int *samplesperblock);
+struct g72x_state *g72x_reader_init(int codec, int *blocksize, int *samplesperblock);
+struct g72x_state *g72x_writer_init(int codec, int *blocksize, int *samplesperblock);
 /*
 **	Initialize the ADPCM state table for the given codec.
 **	Return 0 on success, 1 on fail.
 */
 
-int g72x_decode_block(struct g72x_state *pstate, const unsigned char *block,
-                      short *samples);
+int g72x_decode_block(struct g72x_state *pstate, const unsigned char *block, short *samples);
 /*
 **	The caller fills data->block with data->bytes bytes before calling the
 **	function. The value data->bytes must be an integer multiple of
@@ -86,8 +83,7 @@ int g72x_decode_block(struct g72x_state *pstate, const unsigned char *block,
 **	When it returns, the caller can read out data->samples samples.
 */
 
-int g72x_encode_block(struct g72x_state *pstate, short *samples,
-                      unsigned char *block);
+int g72x_encode_block(struct g72x_state *pstate, short *samples, unsigned char *block);
 /*
 **	The caller fills state->samples some integer multiple data->samples_per_block
 **	(up to G72x_BLOCK_SIZE) samples before calling the function.

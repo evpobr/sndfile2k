@@ -63,8 +63,8 @@ static inline int32_t ALWAYS_INLINE sign_of_int(int32_t i)
     return negishift | (i >> 31);
 }
 
-void pc_block(int32_t *in, int32_t *pc1, int32_t num, int16_t *coefs,
-              int32_t numactive, uint32_t chanbits, uint32_t denshift)
+void pc_block(int32_t *in, int32_t *pc1, int32_t num, int16_t *coefs, int32_t numactive,
+              uint32_t chanbits, uint32_t denshift)
 {
     register int16_t a0, a1, a2, a3;
     register int32_t b0, b1, b2, b3;
@@ -124,8 +124,7 @@ void pc_block(int32_t *in, int32_t *pc1, int32_t num, int16_t *coefs,
             b2 = top - pin[-2];
             b3 = top - pin[-3];
 
-            sum1 =
-                (denhalf - a0 * b0 - a1 * b1 - a2 * b2 - a3 * b3) >> denshift;
+            sum1 = (denhalf - a0 * b0 - a1 * b1 - a2 * b2 - a3 * b3) >> denshift;
 
             del = in[j] - top - sum1;
             del = arith_shift_left(del, chanshift) >> chanshift;
@@ -217,8 +216,8 @@ void pc_block(int32_t *in, int32_t *pc1, int32_t num, int16_t *coefs,
             b7 = top - (*pin);
             pin += 8;
 
-            sum1 = (denhalf - a0 * b0 - a1 * b1 - a2 * b2 - a3 * b3 - a4 * b4 -
-                    a5 * b5 - a6 * b6 - a7 * b7) >>
+            sum1 = (denhalf - a0 * b0 - a1 * b1 - a2 * b2 - a3 * b3 - a4 * b4 - a5 * b5 - a6 * b6 -
+                    a7 * b7) >>
                    denshift;
 
             del = in[j] - top - sum1;

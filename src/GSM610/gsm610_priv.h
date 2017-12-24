@@ -135,8 +135,7 @@ static inline int32_t GSM_L_ADD(int32_t a, int32_t b)
     if (a < 0 && b < 0)
     {
         utmp = (uint32_t) - ((a) + 1) + (uint32_t) - ((b) + 1);
-        return (utmp >= (uint32_t)MAX_LONGWORD) ? MIN_LONGWORD
-                                                : -(int32_t)utmp - 2;
+        return (utmp >= (uint32_t)MAX_LONGWORD) ? MIN_LONGWORD : -(int32_t)utmp - 2;
     };
 
     if (a > 0 && b > 0)
@@ -188,8 +187,7 @@ static inline int16_t GSM_ABS(int16_t a)
 /*
  *  More prototypes from implementations..
  */
-void Gsm_Coder(struct gsm_state *S,
-               int16_t *s, /* [0..159] samples                 IN  */
+void Gsm_Coder(struct gsm_state *S, int16_t *s, /* [0..159] samples                 IN  */
                int16_t *LARc, /* [0..7] LAR coefficients          OUT */
                int16_t *Nc, /* [0..3] LTP lag                   OUT */
                int16_t *bc, /* [0..3] coded LTP gain            OUT */
@@ -198,29 +196,24 @@ void Gsm_Coder(struct gsm_state *S,
                int16_t *xMc); /* [13*4] normalized RPE samples    OUT */
 
 void Gsm_Long_Term_Predictor(/* 4x for 160 samples */
-                             struct gsm_state *S,
-                             int16_t *d, /* [0..39]   residual signal    IN  */
+                             struct gsm_state *S, int16_t *d, /* [0..39]   residual signal    IN  */
                              int16_t *dp, /* [-120..-1] d'                IN  */
                              int16_t *e, /* [0..40]                      OUT */
-                             int16_t
-                                 *dpp, /* [0..40]                      OUT */
+                             int16_t *dpp, /* [0..40]                      OUT */
                              int16_t *Nc, /* correlation lag              OUT */
-                             int16_t
-                                 *bc); /* gain factor                  OUT */
+                             int16_t *bc); /* gain factor                  OUT */
 
-void Gsm_LPC_Analysis(struct gsm_state *S,
-                      int16_t *s, /* 0..159 signals   IN/OUT */
+void Gsm_LPC_Analysis(struct gsm_state *S, int16_t *s, /* 0..159 signals   IN/OUT */
                       int16_t *LARc); /* 0..7   LARc's    OUT    */
 
 void Gsm_Preprocess(struct gsm_state *S, int16_t *s, int16_t *so);
 
-void Gsm_Encoding(struct gsm_state *S, int16_t *e, int16_t *ep, int16_t *xmaxc,
-                  int16_t *Mc, int16_t *xMc);
+void Gsm_Encoding(struct gsm_state *S, int16_t *e, int16_t *ep, int16_t *xmaxc, int16_t *Mc,
+                  int16_t *xMc);
 
-void Gsm_Short_Term_Analysis_Filter(
-    struct gsm_state *S,
-    int16_t *LARc, /* coded log area ratio [0..7]  IN     */
-    int16_t *d); /* st res. signal [0..159]      IN/OUT */
+void Gsm_Short_Term_Analysis_Filter(struct gsm_state *S,
+                                    int16_t *LARc, /* coded log area ratio [0..7]  IN     */
+                                    int16_t *d); /* st res. signal [0..159]      IN/OUT */
 
 void Gsm_Decoder(struct gsm_state *S, int16_t *LARcr, /* [0..7]       IN  */
                  int16_t *Ncr, /* [0..3]       IN  */
@@ -234,15 +227,13 @@ void Gsm_Decoding(struct gsm_state *S, int16_t xmaxcr, int16_t Mcr,
                   int16_t *xMcr, /* [0..12]      IN  */
                   int16_t *erp); /* [0..39]      OUT */
 
-void Gsm_Long_Term_Synthesis_Filtering(
-    struct gsm_state *S, int16_t Ncr, int16_t bcr,
-    int16_t *erp, /* [0..39]    IN */
-    int16_t *drp); /* [-120..-1] IN, [0..40] OUT */
+void Gsm_Long_Term_Synthesis_Filtering(struct gsm_state *S, int16_t Ncr, int16_t bcr,
+                                       int16_t *erp, /* [0..39]    IN */
+                                       int16_t *drp); /* [-120..-1] IN, [0..40] OUT */
 
 void Gsm_RPE_Decoding(
     /*-struct gsm_state *S,-*/
-    int16_t xmaxcr, int16_t Mcr,
-    int16_t *xMcr, /* [0..12], 3 bits             IN      */
+    int16_t xmaxcr, int16_t Mcr, int16_t *xMcr, /* [0..12], 3 bits             IN      */
     int16_t *erp); /* [0..39]                     OUT     */
 
 void Gsm_RPE_Encoding(
@@ -252,15 +243,14 @@ void Gsm_RPE_Encoding(
     int16_t *Mc, /*                              OUT */
     int16_t *xMc); /* [0..12]                      OUT */
 
-void Gsm_Short_Term_Synthesis_Filter(
-    struct gsm_state *S, int16_t *LARcr, /* log area ratios [0..7]  IN  */
-    int16_t *drp, /* received d [0...39]     IN  */
-    int16_t *s); /* signal   s [0..159]     OUT */
+void Gsm_Short_Term_Synthesis_Filter(struct gsm_state *S,
+                                     int16_t *LARcr, /* log area ratios [0..7]  IN  */
+                                     int16_t *drp, /* received d [0...39]     IN  */
+                                     int16_t *s); /* signal   s [0..159]     OUT */
 
-void Gsm_Update_of_reconstructed_short_time_residual_signal(
-    int16_t *dpp, /* [0...39]    IN */
-    int16_t *ep, /* [0...39]	   IN */
-    int16_t *dp); /* [-120...-1] IN/OUT */
+void Gsm_Update_of_reconstructed_short_time_residual_signal(int16_t *dpp, /* [0...39]    IN */
+                                                            int16_t *ep, /* [0...39]	   IN */
+                                                            int16_t *dp); /* [-120...-1] IN/OUT */
 
 /*
  * Tables from table.c

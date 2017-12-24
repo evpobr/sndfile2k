@@ -63,22 +63,17 @@
 
 #define RIFF_DOWNGRADE_BYTES ((sf_count_t)0xffffffff)
 
-static int rf64_read_header(SF_PRIVATE *psf, int *blockalign,
-                            int *framesperblock);
+static int rf64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock);
 static int rf64_write_header(SF_PRIVATE *psf, int calc_length);
 static int rf64_write_tailer(SF_PRIVATE *psf);
 static int rf64_close(SF_PRIVATE *psf);
-static size_t rf64_command(SF_PRIVATE *psf, int command, void *UNUSED(data),
-                           size_t datasize);
+static size_t rf64_command(SF_PRIVATE *psf, int command, void *UNUSED(data), size_t datasize);
 
 static int rf64_set_chunk(SF_PRIVATE *psf, const SF_CHUNK_INFO *chunk_info);
-static SF_CHUNK_ITERATOR *rf64_next_chunk_iterator(SF_PRIVATE *psf,
-                                                   SF_CHUNK_ITERATOR *iterator);
-static int rf64_get_chunk_size(SF_PRIVATE *psf,
-                               const SF_CHUNK_ITERATOR *iterator,
+static SF_CHUNK_ITERATOR *rf64_next_chunk_iterator(SF_PRIVATE *psf, SF_CHUNK_ITERATOR *iterator);
+static int rf64_get_chunk_size(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
                                SF_CHUNK_INFO *chunk_info);
-static int rf64_get_chunk_data(SF_PRIVATE *psf,
-                               const SF_CHUNK_ITERATOR *iterator,
+static int rf64_get_chunk_data(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
                                SF_CHUNK_INFO *chunk_info);
 
 int rf64_open(SF_PRIVATE *psf)
@@ -97,8 +92,7 @@ int rf64_open(SF_PRIVATE *psf)
 
     psf->strings.flags = SF_STR_ALLOW_START | SF_STR_ALLOW_END;
 
-    if (psf->file.mode == SFM_READ ||
-        (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = rf64_read_header(psf, &blockalign, &framesperblock)) != 0)
             return error;
@@ -177,8 +171,7 @@ enum
 
 #define HAVE_CHUNK(CHUNK) ((parsestage & CHUNK) != 0)
 
-static int rf64_read_header(SF_PRIVATE *psf, int *blockalign,
-                            int *framesperblock)
+static int rf64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 {
     WAVLIKE_PRIVATE *wpriv;
     WAV_FMT *wav_fmt;
@@ -198,8 +191,7 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign,
     if (marks[0] == FFFF_MARKER)
         psf_log_printf(psf, "%M\n  %M\n", RF64_MARKER, WAVE_MARKER);
     else
-        psf_log_printf(psf, "%M : 0x%x (should be 0xFFFFFFFF)\n  %M\n",
-                       RF64_MARKER, WAVE_MARKER);
+        psf_log_printf(psf, "%M : 0x%x (should be 0xFFFFFFFF)\n  %M\n", RF64_MARKER, WAVE_MARKER);
 
     while (!done)
     {
@@ -209,13 +201,11 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign,
         if (marker == 0)
         {
             sf_count_t pos = psf_ftell(psf);
-            psf_log_printf(psf, "Have 0 marker at position %D (0x%x).\n", pos,
-                           pos);
+            psf_log_printf(psf, "Have 0 marker at position %D (0x%x).\n", pos, pos);
             break;
         };
 
-        psf_store_read_chunk_u32(&psf->rchunks, marker, psf_ftell(psf),
-                                 chunk_size);
+        psf_store_read_chunk_u32(&psf->rchunks, marker, psf_ftell(psf), chunk_size);
 
         switch (marker)
         {
@@ -230,8 +220,8 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign,
                 unsigned int table_len, bytesread;
 
                 /* Read ds64 sizes (3 8-byte words). */
-                bytesread = psf_binheader_readf(psf, "888", &riff_size,
-                                                &ds64_datalength, &frame_count);
+                bytesread =
+                    psf_binheader_readf(psf, "888", &riff_size, &ds64_datalength, &frame_count);
 
                 /* Read table length. */
                 bytesread += psf_binheader_readf(psf, "4", &table_len);
@@ -248,21 +238,20 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign,
                     psf_binheader_readf(psf, "m", &next);
                     if (next == fmt_MARKER)
                     {
-                        psf_log_printf(psf, "%M : %u (should be %u)\n", marker,
-                                       chunk_size, bytesread);
+                        psf_log_printf(psf, "%M : %u (should be %u)\n", marker, chunk_size,
+                                       bytesread);
                         psf_binheader_readf(psf, "j", -4);
                     }
                     else
                     {
                         psf_log_printf(psf, "%M : %u\n", marker, chunk_size);
-                        psf_binheader_readf(psf, "j",
-                                            chunk_size - bytesread - 4);
+                        psf_binheader_readf(psf, "j", chunk_size - bytesread - 4);
                     };
                 };
 
                 if (psf->filelength != riff_size + 8)
-                    psf_log_printf(psf, "  Riff size : %D (should be %D)\n",
-                                   riff_size, psf->filelength - 8);
+                    psf_log_printf(psf, "  Riff size : %D (should be %D)\n", riff_size,
+                                   psf->filelength - 8);
                 else
                     psf_log_printf(psf, "  Riff size : %D\n", riff_size);
 
@@ -322,8 +311,7 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign,
                 if (chunk_size == 0xffffffff)
                     psf_log_printf(psf, "%M : 0x%x\n", marker, chunk_size);
                 else
-                    psf_log_printf(psf, "%M : 0x%x (should be 0xffffffff\n",
-                                   marker, chunk_size);
+                    psf_log_printf(psf, "%M : 0x%x (should be 0xffffffff\n", marker, chunk_size);
                 psf->datalength = ds64_datalength;
             }
             else
@@ -331,15 +319,14 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign,
                 if (chunk_size == 0xffffffff)
                 {
                     psf_log_printf(psf, "%M : 0x%x\n", marker, chunk_size);
-                    psf_log_printf(
-                        psf,
-                        "  *** Data length not specified no 'ds64' chunk.\n");
+                    psf_log_printf(psf, "  *** Data length not specified no 'ds64' chunk.\n");
                 }
                 else
                 {
-                    psf_log_printf(psf, "%M : 0x%x\n**** Weird, RF64 file "
-                                        "without a 'ds64' chunk and no valid "
-                                        "'data' size.\n",
+                    psf_log_printf(psf,
+                                   "%M : 0x%x\n**** Weird, RF64 file "
+                                   "without a 'ds64' chunk and no valid "
+                                   "'data' size.\n",
                                    marker, chunk_size);
                     psf->datalength = chunk_size;
                 };
@@ -380,33 +367,31 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign,
         default:
             if (chunk_size >= 0xffff0000)
             {
-                psf_log_printf(psf, "*** Unknown chunk marker (%X) at position "
-                                    "%D with length %u. Exiting parser.\n",
+                psf_log_printf(psf,
+                               "*** Unknown chunk marker (%X) at position "
+                               "%D with length %u. Exiting parser.\n",
                                marker, psf_ftell(psf) - 8, chunk_size);
                 done = SF_TRUE;
                 break;
             };
 
-            if (isprint((marker >> 24) & 0xFF) &&
-                isprint((marker >> 16) & 0xFF) &&
+            if (isprint((marker >> 24) & 0xFF) && isprint((marker >> 16) & 0xFF) &&
                 isprint((marker >> 8) & 0xFF) && isprint(marker & 0xFF))
             {
-                psf_log_printf(psf, "*** %M : %d (unknown marker)\n", marker,
-                               chunk_size);
+                psf_log_printf(psf, "*** %M : %d (unknown marker)\n", marker, chunk_size);
                 psf_binheader_readf(psf, "j", chunk_size);
                 break;
             };
             if (psf_ftell(psf) & 0x03)
             {
-                psf_log_printf(
-                    psf,
-                    "  Unknown chunk marker at position 0x%x. Resynching.\n",
-                    chunk_size - 4);
+                psf_log_printf(psf, "  Unknown chunk marker at position 0x%x. Resynching.\n",
+                               chunk_size - 4);
                 psf_binheader_readf(psf, "j", -3);
                 break;
             };
-            psf_log_printf(psf, "*** Unknown chunk marker (0x%X) at position "
-                                "0x%X. Exiting parser.\n",
+            psf_log_printf(psf,
+                           "*** Unknown chunk marker (0x%X) at position "
+                           "0x%X. Exiting parser.\n",
                            marker, psf_ftell(psf) - 4);
             done = SF_TRUE;
             break;
@@ -418,9 +403,8 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign,
 		 */
         if (marker != data_MARKER && chunk_size >= psf->filelength)
         {
-            psf_log_printf(
-                psf, "*** Chunk size %u > file length %D. Exiting parser.\n",
-                chunk_size, psf->filelength);
+            psf_log_printf(psf, "*** Chunk size %u > file length %D. Exiting parser.\n", chunk_size,
+                           psf->filelength);
             break;
         };
 
@@ -462,15 +446,15 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign,
     if (psf->blockwidth)
     {
         if (psf->filelength - psf->dataoffset < psf->datalength)
-            psf->sf.frames =
-                (psf->filelength - psf->dataoffset) / psf->blockwidth;
+            psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth;
         else
             psf->sf.frames = psf->datalength / psf->blockwidth;
     };
 
     if (frame_count != psf->sf.frames)
-        psf_log_printf(psf, "*** Calculated frame count %d does not match "
-                            "value from 'ds64' chunk of %d.\n",
+        psf_log_printf(psf,
+                       "*** Calculated frame count %d does not match "
+                       "value from 'ds64' chunk of %d.\n",
                        psf->sf.frames, frame_count);
 
     switch (format)
@@ -478,8 +462,7 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign,
     case WAVE_FORMAT_EXTENSIBLE:
 
         /* with WAVE_FORMAT_EXTENSIBLE the psf->sf.format field is already set. We just have to set the major to rf64 */
-        psf->sf.format =
-            (psf->sf.format & ~SF_FORMAT_TYPEMASK) | SF_FORMAT_RF64;
+        psf->sf.format = (psf->sf.format & ~SF_FORMAT_TYPEMASK) | SF_FORMAT_RF64;
 
         if (psf->sf.format == (SF_FORMAT_WAVEX | SF_FORMAT_MS_ADPCM))
         {
@@ -489,8 +472,7 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign,
         break;
 
     case WAVE_FORMAT_PCM:
-        psf->sf.format =
-            SF_FORMAT_RF64 | u_bitwidth_to_subformat(psf->bytewidth * 8);
+        psf->sf.format = SF_FORMAT_RF64 | u_bitwidth_to_subformat(psf->bytewidth * 8);
         break;
 
     case WAVE_FORMAT_MULAW:
@@ -521,8 +503,7 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign,
 
     case WAVE_FORMAT_IEEE_FLOAT:
         psf->sf.format = SF_FORMAT_RF64;
-        psf->sf.format |=
-            (psf->bytewidth == 8) ? SF_FORMAT_DOUBLE : SF_FORMAT_FLOAT;
+        psf->sf.format |= (psf->bytewidth == 8) ? SF_FORMAT_DOUBLE : SF_FORMAT_FLOAT;
         break;
 
     case WAVE_FORMAT_G721_ADPCM:
@@ -545,10 +526,7 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign,
 
 /*  known WAVEFORMATEXTENSIBLE GUIDS  */
 static const EXT_SUBFORMAT MSGUID_SUBTYPE_PCM = {
-    0x00000001,
-    0x0000,
-    0x0010,
-    {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+    0x00000001, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 
 #if 0
 static const EXT_SUBFORMAT MSGUID_SUBTYPE_MS_ADPCM =
@@ -558,38 +536,23 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_MS_ADPCM =
 #endif
 
 static const EXT_SUBFORMAT MSGUID_SUBTYPE_IEEE_FLOAT = {
-    0x00000003,
-    0x0000,
-    0x0010,
-    {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+    0x00000003, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 
 static const EXT_SUBFORMAT MSGUID_SUBTYPE_ALAW = {
-    0x00000006,
-    0x0000,
-    0x0010,
-    {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+    0x00000006, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 
 static const EXT_SUBFORMAT MSGUID_SUBTYPE_MULAW = {
-    0x00000007,
-    0x0000,
-    0x0010,
-    {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+    0x00000007, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 
 /*
  * the next two are from
  * http://dream.cs.bath.ac.uk/researchdev/wave-ex/bformat.html
  */
 static const EXT_SUBFORMAT MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM = {
-    0x00000001,
-    0x0721,
-    0x11d3,
-    {0x86, 0x44, 0xC8, 0xC1, 0xCA, 0x00, 0x00, 0x00}};
+    0x00000001, 0x0721, 0x11d3, {0x86, 0x44, 0xC8, 0xC1, 0xCA, 0x00, 0x00, 0x00}};
 
 static const EXT_SUBFORMAT MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT = {
-    0x00000003,
-    0x0721,
-    0x11d3,
-    {0x86, 0x44, 0xC8, 0xC1, 0xCA, 0x00, 0x00, 0x00}};
+    0x00000003, 0x0721, 0x11d3, {0x86, 0x44, 0xC8, 0xC1, 0xCA, 0x00, 0x00, 0x00}};
 
 static int rf64_write_fmt_chunk(SF_PRIVATE *psf)
 {
@@ -615,12 +578,11 @@ static int rf64_write_fmt_chunk(SF_PRIVATE *psf)
         fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 + 4 + 4 + 2 + 2 + 8;
 
         /* fmt : format, channels, samplerate */
-        psf_binheader_writef(psf, "4224", BHW4(fmt_size),
-                             BHW2(WAVE_FORMAT_EXTENSIBLE),
+        psf_binheader_writef(psf, "4224", BHW4(fmt_size), BHW2(WAVE_FORMAT_EXTENSIBLE),
                              BHW2(psf->sf.channels), BHW4(psf->sf.samplerate));
         /*  fmt : bytespersec */
-        psf_binheader_writef(psf, "4", BHW4(psf->sf.samplerate *
-                                            psf->bytewidth * psf->sf.channels));
+        psf_binheader_writef(psf, "4",
+                             BHW4(psf->sf.samplerate * psf->bytewidth * psf->sf.channels));
         /*  fmt : blockalign, bitwidth */
         psf_binheader_writef(psf, "22", BHW2(psf->bytewidth * psf->sf.channels),
                              BHW2(psf->bytewidth * 8));
@@ -664,13 +626,12 @@ static int rf64_write_fmt_chunk(SF_PRIVATE *psf)
                 break;
 
             case 6: /* 5.1 */
-                psf_binheader_writef(psf, "4",
-                                     BHW4(0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20));
+                psf_binheader_writef(psf, "4", BHW4(0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20));
                 break;
 
             case 8: /* 7.1 */
-                psf_binheader_writef(psf, "4", BHW4(0x1 | 0x2 | 0x4 | 0x8 |
-                                                    0x10 | 0x20 | 0x40 | 0x80));
+                psf_binheader_writef(psf, "4",
+                                     BHW4(0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20 | 0x40 | 0x80));
                 break;
 
             default: /* 0 when in doubt , use direct out, ie NO mapping*/
@@ -693,18 +654,16 @@ static int rf64_write_fmt_chunk(SF_PRIVATE *psf)
     case SF_FORMAT_PCM_16:
     case SF_FORMAT_PCM_24:
     case SF_FORMAT_PCM_32:
-        wavlike_write_guid(psf,
-                           wpriv->wavex_ambisonic == SF_AMBISONIC_NONE
-                               ? &MSGUID_SUBTYPE_PCM
-                               : &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM);
+        wavlike_write_guid(psf, wpriv->wavex_ambisonic == SF_AMBISONIC_NONE
+                                    ? &MSGUID_SUBTYPE_PCM
+                                    : &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM);
         break;
 
     case SF_FORMAT_FLOAT:
     case SF_FORMAT_DOUBLE:
-        wavlike_write_guid(psf,
-                           wpriv->wavex_ambisonic == SF_AMBISONIC_NONE
-                               ? &MSGUID_SUBTYPE_IEEE_FLOAT
-                               : &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT);
+        wavlike_write_guid(psf, wpriv->wavex_ambisonic == SF_AMBISONIC_NONE
+                                    ? &MSGUID_SUBTYPE_IEEE_FLOAT
+                                    : &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT);
         break;
 
     case SF_FORMAT_ULAW:
@@ -745,8 +704,7 @@ static int rf64_write_header(SF_PRIVATE *psf, int calc_length)
             psf->datalength -= psf->filelength - psf->dataend;
 
         if (psf->bytewidth > 0)
-            psf->sf.frames =
-                psf->datalength / (psf->bytewidth * psf->sf.channels);
+            psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels);
     };
 
     /* Reset the current header length to zero. */
@@ -756,21 +714,18 @@ static int rf64_write_header(SF_PRIVATE *psf, int calc_length)
 
     if (wpriv->rf64_downgrade && psf->filelength < RIFF_DOWNGRADE_BYTES)
     {
-        psf_binheader_writef(
-            psf, "etm8m", BHWm(RIFF_MARKER),
-            BHW8((psf->filelength < 8) ? 8 : psf->filelength - 8),
-            BHWm(WAVE_MARKER));
+        psf_binheader_writef(psf, "etm8m", BHWm(RIFF_MARKER),
+                             BHW8((psf->filelength < 8) ? 8 : psf->filelength - 8),
+                             BHWm(WAVE_MARKER));
         psf_binheader_writef(psf, "m4z", BHWm(JUNK_MARKER), BHW4(24), BHWz(24));
         add_fact_chunk = 1;
     }
     else
     {
-        psf_binheader_writef(psf, "em4m", BHWm(RF64_MARKER), BHW4(0xffffffff),
-                             BHWm(WAVE_MARKER));
+        psf_binheader_writef(psf, "em4m", BHWm(RF64_MARKER), BHW4(0xffffffff), BHWm(WAVE_MARKER));
         /* Currently no table. */
-        psf_binheader_writef(psf, "m48884", BHWm(ds64_MARKER), BHW4(28),
-                             BHW8(psf->filelength - 8), BHW8(psf->datalength),
-                             BHW8(psf->sf.frames), BHW4(0));
+        psf_binheader_writef(psf, "m48884", BHWm(ds64_MARKER), BHW4(28), BHW8(psf->filelength - 8),
+                             BHW8(psf->datalength), BHW8(psf->sf.frames), BHW4(0));
     };
 
     /* WAVE and 'fmt ' markers. */
@@ -789,8 +744,7 @@ static int rf64_write_header(SF_PRIVATE *psf, int calc_length)
         if ((error = rf64_write_fmt_chunk(psf)) != 0)
             return error;
         if (add_fact_chunk)
-            psf_binheader_writef(psf, "tm48", BHWm(fact_MARKER), BHW4(4),
-                                 BHW8(psf->sf.frames));
+            psf_binheader_writef(psf, "tm48", BHWm(fact_MARKER), BHW4(4), BHW8(psf->sf.frames));
         break;
 
     default:
@@ -852,12 +806,11 @@ static int rf64_write_header(SF_PRIVATE *psf, int calc_length)
     /* Padding may be needed if string data sizes change. */
     pad_size = psf->dataoffset - 16 - psf->header.indx;
     if (pad_size >= 0)
-        psf_binheader_writef(psf, "m4z", BHWm(PAD_MARKER),
-                             BHW4((unsigned int)pad_size), BHWz(pad_size));
+        psf_binheader_writef(psf, "m4z", BHWm(PAD_MARKER), BHW4((unsigned int)pad_size),
+                             BHWz(pad_size));
 
     if (wpriv->rf64_downgrade && (psf->filelength < RIFF_DOWNGRADE_BYTES))
-        psf_binheader_writef(psf, "tm8", BHWm(data_MARKER),
-                             BHW8(psf->datalength));
+        psf_binheader_writef(psf, "tm8", BHWm(data_MARKER), BHW8(psf->datalength));
     else
         psf_binheader_writef(psf, "m4", BHWm(data_MARKER), BHW4(0xffffffff));
 
@@ -867,8 +820,7 @@ static int rf64_write_header(SF_PRIVATE *psf, int calc_length)
 
     if (has_data && psf->dataoffset != psf->header.indx)
     {
-        psf_log_printf(
-            psf, "Oooops : has_data && psf->dataoffset != psf->header.indx\n");
+        psf_log_printf(psf, "Oooops : has_data && psf->dataoffset != psf->header.indx\n");
         return psf->error = SFE_INTERNAL;
     };
 
@@ -923,8 +875,7 @@ static int rf64_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static size_t rf64_command(SF_PRIVATE *psf, int command, void *UNUSED(data),
-                           size_t datasize)
+static size_t rf64_command(SF_PRIVATE *psf, int command, void *UNUSED(data), size_t datasize)
 {
     WAVLIKE_PRIVATE *wpriv;
 
@@ -949,8 +900,7 @@ static size_t rf64_command(SF_PRIVATE *psf, int command, void *UNUSED(data),
         return wpriv->wavex_ambisonic;
 
     case SFC_SET_CHANNEL_MAP_INFO:
-        wpriv->wavex_channelmask =
-            wavlike_gen_channel_mask(psf->channel_map, psf->sf.channels);
+        wpriv->wavex_channelmask = wavlike_gen_channel_mask(psf->channel_map, psf->sf.channels);
         return (wpriv->wavex_channelmask != 0);
 
     case SFC_RF64_AUTO_DOWNGRADE:
@@ -970,14 +920,12 @@ static int rf64_set_chunk(SF_PRIVATE *psf, const SF_CHUNK_INFO *chunk_info)
     return psf_save_write_chunk(&psf->wchunks, chunk_info);
 }
 
-static SF_CHUNK_ITERATOR *rf64_next_chunk_iterator(SF_PRIVATE *psf,
-                                                   SF_CHUNK_ITERATOR *iterator)
+static SF_CHUNK_ITERATOR *rf64_next_chunk_iterator(SF_PRIVATE *psf, SF_CHUNK_ITERATOR *iterator)
 {
     return psf_next_chunk_iterator(&psf->rchunks, iterator);
 }
 
-static int rf64_get_chunk_size(SF_PRIVATE *psf,
-                               const SF_CHUNK_ITERATOR *iterator,
+static int rf64_get_chunk_size(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
                                SF_CHUNK_INFO *chunk_info)
 {
     int indx;
@@ -990,8 +938,7 @@ static int rf64_get_chunk_size(SF_PRIVATE *psf,
     return SFE_NO_ERROR;
 }
 
-static int rf64_get_chunk_data(SF_PRIVATE *psf,
-                               const SF_CHUNK_ITERATOR *iterator,
+static int rf64_get_chunk_data(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
                                SF_CHUNK_INFO *chunk_info)
 {
     int indx;
@@ -1009,9 +956,7 @@ static int rf64_get_chunk_data(SF_PRIVATE *psf,
 
     pos = psf_ftell(psf);
     psf_fseek(psf, psf->rchunks.chunks[indx].offset, SEEK_SET);
-    psf_fread(chunk_info->data,
-              SF_MIN(chunk_info->datalen, psf->rchunks.chunks[indx].len), 1,
-              psf);
+    psf_fread(chunk_info->data, SF_MIN(chunk_info->datalen, psf->rchunks.chunks[indx].len), 1, psf);
     psf_fseek(psf, pos, SEEK_SET);
 
     return SFE_NO_ERROR;

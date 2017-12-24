@@ -46,8 +46,7 @@ int wve_open(SF_PRIVATE *psf)
     if (psf->is_pipe)
         return SFE_WVE_NO_PIPE;
 
-    if (psf->file.mode == SFM_READ ||
-        (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = wve_read_header(psf)))
             return error;
@@ -118,22 +117,19 @@ static int wve_read_header(SF_PRIVATE *psf)
                         "  Encoding    : A-law\n");
 
     if (version != PSION_VERSION)
-        psf_log_printf(psf, "Psion version %d should be %d\n", version,
-                       PSION_VERSION);
+        psf_log_printf(psf, "Psion version %d should be %d\n", version, PSION_VERSION);
 
     psf_binheader_readf(psf, "E4", &datalength);
     psf->dataoffset = PSION_DATAOFFSET;
     if (datalength != psf->filelength - psf->dataoffset)
     {
         psf->datalength = psf->filelength - psf->dataoffset;
-        psf_log_printf(psf, "Data length %d should be %D\n", datalength,
-                       psf->datalength);
+        psf_log_printf(psf, "Data length %d should be %D\n", datalength, psf->datalength);
     }
     else
         psf->datalength = datalength;
 
-    psf_binheader_readf(psf, "E22222", &padding, &repeats, &trash, &trash,
-                        &trash);
+    psf_binheader_readf(psf, "E22222", &padding, &repeats, &trash, &trash, &trash);
 
     psf->sf.format = SF_FORMAT_WVE | SF_FORMAT_ALAW;
     psf->sf.samplerate = 8000;
@@ -168,10 +164,10 @@ static int wve_write_header(SF_PRIVATE *psf, int calc_length)
 
     /* Write header. */
     datalen = psf->datalength;
-    psf_binheader_writef(psf, "Emmmm", BHWm(ALAW_MARKER), BHWm(SOUN_MARKER),
-                         BHWm(DFIL_MARKER), BHWm(ESSN_MARKER));
-    psf_binheader_writef(psf, "E2422222", BHW2(PSION_VERSION), BHW4(datalen),
-                         BHW2(0), BHW2(0), BHW2(0), BHW2(0), BHW2(0));
+    psf_binheader_writef(psf, "Emmmm", BHWm(ALAW_MARKER), BHWm(SOUN_MARKER), BHWm(DFIL_MARKER),
+                         BHWm(ESSN_MARKER));
+    psf_binheader_writef(psf, "E2422222", BHW2(PSION_VERSION), BHW4(datalen), BHW2(0), BHW2(0),
+                         BHW2(0), BHW2(0), BHW2(0));
     psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
 
     if (psf->sf.channels != 1)

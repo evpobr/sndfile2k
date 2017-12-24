@@ -60,20 +60,17 @@ static int psf_bump_header_allocation(SF_PRIVATE *psf, sf_count_t needed)
     size_t newlen, smallest = INITIAL_HEADER_SIZE;
     void *ptr;
 
-    newlen = (needed > psf->header.len) ? 2 * SF_MAX(needed, smallest)
-                                        : 2 * psf->header.len;
+    newlen = (needed > psf->header.len) ? 2 * SF_MAX(needed, smallest) : 2 * psf->header.len;
 
     if (newlen > 100 * 1024)
     {
-        psf_log_printf(psf, "Request for header allocation of %D denied.\n",
-                       newlen);
+        psf_log_printf(psf, "Request for header allocation of %D denied.\n", newlen);
         return 1;
     }
 
     if ((ptr = realloc(psf->header.ptr, newlen)) == NULL)
     {
-        psf_log_printf(psf, "realloc (%p, %z) failed\n", psf->header.ptr,
-                       newlen);
+        psf_log_printf(psf, "realloc (%p, %z) failed\n", psf->header.ptr, newlen);
         psf->error = SFE_MALLOC_FAILED;
         return 1;
     };
@@ -176,8 +173,7 @@ void psf_log_printf(SF_PRIVATE *psf, const char *format, ...)
             if (strptr == NULL)
                 break;
             slen = strlen(strptr);
-            width_specifier =
-                width_specifier >= slen ? width_specifier - slen : 0;
+            width_specifier = width_specifier >= slen ? width_specifier - slen : 0;
             if (left_align == SF_FALSE)
                 while (width_specifier-- > 0)
                     log_putchar(psf, ' ');
@@ -597,8 +593,7 @@ int psf_binheader_writef(SF_PRIVATE *psf, const char *format, ...)
 
     while ((c = *format++))
     {
-        if (psf->header.indx + 16 >= psf->header.len &&
-            psf_bump_header_allocation(psf, 16))
+        if (psf->header.indx + 16 >= psf->header.len && psf_bump_header_allocation(psf, 16))
             return count;
 
         switch (c)
@@ -680,8 +675,7 @@ int psf_binheader_writef(SF_PRIVATE *psf, const char *format, ...)
                 header_put_be_8byte(psf, countdata);
                 count += 8;
             }
-            else if (psf->rwf_endian == SF_ENDIAN_LITTLE &&
-                     trunc_8to4 == SF_FALSE)
+            else if (psf->rwf_endian == SF_ENDIAN_LITTLE && trunc_8to4 == SF_FALSE)
             {
                 header_put_le_8byte(psf, countdata);
                 count += 8;
@@ -692,8 +686,7 @@ int psf_binheader_writef(SF_PRIVATE *psf, const char *format, ...)
                 header_put_be_int(psf, longdata);
                 count += 4;
             }
-            else if (psf->rwf_endian == SF_ENDIAN_LITTLE &&
-                     trunc_8to4 == SF_TRUE)
+            else if (psf->rwf_endian == SF_ENDIAN_LITTLE && trunc_8to4 == SF_TRUE)
             {
                 longdata = countdata & 0xFFFFFFFF;
                 header_put_le_int(psf, longdata);
@@ -715,11 +708,9 @@ int psf_binheader_writef(SF_PRIVATE *psf, const char *format, ...)
         case 'd':
             doubledata = va_arg(argptr, double);
             if (psf->rwf_endian == SF_ENDIAN_BIG)
-                double64_be_write(doubledata,
-                                  psf->header.ptr + psf->header.indx);
+                double64_be_write(doubledata, psf->header.ptr + psf->header.indx);
             else
-                double64_le_write(doubledata,
-                                  psf->header.ptr + psf->header.indx);
+                double64_le_write(doubledata, psf->header.ptr + psf->header.indx);
             psf->header.indx += 8;
             count += 8;
             break;
@@ -729,8 +720,7 @@ int psf_binheader_writef(SF_PRIVATE *psf, const char *format, ...)
             strptr = va_arg(argptr, char *);
             size = strlen(strptr) + 1;
 
-            if (psf->header.indx + 4 + (sf_count_t)size +
-                        (sf_count_t)(size & 1) >
+            if (psf->header.indx + 4 + (sf_count_t)size + (sf_count_t)(size & 1) >
                     psf->header.len &&
                 psf_bump_header_allocation(psf, 4 + size + (size & 1)))
                 return count;
@@ -753,8 +743,7 @@ int psf_binheader_writef(SF_PRIVATE *psf, const char *format, ...)
 			*/
             strptr = va_arg(argptr, char *);
             size = strlen(strptr);
-            if (psf->header.indx + 4 + (sf_count_t)size +
-                        (sf_count_t)(size & 1) >
+            if (psf->header.indx + 4 + (sf_count_t)size + (sf_count_t)(size & 1) >
                     psf->header.len &&
                 psf_bump_header_allocation(psf, 4 + size + (size & 1)))
                 return count;
@@ -762,8 +751,7 @@ int psf_binheader_writef(SF_PRIVATE *psf, const char *format, ...)
                 header_put_be_int(psf, size);
             else
                 header_put_le_int(psf, size);
-            memcpy(&(psf->header.ptr[psf->header.indx]), strptr,
-                   size + (size & 1));
+            memcpy(&(psf->header.ptr[psf->header.indx]), strptr, size + (size & 1));
             size += (size & 1);
             psf->header.indx += size;
             count += 4 + size;
@@ -837,8 +825,7 @@ int psf_binheader_writef(SF_PRIVATE *psf, const char *format, ...)
         case 'o': /* Jump to specified offset. */
             size = va_arg(argptr, size_t);
 
-            if ((sf_count_t)size >= psf->header.len &&
-                psf_bump_header_allocation(psf, size))
+            if ((sf_count_t)size >= psf->header.len && psf_bump_header_allocation(psf, size))
                 return count;
 
             psf->header.indx = size;
@@ -867,14 +854,12 @@ int psf_binheader_writef(SF_PRIVATE *psf, const char *format, ...)
 */
 
 #if (CPU_IS_BIG_ENDIAN == 1)
-#define GET_MARKER(ptr)                                                  \
-    ((((uint32_t)(ptr)[0]) << 24) | ((ptr)[1] << 16) | ((ptr)[2] << 8) | \
-     ((ptr)[3]))
+#define GET_MARKER(ptr) \
+    ((((uint32_t)(ptr)[0]) << 24) | ((ptr)[1] << 16) | ((ptr)[2] << 8) | ((ptr)[3]))
 
 #elif (CPU_IS_LITTLE_ENDIAN == 1)
-#define GET_MARKER(ptr)                                \
-    (((ptr)[0]) | ((ptr)[1] << 8) | ((ptr)[2] << 16) | \
-     (((uint32_t)(ptr)[3]) << 24))
+#define GET_MARKER(ptr) \
+    (((ptr)[0]) | ((ptr)[1] << 8) | ((ptr)[2] << 16) | (((uint32_t)(ptr)[3]) << 24))
 
 #else
 #error "Cannot determine endian-ness of processor."
@@ -886,11 +871,9 @@ int psf_binheader_writef(SF_PRIVATE *psf, const char *format, ...)
 #define GET_LE_3BYTE(ptr) (((ptr)[2] << 16) | ((ptr)[1] << 8) | ((ptr)[0]))
 #define GET_BE_3BYTE(ptr) (((ptr)[0] << 16) | ((ptr)[1] << 8) | ((ptr)[2]))
 
-#define GET_LE_INT(ptr) \
-    (((ptr)[3] << 24) | ((ptr)[2] << 16) | ((ptr)[1] << 8) | ((ptr)[0]))
+#define GET_LE_INT(ptr) (((ptr)[3] << 24) | ((ptr)[2] << 16) | ((ptr)[1] << 8) | ((ptr)[0]))
 
-#define GET_BE_INT(ptr) \
-    (((ptr)[0] << 24) | ((ptr)[1] << 16) | ((ptr)[2] << 8) | ((ptr)[3]))
+#define GET_BE_INT(ptr) (((ptr)[0] << 24) | ((ptr)[1] << 16) | ((ptr)[2] << 8) | ((ptr)[3]))
 
 #define GET_LE_8BYTE(ptr)                                              \
     ((((sf_count_t)(ptr)[7]) << 56) | (((sf_count_t)(ptr)[6]) << 48) | \
@@ -908,8 +891,7 @@ static size_t header_read(SF_PRIVATE *psf, void *ptr, size_t bytes)
 {
     size_t count = 0;
 
-    if (psf->header.indx + bytes >= psf->header.len &&
-        psf_bump_header_allocation(psf, bytes))
+    if (psf->header.indx + bytes >= psf->header.len && psf_bump_header_allocation(psf, bytes))
         return count;
 
     if (psf->header.indx + bytes > psf->header.end)
@@ -944,8 +926,8 @@ static void header_seek(SF_PRIVATE *psf, sf_count_t position, int whence)
             return;
         };
         if (position > psf->header.end)
-            psf->header.end += psf_fread(psf->header.ptr + psf->header.end, 1,
-                                         position - psf->header.end, psf);
+            psf->header.end +=
+                psf_fread(psf->header.ptr + psf->header.end, 1, position - psf->header.end, psf);
         psf->header.indx = position;
         break;
 
@@ -976,9 +958,8 @@ static void header_seek(SF_PRIVATE *psf, sf_count_t position, int whence)
             break;
         };
 
-        psf->header.end +=
-            psf_fread(psf->header.ptr + psf->header.end, 1,
-                      position - (psf->header.end - psf->header.indx), psf);
+        psf->header.end += psf_fread(psf->header.ptr + psf->header.end, 1,
+                                     position - (psf->header.end - psf->header.indx), psf);
         psf->header.indx = psf->header.end;
         break;
 
@@ -995,8 +976,7 @@ static int header_gets(SF_PRIVATE *psf, char *ptr, int bufsize)
 {
     int k;
 
-    if (psf->header.indx + bufsize >= psf->header.len &&
-        psf_bump_header_allocation(psf, bufsize))
+    if (psf->header.indx + bufsize >= psf->header.len && psf_bump_header_allocation(psf, bufsize))
         return 0;
 
     for (k = 0; k < bufsize - 1; k++)
@@ -1008,8 +988,7 @@ static int header_gets(SF_PRIVATE *psf, char *ptr, int bufsize)
         }
         else
         {
-            psf->header.end +=
-                psf_fread(psf->header.ptr + psf->header.end, 1, 1, psf);
+            psf->header.end += psf_fread(psf->header.ptr + psf->header.end, 1, 1, psf);
             ptr[k] = psf->header.ptr[psf->header.indx];
             psf->header.indx = psf->header.end;
         };
@@ -1043,8 +1022,7 @@ int psf_binheader_readf(SF_PRIVATE *psf, char const *format, ...)
 
     while ((c = *format++))
     {
-        if (psf->header.indx + 16 >= psf->header.len &&
-            psf_bump_header_allocation(psf, 16))
+        if (psf->header.indx + 16 >= psf->header.len && psf_bump_header_allocation(psf, 16))
             return count;
 
         switch (c)
@@ -1069,8 +1047,7 @@ int psf_binheader_readf(SF_PRIVATE *psf, char const *format, ...)
             intptr = va_arg(argptr, unsigned int *);
             *intptr = 0;
             ucptr = (unsigned char *)intptr;
-            byte_count +=
-                header_read(psf, sixteen_bytes, sizeof(sixteen_bytes));
+            byte_count += header_read(psf, sixteen_bytes, sizeof(sixteen_bytes));
             {
                 int k;
                 intdata = 0;
@@ -1217,8 +1194,7 @@ int psf_binheader_readf(SF_PRIVATE *psf, char const *format, ...)
     return byte_count;
 }
 
-sf_count_t psf_default_seek(SF_PRIVATE *psf, int UNUSED(mode),
-                            sf_count_t samples_from_start)
+sf_count_t psf_default_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t samples_from_start)
 {
     sf_count_t position, retval;
 
@@ -1293,8 +1269,7 @@ void psf_log_SF_INFO(SF_PRIVATE *psf)
 
     psf_log_printf(psf, " Format      :   0x%X\n", psf->sf.format);
     psf_log_printf(psf, " Sections    :   %d\n", psf->sf.sections);
-    psf_log_printf(psf, " Seekable    :   %s\n",
-                   psf->sf.seekable ? "TRUE" : "FALSE");
+    psf_log_printf(psf, " Seekable    :   %s\n", psf->sf.seekable ? "TRUE" : "FALSE");
 
     psf_log_printf(psf, "---------------------------------\n");
 }
@@ -1326,8 +1301,7 @@ void *psf_memset(void *s, int c, sf_count_t len)
 
 typedef SF_CUES_VAR(0) SF_CUES_0;
 
-#define SF_CUES_VAR_SIZE(count) \
-    (sizeof(SF_CUES_0) + count * sizeof(SF_CUE_POINT))
+#define SF_CUES_VAR_SIZE(count) (sizeof(SF_CUES_0) + count * sizeof(SF_CUE_POINT))
 
 SF_CUES *psf_cues_alloc(uint32_t cue_count)
 {
@@ -1350,8 +1324,7 @@ void psf_get_cues(SF_PRIVATE *psf, void *data, size_t datasize)
 {
     if (psf->cues)
     {
-        uint32_t cue_count =
-            (datasize - sizeof(uint32_t)) / sizeof(SF_CUE_POINT);
+        uint32_t cue_count = (datasize - sizeof(uint32_t)) / sizeof(SF_CUE_POINT);
 
         cue_count = SF_MIN(cue_count, psf->cues->cue_count);
         memcpy(data, psf->cues, SF_CUES_VAR_SIZE(cue_count));
@@ -1408,9 +1381,9 @@ void psf_get_date_str(char *str, int maxlen)
 #endif
 
     if (tmptr)
-        snprintf(str, maxlen, "%4d-%02d-%02d %02d:%02d:%02d UTC",
-                 1900 + timedata.tm_year, timedata.tm_mon, timedata.tm_mday,
-                 timedata.tm_hour, timedata.tm_min, timedata.tm_sec);
+        snprintf(str, maxlen, "%4d-%02d-%02d %02d:%02d:%02d UTC", 1900 + timedata.tm_year,
+                 timedata.tm_mon, timedata.tm_mday, timedata.tm_hour, timedata.tm_min,
+                 timedata.tm_sec);
     else
         snprintf(str, maxlen, "Unknown date");
 
@@ -1440,8 +1413,7 @@ int subformat_to_bytewidth(int format)
 
 int s_bitwidth_to_subformat(int bits)
 {
-    static int array[] = {SF_FORMAT_PCM_S8, SF_FORMAT_PCM_16, SF_FORMAT_PCM_24,
-                          SF_FORMAT_PCM_32};
+    static int array[] = {SF_FORMAT_PCM_S8, SF_FORMAT_PCM_16, SF_FORMAT_PCM_24, SF_FORMAT_PCM_32};
 
     if (bits < 8 || bits > 32)
         return 0;
@@ -1451,8 +1423,7 @@ int s_bitwidth_to_subformat(int bits)
 
 int u_bitwidth_to_subformat(int bits)
 {
-    static int array[] = {SF_FORMAT_PCM_U8, SF_FORMAT_PCM_16, SF_FORMAT_PCM_24,
-                          SF_FORMAT_PCM_32};
+    static int array[] = {SF_FORMAT_PCM_U8, SF_FORMAT_PCM_16, SF_FORMAT_PCM_24, SF_FORMAT_PCM_32};
 
     if (bits < 8 || bits > 32)
         return 0;
@@ -1505,8 +1476,7 @@ void append_snprintf(char *dest, size_t maxlen, const char *fmt, ...)
     return;
 }
 
-void psf_strlcpy_crlf(char *dest, const char *src, size_t destmax,
-                      size_t srcmax)
+void psf_strlcpy_crlf(char *dest, const char *src, size_t destmax, size_t srcmax)
 {
     /* Must be minus 2 so it can still expand a single trailing '\n' or '\r'. */
     char *destend = dest + destmax - 2;
@@ -1514,8 +1484,7 @@ void psf_strlcpy_crlf(char *dest, const char *src, size_t destmax,
 
     while (dest < destend && src < srcend)
     {
-        if ((src[0] == '\r' && src[1] == '\n') ||
-            (src[0] == '\n' && src[1] == '\r'))
+        if ((src[0] == '\r' && src[1] == '\n') || (src[0] == '\n' && src[1] == '\r'))
         {
             *dest++ = '\r';
             *dest++ = '\n';
@@ -1726,8 +1695,7 @@ void psf_d2s_array(const double *src, short *dest, size_t count, int normalize)
     return;
 }
 
-void psf_d2s_clip_array(const double *src, short *dest, size_t count,
-                        int normalize)
+void psf_d2s_clip_array(const double *src, short *dest, size_t count, int normalize)
 {
     double normfact, scaled_value;
 
@@ -1850,14 +1818,12 @@ FILE *psf_open_tmpfile(char *fname, size_t fnamelen)
 
     if (tmpdir && access(tmpdir, R_OK | W_OK | X_OK) == 0)
     {
-        snprintf(fname, fnamelen, "%s/%x%x-alac.tmp", tmpdir, psf_rand_int32(),
-                 psf_rand_int32());
+        snprintf(fname, fnamelen, "%s/%x%x-alac.tmp", tmpdir, psf_rand_int32(), psf_rand_int32());
         if ((file = fopen(fname, "wb+")) != NULL)
             return file;
     };
 
-    snprintf(fname, fnamelen, "%x%x-alac.tmp", psf_rand_int32(),
-             psf_rand_int32());
+    snprintf(fname, fnamelen, "%x%x-alac.tmp", psf_rand_int32(), psf_rand_int32());
     if ((file = fopen(fname, "wb+")) != NULL)
         return file;
 

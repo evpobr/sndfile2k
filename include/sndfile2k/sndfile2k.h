@@ -687,7 +687,7 @@ typedef enum SF_COMMAND
      */
     SFC_SET_CUE = 0x10CF,
 
-   /** Gets instrument information
+    /** Gets instrument information
      *
      * @param[in] sndfile a valid ::SNDFILE* pointer
      * @param[out] data A pointer to a ::SF_INSTRUMENT struct
@@ -701,7 +701,7 @@ typedef enum SF_COMMAND
      * the file, ::SF_FALSE otherwise.
      */
     SFC_GET_INSTRUMENT = 0x10D0,
-   /** Sets instrument information
+    /** Sets instrument information
      *
      * @param[in] sndfile a valid ::SNDFILE* pointer
      * @param[in] data A pointer to a ::SF_INSTRUMENT struct
@@ -939,7 +939,7 @@ typedef enum SF_STR_FIELD
 /** Defines start index of of tags fields
  */
 #define SF_STR_FIRST SF_STR_TITLE
- /** Defines last index of of tags fields
+/** Defines last index of of tags fields
  */
 #define SF_STR_LAST SF_STR_GENRE
 
@@ -1081,7 +1081,7 @@ typedef struct SF_INFO
     int format;
     //! Unused.
     int sections;
-    //! Indicates that sound file is seekable if set to non-zero value 
+    //! Indicates that sound file is seekable if set to non-zero value
     int seekable;
 } SF_INFO;
 
@@ -1163,11 +1163,11 @@ typedef struct SF_CUE_POINT
  * @param[in] count Size of @c cue_points array
  */
 #define SF_CUES_VAR(count)              \
-struct                                  \
-{                                       \
+    struct                              \
+    {                                   \
         uint32_t cue_count;             \
         SF_CUE_POINT cue_points[count]; \
-}
+    }
 
 /** Represents CUE markers struct containing maximum of @c 100 CUE markers
  */
@@ -1214,21 +1214,21 @@ typedef struct SF_LOOP_INFO
 {
     short time_sig_num; // any positive integer    > 0
     short time_sig_den; // any positive power of 2 > 0
-    int loop_mode;      // see SF_LOOP enum
+    int loop_mode; // see SF_LOOP enum
 
     /* 
      * this is NOT the amount of quarter notes !!!
      * a full bar of 4/4 is 4 beats
      * a full bar of 7/8 is 7 beats
      */
-    int num_beats; 
+    int num_beats;
 
     /*
      * suggestion, as it can be calculated using other fields:
      * file's length, file's sampleRate and our time_sig_den
      * -> bpms are always the amount of _quarter notes_ per minute
      */
-    float bpm; 
+    float bpm;
 
     int root_key; // MIDI note, or -1 for None
     int future[6];
@@ -1239,8 +1239,8 @@ typedef struct SF_LOOP_INFO
  * Strongly (!) based on EBU "bext" chunk format used in Broadcast WAVE.
  */
 #define SF_BROADCAST_INFO_VAR(coding_hist_size) \
-struct                                          \
-{                                               \
+    struct                                      \
+    {                                           \
         char description[256];                  \
         char originator[32];                    \
         char originator_reference[32];          \
@@ -1253,7 +1253,7 @@ struct                                          \
         char reserved[190];                     \
         uint32_t coding_history_size;           \
         char coding_history[coding_hist_size];  \
-}
+    }
 
 /** Defines Broadcast struct with @c coding_history field of 256 bytes
  */
@@ -1268,8 +1268,8 @@ typedef struct SF_CART_TIMER
 } SF_CART_TIMER;
 
 #define SF_CART_INFO_VAR(p_tag_text_size) \
-struct                                    \
-{                                         \
+    struct                                \
+    {                                     \
         char version[4];                  \
         char title[64];                   \
         char artist[64];                  \
@@ -1291,7 +1291,7 @@ struct                                    \
         char url[1024];                   \
         uint32_t tag_text_size;           \
         char tag_text[p_tag_text_size];   \
-}
+    }
 
 typedef SF_CART_INFO_VAR(256) SF_CART_INFO;
 
@@ -1319,8 +1319,7 @@ typedef sf_count_t (*sf_vio_get_filelen)(void *user_data);
  * @return Non-negative offset from start on the file on success, @c -1
  * otherwise.
  */
-typedef sf_count_t (*sf_vio_seek)(sf_count_t offset, int whence,
-                                  void *user_data);
+typedef sf_count_t (*sf_vio_seek)(sf_count_t offset, int whence, void *user_data);
 /** Type of user defined read function
  *
  * @ingroup file-virt
@@ -1343,8 +1342,7 @@ typedef sf_count_t (*sf_vio_read)(void *ptr, sf_count_t count, void *user_data);
  *
  * @return Count of bytes actually written or zero otherwise.
  */
-typedef sf_count_t (*sf_vio_write)(const void *ptr, sf_count_t count,
-                                   void *user_data);
+typedef sf_count_t (*sf_vio_write)(const void *ptr, sf_count_t count, void *user_data);
 /** Type of user defined function that returns current position in file
 *
 * @ingroup file-base
@@ -1380,7 +1378,6 @@ typedef struct SF_VIRTUAL_IO
     //! Pointer to a user defined function that returns file position
     sf_vio_tell tell;
 } SF_VIRTUAL_IO;
-
 
 #include "sndfile2k_export.h"
 
@@ -1458,8 +1455,7 @@ SNDFILE2K_EXPORT SNDFILE *sf_open(const char *path, int mode, SF_INFO *sfinfo);
  * @sa sf_open(), sf_wchar_open(), sf_open_virtual()
  * @sa sf_close()
  */
-SNDFILE2K_EXPORT SNDFILE *sf_open_fd(int fd, int mode, SF_INFO *sfinfo,
-                                     int close_desc);
+SNDFILE2K_EXPORT SNDFILE *sf_open_fd(int fd, int mode, SF_INFO *sfinfo, int close_desc);
 
 /** @defgroup file-virt Virtual I/O
  *
@@ -1488,8 +1484,8 @@ SNDFILE2K_EXPORT SNDFILE *sf_open_fd(int fd, int mode, SF_INFO *sfinfo,
  * @sa sf_open(), sf_wchar_open(), sf_open_fd()
  * @sa sf_close()
  */
-SNDFILE2K_EXPORT SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, int mode,
-                                          SF_INFO *sfinfo, void *user_data);
+SNDFILE2K_EXPORT SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo,
+                                          void *user_data);
 
 /** @}*/
 
@@ -1596,8 +1592,7 @@ SNDFILE2K_EXPORT int sf_error_str(SNDFILE *sndfile, char *str, size_t len);
  *
  * @return Command-specific, see particular command description.
  */
-SNDFILE2K_EXPORT int sf_command(SNDFILE *sndfile, int command, void *data,
-                                int datasize);
+SNDFILE2K_EXPORT int sf_command(SNDFILE *sndfile, int command, void *data, int datasize);
 
 /** @}*/
 
@@ -1658,8 +1653,7 @@ typedef enum SF_SEEK_MODE
  * @c -1 if an error occured (ie an attempt is made to seek beyond the start or
  * end of the file).
  */
-SNDFILE2K_EXPORT sf_count_t sf_seek(SNDFILE *sndfile, sf_count_t frames,
-                                    int whence);
+SNDFILE2K_EXPORT sf_count_t sf_seek(SNDFILE *sndfile, sf_count_t frames, int whence);
 
 /** @defgroup tagging Tags manipulation
  *
@@ -1686,8 +1680,7 @@ SNDFILE2K_EXPORT sf_count_t sf_seek(SNDFILE *sndfile, sf_count_t frames,
  *
  * @return Zero on success and non-zero value otherwise.
  */
-SNDFILE2K_EXPORT int sf_set_string(SNDFILE *sndfile, int str_type,
-                                   const char *str);
+SNDFILE2K_EXPORT int sf_set_string(SNDFILE *sndfile, int str_type, const char *str);
 
 /** Gets string field from given sound file
  *
@@ -1729,8 +1722,7 @@ SNDFILE2K_EXPORT int sf_current_byterate(SNDFILE *sndfile);
  *
  * @return Number of bytes actually read.
  */
-SNDFILE2K_EXPORT sf_count_t sf_read_raw(SNDFILE *sndfile, void *ptr,
-                                        sf_count_t bytes);
+SNDFILE2K_EXPORT sf_count_t sf_read_raw(SNDFILE *sndfile, void *ptr, sf_count_t bytes);
 
 /** Writes raw bytes to sound file
  *
@@ -1743,9 +1735,7 @@ SNDFILE2K_EXPORT sf_count_t sf_read_raw(SNDFILE *sndfile, void *ptr,
  *
  * @return Number of bytes actually written.
  */
-SNDFILE2K_EXPORT sf_count_t sf_write_raw(SNDFILE *sndfile, const void *ptr,
-                                         sf_count_t bytes);
-
+SNDFILE2K_EXPORT sf_count_t sf_write_raw(SNDFILE *sndfile, const void *ptr, sf_count_t bytes);
 
 /** @defgroup read-write-frames Read/Write frames
  *
@@ -1776,8 +1766,7 @@ SNDFILE2K_EXPORT sf_count_t sf_write_raw(SNDFILE *sndfile, const void *ptr,
  *
  * @return Number of frames actually read.
  */
-SNDFILE2K_EXPORT sf_count_t sf_readf_short(SNDFILE *sndfile, short *ptr,
-                                           sf_count_t frames);
+SNDFILE2K_EXPORT sf_count_t sf_readf_short(SNDFILE *sndfile, short *ptr, sf_count_t frames);
 /** Writes short (16-bit) frames to file
  *
  * @param[in] sndfile Pointer to a sound file state
@@ -1786,8 +1775,7 @@ SNDFILE2K_EXPORT sf_count_t sf_readf_short(SNDFILE *sndfile, short *ptr,
  *
  * @return Number of frames actually written.
  */
-SNDFILE2K_EXPORT sf_count_t sf_writef_short(SNDFILE *sndfile, const short *ptr,
-                                            sf_count_t frames);
+SNDFILE2K_EXPORT sf_count_t sf_writef_short(SNDFILE *sndfile, const short *ptr, sf_count_t frames);
 
 /** Reads integer (32-bit) frames from file
  *
@@ -1797,8 +1785,7 @@ SNDFILE2K_EXPORT sf_count_t sf_writef_short(SNDFILE *sndfile, const short *ptr,
  *
  * @return Number of frames actually read.
  */
-SNDFILE2K_EXPORT sf_count_t sf_readf_int(SNDFILE *sndfile, int *ptr,
-                                         sf_count_t frames);
+SNDFILE2K_EXPORT sf_count_t sf_readf_int(SNDFILE *sndfile, int *ptr, sf_count_t frames);
 /** Writes integer (32-bit) frames to file
  *
  * @param[in] sndfile Pointer to a sound file state
@@ -1807,8 +1794,7 @@ SNDFILE2K_EXPORT sf_count_t sf_readf_int(SNDFILE *sndfile, int *ptr,
  *
  * @return Number of frames actually written.
  */
-SNDFILE2K_EXPORT sf_count_t sf_writef_int(SNDFILE *sndfile, const int *ptr,
-                                          sf_count_t frames);
+SNDFILE2K_EXPORT sf_count_t sf_writef_int(SNDFILE *sndfile, const int *ptr, sf_count_t frames);
 
 /** Reads float (32-bit) frames from file
  *
@@ -1818,8 +1804,7 @@ SNDFILE2K_EXPORT sf_count_t sf_writef_int(SNDFILE *sndfile, const int *ptr,
  *
  * @return Number of frames actually read.
  */
-SNDFILE2K_EXPORT sf_count_t sf_readf_float(SNDFILE *sndfile, float *ptr,
-                                           sf_count_t frames);
+SNDFILE2K_EXPORT sf_count_t sf_readf_float(SNDFILE *sndfile, float *ptr, sf_count_t frames);
 /** Writes float (32-bit) frames to file
  *
  * @param[in] sndfile Pointer to a sound file state
@@ -1828,8 +1813,7 @@ SNDFILE2K_EXPORT sf_count_t sf_readf_float(SNDFILE *sndfile, float *ptr,
  *
  * @return Number of frames actually written.
  */
-SNDFILE2K_EXPORT sf_count_t sf_writef_float(SNDFILE *sndfile, const float *ptr,
-                                            sf_count_t frames);
+SNDFILE2K_EXPORT sf_count_t sf_writef_float(SNDFILE *sndfile, const float *ptr, sf_count_t frames);
 
 /** Reads double (64-bit) frames from file
  *
@@ -1839,8 +1823,7 @@ SNDFILE2K_EXPORT sf_count_t sf_writef_float(SNDFILE *sndfile, const float *ptr,
  *
  * @return Number of frames actually read.
  */
-SNDFILE2K_EXPORT sf_count_t sf_readf_double(SNDFILE *sndfile, double *ptr,
-                                            sf_count_t frames);
+SNDFILE2K_EXPORT sf_count_t sf_readf_double(SNDFILE *sndfile, double *ptr, sf_count_t frames);
 /** Writes double (64-bit) frames to file
  *
  * @param[in] sndfile Pointer to a sound file state
@@ -1849,8 +1832,7 @@ SNDFILE2K_EXPORT sf_count_t sf_readf_double(SNDFILE *sndfile, double *ptr,
  *
  * @return Number of frames actually written.
  */
-SNDFILE2K_EXPORT sf_count_t sf_writef_double(SNDFILE *sndfile,
-                                             const double *ptr,
+SNDFILE2K_EXPORT sf_count_t sf_writef_double(SNDFILE *sndfile, const double *ptr,
                                              sf_count_t frames);
 
 /** @}*/
@@ -1884,8 +1866,7 @@ SNDFILE2K_EXPORT sf_count_t sf_writef_double(SNDFILE *sndfile,
  *
  * @return Number of samples actually read.
  */
-SNDFILE2K_EXPORT sf_count_t sf_read_short(SNDFILE *sndfile, short *ptr,
-                                          sf_count_t items);
+SNDFILE2K_EXPORT sf_count_t sf_read_short(SNDFILE *sndfile, short *ptr, sf_count_t items);
 /** Writes short (16-bit) samples to file
  *
  * @param[in] sndfile Pointer to a sound file state
@@ -1894,8 +1875,7 @@ SNDFILE2K_EXPORT sf_count_t sf_read_short(SNDFILE *sndfile, short *ptr,
  *
  * @return Number of samples actually written.
  */
-SNDFILE2K_EXPORT sf_count_t sf_write_short(SNDFILE *sndfile, const short *ptr,
-                                           sf_count_t items);
+SNDFILE2K_EXPORT sf_count_t sf_write_short(SNDFILE *sndfile, const short *ptr, sf_count_t items);
 
 /** Reads integer (32-bit) samples from file
  *
@@ -1905,8 +1885,7 @@ SNDFILE2K_EXPORT sf_count_t sf_write_short(SNDFILE *sndfile, const short *ptr,
  *
  * @return Number of samples actually read.
  */
-SNDFILE2K_EXPORT sf_count_t sf_read_int(SNDFILE *sndfile, int *ptr,
-                                        sf_count_t items);
+SNDFILE2K_EXPORT sf_count_t sf_read_int(SNDFILE *sndfile, int *ptr, sf_count_t items);
 /** Writes integer (32-bit) samples to file
  *
  * @param[in] sndfile Pointer to a sound file state
@@ -1915,8 +1894,7 @@ SNDFILE2K_EXPORT sf_count_t sf_read_int(SNDFILE *sndfile, int *ptr,
  *
  * @return Number of samples actually written.
  */
-SNDFILE2K_EXPORT sf_count_t sf_write_int(SNDFILE *sndfile, const int *ptr,
-                                         sf_count_t items);
+SNDFILE2K_EXPORT sf_count_t sf_write_int(SNDFILE *sndfile, const int *ptr, sf_count_t items);
 
 /** Reads float (32-bit) samples from file
  *
@@ -1926,8 +1904,7 @@ SNDFILE2K_EXPORT sf_count_t sf_write_int(SNDFILE *sndfile, const int *ptr,
  *
  * @return Number of samples actually read.
  */
-SNDFILE2K_EXPORT sf_count_t sf_read_float(SNDFILE *sndfile, float *ptr,
-                                          sf_count_t items);
+SNDFILE2K_EXPORT sf_count_t sf_read_float(SNDFILE *sndfile, float *ptr, sf_count_t items);
 /** Writes float (32-bit) samples to file
  *
  * @param[in] sndfile Pointer to a sound file state
@@ -1936,8 +1913,7 @@ SNDFILE2K_EXPORT sf_count_t sf_read_float(SNDFILE *sndfile, float *ptr,
  *
  * @return Number of samples actually written.
  */
-SNDFILE2K_EXPORT sf_count_t sf_write_float(SNDFILE *sndfile, const float *ptr,
-                                           sf_count_t items);
+SNDFILE2K_EXPORT sf_count_t sf_write_float(SNDFILE *sndfile, const float *ptr, sf_count_t items);
 
 /** Reads double (64-bit) samples from file
  *
@@ -1947,8 +1923,7 @@ SNDFILE2K_EXPORT sf_count_t sf_write_float(SNDFILE *sndfile, const float *ptr,
  *
  * @return Number of samples actually read.
  */
-SNDFILE2K_EXPORT sf_count_t sf_read_double(SNDFILE *sndfile, double *ptr,
-                                           sf_count_t items);
+SNDFILE2K_EXPORT sf_count_t sf_read_double(SNDFILE *sndfile, double *ptr, sf_count_t items);
 /** Writes double (64-bit) samples to file
  *
  * @param[in] sndfile Pointer to a sound file state
@@ -1957,8 +1932,7 @@ SNDFILE2K_EXPORT sf_count_t sf_read_double(SNDFILE *sndfile, double *ptr,
  *
  * @return Number of samples actually written.
  */
-SNDFILE2K_EXPORT sf_count_t sf_write_double(SNDFILE *sndfile, const double *ptr,
-                                            sf_count_t items);
+SNDFILE2K_EXPORT sf_count_t sf_write_double(SNDFILE *sndfile, const double *ptr, sf_count_t items);
 /** @}*/
 
 /** Closes the ::SNDFILE object
@@ -2004,10 +1978,8 @@ SNDFILE2K_EXPORT void sf_write_sync(SNDFILE *sndfile);
  * @sa sf_open(), sf_open_fd(), sf_open_virtual()
  * @sa sf_close()
  */
-SNDFILE2K_EXPORT SNDFILE *sf_wchar_open(const wchar_t *wpath, int mode,
-                                        SF_INFO *sfinfo);
+SNDFILE2K_EXPORT SNDFILE *sf_wchar_open(const wchar_t *wpath, int mode, SF_INFO *sfinfo);
 #endif
-
 
 /** @defgroup chunks Chunks API
  *
@@ -2023,15 +1995,15 @@ SNDFILE2K_EXPORT SNDFILE *sf_wchar_open(const wchar_t *wpath, int mode,
  *
  *  @{
  */
- 
+
 /** Describes sound file chunk
  */
 struct SF_CHUNK_INFO
 {
-    char id[64];      //! The chunk identifier
+    char id[64]; //! The chunk identifier
     unsigned id_size; //! The size of the chunk identifier
     unsigned datalen; //! The size of that data
-    void *data;       //! Pointer to the data
+    void *data; //! Pointer to the data
 };
 
 typedef struct SF_CHUNK_INFO SF_CHUNK_INFO;
@@ -2049,8 +2021,7 @@ typedef struct SF_CHUNK_INFO SF_CHUNK_INFO;
  *
  * @return Returns ::SF_ERR_NO_ERROR on success or non-zero on failure.
  */
-SNDFILE2K_EXPORT int sf_set_chunk(SNDFILE *sndfile,
-                                  const SF_CHUNK_INFO *chunk_info);
+SNDFILE2K_EXPORT int sf_set_chunk(SNDFILE *sndfile, const SF_CHUNK_INFO *chunk_info);
 
 /** An opaque structure to an iterator over the all chunks of a given id
  */
@@ -2085,8 +2056,8 @@ typedef struct SF_CHUNK_ITERATOR SF_CHUNK_ITERATOR;
  *
  * @return Chunk iterator on success, @c NULL otherwise.
  */
-SNDFILE2K_EXPORT SF_CHUNK_ITERATOR *
-sf_get_chunk_iterator(SNDFILE *sndfile, const SF_CHUNK_INFO *chunk_info);
+SNDFILE2K_EXPORT SF_CHUNK_ITERATOR *sf_get_chunk_iterator(SNDFILE *sndfile,
+                                                          const SF_CHUNK_INFO *chunk_info);
 
 /** Iterates through chunks by incrementing the iterator.
  *
@@ -2108,8 +2079,7 @@ sf_get_chunk_iterator(SNDFILE *sndfile, const SF_CHUNK_INFO *chunk_info);
  *
  * @return Next chunk interator on success, @c NULL otherwise.
  */
-SNDFILE2K_EXPORT SF_CHUNK_ITERATOR *
-sf_next_chunk_iterator(SF_CHUNK_ITERATOR *iterator);
+SNDFILE2K_EXPORT SF_CHUNK_ITERATOR *sf_next_chunk_iterator(SF_CHUNK_ITERATOR *iterator);
 
 /** Gets the size of the specified chunk
  *
@@ -2128,8 +2098,7 @@ sf_next_chunk_iterator(SF_CHUNK_ITERATOR *iterator);
  *
  * @return ::SF_ERR_NO_ERROR on success, negative error code otherwise.
  */
-SNDFILE2K_EXPORT int sf_get_chunk_size(const SF_CHUNK_ITERATOR *it,
-                                       SF_CHUNK_INFO *chunk_info);
+SNDFILE2K_EXPORT int sf_get_chunk_size(const SF_CHUNK_ITERATOR *it, SF_CHUNK_INFO *chunk_info);
 
 /** Gets the specified chunk data
  *
@@ -2147,8 +2116,7 @@ SNDFILE2K_EXPORT int sf_get_chunk_size(const SF_CHUNK_ITERATOR *it,
  *
  * @return ::SF_ERR_NO_ERROR on success, negative error code otherwise.
  */
-SNDFILE2K_EXPORT int sf_get_chunk_data(const SF_CHUNK_ITERATOR *it,
-                                       SF_CHUNK_INFO *chunk_info);
+SNDFILE2K_EXPORT int sf_get_chunk_data(const SF_CHUNK_ITERATOR *it, SF_CHUNK_INFO *chunk_info);
 
 /** @}*/
 
