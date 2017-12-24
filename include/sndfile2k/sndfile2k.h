@@ -318,7 +318,7 @@ typedef enum SF_COMMAND
      * @param[in] data Not used
      * @param[in] datasize ::SF_TRUE or ::SF_FALSE
      *
-     * @return The previous ::SFC_SET_SCALE_FLOAT_INT_WRITE setting for this
+     * @return The previous ::SFC_SET_SCALE_INT_FLOAT_WRITE setting for this
      * file.
      */
     SFC_SET_SCALE_INT_FLOAT_WRITE = 0x1015,
@@ -750,7 +750,7 @@ typedef enum SF_COMMAND
      * @param[out] data A pointer to pointer to an int
      * @param[in] datasize datasize sizeof (double) * number_of_channels
      *
-     * When succeeded ::SF_GET_CHANNEL_MAP_INFO fills data array with channel
+     * When succeeded ::SFC_GET_CHANNEL_MAP_INFO fills data array with channel
      * mapping values.
      *
      * @return ::SF_TRUE on success, ::SF_FALSE otherwise.

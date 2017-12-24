@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.0.0-rc.2] - 2017-12-24
+
+### Added
+
+- CMake documentation target `docs`
+
+### Changed
+
+- CMake installation ia now component based
+
+### Fixed
+
+- Appveyor CI badge in `README.md`
+- Documentation glitches
+
 ## [1.0.0-rc.1] - 2017-12-22
 
 ### Added
@@ -103,3 +118,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 [1.0.0-beta3]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta2...v1.0.0-beta3
 [1.0.0-beta4]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta3...v1.0.0-beta4
 [1.0.0-rc.1]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta4...v1.0.0-rc.1
+[1.0.0-rc.2]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-rc.1...v1.0.0-rc.2

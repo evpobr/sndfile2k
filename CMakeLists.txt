@@ -18,6 +18,10 @@ set(SNDFILE2K_SOVERSION_MINOR 0)
 set(SNDFILE2K_SOVERSION_PATCH 0)
 set(SNDFILE2K_SOVERSION "${SNDFILE2K_SOVERSION_MAJOR}.${SNDFILE2K_SOVERSION_MINOR}.${SNDFILE2K_SOVERSION_PATCH}")
 
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+
 #
 # System-wide includes
 #
@@ -53,11 +57,13 @@ include(${CMAKE_MODULE_PATH}/SndFileChecks.cmake)
 
 cmake_dependent_option(HAVE_XIPH_CODECS "Enable use of Xiph.org Vorbis and FLAC codecs" ON "HAVE_EXTERNAL_XIPH_LIBS" OFF)
 cmake_dependent_option(HAVE_SPEEX "Enable use of Xiph.org Speex codec" ON "ENABLE_EXPERIMENTAL AND SPEEX_FOUND" OFF)
+cmake_dependent_option(BUILD_DOCUMENTATION "Enable use of Doxygen documentation generator" ON "Doxygen_FOUND;CMAKE_DOXYGEN_SUPPORTS_TARGETS" OFF)
 
 add_feature_info(BuildSharedLibs BUILD_SHARED_LIBS "build shared libraries")
 add_feature_info(WithVorbis HAVE_XIPH_CODECS "Xiph Vorbis codec support")
 add_feature_info(WithFLAC HAVE_XIPH_CODECS "Xiph FLAC codec support")
 add_feature_info(WithSpeex HAVE_SPEEX "Xiph Speex codec support")
+add_feature_info(WithDoxygen HAVE_DOXYGEN "Doxygen documentation generator")
 add_feature_info(ExperimentalCode ENABLE_EXPERIMENTAL "enable experimental code")
 add_feature_info(BuildTesting BUILD_TESTING "build tests")
 add_feature_info(CPUClip ENABLE_CPU_CLIP "Enable tricky cpu specific clipper")
@@ -84,6 +90,10 @@ set_package_properties(Speex PROPERTIES TYPE OPTIONAL
   URL "www.speex.org/"
   DESCRIPTION "an audio codec tuned for speech"
   PURPOSE "Enables experemental Speex support")
+set_package_properties(Doxygen PROPERTIES TYPE OPTIONAL
+  URL "www.doxygen.org/"
+  DESCRIPTION "generate documentation from source code"
+  PURPOSE "Enables documentation generation")
 
 feature_summary(WHAT ALL)
 
@@ -515,58 +525,70 @@ if(BUILD_EXAMPLES)
 
 endif()
 
+# Doxygen documentation
+
+if(BUILD_DOCUMENTATION)
+  set(DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs)
+  set(DOXYGEN_JAVADOC_AUTOBRIEF YES)
+  set(DOXYGEN_OPTIMIZE_OUTPUT_FOR_C YES)
+  set(DOXYGEN_TYPEDEF_HIDES_STRUCT YES)
+  set(DOXYGEN_USE_MDFILE_AS_MAINPAGE INDEX.md)
+  doxygen_add_docs(docs
+    include/sndfile2k/sndfile2k.h
+    include/sndfile2k/sndfile2k.hpp
+    docs)
+endif()
+
 #
 # Installation
 #
 
+if(UNIX)
+  set(CMAKE_INSTALL_PACKAGEDIR ${CMAKE_INSTALL_LIBDIR}/cmake/sndfile2k)
+elseif(WIN32)
+  set(CMAKE_INSTALL_PACKAGEDIR cmake)
+endif()
+
+install(TARGETS sndfile2k ${SNDFILE_SHARED_TARGET} ${SNDFILE_PROGRAM_TARGETS}
+  EXPORT SndFile2KTargets
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT BIN
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT DEV
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT BIN)
+
+install(FILES ${libsndfile2k_PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sndfile2k COMPONENT DEV)
+
+include(CMakePackageConfigHelpers)
+
+write_basic_package_version_file(SndFile2KConfigVersion.cmake COMPATIBILITY SameMajorVersion)
+configure_package_config_file(
+  cmake/SndFile2KConfig.in.cmake
+  SndFile2KConfig.cmake
+  INSTALL_DESTINATION ${CMAKE_INSTALL_PACKAGEDIR})
+
 if(ENABLE_CMAKE_PACKAGE_CONFIG)
-
-  if(UNIX)
-    set(CMAKE_INSTALL_PACKAGEDIR ${CMAKE_INSTALL_LIBDIR}/cmake/sndfile2k)
-  elseif(WIN32)
-    set(CMAKE_INSTALL_PACKAGEDIR cmake)
-  endif()
-
-
-  install(TARGETS sndfile2k ${SNDFILE_SHARED_TARGET} ${SNDFILE_PROGRAM_TARGETS}
-    EXPORT SndFile2KTargets
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-  install(FILES ${libsndfile2k_PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sndfile2k)
-
-  include(CMakePackageConfigHelpers)
-
-  write_basic_package_version_file(SndFile2KConfigVersion.cmake COMPATIBILITY SameMajorVersion)
-  configure_package_config_file(
-    cmake/SndFile2KConfig.in.cmake
-    SndFile2KConfig.cmake
-    INSTALL_DESTINATION ${CMAKE_INSTALL_PACKAGEDIR})
-
-  install(EXPORT SndFile2KTargets DESTINATION ${CMAKE_INSTALL_PACKAGEDIR})
+  install(EXPORT SndFile2KTargets DESTINATION ${CMAKE_INSTALL_PACKAGEDIR} COMPONENT DEV)
   install(
     FILES
       ${CMAKE_CURRENT_BINARY_DIR}/SndFile2KConfig.cmake
       ${CMAKE_CURRENT_BINARY_DIR}/SndFile2KConfigVersion.cmake
-    DESTINATION
-      ${CMAKE_INSTALL_PACKAGEDIR})
-
-elseif()
-
-  install(
-    TARGETS
-      sndfile2k ${sdnfile_PROGRAMS}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-  install(FILES "${libsndfile2k_PUBLIC_HEADERS}" ${CMAKE_INSTALL_LIBDIR}/sndfile2k)
-
+    DESTINATION ${CMAKE_INSTALL_PACKAGEDIR}
+    COMPONENT DEV)
 endif()
 
 if(ENABLE_PKGCONFIG_FILE)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sndfile2k.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+  install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/sndfile2k.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    COMPONENT DEV
+  )
+endif()
+
+if(BUILD_DOCUMENTATION)
+  install(
+    DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs/html
+    DESTINATION ${CMAKE_INSTALL_DOCDIR}
+    COMPONENT DOC
+  )
 endif()
 
 #
@@ -1309,7 +1331,3 @@ if(BUILD_TESTING)
   set_target_properties(${SNDFILE_TEST_TARGETS} PROPERTIES FOLDER Tests)
 
 endif()
-
-# Doxygen documentation
-
-configure_file(Doxyfile.in Doxyfile)

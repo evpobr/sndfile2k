@@ -294,7 +294,7 @@ public:
 
     /** Gets or sets parameters of library or sound file object.
      *
-     * @param command Command ID see ::SF_COMMAND for details
+     * @param cmd Command ID see ::SF_COMMAND for details
      * @param data Command specific, could be @c NULL
      * @param datasize Size of @c data, could be @c 0
      *

@@ -32,6 +32,11 @@ if(VORBISENC_FOUND AND FLAC_FOUND)
   set(HAVE_EXTERNAL_XIPH_LIBS 1)
 endif()
 find_package(Speex)
+find_package(Doxygen 1.8)
+if(NOT CMAKE_VERSION VERSION_LESS 3.9)
+  set(CMAKE_DOXYGEN_SUPPORTS_TARGETS 1)
+endif()
+
 
 if(BUILD_PROGRAMS)
   if(WIN32)
