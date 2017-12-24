@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['samplerate',['samplerate',['../class_sndfile_handle.html#a35bc814b03ba0cb72a78ce83204a1f87',1,'SndfileHandle']]],
+  ['samplerate',['samplerate',['../class_sndfile_handle.html#aa4db003e80513fff2f861cc17d459911',1,'SndfileHandle']]],
   ['seek',['seek',['../class_sndfile_handle.html#a0751c210cba5d0d757ce801381743ef3',1,'SndfileHandle']]],
   ['setstring',['setString',['../class_sndfile_handle.html#a6fa21cda95c6016c9f2f133d2e94da8b',1,'SndfileHandle']]],
   ['sf_5fbroadcast_5finfo_5fvar',['SF_BROADCAST_INFO_VAR',['../sndfile2k_8h.html#a681b92a0003d2990ce7f0868e50d2483',1,'sndfile2k.h']]],
@@ -35,7 +35,6 @@ var searchData=
   ['sf_5fset_5fstring',['sf_set_string',['../group__tagging.html#gaf0d0acafcc4452475ce50a29811e5463',1,'sndfile2k.h']]],
   ['sf_5fstrerror',['sf_strerror',['../group__error.html#gae494b84ac05e91d2c38cb2ad4b2902ca',1,'sndfile2k.h']]],
   ['sf_5fversion_5fstring',['sf_version_string',['../sndfile2k_8h.html#a46f1b4bace9bfcd17dc8ad1e57c381d9',1,'sndfile2k.h']]],
-  ['sf_5fwchar_5fopen',['sf_wchar_open',['../group__file-base.html#ga6d604e78b41c345f0824b8abebdb97a5',1,'sndfile2k.h']]],
   ['sf_5fwrite_5fdouble',['sf_write_double',['../group__read-write-items.html#gad136b4786d92924a9bc9175eb84edd8e',1,'sndfile2k.h']]],
   ['sf_5fwrite_5ffloat',['sf_write_float',['../group__read-write-items.html#gac77377d90c69261360301e15bade7365',1,'sndfile2k.h']]],
   ['sf_5fwrite_5fint',['sf_write_int',['../group__read-write-items.html#ga8953dd30dcd6cbc62279f461c79544b7',1,'sndfile2k.h']]],
@@ -46,6 +45,6 @@ var searchData=
   ['sf_5fwritef_5ffloat',['sf_writef_float',['../group__read-write-frames.html#ga0627c30780831b7a2a9eff3f194337e0',1,'sndfile2k.h']]],
   ['sf_5fwritef_5fint',['sf_writef_int',['../group__read-write-frames.html#ga84b215971ec8a1e32a7347e9eb734dd7',1,'sndfile2k.h']]],
   ['sf_5fwritef_5fshort',['sf_writef_short',['../group__read-write-frames.html#gafa7269d2aa0d31a731d71ca6b7182d37',1,'sndfile2k.h']]],
-  ['sndfilehandle',['SndfileHandle',['../class_sndfile_handle.html#a90b0e918f3531329dfb4ab0988187add',1,'SndfileHandle::SndfileHandle(void)'],['../class_sndfile_handle.html#a60e5ec8dac736c5f3a2fdc95e7e9c70e',1,'SndfileHandle::SndfileHandle(const char *path, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#af782c1d529a09587c127272bd96cb42a',1,'SndfileHandle::SndfileHandle(std::string const &amp;path, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#a3cbcef78befb00c3ad7391754a9c0343',1,'SndfileHandle::SndfileHandle(int fd, bool close_desc, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#a4c0aa4c1c1403c8ee28287a40eda0ddc',1,'SndfileHandle::SndfileHandle(SF_VIRTUAL_IO &amp;sfvirtual, void *user_data, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#a028b40645921aee524de73848139b9bc',1,'SndfileHandle::SndfileHandle(const wchar_t *wpath, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#af9c8bc95a16a9cc913586623c29a3bcd',1,'SndfileHandle::SndfileHandle(const SndfileHandle &amp;orig)']]],
-  ['strerror',['strError',['../class_sndfile_handle.html#aa627abe4c4e9f8eb5ee3b7ab9de9eed3',1,'SndfileHandle']]]
+  ['sndfilehandle',['SndfileHandle',['../class_sndfile_handle.html#a90b0e918f3531329dfb4ab0988187add',1,'SndfileHandle::SndfileHandle(void)'],['../class_sndfile_handle.html#a60e5ec8dac736c5f3a2fdc95e7e9c70e',1,'SndfileHandle::SndfileHandle(const char *path, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#af782c1d529a09587c127272bd96cb42a',1,'SndfileHandle::SndfileHandle(std::string const &amp;path, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#a3cbcef78befb00c3ad7391754a9c0343',1,'SndfileHandle::SndfileHandle(int fd, bool close_desc, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#a4c0aa4c1c1403c8ee28287a40eda0ddc',1,'SndfileHandle::SndfileHandle(SF_VIRTUAL_IO &amp;sfvirtual, void *user_data, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#af9c8bc95a16a9cc913586623c29a3bcd',1,'SndfileHandle::SndfileHandle(const SndfileHandle &amp;orig)']]],
+  ['strerror',['strError',['../class_sndfile_handle.html#a1405842e7e672b9789075bf8a4983a13',1,'SndfileHandle']]]
 ];

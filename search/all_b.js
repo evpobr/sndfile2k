@@ -1,7 +1,7 @@
 var searchData=
 [
   ['sndfile2k',['SndFile2K',['../index.html',1,'']]],
-  ['samplerate',['samplerate',['../struct_s_f___i_n_f_o.html#acfd248e20ab1c58b57aafc7b16404a5f',1,'SF_INFO::samplerate()'],['../class_sndfile_handle.html#a35bc814b03ba0cb72a78ce83204a1f87',1,'SndfileHandle::samplerate()']]],
+  ['samplerate',['samplerate',['../struct_s_f___i_n_f_o.html#acfd248e20ab1c58b57aafc7b16404a5f',1,'SF_INFO::samplerate()'],['../class_sndfile_handle.html#aa4db003e80513fff2f861cc17d459911',1,'SndfileHandle::samplerate()']]],
   ['sections',['sections',['../struct_s_f___i_n_f_o.html#a5f4c7cb564c05f6c3eeac9164a806544',1,'SF_INFO']]],
   ['seek',['seek',['../struct_s_f___v_i_r_t_u_a_l___i_o.html#aa8ac1ef2302a43acca58a02e809a815f',1,'SF_VIRTUAL_IO::seek()'],['../class_sndfile_handle.html#a0751c210cba5d0d757ce801381743ef3',1,'SndfileHandle::seek()']]],
   ['seekable',['seekable',['../struct_s_f___i_n_f_o.html#ad8978123d4122e137e9500f65d28ac31',1,'SF_INFO']]],
@@ -20,7 +20,7 @@ var searchData=
   ['sf_5fcount_5fmax',['SF_COUNT_MAX',['../sndfile2k_8h.html#a2a594c90b41e9b0140f28724f80b763a',1,'sndfile2k.h']]],
   ['sf_5fcount_5ft',['sf_count_t',['../sndfile2k_8h.html#a398121a5f562230ea7f772528fff5f84',1,'sndfile2k.h']]],
   ['sf_5fcue_5fpoint',['SF_CUE_POINT',['../struct_s_f___c_u_e___p_o_i_n_t.html',1,'']]],
-  ['sf_5fcues_5fvar',['SF_CUES_VAR',['../sndfile2k_8h.html#aa818b9568a6fbf50bfc1f5f3df378f7a',1,'SF_CUES_VAR():&#160;sndfile2k.h'],['../sndfile2k_8h.html#a36936578c6066276291e0c8fd3c4bf76',1,'SF_CUES_VAR(100) SF_CUES:&#160;sndfile2k.h']]],
+  ['sf_5fcues_5fvar',['SF_CUES_VAR',['../sndfile2k_8h.html#a01418c0b27e026aee7b718533bb4f7f9',1,'SF_CUES_VAR():&#160;sndfile2k.h'],['../sndfile2k_8h.html#a36936578c6066276291e0c8fd3c4bf76',1,'SF_CUES_VAR(100) SF_CUES:&#160;sndfile2k.h']]],
   ['sf_5fcurrent_5fbyterate',['sf_current_byterate',['../sndfile2k_8h.html#a275b558bfc2e1a38e05e201dbd094eb1',1,'sndfile2k.h']]],
   ['sf_5fdither_5finfo',['SF_DITHER_INFO',['../struct_s_f___d_i_t_h_e_r___i_n_f_o.html',1,'']]],
   ['sf_5fdither_5ftype',['SF_DITHER_TYPE',['../sndfile2k_8h.html#a420eb1d68419a60d437baae9818dd771',1,'sndfile2k.h']]],
@@ -153,7 +153,6 @@ var searchData=
   ['sf_5fvio_5ftell',['sf_vio_tell',['../group__file-base.html#ga457595d4cdaf505525ff421aebe6eb5d',1,'sndfile2k.h']]],
   ['sf_5fvio_5fwrite',['sf_vio_write',['../group__file-virt.html#gaa1b1f82878422da550bfd70f2be3ded3',1,'sndfile2k.h']]],
   ['sf_5fvirtual_5fio',['SF_VIRTUAL_IO',['../struct_s_f___v_i_r_t_u_a_l___i_o.html',1,'']]],
-  ['sf_5fwchar_5fopen',['sf_wchar_open',['../group__file-base.html#ga6d604e78b41c345f0824b8abebdb97a5',1,'sndfile2k.h']]],
   ['sf_5fwrite_5fdouble',['sf_write_double',['../group__read-write-items.html#gad136b4786d92924a9bc9175eb84edd8e',1,'sndfile2k.h']]],
   ['sf_5fwrite_5ffloat',['sf_write_float',['../group__read-write-items.html#gac77377d90c69261360301e15bade7365',1,'sndfile2k.h']]],
   ['sf_5fwrite_5fint',['sf_write_int',['../group__read-write-items.html#ga8953dd30dcd6cbc62279f461c79544b7',1,'sndfile2k.h']]],
@@ -231,6 +230,6 @@ var searchData=
   ['sndfile',['SNDFILE',['../group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc',1,'sndfile2k.h']]],
   ['sndfile2k_2eh',['sndfile2k.h',['../sndfile2k_8h.html',1,'']]],
   ['sndfile2k_2ehpp',['sndfile2k.hpp',['../sndfile2k_8hpp.html',1,'']]],
-  ['sndfilehandle',['SndfileHandle',['../class_sndfile_handle.html',1,'SndfileHandle'],['../class_sndfile_handle.html#a90b0e918f3531329dfb4ab0988187add',1,'SndfileHandle::SndfileHandle(void)'],['../class_sndfile_handle.html#a60e5ec8dac736c5f3a2fdc95e7e9c70e',1,'SndfileHandle::SndfileHandle(const char *path, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#af782c1d529a09587c127272bd96cb42a',1,'SndfileHandle::SndfileHandle(std::string const &amp;path, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#a3cbcef78befb00c3ad7391754a9c0343',1,'SndfileHandle::SndfileHandle(int fd, bool close_desc, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#a4c0aa4c1c1403c8ee28287a40eda0ddc',1,'SndfileHandle::SndfileHandle(SF_VIRTUAL_IO &amp;sfvirtual, void *user_data, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#a028b40645921aee524de73848139b9bc',1,'SndfileHandle::SndfileHandle(const wchar_t *wpath, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#af9c8bc95a16a9cc913586623c29a3bcd',1,'SndfileHandle::SndfileHandle(const SndfileHandle &amp;orig)']]],
-  ['strerror',['strError',['../class_sndfile_handle.html#aa627abe4c4e9f8eb5ee3b7ab9de9eed3',1,'SndfileHandle']]]
+  ['sndfilehandle',['SndfileHandle',['../class_sndfile_handle.html',1,'SndfileHandle'],['../class_sndfile_handle.html#a90b0e918f3531329dfb4ab0988187add',1,'SndfileHandle::SndfileHandle(void)'],['../class_sndfile_handle.html#a60e5ec8dac736c5f3a2fdc95e7e9c70e',1,'SndfileHandle::SndfileHandle(const char *path, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#af782c1d529a09587c127272bd96cb42a',1,'SndfileHandle::SndfileHandle(std::string const &amp;path, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#a3cbcef78befb00c3ad7391754a9c0343',1,'SndfileHandle::SndfileHandle(int fd, bool close_desc, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#a4c0aa4c1c1403c8ee28287a40eda0ddc',1,'SndfileHandle::SndfileHandle(SF_VIRTUAL_IO &amp;sfvirtual, void *user_data, int mode=SFM_READ, int format=0, int channels=0, int samplerate=0)'],['../class_sndfile_handle.html#af9c8bc95a16a9cc913586623c29a3bcd',1,'SndfileHandle::SndfileHandle(const SndfileHandle &amp;orig)']]],
+  ['strerror',['strError',['../class_sndfile_handle.html#a1405842e7e672b9789075bf8a4983a13',1,'SndfileHandle']]]
 ];
