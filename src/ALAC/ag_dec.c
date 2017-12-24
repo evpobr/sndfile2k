@@ -48,8 +48,7 @@
  - WSK 5/19/04
 */
 
-void set_standard_ag_params(AGParamRecPtr params, uint32_t fullwidth,
-                            uint32_t sectorwidth)
+void set_standard_ag_params(AGParamRecPtr params, uint32_t fullwidth, uint32_t sectorwidth)
 {
     /* Use
 		fullwidth = sectorwidth = numOfSamples, for analog 1-dimensional type-short data,
@@ -57,12 +56,11 @@ void set_standard_ag_params(AGParamRecPtr params, uint32_t fullwidth,
 		fullwidth = full image width, sectorwidth = sector (patch) width
 		for such as image (2-dim.) data.
 	*/
-    set_ag_params(params, MB0, PB0, KB0, fullwidth, sectorwidth,
-                  MAX_RUN_DEFAULT);
+    set_ag_params(params, MB0, PB0, KB0, fullwidth, sectorwidth, MAX_RUN_DEFAULT);
 }
 
-void set_ag_params(AGParamRecPtr params, uint32_t m, uint32_t p, uint32_t k,
-                   uint32_t f, uint32_t s, uint32_t maxrun)
+void set_ag_params(AGParamRecPtr params, uint32_t m, uint32_t p, uint32_t k, uint32_t f, uint32_t s,
+                   uint32_t maxrun)
 {
     params->mb = params->mb0 = m;
     params->pb = p;
@@ -110,8 +108,8 @@ static inline uint32_t ALWAYS_INLINE read32bit(uint8_t *buffer)
     // embedded CPUs typically can't read unaligned 32-bit words so just read the bytes
     uint32_t value;
 
-    value = ((uint32_t)buffer[0] << 24) | ((uint32_t)buffer[1] << 16) |
-            ((uint32_t)buffer[2] << 8) | (uint32_t)buffer[3];
+    value = ((uint32_t)buffer[0] << 24) | ((uint32_t)buffer[1] << 16) | ((uint32_t)buffer[2] << 8) |
+            (uint32_t)buffer[3];
     return value;
 }
 
@@ -121,9 +119,7 @@ static inline uint32_t ALWAYS_INLINE read32bit(uint8_t *buffer)
 
 #define get_next_fromlong(inlong, suff) ((inlong) >> (32 - (suff)))
 
-static inline uint32_t ALWAYS_INLINE getstreambits(uint8_t *in,
-                                                   int32_t bitoffset,
-                                                   int32_t numbits)
+static inline uint32_t ALWAYS_INLINE getstreambits(uint8_t *in, int32_t bitoffset, int32_t numbits)
 {
     uint32_t load1, load2;
     uint32_t byteoffset = bitoffset / 8;
@@ -157,8 +153,7 @@ static inline uint32_t ALWAYS_INLINE getstreambits(uint8_t *in,
     return result;
 }
 
-static inline int32_t dyn_get(unsigned char *in, uint32_t *bitPos, uint32_t m,
-                              uint32_t k)
+static inline int32_t dyn_get(unsigned char *in, uint32_t *bitPos, uint32_t m, uint32_t k)
 {
     uint32_t tempbits = *bitPos;
     uint32_t result;
@@ -206,8 +201,8 @@ static inline int32_t dyn_get(unsigned char *in, uint32_t *bitPos, uint32_t m,
     return result;
 }
 
-static inline int32_t dyn_get_32bit(uint8_t *in, uint32_t *bitPos, int32_t m,
-                                    int32_t k, int32_t maxbits)
+static inline int32_t dyn_get_32bit(uint8_t *in, uint32_t *bitPos, int32_t m, int32_t k,
+                                    int32_t maxbits)
 {
     uint32_t tempbits = *bitPos;
     uint32_t v;
@@ -259,8 +254,8 @@ static inline int32_t dyn_get_32bit(uint8_t *in, uint32_t *bitPos, int32_t m,
     return result;
 }
 
-int32_t dyn_decomp(AGParamRecPtr params, BitBuffer *bitstream, int32_t *pc,
-                   int32_t numSamples, int32_t maxSize, uint32_t *outNumBits)
+int32_t dyn_decomp(AGParamRecPtr params, BitBuffer *bitstream, int32_t *pc, int32_t numSamples,
+                   int32_t maxSize, uint32_t *outNumBits)
 {
     uint8_t *in;
     int32_t *outPtr = pc;
@@ -330,9 +325,7 @@ int32_t dyn_decomp(AGParamRecPtr params, BitBuffer *bitstream, int32_t *pc,
 
             n = dyn_get(in, &bitPos, mz, k);
 
-            RequireAction(c + n <= (uint32_t)numSamples,
-                          status = kALAC_ParamError;
-                          goto Exit;);
+            RequireAction(c + n <= (uint32_t)numSamples, status = kALAC_ParamError; goto Exit;);
 
             for (j = 0; j < n; j++)
             {

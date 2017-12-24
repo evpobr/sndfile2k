@@ -41,8 +41,7 @@ int16_t gsm_QLB[4] = {3277, 11469, 21299, 32767};
 /*   Table 4.4	 Coefficients of the weighting filter
  */
 /* i		    0      1   2    3   4      5      6     7   8   9    10  */
-int16_t gsm_H[11] = {-134, -374, 0, 2054, 5741, 8192,
-                     5741, 2054, 0, -374, -134};
+int16_t gsm_H[11] = {-134, -374, 0, 2054, 5741, 8192, 5741, 2054, 0, -374, -134};
 
 /*   Table 4.5 	 Normalized inverse mantissa used to compute xM/xmax
  */

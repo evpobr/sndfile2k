@@ -45,8 +45,7 @@
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
-void sfe_copy_data_fp(SNDFILE *outfile, SNDFILE *infile, int channels,
-                      int normalize)
+void sfe_copy_data_fp(SNDFILE *outfile, SNDFILE *infile, int channels, int normalize)
 {
     static double data[BUFFER_LEN], max;
     sf_count_t frames, readcount, k;
@@ -181,8 +180,7 @@ static int merge_broadcast_info(SNDFILE *infile, SNDFILE *outfile, int format,
         }
         else
         {
-            size_t slen =
-                MIN(strlen(info->coding_history), sizeof(binfo.coding_history));
+            size_t slen = MIN(strlen(info->coding_history), sizeof(binfo.coding_history));
 
             memset(binfo.coding_history, 0, sizeof(binfo.coding_history));
             memcpy(binfo.coding_history, info->coding_history, slen);
@@ -223,8 +221,7 @@ static void update_strings(SNDFILE *outfile, const METADATA_INFO *info)
         sf_set_string(outfile, SF_STR_LICENSE, info->license);
 }
 
-void sfe_apply_metadata_changes(const char *filenames[2],
-                                const METADATA_INFO *info)
+void sfe_apply_metadata_changes(const char *filenames[2], const METADATA_INFO *info)
 {
     SNDFILE *infile = NULL, *outfile = NULL;
     SF_INFO sfinfo;
@@ -261,8 +258,7 @@ void sfe_apply_metadata_changes(const char *filenames[2],
         goto cleanup_exit;
     };
 
-    if (info->has_bext_fields &&
-        merge_broadcast_info(infile, outfile, sfinfo.format, info))
+    if (info->has_bext_fields && merge_broadcast_info(infile, outfile, sfinfo.format, info))
     {
         error_code = 1;
         goto cleanup_exit;
@@ -273,8 +269,7 @@ void sfe_apply_metadata_changes(const char *filenames[2],
         int infileminor = SF_FORMAT_SUBMASK & sfinfo.format;
 
         /* If the input file is not the same as the output file, copy the data. */
-        if ((infileminor == SF_FORMAT_DOUBLE) ||
-            (infileminor == SF_FORMAT_FLOAT))
+        if ((infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT))
             sfe_copy_data_fp(outfile, infile, sfinfo.channels, SF_FALSE);
         else
             sfe_copy_data_int(outfile, infile, sfinfo.channels);
@@ -364,8 +359,7 @@ int sfe_file_type_of_ext(const char *str, int format)
 
     for (k = 0; k < (int)(sizeof(format_map) / sizeof(format_map[0])); k++)
     {
-        if (format_map[k].len > 0 &&
-            strncmp(buffer, format_map[k].ext, format_map[k].len) == 0)
+        if (format_map[k].len > 0 && strncmp(buffer, format_map[k].ext, format_map[k].len) == 0)
             return format_map[k].format | format;
         else if (strcmp(buffer, format_map[k].ext) == 0)
             return format_map[k].format | format;
@@ -384,8 +378,7 @@ void sfe_dump_format_map(void)
     {
         info.format = format_map[k].format;
         sf_command(NULL, SFC_GET_FORMAT_INFO, &info, sizeof(info));
-        printf("        %-10s : %s\n", format_map[k].ext,
-               info.name == NULL ? "????" : info.name);
+        printf("        %-10s : %s\n", format_map[k].ext, info.name == NULL ? "????" : info.name);
     };
 }
 

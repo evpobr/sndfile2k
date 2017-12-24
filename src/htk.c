@@ -43,8 +43,7 @@ int htk_open(SF_PRIVATE *psf)
     if (psf->is_pipe)
         return SFE_HTK_NO_PIPE;
 
-    if (psf->file.mode == SFM_READ ||
-        (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = htk_read_header(psf)))
             return error;
@@ -112,8 +111,7 @@ static int htk_write_header(SF_PRIVATE *psf, int calc_length)
 
     sample_period = 10000000 / psf->sf.samplerate;
 
-    psf_binheader_writef(psf, "E444", BHW4(sample_count), BHW4(sample_period),
-                         BHW4(0x20000));
+    psf_binheader_writef(psf, "E444", BHW4(sample_count), BHW4(sample_period), BHW4(0x20000));
 
     /* Header construction complete so write it out. */
     psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
@@ -176,8 +174,7 @@ static int htk_read_header(SF_PRIVATE *psf)
 {
     int sample_count, sample_period, marker;
 
-    psf_binheader_readf(psf, "pE444", 0, &sample_count, &sample_period,
-                        &marker);
+    psf_binheader_readf(psf, "pE444", 0, &sample_count, &sample_period, &marker);
 
     if (2 * sample_count + 12 != psf->filelength)
         return SFE_HTK_BAD_FILE_LEN;
@@ -190,16 +187,18 @@ static int htk_read_header(SF_PRIVATE *psf)
     if (sample_period > 0)
     {
         psf->sf.samplerate = 10000000 / sample_period;
-        psf_log_printf(psf, "HTK Waveform file\n  Sample Count  : %d\n  Sample "
-                            "Period : %d => %d Hz\n",
+        psf_log_printf(psf,
+                       "HTK Waveform file\n  Sample Count  : %d\n  Sample "
+                       "Period : %d => %d Hz\n",
                        sample_count, sample_period, psf->sf.samplerate);
     }
     else
     {
         psf->sf.samplerate = 16000;
-        psf_log_printf(psf, "HTK Waveform file\n  Sample Count  : %d\n  Sample "
-                            "Period : %d (should be > 0) => Guessed sample "
-                            "rate %d Hz\n",
+        psf_log_printf(psf,
+                       "HTK Waveform file\n  Sample Count  : %d\n  Sample "
+                       "Period : %d (should be > 0) => Guessed sample "
+                       "rate %d Hz\n",
                        sample_count, sample_period, psf->sf.samplerate);
     };
 

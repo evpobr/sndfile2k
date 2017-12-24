@@ -40,7 +40,7 @@ void Gsm_Coder(struct gsm_state *State,
                int16_t *Mc, /* [0..3] RPE grid selection        OUT */
                int16_t *xmaxc, /* [0..3] Coded maximum amplitude   OUT */
                int16_t *xMc /* [13*4] normalized RPE samples    OUT */
-               )
+)
 {
     int k;
     int16_t *dp = State->dp0 + 120; /* [-120...-1] */
@@ -76,6 +76,5 @@ void Gsm_Coder(struct gsm_state *State,
         dp += 40;
         dpp += 40;
     }
-    memcpy((char *)State->dp0, (char *)(State->dp0 + 160),
-           120 * sizeof(*State->dp0));
+    memcpy((char *)State->dp0, (char *)(State->dp0 + 160), 120 * sizeof(*State->dp0));
 }

@@ -160,11 +160,10 @@ static void Cut_Calculation_of_the_LTP_parameters(
 
 #endif /* LTP_CUT */
 
-static void
-Calculation_of_the_LTP_parameters(register int16_t *d, /* [0..39]      IN  */
-                                  register int16_t *dp, /* [-120..-1]   IN  */
-                                  int16_t *bc_out, /*              OUT */
-                                  int16_t *Nc_out /*              OUT */)
+static void Calculation_of_the_LTP_parameters(register int16_t *d, /* [0..39]      IN  */
+                                              register int16_t *dp, /* [-120..-1]   IN  */
+                                              int16_t *bc_out, /*              OUT */
+                                              int16_t *Nc_out /*              OUT */)
 {
     register int k, lambda;
     int16_t Nc, bc;
@@ -327,12 +326,11 @@ Calculation_of_the_LTP_parameters(register int16_t *d, /* [0..39]      IN  */
 
 #ifdef LTP_CUT
 
-static void Cut_Calculation_of_the_LTP_parameters(
-    struct gsm_state *st, /*              IN  */
-    register int16_t *d, /* [0..39]      IN  */
-    register int16_t *dp, /* [-120..-1]   IN  */
-    int16_t *bc_out, /*              OUT */
-    int16_t *Nc_out /*              OUT */)
+static void Cut_Calculation_of_the_LTP_parameters(struct gsm_state *st, /*              IN  */
+                                                  register int16_t *d, /* [0..39]      IN  */
+                                                  register int16_t *dp, /* [-120..-1]   IN  */
+                                                  int16_t *bc_out, /*              OUT */
+                                                  int16_t *Nc_out /*              OUT */)
 {
     register int k, lambda;
     int16_t Nc, bc;
@@ -398,11 +396,10 @@ static void Cut_Calculation_of_the_LTP_parameters(
         register float *lp = dp_float - lambda;
 
         register float W;
-        register float a = lp[-8], b = lp[-7], c = lp[-6], d = lp[-5],
-                       e = lp[-4], f = lp[-3], g = lp[-2], h = lp[-1];
+        register float a = lp[-8], b = lp[-7], c = lp[-6], d = lp[-5], e = lp[-4], f = lp[-3],
+                       g = lp[-2], h = lp[-1];
         register float E;
-        register float S0 = 0, S1 = 0, S2 = 0, S3 = 0, S4 = 0, S5 = 0, S6 = 0,
-                       S7 = 0, S8 = 0;
+        register float S0 = 0, S1 = 0, S2 = 0, S3 = 0, S4 = 0, S5 = 0, S6 = 0, S7 = 0, S8 = 0;
 
 #undef STEP
 #define STEP(K, a, b, c, d, e, f, g, h) \
@@ -597,11 +594,10 @@ static void Cut_Calculation_of_the_LTP_parameters(
 
 #endif /* LTP_CUT */
 
-static void
-Calculation_of_the_LTP_parameters(register int16_t *din, /* [0..39]      IN  */
-                                  register int16_t *dp, /* [-120..-1]   IN  */
-                                  int16_t *bc_out, /*              OUT */
-                                  int16_t *Nc_out /*              OUT */)
+static void Calculation_of_the_LTP_parameters(register int16_t *din, /* [0..39]      IN  */
+                                              register int16_t *dp, /* [-120..-1]   IN  */
+                                              int16_t *bc_out, /*              OUT */
+                                              int16_t *Nc_out /*              OUT */)
 {
     register int k, lambda;
     int16_t Nc, bc;
@@ -659,11 +655,10 @@ Calculation_of_the_LTP_parameters(register int16_t *din, /* [0..39]      IN  */
         register float *lp = dp_float - lambda;
 
         register float W;
-        register float a = lp[-8], b = lp[-7], c = lp[-6], d = lp[-5],
-                       e = lp[-4], f = lp[-3], g = lp[-2], h = lp[-1];
+        register float a = lp[-8], b = lp[-7], c = lp[-6], d = lp[-5], e = lp[-4], f = lp[-3],
+                       g = lp[-2], h = lp[-1];
         register float E;
-        register float S0 = 0, S1 = 0, S2 = 0, S3 = 0, S4 = 0, S5 = 0, S6 = 0,
-                       S7 = 0, S8 = 0;
+        register float S0 = 0, S1 = 0, S2 = 0, S3 = 0, S4 = 0, S5 = 0, S6 = 0, S7 = 0, S8 = 0;
 
 #undef STEP
 #define STEP(K, a, b, c, d, e, f, g, h) \
@@ -855,12 +850,11 @@ Calculation_of_the_LTP_parameters(register int16_t *din, /* [0..39]      IN  */
 #ifdef FAST
 #ifdef LTP_CUT
 
-static void Cut_Fast_Calculation_of_the_LTP_parameters(
-    struct gsm_state *st, /*              IN  */
-    register int16_t *d, /* [0..39]      IN  */
-    register int16_t *dp, /* [-120..-1]   IN  */
-    int16_t *bc_out, /*              OUT */
-    int16_t *Nc_out /*              OUT */)
+static void Cut_Fast_Calculation_of_the_LTP_parameters(struct gsm_state *st, /*              IN  */
+                                                       register int16_t *d, /* [0..39]      IN  */
+                                                       register int16_t *dp, /* [-120..-1]   IN  */
+                                                       int16_t *bc_out, /*              OUT */
+                                                       int16_t *Nc_out /*              OUT */)
 {
     register int k, lambda;
     register float wt_float;
@@ -938,11 +932,10 @@ static void Cut_Fast_Calculation_of_the_LTP_parameters(
 
 #endif /* LTP_CUT */
 
-static void Fast_Calculation_of_the_LTP_parameters(
-    register int16_t *din, /* [0..39]      IN  */
-    register int16_t *dp, /* [-120..-1]   IN  */
-    int16_t *bc_out, /*              OUT */
-    int16_t *Nc_out /*              OUT */)
+static void Fast_Calculation_of_the_LTP_parameters(register int16_t *din, /* [0..39]      IN  */
+                                                   register int16_t *dp, /* [-120..-1]   IN  */
+                                                   int16_t *bc_out, /*              OUT */
+                                                   int16_t *Nc_out /*              OUT */)
 {
     register int k, lambda;
     int16_t Nc, bc;
@@ -967,11 +960,10 @@ static void Fast_Calculation_of_the_LTP_parameters(
         register float *lp = dp_float - lambda;
 
         register float W;
-        register float a = lp[-8], b = lp[-7], c = lp[-6], d = lp[-5],
-                       e = lp[-4], f = lp[-3], g = lp[-2], h = lp[-1];
+        register float a = lp[-8], b = lp[-7], c = lp[-6], d = lp[-5], e = lp[-4], f = lp[-3],
+                       g = lp[-2], h = lp[-1];
         register float E;
-        register float S0 = 0, S1 = 0, S2 = 0, S3 = 0, S4 = 0, S5 = 0, S6 = 0,
-                       S7 = 0, S8 = 0;
+        register float S0 = 0, S1 = 0, S2 = 0, S3 = 0, S4 = 0, S5 = 0, S6 = 0, S7 = 0, S8 = 0;
 
 #undef STEP
 #define STEP(K, a, b, c, d, e, f, g, h) \
@@ -1137,13 +1129,13 @@ static void Fast_Calculation_of_the_LTP_parameters(
 
 /* 4.2.12 */
 
-static void Long_term_analysis_filtering(
-    int16_t bc, /*                                  IN  */
-    int16_t Nc, /*                                  IN  */
-    register int16_t *dp, /* previous d            [-120..-1] IN  */
-    register int16_t *d, /* d                     [0..39]    IN  */
-    register int16_t *dpp, /* estimate              [0..39]    OUT */
-    register int16_t *e /* long term res. signal [0..39]    OUT */)
+static void
+Long_term_analysis_filtering(int16_t bc, /*                                  IN  */
+                             int16_t Nc, /*                                  IN  */
+                             register int16_t *dp, /* previous d            [-120..-1] IN  */
+                             register int16_t *d, /* d                     [0..39]    IN  */
+                             register int16_t *dpp, /* estimate              [0..39]    OUT */
+                             register int16_t *e /* long term res. signal [0..39]    OUT */)
 /*
  *  In this part, we have to decode the bc parameter to compute
  *  the samples of the estimate dpp [0..39].  The decoding of bc needs the
@@ -1155,14 +1147,13 @@ static void Long_term_analysis_filtering(
 
 #undef STEP
 #define STEP(BP)                             \
-    \
-for(k = 0; k <= 39; k++)                     \
-    \
-{                                     \
+                                             \
+    for (k = 0; k <= 39; k++)                \
+                                             \
+    {                                        \
         dpp[k] = GSM_MULT_R(BP, dp[k - Nc]); \
         e[k] = GSM_SUB(d[k], dpp[k]);        \
-    \
-}
+    }
 
     switch (bc)
     {
@@ -1189,8 +1180,7 @@ void Gsm_Long_Term_Predictor(/* 4x for 160 samples */
                              int16_t *dp, /* [-120..-1] d'                IN */
 
                              int16_t *e, /* [0..39]                      OUT */
-                             int16_t
-                                 *dpp, /* [0..39]                      OUT */
+                             int16_t *dpp, /* [0..39]                      OUT */
                              int16_t *Nc, /* correlation lag              OUT */
                              int16_t *bc /* gain factor                  OUT */)
 {
@@ -1222,11 +1212,11 @@ void Gsm_Long_Term_Predictor(/* 4x for 160 samples */
 }
 
 /* 4.3.2 */
-void Gsm_Long_Term_Synthesis_Filtering(
-    struct gsm_state *S,
+void Gsm_Long_Term_Synthesis_Filtering(struct gsm_state *S,
 
-    int16_t Ncr, int16_t bcr, register int16_t *erp, /* [0..39]          IN */
-    register int16_t *drp /* [-120..-1] IN, [-120..40] OUT */)
+                                       int16_t Ncr, int16_t bcr,
+                                       register int16_t *erp, /* [0..39]          IN */
+                                       register int16_t *drp /* [-120..-1] IN, [-120..40] OUT */)
 /*
  *  This procedure uses the bcr and Ncr parameter to realize the
  *  long term synthesis filtering.  The decoding of bcr needs

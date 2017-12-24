@@ -138,9 +138,7 @@ static int ogg_opus_close(SF_PRIVATE *UNUSED(psf))
 
 int ogg_opus_open(SF_PRIVATE *psf)
 {
-    psf_log_printf(
-        psf,
-        "This version of libsndfile was compiled without Ogg/Opus support.\n");
+    psf_log_printf(psf, "This version of libsndfile was compiled without Ogg/Opus support.\n");
     return SFE_UNIMPLEMENTED;
 }
 

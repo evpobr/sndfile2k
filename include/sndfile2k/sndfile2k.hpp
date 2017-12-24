@@ -59,24 +59,24 @@
  */
 class SndfileHandle
 {
-private:
-	struct SNDFILE_ref
-	{
-		SNDFILE_ref(void);
-		~SNDFILE_ref(void);
+  private:
+    struct SNDFILE_ref
+    {
+        SNDFILE_ref(void);
+        ~SNDFILE_ref(void);
 
-		SNDFILE *sf;
-		SF_INFO sfinfo;
-		int ref;
-	};
+        SNDFILE *sf;
+        SF_INFO sfinfo;
+        int ref;
+    };
 
-	SNDFILE_ref *p;
+    SNDFILE_ref *p;
 
-public:
-	/** SndFileHandle default constructor.
+  public:
+    /** SndFileHandle default constructor.
 	 *
 	 */
-	SndfileHandle(void) : p(NULL) {};
+    SndfileHandle(void) : p(NULL){};
 
     /** Opens the specified file using path
      *
@@ -105,8 +105,8 @@ public:
      * @sa sf_wchar_open(), sf_open_fd(), sf_open_virtual()
      * @sa sf_close()
      */
-	SndfileHandle(const char *path, int mode = SFM_READ,
-	              int format = 0, int channels = 0, int samplerate = 0);
+    SndfileHandle(const char *path, int mode = SFM_READ, int format = 0, int channels = 0,
+                  int samplerate = 0);
 
     /** Opens the specified file using path
      *
@@ -122,8 +122,8 @@ public:
      * @sa sf_wchar_open(), sf_open_fd(), sf_open_virtual()
      * @sa sf_close()
      */
-	SndfileHandle(std::string const &path, int mode = SFM_READ,
-	              int format = 0, int channels = 0, int samplerate = 0);
+    SndfileHandle(std::string const &path, int mode = SFM_READ, int format = 0, int channels = 0,
+                  int samplerate = 0);
 
     /** Opens file using @c POSIX file descriptor
      *
@@ -158,8 +158,8 @@ public:
      * @sa sf_open(), sf_wchar_open(), sf_open_virtual()
      * @sa sf_close()
      */
-	SndfileHandle(int fd, bool close_desc, int mode = SFM_READ,
-	              int format = 0, int channels = 0, int samplerate = 0);
+    SndfileHandle(int fd, bool close_desc, int mode = SFM_READ, int format = 0, int channels = 0,
+                  int samplerate = 0);
 
     /** Opens sound file using Virtual I/O context
      *
@@ -179,8 +179,8 @@ public:
      * @sa sf_open(), sf_wchar_open(), sf_open_fd()
      * @sa sf_close()
      */
-	SndfileHandle(SF_VIRTUAL_IO &sfvirtual, void *user_data, int mode = SFM_READ,
-	              int format = 0, int channels = 0, int samplerate = 0);
+    SndfileHandle(SF_VIRTUAL_IO &sfvirtual, void *user_data, int mode = SFM_READ, int format = 0,
+                  int channels = 0, int samplerate = 0);
 
 #if (defined(_WIN32) || defined(__CYGWIN__))
 
@@ -200,72 +200,72 @@ public:
      * @sa sf_open(), sf_open_fd(), sf_open_virtual()
      * @sa sf_close()
      */
-	SndfileHandle(const wchar_t *wpath, int mode = SFM_READ,
-	              int format = 0, int channels = 0, int samplerate = 0);
+    SndfileHandle(const wchar_t *wpath, int mode = SFM_READ, int format = 0, int channels = 0,
+                  int samplerate = 0);
 #endif
 
     /** SndfileHandle destructor
      */
-	~SndfileHandle(void);
+    ~SndfileHandle(void);
 
     /** SndfileHandle copy constructor
      */
-	SndfileHandle(const SndfileHandle &orig);
+    SndfileHandle(const SndfileHandle &orig);
 
     /** Assignment operator
      */
-	SndfileHandle &operator = (const SndfileHandle &rhs);
+    SndfileHandle &operator=(const SndfileHandle &rhs);
 
     /** Gets number of references to this sound file
      */
-	int refCount(void) const
-	{
-		return (p == NULL) ? 0 : p->ref;
-	}
+    int refCount(void) const
+    {
+        return (p == NULL) ? 0 : p->ref;
+    }
 
     /** Compares sound file with NULL
      */
-	operator bool() const
-	{
-		return (p != NULL);
-	}
+    operator bool() const
+    {
+        return (p != NULL);
+    }
 
     /** Compares one sound file object with other
      */
-	bool operator == (const SndfileHandle &rhs) const
-	{
-		return (p == rhs.p);
-	}
+    bool operator==(const SndfileHandle &rhs) const
+    {
+        return (p == rhs.p);
+    }
 
     /** Gets number of frames
      */
-	sf_count_t frames(void) const
-	{
-		return p ? p->sfinfo.frames : 0;
-	}
+    sf_count_t frames(void) const
+    {
+        return p ? p->sfinfo.frames : 0;
+    }
 
     /** Gets format
      *
      * @sa ::SF_FORMAT
      */
-	int format(void) const
-	{
-		return p ? p->sfinfo.format : 0;
-	}
+    int format(void) const
+    {
+        return p ? p->sfinfo.format : 0;
+    }
 
     /** Gets number of channels
      */
-	int channels(void) const
-	{
-		return p ? p->sfinfo.channels : 0;
-	}
+    int channels(void) const
+    {
+        return p ? p->sfinfo.channels : 0;
+    }
 
     /** Gets samplerate
      */
-	int samplerate(void) const
-	{
-		return p ? p->sfinfo.samplerate : 0;
-	}
+    int samplerate(void) const
+    {
+        return p ? p->sfinfo.samplerate : 0;
+    }
 
     /** Gets the current error code of sound file object
      *
@@ -282,7 +282,7 @@ public:
      *
      * @sa strError()
      */
-	int error(void) const;
+    int error(void) const;
 
     /** Returns textual description of  the current error code
      *
@@ -290,7 +290,7 @@ public:
      *
      * @sa error()
      */
-	const char *strError(void) const;
+    const char *strError(void) const;
 
     /** Gets or sets parameters of library or sound file object.
      *
@@ -300,7 +300,7 @@ public:
      *
      * @return Command-specific, see particular command description.
      */
-	int command(int cmd, void *data, int datasize);
+    int command(int cmd, void *data, int datasize);
 
     /** Changes position of sound file
      *
@@ -328,7 +328,7 @@ public:
      * or @c -1 if an error occured (ie an attempt is made to seek beyond the
      * start or end of the file).
      */
-	sf_count_t seek(sf_count_t frames, int whence);
+    sf_count_t seek(sf_count_t frames, int whence);
 
     /** Forces writing of data to disk
      *
@@ -336,7 +336,7 @@ public:
      * to force the writing of data to disk. If the file is opened ::SFM_READ no
      * action is taken.
      */
-	void writeSync(void);
+    void writeSync(void);
 
     /** Sets string field
      *
@@ -353,7 +353,7 @@ public:
      *
      * @return Zero on success and non-zero value otherwise.
      */
-	int setString(int str_type, const char *str);
+    int setString(int str_type, const char *str);
 
     /** Gets string field
      *
@@ -363,7 +363,7 @@ public:
      * @return Zero-terminated string in utf-8 encoding on success or @c NULL
      * otherwise.
      */
-	const char *getString(int str_type) const;
+    const char *getString(int str_type) const;
 
     /** Checks correctness of format parameters combination
      *
@@ -375,7 +375,7 @@ public:
      *
      * @sa sf_format_check()
      */
-	static int formatCheck(int format, int channels, int samplerate);
+    static int formatCheck(int format, int channels, int samplerate);
 
     /** Reads short (16-bit) samples from file
      *
@@ -384,7 +384,7 @@ public:
      *
      * @return Number of samples actually read.
      */
-	sf_count_t read(short *ptr, sf_count_t items);
+    sf_count_t read(short *ptr, sf_count_t items);
 
     /** Reads integer (32-bit) samples from file
      *
@@ -393,7 +393,7 @@ public:
      *
      * @return Number of samples actually read.
      */
-	sf_count_t read(int *ptr, sf_count_t items);
+    sf_count_t read(int *ptr, sf_count_t items);
 
     /** Reads float (32-bit) samples from file
      *
@@ -402,7 +402,7 @@ public:
      *
      * @return Number of samples actually read.
      */
-	sf_count_t read(float *ptr, sf_count_t items);
+    sf_count_t read(float *ptr, sf_count_t items);
 
     /** Reads double (64-bit) samples from file
      *
@@ -411,7 +411,7 @@ public:
      *
      * @return Number of samples actually read.
      */
-	sf_count_t read(double *ptr, sf_count_t items);
+    sf_count_t read(double *ptr, sf_count_t items);
 
     /** Writes short (16-bit) samples to file
      *
@@ -420,7 +420,7 @@ public:
      *
      * @return Number of samples actually written.
      */
-	sf_count_t write(const short *ptr, sf_count_t items);
+    sf_count_t write(const short *ptr, sf_count_t items);
 
     /** Writes integer (32-bit) samples to file
      *
@@ -429,7 +429,7 @@ public:
      *
      * @return Number of samples actually written.
      */
-	sf_count_t write(const int *ptr, sf_count_t items);
+    sf_count_t write(const int *ptr, sf_count_t items);
 
     /** Writes float (32-bit) samples to file
      *
@@ -438,7 +438,7 @@ public:
      *
      * @return Number of samples actually written.
      */
-	sf_count_t write(const float *ptr, sf_count_t items);
+    sf_count_t write(const float *ptr, sf_count_t items);
 
     /** Writes double (64-bit) samples to file
      *
@@ -447,7 +447,7 @@ public:
      *
      * @return Number of samples actually written.
      */
-	sf_count_t write(const double *ptr, sf_count_t items);
+    sf_count_t write(const double *ptr, sf_count_t items);
 
     /** Reads short (16-bit) frames from file
      *
@@ -456,7 +456,7 @@ public:
      *
      * @return Number of frames actually read.
      */
-	sf_count_t readf(short *ptr, sf_count_t frames);
+    sf_count_t readf(short *ptr, sf_count_t frames);
 
     /** Reads integer (32-bit) frames from file
      *
@@ -465,7 +465,7 @@ public:
      *
      * @return Number of frames actually read.
      */
-	sf_count_t readf(int *ptr, sf_count_t frames);
+    sf_count_t readf(int *ptr, sf_count_t frames);
 
     /** Reads float (32-bit) frames from file
      *
@@ -474,7 +474,7 @@ public:
      *
      * @return Number of frames actually read.
      */
-	sf_count_t readf(float *ptr, sf_count_t frames);
+    sf_count_t readf(float *ptr, sf_count_t frames);
 
     /** Reads double (64-bit) frames from file
      *
@@ -483,7 +483,7 @@ public:
      *
      * @return Number of frames actually read.
      */
-	sf_count_t readf(double *ptr, sf_count_t frames);
+    sf_count_t readf(double *ptr, sf_count_t frames);
 
     /** Writes short (16-bit) frames to file
      *
@@ -492,7 +492,7 @@ public:
      *
      * @return Number of frames actually written.
      */
-	sf_count_t writef(const short *ptr, sf_count_t frames);
+    sf_count_t writef(const short *ptr, sf_count_t frames);
 
     /** Writes integer (32-bit) frames to file
      *
@@ -501,7 +501,7 @@ public:
      *
      * @return Number of frames actually written.
      */
-	sf_count_t writef(const int *ptr, sf_count_t frames);
+    sf_count_t writef(const int *ptr, sf_count_t frames);
 
     /** Writes float (32-bit) frames to file
      *
@@ -510,7 +510,7 @@ public:
      *
      * @return Number of frames actually written.
      */
-	sf_count_t writef(const float *ptr, sf_count_t frames);
+    sf_count_t writef(const float *ptr, sf_count_t frames);
 
     /** Writes double (64-bit) frames to file
      *
@@ -519,7 +519,7 @@ public:
      *
      * @return Number of frames actually written.
      */
-	sf_count_t writef(const double *ptr, sf_count_t frames);
+    sf_count_t writef(const double *ptr, sf_count_t frames);
 
     /** Read raw bytes from sound file
      *
@@ -531,7 +531,7 @@ public:
      *
      * @return Number of bytes actually read.
      */
-	sf_count_t readRaw(void *ptr, sf_count_t bytes);
+    sf_count_t readRaw(void *ptr, sf_count_t bytes);
 
     /** Writes raw bytes to sound file
      *
@@ -543,176 +543,174 @@ public:
      *
      * @return Number of bytes actually written.
      */
-	sf_count_t writeRaw(const void *ptr, sf_count_t bytes);
+    sf_count_t writeRaw(const void *ptr, sf_count_t bytes);
 
-	/** Gets ccess to the raw sound file handle
+    /** Gets ccess to the raw sound file handle
      */
-	SNDFILE *rawHandle(void);
+    SNDFILE *rawHandle(void);
 
-	/** Takes ownership of handle, if reference count is 1
+    /** Takes ownership of handle, if reference count is 1
      */
-	SNDFILE *takeOwnership(void);
+    SNDFILE *takeOwnership(void);
 };
 
 /*==============================================================================
 **	Nothing but implementation below.
 */
 
-inline SndfileHandle::SNDFILE_ref::SNDFILE_ref(void)
-	: sf(NULL), sfinfo(), ref(1)
-{}
+inline SndfileHandle::SNDFILE_ref::SNDFILE_ref(void) : sf(NULL), sfinfo(), ref(1)
+{
+}
 
 inline SndfileHandle::SNDFILE_ref::~SNDFILE_ref(void)
 {
-	if (sf != NULL) sf_close(sf);
+    if (sf != NULL)
+        sf_close(sf);
 }
 
-inline SndfileHandle::SndfileHandle(const char *path, int mode, int fmt,
-                                    int chans, int srate)
-	: p(NULL)
+inline SndfileHandle::SndfileHandle(const char *path, int mode, int fmt, int chans, int srate)
+    : p(NULL)
 {
-	p = new (std::nothrow) SNDFILE_ref();
+    p = new (std::nothrow) SNDFILE_ref();
 
-	if (p != NULL)
-	{
-		p->ref = 1;
+    if (p != NULL)
+    {
+        p->ref = 1;
 
-		p->sfinfo.frames = 0;
-		p->sfinfo.channels = chans;
-		p->sfinfo.format = fmt;
-		p->sfinfo.samplerate = srate;
-		p->sfinfo.sections = 0;
-		p->sfinfo.seekable = 0;
+        p->sfinfo.frames = 0;
+        p->sfinfo.channels = chans;
+        p->sfinfo.format = fmt;
+        p->sfinfo.samplerate = srate;
+        p->sfinfo.sections = 0;
+        p->sfinfo.seekable = 0;
 
-		p->sf = sf_open(path, mode, &p->sfinfo);
-	};
+        p->sf = sf_open(path, mode, &p->sfinfo);
+    };
 
-	return;
+    return;
 } /* SndfileHandle const char * constructor */
 
-inline SndfileHandle::SndfileHandle(std::string const &path, int mode, int fmt,
-                                    int chans, int srate)
-	: p(NULL)
+inline SndfileHandle::SndfileHandle(std::string const &path, int mode, int fmt, int chans,
+                                    int srate)
+    : p(NULL)
 {
-	p = new (std::nothrow) SNDFILE_ref();
+    p = new (std::nothrow) SNDFILE_ref();
 
-	if (p != NULL)
-	{
-		p->ref = 1;
+    if (p != NULL)
+    {
+        p->ref = 1;
 
-		p->sfinfo.frames = 0;
-		p->sfinfo.channels = chans;
-		p->sfinfo.format = fmt;
-		p->sfinfo.samplerate = srate;
-		p->sfinfo.sections = 0;
-		p->sfinfo.seekable = 0;
+        p->sfinfo.frames = 0;
+        p->sfinfo.channels = chans;
+        p->sfinfo.format = fmt;
+        p->sfinfo.samplerate = srate;
+        p->sfinfo.sections = 0;
+        p->sfinfo.seekable = 0;
 
-		p->sf = sf_open(path.c_str(), mode, &p->sfinfo);
-	};
+        p->sf = sf_open(path.c_str(), mode, &p->sfinfo);
+    };
 
-	return;
+    return;
 } /* SndfileHandle std::string constructor */
 
-inline SndfileHandle::SndfileHandle(int fd, bool close_desc, int mode, int fmt,
-                                    int chans, int srate)
-	: p(NULL)
+inline SndfileHandle::SndfileHandle(int fd, bool close_desc, int mode, int fmt, int chans,
+                                    int srate)
+    : p(NULL)
 {
-	if (fd < 0)
-		return;
+    if (fd < 0)
+        return;
 
-	p = new (std::nothrow) SNDFILE_ref();
+    p = new (std::nothrow) SNDFILE_ref();
 
-	if (p != NULL)
-	{
-		p->ref = 1;
+    if (p != NULL)
+    {
+        p->ref = 1;
 
-		p->sfinfo.frames = 0;
-		p->sfinfo.channels = chans;
-		p->sfinfo.format = fmt;
-		p->sfinfo.samplerate = srate;
-		p->sfinfo.sections = 0;
-		p->sfinfo.seekable = 0;
+        p->sfinfo.frames = 0;
+        p->sfinfo.channels = chans;
+        p->sfinfo.format = fmt;
+        p->sfinfo.samplerate = srate;
+        p->sfinfo.sections = 0;
+        p->sfinfo.seekable = 0;
 
-		p->sf = sf_open_fd(fd, mode, &p->sfinfo, close_desc);
-	};
+        p->sf = sf_open_fd(fd, mode, &p->sfinfo, close_desc);
+    };
 
-	return;
+    return;
 } /* SndfileHandle fd constructor */
 
-inline SndfileHandle::SndfileHandle(SF_VIRTUAL_IO &sfvirtual, void *user_data,
-                                    int mode, int fmt, int chans, int srate)
-	: p(NULL)
+inline SndfileHandle::SndfileHandle(SF_VIRTUAL_IO &sfvirtual, void *user_data, int mode, int fmt,
+                                    int chans, int srate)
+    : p(NULL)
 {
-	p = new (std::nothrow) SNDFILE_ref();
+    p = new (std::nothrow) SNDFILE_ref();
 
-	if (p != NULL)
-	{
-		p->ref = 1;
+    if (p != NULL)
+    {
+        p->ref = 1;
 
-		p->sfinfo.frames = 0;
-		p->sfinfo.channels = chans;
-		p->sfinfo.format = fmt;
-		p->sfinfo.samplerate = srate;
-		p->sfinfo.sections = 0;
-		p->sfinfo.seekable = 0;
+        p->sfinfo.frames = 0;
+        p->sfinfo.channels = chans;
+        p->sfinfo.format = fmt;
+        p->sfinfo.samplerate = srate;
+        p->sfinfo.sections = 0;
+        p->sfinfo.seekable = 0;
 
-		p->sf = sf_open_virtual(&sfvirtual, mode, &p->sfinfo, user_data);
-	};
+        p->sf = sf_open_virtual(&sfvirtual, mode, &p->sfinfo, user_data);
+    };
 
-	return;
+    return;
 } /* SndfileHandle std::string constructor */
 
 inline SndfileHandle::~SndfileHandle(void)
 {
-	if (p != NULL && --p->ref == 0)
-		delete p;
+    if (p != NULL && --p->ref == 0)
+        delete p;
 } /* SndfileHandle destructor */
 
-
-inline SndfileHandle::SndfileHandle(const SndfileHandle &orig)
-	: p(orig.p)
+inline SndfileHandle::SndfileHandle(const SndfileHandle &orig) : p(orig.p)
 {
-	if (p != NULL)
-		++p->ref;
+    if (p != NULL)
+        ++p->ref;
 } /* SndfileHandle copy constructor */
 
-inline SndfileHandle &SndfileHandle::operator = (const SndfileHandle &rhs)
+inline SndfileHandle &SndfileHandle::operator=(const SndfileHandle &rhs)
 {
-	if (&rhs == this)
-		return *this;
-	if (p != NULL && --p->ref == 0)
-		delete p;
+    if (&rhs == this)
+        return *this;
+    if (p != NULL && --p->ref == 0)
+        delete p;
 
-	p = rhs.p;
-	if (p != NULL)
-		++p->ref;
+    p = rhs.p;
+    if (p != NULL)
+        ++p->ref;
 
-	return *this;
+    return *this;
 } /* SndfileHandle assignment operator */
 
 inline int SndfileHandle::error(void) const
 {
-	return sf_error(p->sf);
+    return sf_error(p->sf);
 }
 
 inline const char *SndfileHandle::strError(void) const
 {
-	return sf_strerror(p->sf);
+    return sf_strerror(p->sf);
 }
 
 inline int SndfileHandle::command(int cmd, void *data, int datasize)
 {
-	return sf_command(p->sf, cmd, data, datasize);
+    return sf_command(p->sf, cmd, data, datasize);
 }
 
 inline sf_count_t SndfileHandle::seek(sf_count_t frame_count, int whence)
 {
-	return sf_seek(p->sf, frame_count, whence);
+    return sf_seek(p->sf, frame_count, whence);
 }
 
 inline void SndfileHandle::writeSync(void)
 {
-	sf_write_sync(p->sf);
+    sf_write_sync(p->sf);
 }
 
 /** Sets string field
@@ -732,7 +730,7 @@ inline void SndfileHandle::writeSync(void)
  */
 inline int SndfileHandle::setString(int str_type, const char *str)
 {
-	return sf_set_string(p->sf, str_type, str);
+    return sf_set_string(p->sf, str_type, str);
 }
 
 /** Gets string field
@@ -744,159 +742,154 @@ inline int SndfileHandle::setString(int str_type, const char *str)
  */
 inline const char *SndfileHandle::getString(int str_type) const
 {
-	return sf_get_string(p->sf, str_type);
+    return sf_get_string(p->sf, str_type);
 }
 
 inline int SndfileHandle::formatCheck(int fmt, int chans, int srate)
 {
-	SF_INFO sfinfo;
+    SF_INFO sfinfo;
 
-	sfinfo.frames = 0;
-	sfinfo.channels = chans;
-	sfinfo.format = fmt;
-	sfinfo.samplerate = srate;
-	sfinfo.sections = 0;
-	sfinfo.seekable = 0;
+    sfinfo.frames = 0;
+    sfinfo.channels = chans;
+    sfinfo.format = fmt;
+    sfinfo.samplerate = srate;
+    sfinfo.sections = 0;
+    sfinfo.seekable = 0;
 
-	return sf_format_check(&sfinfo);
+    return sf_format_check(&sfinfo);
 }
 
 /*---------------------------------------------------------------------*/
 
 inline sf_count_t SndfileHandle::read(short *ptr, sf_count_t items)
 {
-	return sf_read_short(p->sf, ptr, items);
+    return sf_read_short(p->sf, ptr, items);
 }
 
 inline sf_count_t SndfileHandle::read(int *ptr, sf_count_t items)
 {
-	return sf_read_int(p->sf, ptr, items);
+    return sf_read_int(p->sf, ptr, items);
 }
 
 inline sf_count_t SndfileHandle::read(float *ptr, sf_count_t items)
 {
-	return sf_read_float(p->sf, ptr, items);
+    return sf_read_float(p->sf, ptr, items);
 }
 
 inline sf_count_t SndfileHandle::read(double *ptr, sf_count_t items)
 {
-	return sf_read_double(p->sf, ptr, items);
+    return sf_read_double(p->sf, ptr, items);
 }
 
 inline sf_count_t SndfileHandle::write(const short *ptr, sf_count_t items)
 {
-	return sf_write_short(p->sf, ptr, items);
+    return sf_write_short(p->sf, ptr, items);
 }
 
 inline sf_count_t SndfileHandle::write(const int *ptr, sf_count_t items)
 {
-	return sf_write_int(p->sf, ptr, items);
+    return sf_write_int(p->sf, ptr, items);
 }
 
 inline sf_count_t SndfileHandle::write(const float *ptr, sf_count_t items)
 {
-	return sf_write_float(p->sf, ptr, items);
+    return sf_write_float(p->sf, ptr, items);
 }
 
 inline sf_count_t SndfileHandle::write(const double *ptr, sf_count_t items)
 {
-	return sf_write_double(p->sf, ptr, items);
+    return sf_write_double(p->sf, ptr, items);
 }
 
 inline sf_count_t SndfileHandle::readf(short *ptr, sf_count_t frame_count)
 {
-	return sf_readf_short(p->sf, ptr, frame_count);
+    return sf_readf_short(p->sf, ptr, frame_count);
 }
 
 inline sf_count_t SndfileHandle::readf(int *ptr, sf_count_t frame_count)
 {
-	return sf_readf_int(p->sf, ptr, frame_count);
+    return sf_readf_int(p->sf, ptr, frame_count);
 }
 
 inline sf_count_t SndfileHandle::readf(float *ptr, sf_count_t frame_count)
 {
-	return sf_readf_float(p->sf, ptr, frame_count);
+    return sf_readf_float(p->sf, ptr, frame_count);
 }
 
 inline sf_count_t SndfileHandle::readf(double *ptr, sf_count_t frame_count)
 {
-	return sf_readf_double(p->sf, ptr, frame_count);
+    return sf_readf_double(p->sf, ptr, frame_count);
 }
 
-inline sf_count_t SndfileHandle::writef(const short *ptr,
-                                        sf_count_t frame_count)
+inline sf_count_t SndfileHandle::writef(const short *ptr, sf_count_t frame_count)
 {
-	return sf_writef_short(p->sf, ptr, frame_count);
+    return sf_writef_short(p->sf, ptr, frame_count);
 }
 
 inline sf_count_t SndfileHandle::writef(const int *ptr, sf_count_t frame_count)
 {
-	return sf_writef_int(p->sf, ptr, frame_count);
+    return sf_writef_int(p->sf, ptr, frame_count);
 }
 
-inline sf_count_t SndfileHandle::writef(const float *ptr,
-                                        sf_count_t frame_count)
+inline sf_count_t SndfileHandle::writef(const float *ptr, sf_count_t frame_count)
 {
-	return sf_writef_float(p->sf, ptr, frame_count);
+    return sf_writef_float(p->sf, ptr, frame_count);
 }
 
-inline sf_count_t SndfileHandle::writef(const double *ptr,
-                                        sf_count_t frame_count)
+inline sf_count_t SndfileHandle::writef(const double *ptr, sf_count_t frame_count)
 {
-	return sf_writef_double(p->sf, ptr, frame_count);
+    return sf_writef_double(p->sf, ptr, frame_count);
 }
 
-inline sf_count_t
-SndfileHandle::readRaw(void *ptr, sf_count_t bytes)
+inline sf_count_t SndfileHandle::readRaw(void *ptr, sf_count_t bytes)
 {
-	return sf_read_raw(p->sf, ptr, bytes);
+    return sf_read_raw(p->sf, ptr, bytes);
 }
 
 inline sf_count_t SndfileHandle::writeRaw(const void *ptr, sf_count_t bytes)
 {
-	return sf_write_raw(p->sf, ptr, bytes);
+    return sf_write_raw(p->sf, ptr, bytes);
 }
 
 inline SNDFILE *SndfileHandle::rawHandle(void)
 {
-	return (p ? p->sf : NULL);
+    return (p ? p->sf : NULL);
 }
 
 inline SNDFILE *SndfileHandle::takeOwnership(void)
 {
-	if (p == NULL || (p->ref != 1))
-		return NULL;
+    if (p == NULL || (p->ref != 1))
+        return NULL;
 
-	SNDFILE *sf = p->sf;
-	p->sf = NULL;
-	delete p;
-	p = NULL;
-	return sf;
+    SNDFILE *sf = p->sf;
+    p->sf = NULL;
+    delete p;
+    p = NULL;
+    return sf;
 }
 
 #if (defined(_WIN32) || defined(__CYGWIN__))
 
-inline SndfileHandle::SndfileHandle(const wchar_t *wpath, int mode, int fmt, int chans,
-                                    int srate)
-	: p(NULL)
+inline SndfileHandle::SndfileHandle(const wchar_t *wpath, int mode, int fmt, int chans, int srate)
+    : p(NULL)
 {
-	p = new (std::nothrow) SNDFILE_ref();
+    p = new (std::nothrow) SNDFILE_ref();
 
-	if (p != NULL)
-	{
-		p->ref = 1;
+    if (p != NULL)
+    {
+        p->ref = 1;
 
-		p->sfinfo.frames = 0;
-		p->sfinfo.channels = chans;
-		p->sfinfo.format = fmt;
-		p->sfinfo.samplerate = srate;
-		p->sfinfo.sections = 0;
-		p->sfinfo.seekable = 0;
+        p->sfinfo.frames = 0;
+        p->sfinfo.channels = chans;
+        p->sfinfo.format = fmt;
+        p->sfinfo.samplerate = srate;
+        p->sfinfo.sections = 0;
+        p->sfinfo.seekable = 0;
 
-		p->sf = sf_wchar_open(wpath, mode, &p->sfinfo);
-	};
+        p->sf = sf_wchar_open(wpath, mode, &p->sfinfo);
+    };
 
-	return;
+    return;
 } /* SndfileHandle const wchar_t * constructor */
 
 #endif

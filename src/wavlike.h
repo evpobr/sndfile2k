@@ -442,8 +442,7 @@ typedef struct
 #define WAVLIKE_GSM610_BLOCKSIZE (65)
 #define WAVLIKE_GSM610_SAMPLES (320)
 
-#define WAVLIKE_PEAK_CHUNK_SIZE(ch) \
-    (2 * sizeof(int) + ch * (sizeof(float) + sizeof(int)))
+#define WAVLIKE_PEAK_CHUNK_SIZE(ch) (2 * sizeof(int) + ch * (sizeof(float) + sizeof(int)))
 
 /*------------------------------------------------------------------------------------
 **	Functions defined in wav_ms_adpcm.c

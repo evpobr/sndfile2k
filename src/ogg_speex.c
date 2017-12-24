@@ -35,8 +35,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if (defined(ENABLE_EXPERIMENTAL_CODE) && (ENABLE_EXPERIMENTAL_CODE == 1) \
-     && defined(HAVE_SPEEX))
+#if (defined(ENABLE_EXPERIMENTAL_CODE) && (ENABLE_EXPERIMENTAL_CODE == 1) && defined(HAVE_SPEEX))
 
 #include <ogg/ogg.h>
 
@@ -66,8 +65,8 @@ typedef struct
 
 static int spx_read_header(SF_PRIVATE *psf);
 static int spx_close(SF_PRIVATE *psf);
-static void *spx_header_read(SF_PRIVATE *psf, ogg_packet *op,
-                             spx_int32_t enh_enabled, int force_mode);
+static void *spx_header_read(SF_PRIVATE *psf, ogg_packet *op, spx_int32_t enh_enabled,
+                             int force_mode);
 static void spx_print_comments(const char *comments, int length);
 
 int ogg_speex_open(SF_PRIVATE *psf)
@@ -201,8 +200,7 @@ static int spx_read_header(SF_PRIVATE *psf)
         if (ogg_page_serialno(&odata->opage) != odata->ostream.serialno)
         {
             /* so all streams are read. */
-            ogg_stream_reset_serialno(&odata->ostream,
-                                      ogg_page_serialno(&odata->opage));
+            ogg_stream_reset_serialno(&odata->ostream, ogg_page_serialno(&odata->opage));
         };
 
         /*Add page to the bitstream*/
@@ -211,11 +209,9 @@ static int spx_read_header(SF_PRIVATE *psf)
         page_nb_packets = ogg_page_packets(&odata->opage);
 
         /*Extract all available packets*/
-        while (odata->eos == 0 &&
-               ogg_stream_packetout(&odata->ostream, &odata->opacket) == 1)
+        while (odata->eos == 0 && ogg_stream_packetout(&odata->ostream, &odata->opacket) == 1)
         {
-            if (odata->opacket.bytes >= 8 &&
-                memcmp(odata->opacket.packet, "Speex   ", 8) == 0)
+            if (odata->opacket.bytes >= 8 && memcmp(odata->opacket.packet, "Speex   ", 8) == 0)
             {
                 spx->serialno = odata->ostream.serialno;
             };
@@ -225,8 +221,7 @@ static int spx_read_header(SF_PRIVATE *psf)
 
             if (packet_count == 0)
             {
-                spx->state = spx_header_read(psf, &odata->opacket, enh_enabled,
-                                             force_mode);
+                spx->state = spx_header_read(psf, &odata->opacket, enh_enabled, force_mode);
                 if (!spx->state)
                     break;
 
@@ -236,8 +231,7 @@ static int spx_read_header(SF_PRIVATE *psf)
             }
             else if (packet_count == 1)
             {
-                spx_print_comments((const char *)odata->opacket.packet,
-                                   odata->opacket.bytes);
+                spx_print_comments((const char *)odata->opacket.packet, odata->opacket.bytes);
             }
             else if (packet_count < 2 + spx->header.extra_headers)
             {
@@ -269,8 +263,8 @@ static int spx_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static void *spx_header_read(SF_PRIVATE *psf, ogg_packet *op,
-                             spx_int32_t enh_enabled, int force_mode)
+static void *spx_header_read(SF_PRIVATE *psf, ogg_packet *op, spx_int32_t enh_enabled,
+                             int force_mode)
 {
     SPX_PRIVATE *spx = psf->codec_data;
     void *st;
@@ -292,10 +286,8 @@ static void *spx_header_read(SF_PRIVATE *psf, ogg_packet *op,
 
     if (spx->header.mode >= SPEEX_NB_MODES || spx->header.mode < 0)
     {
-        psf_log_printf(
-            psf,
-            "Mode number %d does not (yet/any longer) exist in this version\n",
-            spx->header.mode);
+        psf_log_printf(psf, "Mode number %d does not (yet/any longer) exist in this version\n",
+                       spx->header.mode);
         return NULL;
     };
 
@@ -307,8 +299,9 @@ static void *spx_header_read(SF_PRIVATE *psf, ogg_packet *op,
 
     if (spx->header.speex_version_id > 1)
     {
-        psf_log_printf(psf, "This file was encoded with Speex bit-stream "
-                            "version %d, which I don't know how to decode\n",
+        psf_log_printf(psf,
+                       "This file was encoded with Speex bit-stream "
+                       "version %d, which I don't know how to decode\n",
                        spx->header.speex_version_id);
         return NULL;
     };
@@ -375,18 +368,17 @@ static void *spx_header_read(SF_PRIVATE *psf, ogg_packet *op,
 
     spx->header.speex_version[sizeof(spx->header.speex_version) - 1] = 0;
 
-    psf_log_printf(psf, "  Encoder ver   : %s\n  Frames/packet : %d\n",
-                   spx->header.speex_version, spx->header.frames_per_packet);
+    psf_log_printf(psf, "  Encoder ver   : %s\n  Frames/packet : %d\n", spx->header.speex_version,
+                   spx->header.frames_per_packet);
 
     if (spx->header.bitrate > 0)
         psf_log_printf(psf, "  Bit rate	  : %d\n", spx->header.bitrate);
 
-    psf_log_printf(
-        psf,
-        "  Sample rate   : %d\n  Mode		  : %s\n  VBR		   : "
-        "%s\n  Channels	  : %d\n",
-        psf->sf.samplerate, mode->modeName, (spx->header.vbr ? "yes" : "no"),
-        psf->sf.channels);
+    psf_log_printf(psf,
+                   "  Sample rate   : %d\n  Mode		  : %s\n  VBR		   : "
+                   "%s\n  Channels	  : %d\n",
+                   psf->sf.samplerate, mode->modeName, (spx->header.vbr ? "yes" : "no"),
+                   psf->sf.channels);
 
     psf_log_printf(psf, "  Extra headers : %d\n", spx->header.extra_headers);
 
@@ -461,9 +453,7 @@ duration = audio_samples / rate
 
 int ogg_speex_open(SF_PRIVATE *psf)
 {
-    psf_log_printf(
-        psf,
-        "This version of libsndfile was compiled without Ogg/Speex support.\n");
+    psf_log_printf(psf, "This version of libsndfile was compiled without Ogg/Speex support.\n");
     return SFE_UNIMPLEMENTED;
 }
 

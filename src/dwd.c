@@ -71,8 +71,7 @@ int dwd_open(SF_PRIVATE *psf)
 {
     int error = 0;
 
-    if (psf->file.mode == SFM_READ ||
-        (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = dwd_read_header(psf)))
             return error;
@@ -131,20 +130,16 @@ static int dwd_read_header(SF_PRIVATE *psf)
     if (memcmp(ubuf.cbuf, DWD_IDENTIFIER, DWD_IDENTIFIER_LEN) != 0)
         return SFE_DWD_NO_DWD;
 
-    psf_log_printf(psf, "Read only : DiamondWare Digitized (.dwd)\n",
-                   ubuf.cbuf);
+    psf_log_printf(psf, "Read only : DiamondWare Digitized (.dwd)\n", ubuf.cbuf);
 
     psf_binheader_readf(psf, "11", &dwdh.major, &dwdh.minor);
     psf_binheader_readf(psf, "e4j1", &dwdh.id, 1, &dwdh.compression);
-    psf_binheader_readf(psf, "e211", &dwdh.srate, &dwdh.channels,
-                        &dwdh.bitwidth);
+    psf_binheader_readf(psf, "e211", &dwdh.srate, &dwdh.channels, &dwdh.bitwidth);
     psf_binheader_readf(psf, "e24", &dwdh.maxval, &dwdh.datalen);
     psf_binheader_readf(psf, "e44", &dwdh.frames, &dwdh.offset);
 
-    psf_log_printf(
-        psf,
-        "  Version Major : %d\n  Version Minor : %d\n  Unique ID     : %08X\n",
-        dwdh.major, dwdh.minor, dwdh.id);
+    psf_log_printf(psf, "  Version Major : %d\n  Version Minor : %d\n  Unique ID     : %08X\n",
+                   dwdh.major, dwdh.minor, dwdh.id);
     psf_log_printf(psf, "  Compression   : %d => ", dwdh.compression);
 
     if (dwdh.compression != 0)
@@ -157,8 +152,9 @@ static int dwd_read_header(SF_PRIVATE *psf)
         psf_log_printf(psf, "None\n");
     }
 
-    psf_log_printf(psf, "  Sample Rate   : %d\n  Channels      : %d\n"
-                        "  Bit Width     : %d\n",
+    psf_log_printf(psf,
+                   "  Sample Rate   : %d\n  Channels      : %d\n"
+                   "  Bit Width     : %d\n",
                    dwdh.srate, dwdh.channels, dwdh.bitwidth);
 
     switch (dwdh.bitwidth)
@@ -180,8 +176,8 @@ static int dwd_read_header(SF_PRIVATE *psf)
 
     if (psf->filelength != dwdh.offset + dwdh.datalen)
     {
-        psf_log_printf(psf, "  Data Length   : %d (should be %D)\n",
-                       dwdh.datalen, psf->filelength - dwdh.offset);
+        psf_log_printf(psf, "  Data Length   : %d (should be %D)\n", dwdh.datalen,
+                       psf->filelength - dwdh.offset);
         dwdh.datalen = (unsigned int)(psf->filelength - dwdh.offset);
     }
     else

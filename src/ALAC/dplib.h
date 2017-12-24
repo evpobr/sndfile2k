@@ -50,10 +50,10 @@ void copy_coefs(const int16_t *srcCoefs, int16_t *dstCoefs, int32_t numPairs);
 
 // NOTE: these routines read at least "numactive" samples so the i/o buffers must be at least that big
 
-void pc_block(int32_t *in, int32_t *pc, int32_t num, int16_t *coefs,
-              int32_t numactive, uint32_t chanbits, uint32_t denshift);
-void unpc_block(const int32_t *pc, int32_t *out, int32_t num, int16_t *coefs,
-                int32_t numactive, uint32_t chanbits, uint32_t denshift);
+void pc_block(int32_t *in, int32_t *pc, int32_t num, int16_t *coefs, int32_t numactive,
+              uint32_t chanbits, uint32_t denshift);
+void unpc_block(const int32_t *pc, int32_t *out, int32_t num, int16_t *coefs, int32_t numactive,
+                uint32_t chanbits, uint32_t denshift);
 
 #ifdef __cplusplus
 }

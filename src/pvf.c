@@ -39,8 +39,7 @@ int pvf_open(SF_PRIVATE *psf)
     int subformat;
     int error = 0;
 
-    if (psf->file.mode == SFM_READ ||
-        (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = pvf_read_header(psf)))
             return error;
@@ -101,8 +100,8 @@ static int pvf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     if (psf->is_pipe == SF_FALSE)
         psf_fseek(psf, 0, SEEK_SET);
 
-    snprintf((char *)psf->header.ptr, psf->header.len, "PVF1\n%d %d %d\n",
-             psf->sf.channels, psf->sf.samplerate, psf->bytewidth * 8);
+    snprintf((char *)psf->header.ptr, psf->header.len, "PVF1\n%d %d %d\n", psf->sf.channels,
+             psf->sf.samplerate, psf->bytewidth * 8);
 
     psf->header.indx = strlen((char *)psf->header.ptr);
 
@@ -137,9 +136,8 @@ static int pvf_read_header(SF_PRIVATE *psf)
     if (sscanf(buffer, "%d %d %d", &channels, &samplerate, &bitwidth) != 3)
         return SFE_PVF_BAD_HEADER;
 
-    psf_log_printf(psf,
-                   " Channels    : %d\n Sample rate : %d\n Bit width   : %d\n",
-                   channels, samplerate, bitwidth);
+    psf_log_printf(psf, " Channels    : %d\n Sample rate : %d\n Bit width   : %d\n", channels,
+                   samplerate, bitwidth);
 
     psf->sf.channels = channels;
     psf->sf.samplerate = samplerate;

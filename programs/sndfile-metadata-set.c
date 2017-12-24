@@ -63,8 +63,7 @@ int main(int argc, char *argv[])
     progname = program_name(argv[0]);
 
     /* Check if we've been asked for help. */
-    if (argc < 3 || strcmp(argv[1], "--help") == 0 ||
-        strcmp(argv[1], "-h") == 0)
+    if (argc < 3 || strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-h") == 0)
         usage_exit(progname, 0);
 
     /* Set all fields of the struct to zero bytes. */
@@ -131,46 +130,42 @@ int main(int argc, char *argv[])
         /* Following options do not take an argument. */
         if (strcmp(argv[k], "--bext-auto-time-date") == 0)
         {
-            snprintf(time, sizeof(time), "%02d:%02d:%02d", timedata.tm_hour,
-                     timedata.tm_min, timedata.tm_sec);
+            snprintf(time, sizeof(time), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min,
+                     timedata.tm_sec);
             info.origination_time = time;
 
-            snprintf(date, sizeof(date), "%04d-%02d-%02d",
-                     timedata.tm_year + 1900, timedata.tm_mon + 1,
-                     timedata.tm_mday);
+            snprintf(date, sizeof(date), "%04d-%02d-%02d", timedata.tm_year + 1900,
+                     timedata.tm_mon + 1, timedata.tm_mday);
             info.origination_date = date;
             continue;
         };
 
         if (strcmp(argv[k], "--bext-auto-time") == 0)
         {
-            snprintf(time, sizeof(time), "%02d:%02d:%02d", timedata.tm_hour,
-                     timedata.tm_min, timedata.tm_sec);
+            snprintf(time, sizeof(time), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min,
+                     timedata.tm_sec);
             info.origination_time = time;
             continue;
         };
 
         if (strcmp(argv[k], "--bext-auto-date") == 0)
         {
-            snprintf(date, sizeof(date), "%04d-%02d-%02d",
-                     timedata.tm_year + 1900, timedata.tm_mon + 1,
-                     timedata.tm_mday);
+            snprintf(date, sizeof(date), "%04d-%02d-%02d", timedata.tm_year + 1900,
+                     timedata.tm_mon + 1, timedata.tm_mday);
             info.origination_date = strdup(date);
             continue;
         };
 
         if (strcmp(argv[k], "--str-auto-date") == 0)
         {
-            snprintf(date, sizeof(date), "%04d-%02d-%02d",
-                     timedata.tm_year + 1900, timedata.tm_mon + 1,
-                     timedata.tm_mday);
+            snprintf(date, sizeof(date), "%04d-%02d-%02d", timedata.tm_year + 1900,
+                     timedata.tm_mon + 1, timedata.tm_mday);
 
             info.date = strdup(date);
             continue;
         };
 
-        printf("Error : Don't know what to do with command line arg '%s'.\n\n",
-               argv[k]);
+        printf("Error : Don't know what to do with command line arg '%s'.\n\n", argv[k]);
         usage_exit(progname, 1);
     };
 
@@ -271,8 +266,8 @@ static int has_bext_fields_set(const METADATA_INFO *info)
     if (info->description || info->originator || info->originator_reference)
         return 1;
 
-    if (info->origination_date || info->origination_time || info->umid ||
-        info->coding_history || info->time_ref)
+    if (info->origination_date || info->origination_time || info->umid || info->coding_history ||
+        info->time_ref)
         return 1;
 
     return 0;

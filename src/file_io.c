@@ -127,8 +127,7 @@ int psf_open_rsrc(SF_PRIVATE *psf)
         return 0;
 
     /* Test for MacOSX style resource fork on HPFS or HPFS+ filesystems. */
-    snprintf(psf->rsrc.path.c, sizeof(psf->rsrc.path.c), "%s/..namedfork/rsrc",
-             psf->file.path.c);
+    snprintf(psf->rsrc.path.c, sizeof(psf->rsrc.path.c), "%s/..namedfork/rsrc", psf->file.path.c);
     psf->error = SFE_NO_ERROR;
     if ((psf->rsrc.filedes = psf_open_fd(&psf->rsrc)) >= 0)
     {
@@ -149,8 +148,8 @@ int psf_open_rsrc(SF_PRIVATE *psf)
 	** Now try for a resource fork stored as a separate file in the same
 	** directory, but preceded with a dot underscore.
 	*/
-    snprintf(psf->rsrc.path.c, sizeof(psf->rsrc.path.c), "%s._%s",
-             psf->file.dir.c, psf->file.name.c);
+    snprintf(psf->rsrc.path.c, sizeof(psf->rsrc.path.c), "%s._%s", psf->file.dir.c,
+             psf->file.name.c);
     psf->error = SFE_NO_ERROR;
     if ((psf->rsrc.filedes = psf_open_fd(&psf->rsrc)) >= 0)
     {
@@ -162,8 +161,8 @@ int psf_open_rsrc(SF_PRIVATE *psf)
 	** Now try for a resource fork stored in a separate file in the
 	** .AppleDouble/ directory.
 	*/
-    snprintf(psf->rsrc.path.c, sizeof(psf->rsrc.path.c), "%s.AppleDouble/%s",
-             psf->file.dir.c, psf->file.name.c);
+    snprintf(psf->rsrc.path.c, sizeof(psf->rsrc.path.c), "%s.AppleDouble/%s", psf->file.dir.c,
+             psf->file.name.c);
     psf->error = SFE_NO_ERROR;
     if ((psf->rsrc.filedes = psf_open_fd(&psf->rsrc)) >= 0)
     {
@@ -314,8 +313,7 @@ sf_count_t psf_fseek(SF_PRIVATE *psf, sf_count_t offset, int whence)
     return absolute_position - psf->fileoffset;
 }
 
-size_t psf_fread(void *ptr, size_t bytes, size_t items,
-                 SF_PRIVATE *psf)
+size_t psf_fread(void *ptr, size_t bytes, size_t items, SF_PRIVATE *psf)
 {
     sf_count_t total = 0;
     ssize_t count;
@@ -358,8 +356,7 @@ size_t psf_fread(void *ptr, size_t bytes, size_t items,
     return total / bytes;
 }
 
-size_t psf_fwrite(const void *ptr, size_t bytes, size_t items,
-                  SF_PRIVATE *psf)
+size_t psf_fwrite(const void *ptr, size_t bytes, size_t items, SF_PRIVATE *psf)
 {
     sf_count_t total = 0;
     ssize_t count;
@@ -416,7 +413,7 @@ sf_count_t psf_ftell(SF_PRIVATE *psf)
         return psf->pipeoffset;
 
 #if _WIN32
-	pos = _lseeki64(psf->file.filedes, 0, SEEK_CUR);
+    pos = _lseeki64(psf->file.filedes, 0, SEEK_CUR);
 #else
     pos = lseek(psf->file.filedes, 0, SEEK_CUR);
 #endif
@@ -521,7 +518,7 @@ int psf_ftruncate(SF_PRIVATE *psf, sf_count_t len)
         return -1;
 
 #ifdef _WIN32
-	retval = _chsize_s(psf->file.filedes, len);
+    retval = _chsize_s(psf->file.filedes, len);
 #else
     retval = ftruncate(psf->file.filedes, len);
 #endif
@@ -627,8 +624,7 @@ static void psf_log_syserr(SF_PRIVATE *psf, int error)
     if (psf->error == 0)
     {
         psf->error = SFE_SYSTEM;
-        snprintf(psf->syserr, sizeof(psf->syserr), "System error : %s.",
-                 strerror(error));
+        snprintf(psf->syserr, sizeof(psf->syserr), "System error : %s.", strerror(error));
     };
 
     return;
@@ -693,8 +689,7 @@ int psf_open_rsrc(SF_PRIVATE *psf)
         return 0;
 
     /* Test for MacOSX style resource fork on HPFS or HPFS+ filesystems. */
-    snprintf(psf->rsrc.path.c, sizeof(psf->rsrc.path.c), "%s/rsrc",
-             psf->file.path.c);
+    snprintf(psf->rsrc.path.c, sizeof(psf->rsrc.path.c), "%s/rsrc", psf->file.path.c);
     psf->error = SFE_NO_ERROR;
     if ((psf->rsrc.handle = psf_open_handle(&psf->rsrc)) != NULL)
     {
@@ -706,8 +701,8 @@ int psf_open_rsrc(SF_PRIVATE *psf)
 	 * Now try for a resource fork stored as a separate file in the same
 	 * directory, but preceded with a dot underscore.
 	 */
-    snprintf(psf->rsrc.path.c, sizeof(psf->rsrc.path.c), "%s._%s",
-             psf->file.dir.c, psf->file.name.c);
+    snprintf(psf->rsrc.path.c, sizeof(psf->rsrc.path.c), "%s._%s", psf->file.dir.c,
+             psf->file.name.c);
     psf->error = SFE_NO_ERROR;
     if ((psf->rsrc.handle = psf_open_handle(&psf->rsrc)) != NULL)
     {
@@ -719,8 +714,8 @@ int psf_open_rsrc(SF_PRIVATE *psf)
 	 * Now try for a resource fork stored in a separate file in the
 	 * .AppleDouble/ directory.
 	 */
-    snprintf(psf->rsrc.path.c, sizeof(psf->rsrc.path.c), "%s.AppleDouble/%s",
-             psf->file.dir.c, psf->file.name.c);
+    snprintf(psf->rsrc.path.c, sizeof(psf->rsrc.path.c), "%s.AppleDouble/%s", psf->file.dir.c,
+             psf->file.name.c);
     psf->error = SFE_NO_ERROR;
     if ((psf->rsrc.handle = psf_open_handle(&psf->rsrc)) != NULL)
     {
@@ -850,7 +845,7 @@ static HANDLE psf_open_handle(PSF_FILE *pfile)
             dwCreationDistribution, /* how to create */
             FILE_ATTRIBUTE_NORMAL, /* file attributes (could use FILE_FLAG_SEQUENTIAL_SCAN) */
             NULL /* handle to file with attributes to copy */
-            );
+        );
     else
         handle = CreateFile(
             pfile->path.c, /* pointer to name of the file */
@@ -860,7 +855,7 @@ static HANDLE psf_open_handle(PSF_FILE *pfile)
             dwCreationDistribution, /* how to create */
             FILE_ATTRIBUTE_NORMAL, /* file attributes (could use FILE_FLAG_SEQUENTIAL_SCAN) */
             NULL /* handle to file with attributes to copy */
-            );
+        );
 
     if (handle == INVALID_HANDLE_VALUE)
         return NULL;
@@ -877,13 +872,10 @@ static void psf_log_syserr(SF_PRIVATE *psf, int error)
     {
         psf->error = SFE_SYSTEM;
 
-        FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                          FORMAT_MESSAGE_FROM_SYSTEM,
-                      NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                      (LPTSTR)&lpMsgBuf, 0, NULL);
+        FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, error,
+                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
 
-        snprintf(psf->syserr, sizeof(psf->syserr), "System error : %s",
-                 (char *)lpMsgBuf);
+        snprintf(psf->syserr, sizeof(psf->syserr), "System error : %s", (char *)lpMsgBuf);
         LocalFree(lpMsgBuf);
     };
 
@@ -978,8 +970,8 @@ sf_count_t psf_fseek(SF_PRIVATE *psf, sf_count_t offset, int whence)
     lDistanceToMove = (DWORD)(offset & 0xFFFFFFFF);
     lDistanceToMoveHigh = (DWORD)((offset >> 32) & 0xFFFFFFFF);
 
-    dwResult = SetFilePointer(psf->file.handle, lDistanceToMove,
-                              &lDistanceToMoveHigh, dwMoveMethod);
+    dwResult =
+        SetFilePointer(psf->file.handle, lDistanceToMove, &lDistanceToMoveHigh, dwMoveMethod);
 
     if (dwResult == 0xFFFFFFFF)
         dwError = GetLastError();
@@ -992,14 +984,12 @@ sf_count_t psf_fseek(SF_PRIVATE *psf, sf_count_t offset, int whence)
         return -1;
     };
 
-    new_position =
-        (dwResult + ((__int64)lDistanceToMoveHigh << 32)) - psf->fileoffset;
+    new_position = (dwResult + ((__int64)lDistanceToMoveHigh << 32)) - psf->fileoffset;
 
     return new_position;
 }
 
-size_t psf_fread(void *ptr, size_t bytes, size_t items,
-                 SF_PRIVATE *psf)
+size_t psf_fread(void *ptr, size_t bytes, size_t items, SF_PRIVATE *psf)
 {
     size_t total = 0;
     size_t count;
@@ -1019,8 +1009,7 @@ size_t psf_fread(void *ptr, size_t bytes, size_t items,
         /* Break the writes down to a sensible size. */
         count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : items;
 
-        if (ReadFile(psf->file.handle, ((char *)ptr) + total, count,
-                     &dwNumberOfBytesRead, 0) == 0)
+        if (ReadFile(psf->file.handle, ((char *)ptr) + total, count, &dwNumberOfBytesRead, 0) == 0)
         {
             psf_log_syserr(psf, GetLastError());
             break;
@@ -1043,8 +1032,7 @@ size_t psf_fread(void *ptr, size_t bytes, size_t items,
     return total / bytes;
 }
 
-size_t psf_fwrite(const void *ptr, size_t bytes, size_t items,
-                  SF_PRIVATE *psf)
+size_t psf_fwrite(const void *ptr, size_t bytes, size_t items, SF_PRIVATE *psf)
 {
     size_t total = 0;
     size_t count;
@@ -1064,8 +1052,8 @@ size_t psf_fwrite(const void *ptr, size_t bytes, size_t items,
         /* Break the writes down to a sensible size. */
         count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : (ssize_t)items;
 
-        if (WriteFile(psf->file.handle, ((const char *)ptr) + total, count,
-                      &dwNumberOfBytesWritten, 0) == 0)
+        if (WriteFile(psf->file.handle, ((const char *)ptr) + total, count, &dwNumberOfBytesWritten,
+                      0) == 0)
         {
             psf_log_syserr(psf, GetLastError());
             break;
@@ -1103,8 +1091,8 @@ sf_count_t psf_ftell(SF_PRIVATE *psf)
     lDistanceToMoveLow = 0;
     lDistanceToMoveHigh = 0;
 
-    dwResult = SetFilePointer(psf->file.handle, lDistanceToMoveLow,
-                              &lDistanceToMoveHigh, FILE_CURRENT);
+    dwResult =
+        SetFilePointer(psf->file.handle, lDistanceToMoveLow, &lDistanceToMoveHigh, FILE_CURRENT);
 
     if (dwResult == 0xFFFFFFFF)
         dwError = GetLastError();
@@ -1141,8 +1129,7 @@ sf_count_t psf_fgets(char *buffer, size_t bufsize, SF_PRIVATE *psf)
 
     while (k < bufsize - 1)
     {
-        if (ReadFile(psf->file.handle, &(buffer[k]), 1, &dwNumberOfBytesRead,
-                     0) == 0)
+        if (ReadFile(psf->file.handle, &(buffer[k]), 1, &dwNumberOfBytesRead, 0) == 0)
         {
             psf_log_syserr(psf, GetLastError());
             break;
@@ -1214,8 +1201,8 @@ int psf_ftruncate(SF_PRIVATE *psf, sf_count_t len)
     lDistanceToMoveLow = (DWORD)(len & 0xFFFFFFFF);
     lDistanceToMoveHigh = (DWORD)((len >> 32) & 0xFFFFFFFF);
 
-    dwResult = SetFilePointer(psf->file.handle, lDistanceToMoveLow,
-                              &lDistanceToMoveHigh, FILE_BEGIN);
+    dwResult =
+        SetFilePointer(psf->file.handle, lDistanceToMoveLow, &lDistanceToMoveHigh, FILE_BEGIN);
 
     if (dwResult == 0xFFFFFFFF)
         dwError = GetLastError();
@@ -1355,8 +1342,7 @@ sf_count_t psf_fseek(SF_PRIVATE *psf, sf_count_t offset, int whence)
     return new_position;
 }
 
-sf_count_t psf_fread(void *ptr, sf_count_t bytes, sf_count_t items,
-                     SF_PRIVATE *psf)
+sf_count_t psf_fread(void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 {
     sf_count_t total = 0;
     ssize_t count;
@@ -1396,8 +1382,7 @@ sf_count_t psf_fread(void *ptr, sf_count_t bytes, sf_count_t items,
     return total / bytes;
 }
 
-sf_count_t psf_fwrite(const void *ptr, sf_count_t bytes, sf_count_t items,
-                      SF_PRIVATE *psf)
+sf_count_t psf_fwrite(const void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 {
     sf_count_t total = 0;
     ssize_t count;
@@ -1631,8 +1616,7 @@ static void psf_log_syserr(SF_PRIVATE *psf, int error)
     if (psf->error == 0)
     {
         psf->error = SFE_SYSTEM;
-        snprintf(psf->syserr, sizeof(psf->syserr), "System error : %s",
-                 strerror(error));
+        snprintf(psf->syserr, sizeof(psf->syserr), "System error : %s", strerror(error));
     };
 
     return;

@@ -46,368 +46,356 @@ static size_t vox_read_i(SF_PRIVATE *psf, int *ptr, size_t len);
 static size_t vox_read_f(SF_PRIVATE *psf, float *ptr, size_t len);
 static size_t vox_read_d(SF_PRIVATE *psf, double *ptr, size_t len);
 
-static size_t vox_write_s(SF_PRIVATE *psf, const short *ptr,
-                          size_t len);
+static size_t vox_write_s(SF_PRIVATE *psf, const short *ptr, size_t len);
 static size_t vox_write_i(SF_PRIVATE *psf, const int *ptr, size_t len);
 static size_t vox_write_f(SF_PRIVATE *psf, const float *ptr, size_t len);
 static size_t vox_write_d(SF_PRIVATE *psf, const double *ptr, size_t len);
 
-static size_t vox_read_block(SF_PRIVATE *psf, IMA_OKI_ADPCM *pvox, short *ptr,
-                             size_t len);
+static size_t vox_read_block(SF_PRIVATE *psf, IMA_OKI_ADPCM *pvox, short *ptr, size_t len);
 
 static int codec_close(SF_PRIVATE *psf)
 {
-	IMA_OKI_ADPCM *p = (IMA_OKI_ADPCM *)psf->codec_data;
+    IMA_OKI_ADPCM *p = (IMA_OKI_ADPCM *)psf->codec_data;
 
-	if (p->errors)
-		psf_log_printf(psf, "*** Warning : ADPCM state errors: %d\n",
-		               p->errors);
-	return p->errors;
+    if (p->errors)
+        psf_log_printf(psf, "*** Warning : ADPCM state errors: %d\n", p->errors);
+    return p->errors;
 }
 
 int vox_adpcm_init(SF_PRIVATE *psf)
 {
-	IMA_OKI_ADPCM *pvox = NULL;
+    IMA_OKI_ADPCM *pvox = NULL;
 
-	if (psf->file.mode == SFM_RDWR)
-		return SFE_BAD_MODE_RW;
+    if (psf->file.mode == SFM_RDWR)
+        return SFE_BAD_MODE_RW;
 
-	if (psf->file.mode == SFM_WRITE && psf->sf.channels != 1)
-		return SFE_CHANNEL_COUNT;
+    if (psf->file.mode == SFM_WRITE && psf->sf.channels != 1)
+        return SFE_CHANNEL_COUNT;
 
-	if ((pvox = malloc(sizeof(IMA_OKI_ADPCM))) == NULL)
-		return SFE_MALLOC_FAILED;
+    if ((pvox = malloc(sizeof(IMA_OKI_ADPCM))) == NULL)
+        return SFE_MALLOC_FAILED;
 
-	psf->codec_data = (void *)pvox;
-	memset(pvox, 0, sizeof(IMA_OKI_ADPCM));
+    psf->codec_data = (void *)pvox;
+    memset(pvox, 0, sizeof(IMA_OKI_ADPCM));
 
-	if (psf->file.mode == SFM_WRITE)
-	{
-		psf->write_short = vox_write_s;
-		psf->write_int = vox_write_i;
-		psf->write_float = vox_write_f;
-		psf->write_double = vox_write_d;
-	}
-	else
-	{
-		psf_log_printf(psf, "Header-less OKI Dialogic ADPCM encoded file.\n");
-		psf_log_printf(psf, "Setting up for 8kHz, mono, Vox ADPCM.\n");
+    if (psf->file.mode == SFM_WRITE)
+    {
+        psf->write_short = vox_write_s;
+        psf->write_int = vox_write_i;
+        psf->write_float = vox_write_f;
+        psf->write_double = vox_write_d;
+    }
+    else
+    {
+        psf_log_printf(psf, "Header-less OKI Dialogic ADPCM encoded file.\n");
+        psf_log_printf(psf, "Setting up for 8kHz, mono, Vox ADPCM.\n");
 
-		psf->read_short = vox_read_s;
-		psf->read_int = vox_read_i;
-		psf->read_float = vox_read_f;
-		psf->read_double = vox_read_d;
-	};
+        psf->read_short = vox_read_s;
+        psf->read_int = vox_read_i;
+        psf->read_float = vox_read_f;
+        psf->read_double = vox_read_d;
+    };
 
-	/* Standard sample rate chennels etc. */
-	if (psf->sf.samplerate < 1)
-		psf->sf.samplerate = 8000;
-	psf->sf.channels = 1;
+    /* Standard sample rate chennels etc. */
+    if (psf->sf.samplerate < 1)
+        psf->sf.samplerate = 8000;
+    psf->sf.channels = 1;
 
-	psf->sf.frames = psf->filelength * 2;
+    psf->sf.frames = psf->filelength * 2;
 
-	psf->sf.seekable = SF_FALSE;
-	psf->codec_close = codec_close;
+    psf->sf.seekable = SF_FALSE;
+    psf->codec_close = codec_close;
 
-	/* Seek back to start of data. */
-	if (psf_fseek(psf, 0, SEEK_SET) == -1)
-		return SFE_BAD_SEEK;
+    /* Seek back to start of data. */
+    if (psf_fseek(psf, 0, SEEK_SET) == -1)
+        return SFE_BAD_SEEK;
 
-	ima_oki_adpcm_init(pvox, IMA_OKI_ADPCM_TYPE_OKI);
+    ima_oki_adpcm_init(pvox, IMA_OKI_ADPCM_TYPE_OKI);
 
-	return 0;
+    return 0;
 }
 
-static size_t vox_read_block(SF_PRIVATE *psf, IMA_OKI_ADPCM *pvox, short *ptr,
-                             size_t len)
+static size_t vox_read_block(SF_PRIVATE *psf, IMA_OKI_ADPCM *pvox, short *ptr, size_t len)
 {
-	size_t indx = 0, k;
+    size_t indx = 0, k;
 
-	while (indx < len)
-	{
-		pvox->code_count = (len - indx > IMA_OKI_ADPCM_PCM_LEN)
-		                   ? IMA_OKI_ADPCM_CODE_LEN
-		                   : (len - indx + 1) / 2;
+    while (indx < len)
+    {
+        pvox->code_count =
+            (len - indx > IMA_OKI_ADPCM_PCM_LEN) ? IMA_OKI_ADPCM_CODE_LEN : (len - indx + 1) / 2;
 
-		if ((k = psf_fread(pvox->codes, 1, pvox->code_count, psf)) !=
-		        pvox->code_count)
-		{
-			if (psf_ftell(psf) != psf->filelength)
-				psf_log_printf(psf, "*** Warning : short read (%d != %d).\n", k,
-				               pvox->code_count);
-			if (k == 0)
-				break;
-		};
+        if ((k = psf_fread(pvox->codes, 1, pvox->code_count, psf)) != pvox->code_count)
+        {
+            if (psf_ftell(psf) != psf->filelength)
+                psf_log_printf(psf, "*** Warning : short read (%d != %d).\n", k, pvox->code_count);
+            if (k == 0)
+                break;
+        };
 
-		pvox->code_count = k;
+        pvox->code_count = k;
 
-		ima_oki_adpcm_decode_block(pvox);
+        ima_oki_adpcm_decode_block(pvox);
 
-		memcpy(&(ptr[indx]), pvox->pcm, pvox->pcm_count * sizeof(short));
-		indx += pvox->pcm_count;
-	};
+        memcpy(&(ptr[indx]), pvox->pcm, pvox->pcm_count * sizeof(short));
+        indx += pvox->pcm_count;
+    };
 
-	return indx;
+    return indx;
 }
 
 static size_t vox_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
 {
-	IMA_OKI_ADPCM *pvox;
-	size_t readcount, count;
-	size_t total = 0;
+    IMA_OKI_ADPCM *pvox;
+    size_t readcount, count;
+    size_t total = 0;
 
-	if (!psf->codec_data)
-		return 0;
-	pvox = (IMA_OKI_ADPCM *)psf->codec_data;
+    if (!psf->codec_data)
+        return 0;
+    pvox = (IMA_OKI_ADPCM *)psf->codec_data;
 
-	while (len > 0)
-	{
-		readcount = (len > 0x10000000) ? 0x10000000 : len;
+    while (len > 0)
+    {
+        readcount = (len > 0x10000000) ? 0x10000000 : len;
 
-		count = vox_read_block(psf, pvox, ptr, readcount);
+        count = vox_read_block(psf, pvox, ptr, readcount);
 
-		total += count;
-		len -= count;
-		if (count != readcount)
-			break;
-	};
+        total += count;
+        len -= count;
+        if (count != readcount)
+            break;
+    };
 
-	return total;
+    return total;
 }
 
 static size_t vox_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
 {
-	IMA_OKI_ADPCM *pvox;
-	BUF_UNION ubuf;
-	short *sptr;
-	size_t k, bufferlen, readcount, count;
-	size_t total = 0;
+    IMA_OKI_ADPCM *pvox;
+    BUF_UNION ubuf;
+    short *sptr;
+    size_t k, bufferlen, readcount, count;
+    size_t total = 0;
 
-	if (!psf->codec_data)
-		return 0;
-	pvox = (IMA_OKI_ADPCM *)psf->codec_data;
+    if (!psf->codec_data)
+        return 0;
+    pvox = (IMA_OKI_ADPCM *)psf->codec_data;
 
-	sptr = ubuf.sbuf;
-	bufferlen = ARRAY_LEN(ubuf.sbuf);
-	while (len > 0)
-	{
-		readcount = (len >= bufferlen) ? bufferlen : len;
-		count = vox_read_block(psf, pvox, sptr, readcount);
-		for (k = 0; k < readcount; k++)
-			ptr[total + k] = arith_shift_left(sptr[k], 16);
-		total += count;
-		len -= readcount;
-		if (count != readcount)
-			break;
-	};
+    sptr = ubuf.sbuf;
+    bufferlen = ARRAY_LEN(ubuf.sbuf);
+    while (len > 0)
+    {
+        readcount = (len >= bufferlen) ? bufferlen : len;
+        count = vox_read_block(psf, pvox, sptr, readcount);
+        for (k = 0; k < readcount; k++)
+            ptr[total + k] = arith_shift_left(sptr[k], 16);
+        total += count;
+        len -= readcount;
+        if (count != readcount)
+            break;
+    };
 
-	return total;
+    return total;
 }
 
 static size_t vox_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
 {
-	IMA_OKI_ADPCM *pvox;
-	BUF_UNION ubuf;
-	short *sptr;
-	size_t k, bufferlen, readcount, count;
-	size_t total = 0;
-	float normfact;
+    IMA_OKI_ADPCM *pvox;
+    BUF_UNION ubuf;
+    short *sptr;
+    size_t k, bufferlen, readcount, count;
+    size_t total = 0;
+    float normfact;
 
-	if (!psf->codec_data)
-		return 0;
-	pvox = (IMA_OKI_ADPCM *)psf->codec_data;
+    if (!psf->codec_data)
+        return 0;
+    pvox = (IMA_OKI_ADPCM *)psf->codec_data;
 
-	normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
+    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
 
-	sptr = ubuf.sbuf;
-	bufferlen = ARRAY_LEN(ubuf.sbuf);
-	while (len > 0)
-	{
-		readcount = (len >= bufferlen) ? bufferlen : len;
-		count = vox_read_block(psf, pvox, sptr, readcount);
-		for (k = 0; k < readcount; k++)
-			ptr[total + k] = normfact * (float)(sptr[k]);
-		total += count;
-		len -= readcount;
-		if (count != readcount)
-			break;
-	};
+    sptr = ubuf.sbuf;
+    bufferlen = ARRAY_LEN(ubuf.sbuf);
+    while (len > 0)
+    {
+        readcount = (len >= bufferlen) ? bufferlen : len;
+        count = vox_read_block(psf, pvox, sptr, readcount);
+        for (k = 0; k < readcount; k++)
+            ptr[total + k] = normfact * (float)(sptr[k]);
+        total += count;
+        len -= readcount;
+        if (count != readcount)
+            break;
+    };
 
-	return total;
+    return total;
 }
 
 static size_t vox_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
 {
-	IMA_OKI_ADPCM *pvox;
-	BUF_UNION ubuf;
-	short *sptr;
-	size_t k, bufferlen, readcount, count;
-	size_t total = 0;
-	double normfact;
+    IMA_OKI_ADPCM *pvox;
+    BUF_UNION ubuf;
+    short *sptr;
+    size_t k, bufferlen, readcount, count;
+    size_t total = 0;
+    double normfact;
 
-	if (!psf->codec_data)
-		return 0;
-	pvox = (IMA_OKI_ADPCM *)psf->codec_data;
+    if (!psf->codec_data)
+        return 0;
+    pvox = (IMA_OKI_ADPCM *)psf->codec_data;
 
-	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x8000) : 1.0;
+    normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x8000) : 1.0;
 
-	sptr = ubuf.sbuf;
-	bufferlen = ARRAY_LEN(ubuf.sbuf);
-	while (len > 0)
-	{
-		readcount = (len >= bufferlen) ? bufferlen : len;
-		count = vox_read_block(psf, pvox, sptr, readcount);
-		for (k = 0; k < readcount; k++)
-			ptr[total + k] = normfact * (double)(sptr[k]);
-		total += count;
-		len -= readcount;
-		if (count != readcount)
-			break;
-	};
+    sptr = ubuf.sbuf;
+    bufferlen = ARRAY_LEN(ubuf.sbuf);
+    while (len > 0)
+    {
+        readcount = (len >= bufferlen) ? bufferlen : len;
+        count = vox_read_block(psf, pvox, sptr, readcount);
+        for (k = 0; k < readcount; k++)
+            ptr[total + k] = normfact * (double)(sptr[k]);
+        total += count;
+        len -= readcount;
+        if (count != readcount)
+            break;
+    };
 
-	return total;
+    return total;
 }
 
-static size_t vox_write_block(SF_PRIVATE *psf, IMA_OKI_ADPCM *pvox,
-                              const short *ptr, size_t len)
+static size_t vox_write_block(SF_PRIVATE *psf, IMA_OKI_ADPCM *pvox, const short *ptr, size_t len)
 {
-	size_t indx = 0, k;
+    size_t indx = 0, k;
 
-	while (indx < len)
-	{
-		pvox->pcm_count = (len - indx > IMA_OKI_ADPCM_PCM_LEN)
-		                  ? IMA_OKI_ADPCM_PCM_LEN
-		                  : len - indx;
+    while (indx < len)
+    {
+        pvox->pcm_count = (len - indx > IMA_OKI_ADPCM_PCM_LEN) ? IMA_OKI_ADPCM_PCM_LEN : len - indx;
 
-		memcpy(pvox->pcm, &(ptr[indx]), pvox->pcm_count * sizeof(short));
+        memcpy(pvox->pcm, &(ptr[indx]), pvox->pcm_count * sizeof(short));
 
-		ima_oki_adpcm_encode_block(pvox);
+        ima_oki_adpcm_encode_block(pvox);
 
-		if ((k = psf_fwrite(pvox->codes, 1, pvox->code_count, psf)) !=
-		        pvox->code_count)
-			psf_log_printf(psf, "*** Warning : short write (%d != %d).\n", k,
-			               pvox->code_count);
+        if ((k = psf_fwrite(pvox->codes, 1, pvox->code_count, psf)) != pvox->code_count)
+            psf_log_printf(psf, "*** Warning : short write (%d != %d).\n", k, pvox->code_count);
 
-		indx += pvox->pcm_count;
-	};
+        indx += pvox->pcm_count;
+    };
 
-	return indx;
+    return indx;
 }
 
 static size_t vox_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
 {
-	IMA_OKI_ADPCM *pvox;
-	size_t writecount, count;
-	size_t total = 0;
+    IMA_OKI_ADPCM *pvox;
+    size_t writecount, count;
+    size_t total = 0;
 
-	if (!psf->codec_data)
-		return 0;
-	pvox = (IMA_OKI_ADPCM *)psf->codec_data;
+    if (!psf->codec_data)
+        return 0;
+    pvox = (IMA_OKI_ADPCM *)psf->codec_data;
 
-	while (len)
-	{
-		writecount = (len > 0x10000000) ? 0x10000000 : len;
+    while (len)
+    {
+        writecount = (len > 0x10000000) ? 0x10000000 : len;
 
-		count = vox_write_block(psf, pvox, ptr, writecount);
+        count = vox_write_block(psf, pvox, ptr, writecount);
 
-		total += count;
-		len -= count;
-		if (count != writecount)
-			break;
-	};
+        total += count;
+        len -= count;
+        if (count != writecount)
+            break;
+    };
 
-	return total;
+    return total;
 }
 
 static size_t vox_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
 {
-	IMA_OKI_ADPCM *pvox;
-	BUF_UNION ubuf;
-	short *sptr;
-	size_t k, bufferlen, writecount, count;
-	size_t total = 0;
+    IMA_OKI_ADPCM *pvox;
+    BUF_UNION ubuf;
+    short *sptr;
+    size_t k, bufferlen, writecount, count;
+    size_t total = 0;
 
-	if (!psf->codec_data)
-		return 0;
-	pvox = (IMA_OKI_ADPCM *)psf->codec_data;
+    if (!psf->codec_data)
+        return 0;
+    pvox = (IMA_OKI_ADPCM *)psf->codec_data;
 
-	sptr = ubuf.sbuf;
-	bufferlen = ARRAY_LEN(ubuf.sbuf);
-	while (len > 0)
-	{
-		writecount = (len >= bufferlen) ? bufferlen : len;
-		for (k = 0; k < writecount; k++)
-			sptr[k] = ptr[total + k] >> 16;
-		count = vox_write_block(psf, pvox, sptr, writecount);
-		total += count;
-		len -= writecount;
-		if (count != writecount)
-			break;
-	};
+    sptr = ubuf.sbuf;
+    bufferlen = ARRAY_LEN(ubuf.sbuf);
+    while (len > 0)
+    {
+        writecount = (len >= bufferlen) ? bufferlen : len;
+        for (k = 0; k < writecount; k++)
+            sptr[k] = ptr[total + k] >> 16;
+        count = vox_write_block(psf, pvox, sptr, writecount);
+        total += count;
+        len -= writecount;
+        if (count != writecount)
+            break;
+    };
 
-	return total;
+    return total;
 }
 
 static size_t vox_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
 {
-	IMA_OKI_ADPCM *pvox;
-	BUF_UNION ubuf;
-	short *sptr;
-	size_t k, bufferlen, writecount, count;
-	size_t total = 0;
-	float normfact;
+    IMA_OKI_ADPCM *pvox;
+    BUF_UNION ubuf;
+    short *sptr;
+    size_t k, bufferlen, writecount, count;
+    size_t total = 0;
+    float normfact;
 
-	if (!psf->codec_data)
-		return 0;
-	pvox = (IMA_OKI_ADPCM *)psf->codec_data;
+    if (!psf->codec_data)
+        return 0;
+    pvox = (IMA_OKI_ADPCM *)psf->codec_data;
 
-	normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0);
+    normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0);
 
-	sptr = ubuf.sbuf;
-	bufferlen = ARRAY_LEN(ubuf.sbuf);
-	while (len > 0)
-	{
-		writecount = (len >= bufferlen) ? bufferlen : (int)len;
-		for (k = 0; k < writecount; k++)
-			sptr[k] = (short)lrintf(normfact * ptr[total + k]);
-		count = vox_write_block(psf, pvox, sptr, writecount);
-		total += count;
-		len -= writecount;
-		if (count != writecount)
-			break;
-	};
+    sptr = ubuf.sbuf;
+    bufferlen = ARRAY_LEN(ubuf.sbuf);
+    while (len > 0)
+    {
+        writecount = (len >= bufferlen) ? bufferlen : (int)len;
+        for (k = 0; k < writecount; k++)
+            sptr[k] = (short)lrintf(normfact * ptr[total + k]);
+        count = vox_write_block(psf, pvox, sptr, writecount);
+        total += count;
+        len -= writecount;
+        if (count != writecount)
+            break;
+    };
 
-	return total;
+    return total;
 }
 
 static size_t vox_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
 {
-	IMA_OKI_ADPCM *pvox;
-	BUF_UNION ubuf;
-	short *sptr;
-	size_t k, bufferlen, writecount, count;
-	size_t total = 0;
-	double normfact;
+    IMA_OKI_ADPCM *pvox;
+    BUF_UNION ubuf;
+    short *sptr;
+    size_t k, bufferlen, writecount, count;
+    size_t total = 0;
+    double normfact;
 
-	if (!psf->codec_data)
-		return 0;
-	pvox = (IMA_OKI_ADPCM *)psf->codec_data;
+    if (!psf->codec_data)
+        return 0;
+    pvox = (IMA_OKI_ADPCM *)psf->codec_data;
 
-	normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0;
+    normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0;
 
-	sptr = ubuf.sbuf;
-	bufferlen = ARRAY_LEN(ubuf.sbuf);
-	while (len > 0)
-	{
-		writecount = (len >= bufferlen) ? bufferlen : len;
-		for (k = 0; k < writecount; k++)
-			sptr[k] = (short)lrint(normfact * ptr[total + k]);
-		count = vox_write_block(psf, pvox, sptr, writecount);
-		total += count;
-		len -= writecount;
-		if (count != writecount)
-			break;
-	};
+    sptr = ubuf.sbuf;
+    bufferlen = ARRAY_LEN(ubuf.sbuf);
+    while (len > 0)
+    {
+        writecount = (len >= bufferlen) ? bufferlen : len;
+        for (k = 0; k < writecount; k++)
+            sptr[k] = (short)lrint(normfact * ptr[total + k]);
+        count = vox_write_block(psf, pvox, sptr, writecount);
+        total += count;
+        len -= writecount;
+        if (count != writecount)
+            break;
+    };
 
-	return total;
+    return total;
 }

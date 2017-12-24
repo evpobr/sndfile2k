@@ -64,8 +64,7 @@ int ircam_open(SF_PRIVATE *psf)
     int subformat;
     int error = SFE_NO_ERROR;
 
-    if (psf->file.mode == SFM_READ ||
-        (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = ircam_read_header(psf)))
             return error;
@@ -80,8 +79,7 @@ int ircam_open(SF_PRIVATE *psf)
 
         psf->endian = SF_ENDIAN(psf->sf.format);
         if (psf->endian == 0 || psf->endian == SF_ENDIAN_CPU)
-            psf->endian =
-                (CPU_IS_BIG_ENDIAN) ? SF_ENDIAN_BIG : SF_ENDIAN_LITTLE;
+            psf->endian = (CPU_IS_BIG_ENDIAN) ? SF_ENDIAN_BIG : SF_ENDIAN_LITTLE;
 
         psf->dataoffset = IRCAM_DATA_OFFSET;
 
@@ -125,8 +123,7 @@ static int ircam_read_header(SF_PRIVATE *psf)
     float samplerate;
     int error = SFE_NO_ERROR;
 
-    psf_binheader_readf(psf, "epmf44", 0, &marker, &samplerate,
-                        &(psf->sf.channels), &encoding);
+    psf_binheader_readf(psf, "epmf44", 0, &marker, &samplerate, &(psf->sf.channels), &encoding);
 
     if (((marker & IRCAM_BE_MASK) != IRCAM_BE_MARKER) &&
         ((marker & IRCAM_LE_MASK) != IRCAM_LE_MARKER))
@@ -139,8 +136,7 @@ static int ircam_read_header(SF_PRIVATE *psf)
 
     if (psf->sf.channels > SF_MAX_CHANNELS)
     {
-        psf_binheader_readf(psf, "Epmf44", 0, &marker, &samplerate,
-                            &(psf->sf.channels), &encoding);
+        psf_binheader_readf(psf, "Epmf44", 0, &marker, &samplerate, &(psf->sf.channels), &encoding);
 
         /* Sanity checking for endian-ness detection. */
         if (psf->sf.channels > SF_MAX_CHANNELS)
@@ -156,11 +152,11 @@ static int ircam_read_header(SF_PRIVATE *psf)
 
     psf->sf.samplerate = (int)samplerate;
 
-    psf_log_printf(psf, "  Sample Rate : %d\n"
-                        "  Channels    : %d\n"
-                        "  Encoding    : %X => %s\n",
-                   psf->sf.samplerate, psf->sf.channels, encoding,
-                   get_encoding_str(encoding));
+    psf_log_printf(psf,
+                   "  Sample Rate : %d\n"
+                   "  Channels    : %d\n"
+                   "  Encoding    : %X => %s\n",
+                   psf->sf.samplerate, psf->sf.channels, encoding, get_encoding_str(encoding));
 
     switch (encoding)
     {
@@ -261,25 +257,20 @@ static int ircam_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     switch (psf->endian)
     {
     case SF_ENDIAN_BIG:
-        psf_binheader_writef(psf, "Emf", BHWm(IRCAM_02B_MARKER),
-                             BHWf(samplerate));
-        psf_binheader_writef(psf, "E44", BHW4(psf->sf.channels),
-                             BHW4(encoding));
+        psf_binheader_writef(psf, "Emf", BHWm(IRCAM_02B_MARKER), BHWf(samplerate));
+        psf_binheader_writef(psf, "E44", BHW4(psf->sf.channels), BHW4(encoding));
         break;
 
     case SF_ENDIAN_LITTLE:
-        psf_binheader_writef(psf, "emf", BHWm(IRCAM_03L_MARKER),
-                             BHWf(samplerate));
-        psf_binheader_writef(psf, "e44", BHW4(psf->sf.channels),
-                             BHW4(encoding));
+        psf_binheader_writef(psf, "emf", BHWm(IRCAM_03L_MARKER), BHWf(samplerate));
+        psf_binheader_writef(psf, "e44", BHW4(psf->sf.channels), BHW4(encoding));
         break;
 
     default:
         return SFE_BAD_OPEN_FORMAT;
     };
 
-    psf_binheader_writef(psf, "z",
-                         BHWz((size_t)(IRCAM_DATA_OFFSET - psf->header.indx)));
+    psf_binheader_writef(psf, "z", BHWz((size_t)(IRCAM_DATA_OFFSET - psf->header.indx)));
 
     /* Header construction complete so write it out. */
     psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);

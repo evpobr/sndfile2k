@@ -41,7 +41,8 @@ typedef struct
     short pcm[IMA_OKI_ADPCM_PCM_LEN];
 } IMA_OKI_ADPCM;
 
-typedef enum {
+typedef enum
+{
     IMA_OKI_ADPCM_TYPE_IMA,
     IMA_OKI_ADPCM_TYPE_OKI
 } IMA_OKI_ADPCM_TYPE;

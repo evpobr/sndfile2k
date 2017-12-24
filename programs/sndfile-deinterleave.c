@@ -84,8 +84,7 @@ int main(int argc, char **argv)
 
     if ((state.infile = sf_open(argv[1], SFM_READ, &sfinfo)) == NULL)
     {
-        printf("\nError : Not able to open input file '%s'\n%s\n", argv[1],
-               sf_strerror(NULL));
+        printf("\nError : Not able to open input file '%s'\n%s\n", argv[1], sf_strerror(NULL));
         exit(1);
     };
 
@@ -98,8 +97,7 @@ int main(int argc, char **argv)
     state.channels = sfinfo.channels;
     sfinfo.channels = 1;
 
-    if (snprintf(pathname, sizeof(pathname), "%s", argv[1]) >
-        (int)sizeof(pathname))
+    if (snprintf(pathname, sizeof(pathname), "%s", argv[1]) > (int)sizeof(pathname))
     {
         printf("\nError : Length of provided filename '%s' exceeds MAX_PATH "
                "(%d).\n",
@@ -126,8 +124,7 @@ int main(int argc, char **argv)
 
         if ((state.outfile[ch] = sf_open(filename, SFM_WRITE, &sfinfo)) == NULL)
         {
-            printf("Not able to open output file '%s'\n%s\n", filename,
-                   sf_strerror(NULL));
+            printf("Not able to open output file '%s'\n%s\n", filename, sf_strerror(NULL));
             exit(1);
         };
 

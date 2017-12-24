@@ -101,8 +101,7 @@ int quantize(int d, int y, short *table, int size);
 
 int reconstruct(int sign, int dqln, int y);
 
-void update(int code_size, int y, int wi, int fi, int dq, int sr, int dqsez,
-            G72x_STATE *state_ptr);
+void update(int code_size, int y, int wi, int fi, int dq, int sr, int dqsez, G72x_STATE *state_ptr);
 
 int g721_encoder(int sample, G72x_STATE *state_ptr);
 int g721_decoder(int code, G72x_STATE *state_ptr);

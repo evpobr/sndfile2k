@@ -70,15 +70,13 @@ int cart_var_set(SF_PRIVATE *psf, const SF_CART_INFO *info, size_t datasize)
     };
 
     memcpy(psf->cart_16k, info, offsetof(SF_CART_INFO, tag_text));
-    psf_strlcpy_crlf(psf->cart_16k->tag_text, info->tag_text,
-                     sizeof(psf->cart_16k->tag_text),
+    psf_strlcpy_crlf(psf->cart_16k->tag_text, info->tag_text, sizeof(psf->cart_16k->tag_text),
                      datasize - offsetof(SF_CART_INFO, tag_text));
 
     len = strlen(psf->cart_16k->tag_text);
 
     if (len > 0 && psf->cart_16k->tag_text[len - 1] != '\n')
-        psf_strlcat(psf->cart_16k->tag_text, sizeof(psf->cart_16k->tag_text),
-                    "\r\n");
+        psf_strlcat(psf->cart_16k->tag_text, sizeof(psf->cart_16k->tag_text), "\r\n");
 
     /* Force tag_text_size to be even. */
     len = strlen(psf->cart_16k->tag_text);

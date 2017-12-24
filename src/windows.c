@@ -49,8 +49,7 @@ SNDFILE *sf_wchar_open(const wchar_t *wpath, int mode, SF_INFO *sfinfo)
 
     psf_init_files(psf);
 
-    if (WideCharToMultiByte(CP_UTF8, 0, wpath, -1, utf8name, sizeof(utf8name),
-                            NULL, NULL) == 0)
+    if (WideCharToMultiByte(CP_UTF8, 0, wpath, -1, utf8name, sizeof(utf8name), NULL, NULL) == 0)
         psf->file.path.wc[0] = 0;
 
     psf_log_printf(psf, "File : '%s' (utf-8 converted from ucs-2)\n", utf8name);
@@ -82,8 +81,7 @@ static void copy_filename(SF_PRIVATE *psf, LPCWSTR wpath)
     wcsncpy(psf->file.dir.wc, wpath, ARRAY_LEN(psf->file.dir.wc));
     psf->file.dir.wc[ARRAY_LEN(psf->file.dir.wc) - 1] = 0;
 
-    if ((wcptr = wcsrchr(psf->file.dir.wc, '/')) ||
-        (wcptr = wcsrchr(psf->file.dir.wc, '\\')))
+    if ((wcptr = wcsrchr(psf->file.dir.wc, '/')) || (wcptr = wcsrchr(psf->file.dir.wc, '\\')))
         wcptr[1] = 0;
     else
         psf->file.dir.wc[0] = 0;

@@ -72,8 +72,7 @@ int mat5_open(SF_PRIVATE *psf)
 {
     int subformat, error = 0;
 
-    if (psf->file.mode == SFM_READ ||
-        (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = mat5_read_header(psf)))
             return error;
@@ -90,11 +89,9 @@ int mat5_open(SF_PRIVATE *psf)
             return SFE_NO_PIPE_WRITE;
 
         psf->endian = SF_ENDIAN(psf->sf.format);
-        if (CPU_IS_LITTLE_ENDIAN &&
-            (psf->endian == SF_ENDIAN_CPU || psf->endian == 0))
+        if (CPU_IS_LITTLE_ENDIAN && (psf->endian == SF_ENDIAN_CPU || psf->endian == 0))
             psf->endian = SF_ENDIAN_LITTLE;
-        else if (CPU_IS_BIG_ENDIAN &&
-                 (psf->endian == SF_ENDIAN_CPU || psf->endian == 0))
+        else if (CPU_IS_BIG_ENDIAN && (psf->endian == SF_ENDIAN_CPU || psf->endian == 0))
             psf->endian = SF_ENDIAN_BIG;
 
         if ((error = mat5_write_header(psf, SF_FALSE)))
@@ -144,8 +141,7 @@ static int mat5_close(SF_PRIVATE *psf)
 static int mat5_write_header(SF_PRIVATE *psf, int calc_length)
 {
     static const char *filename =
-        "MATLAB 5.0 MAT-file, written by " PACKAGE_NAME "-" PACKAGE_VERSION
-        ", ";
+        "MATLAB 5.0 MAT-file, written by " PACKAGE_NAME "-" PACKAGE_VERSION ", ";
     static const char *sr_name = "samplerate\0\0\0\0\0\0\0\0\0\0\0";
     static const char *wd_name = "wavedata\0";
     char buffer[256];
@@ -199,8 +195,8 @@ static int mat5_write_header(SF_PRIVATE *psf, int calc_length)
     psf_fseek(psf, 0, SEEK_SET);
 
     psf_get_date_str(buffer, sizeof(buffer));
-    psf_binheader_writef(psf, "bb", BHWv(filename), BHWz(strlen(filename)),
-                         BHWv(buffer), BHWz(strlen(buffer) + 1));
+    psf_binheader_writef(psf, "bb", BHWv(filename), BHWz(strlen(filename)), BHWv(buffer),
+                         BHWz(strlen(buffer) + 1));
 
     memset(buffer, ' ', 124 - psf->header.indx);
     psf_binheader_writef(psf, "b", BHWv(buffer), BHWz(124 - psf->header.indx));
@@ -212,35 +208,30 @@ static int mat5_write_header(SF_PRIVATE *psf, int calc_length)
     else
         psf_binheader_writef(psf, "2b", BHW2(0x0100), BHWv("IM"), BHWz(2));
 
-    psf_binheader_writef(psf, "444444", BHW4(MAT5_TYPE_ARRAY), BHW4(64),
-                         BHW4(MAT5_TYPE_UINT32), BHW4(8), BHW4(6), BHW4(0));
-    psf_binheader_writef(psf, "4444", BHW4(MAT5_TYPE_INT32), BHW4(8), BHW4(1),
-                         BHW4(1));
-    psf_binheader_writef(psf, "44b", BHW4(MAT5_TYPE_SCHAR),
-                         BHW4(strlen(sr_name)), BHWv(sr_name), BHWz(16));
+    psf_binheader_writef(psf, "444444", BHW4(MAT5_TYPE_ARRAY), BHW4(64), BHW4(MAT5_TYPE_UINT32),
+                         BHW4(8), BHW4(6), BHW4(0));
+    psf_binheader_writef(psf, "4444", BHW4(MAT5_TYPE_INT32), BHW4(8), BHW4(1), BHW4(1));
+    psf_binheader_writef(psf, "44b", BHW4(MAT5_TYPE_SCHAR), BHW4(strlen(sr_name)), BHWv(sr_name),
+                         BHWz(16));
 
     if (psf->sf.samplerate > 0xFFFF)
     {
-        psf_binheader_writef(psf, "44", BHW4(MAT5_TYPE_COMP_UINT),
-                             BHW4(psf->sf.samplerate));
+        psf_binheader_writef(psf, "44", BHW4(MAT5_TYPE_COMP_UINT), BHW4(psf->sf.samplerate));
     }
     else
     {
         unsigned short samplerate = psf->sf.samplerate;
 
-        psf_binheader_writef(psf, "422", BHW4(MAT5_TYPE_COMP_USHORT),
-                             BHW2(samplerate), BHW2(0));
+        psf_binheader_writef(psf, "422", BHW4(MAT5_TYPE_COMP_USHORT), BHW2(samplerate), BHW2(0));
     };
 
     datasize = psf->sf.frames * psf->sf.channels * psf->bytewidth;
 
-    psf_binheader_writef(psf, "t484444", BHW4(MAT5_TYPE_ARRAY),
-                         BHW8(datasize + 64), BHW4(MAT5_TYPE_UINT32), BHW4(8),
-                         BHW4(6), BHW4(0));
-    psf_binheader_writef(psf, "t4448", BHW4(MAT5_TYPE_INT32), BHW4(8),
-                         BHW4(psf->sf.channels), BHW8(psf->sf.frames));
-    psf_binheader_writef(psf, "44b", BHW4(MAT5_TYPE_SCHAR),
-                         BHW4(strlen(wd_name)), BHWv(wd_name),
+    psf_binheader_writef(psf, "t484444", BHW4(MAT5_TYPE_ARRAY), BHW8(datasize + 64),
+                         BHW4(MAT5_TYPE_UINT32), BHW4(8), BHW4(6), BHW4(0));
+    psf_binheader_writef(psf, "t4448", BHW4(MAT5_TYPE_INT32), BHW4(8), BHW4(psf->sf.channels),
+                         BHW8(psf->sf.frames));
+    psf_binheader_writef(psf, "44b", BHW4(MAT5_TYPE_SCHAR), BHW4(strlen(wd_name)), BHWv(wd_name),
                          BHWz(strlen(wd_name)));
 
     datasize = psf->sf.frames * psf->sf.channels * psf->bytewidth;
@@ -298,8 +289,7 @@ static int mat5_read_header(SF_PRIVATE *psf)
     else
         return SFE_MAT5_BAD_ENDIAN;
 
-    if ((CPU_IS_LITTLE_ENDIAN && endian == IM_MARKER) ||
-        (CPU_IS_BIG_ENDIAN && endian == MI_MARKER))
+    if ((CPU_IS_LITTLE_ENDIAN && endian == IM_MARKER) || (CPU_IS_BIG_ENDIAN && endian == MI_MARKER))
         version = ENDSWAP_16(version);
 
     psf_log_printf(psf, "Version : 0x%04X\n", version);

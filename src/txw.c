@@ -197,11 +197,10 @@ static int txw_read_header(SF_PRIVATE *psf)
     if (strptr)
         psf_log_printf(psf, strptr);
     else if (txwh.srhash)
-        psf_log_printf(psf, " Sample Rate : %d (0x%X) => %d\n", txwh.srate,
-                       txwh.srhash, psf->sf.samplerate);
-    else
-        psf_log_printf(psf, " Sample Rate : %d => %d\n", txwh.srate,
+        psf_log_printf(psf, " Sample Rate : %d (0x%X) => %d\n", txwh.srate, txwh.srhash,
                        psf->sf.samplerate);
+    else
+        psf_log_printf(psf, " Sample Rate : %d => %d\n", txwh.srate, psf->sf.samplerate);
 
     if (txwh.format == TXW_LOOPED)
     {

@@ -49,8 +49,7 @@ static void copy_metadata(SNDFILE *outfile, SNDFILE *infile, int channels);
 
 static void usage_exit(const char *progname)
 {
-    printf("\nUsage : %s [options] [encoding] <input file> <output file>\n",
-           progname);
+    printf("\nUsage : %s [options] [encoding] <input file> <output file>\n", progname);
     puts("\n"
          "    where [option] may be:\n\n"
          "        -override-sample-rate=X  : force sample rate of input to X\n"
@@ -122,8 +121,7 @@ static void report_format_error_exit(const char *argv0, SF_INFO *sfinfo)
            "Error : output file format is invalid.\n"
            "The '%s' container does not support '%s' codec data.\n"
            "Run '%s --help' for clues.\n\n",
-           sfe_container_name(sfinfo->format), sfe_codec_name(sfinfo->format),
-           program_name(argv0));
+           sfe_container_name(sfinfo->format), sfe_codec_name(sfinfo->format), program_name(argv0));
     exit(1);
 }
 
@@ -152,15 +150,13 @@ int main(int argc, char *argv[])
 
     if (strlen(infilename) > 1 && infilename[0] == '-')
     {
-        printf("Error : Input filename (%s) looks like an option.\n\n",
-               infilename);
+        printf("Error : Input filename (%s) looks like an option.\n\n", infilename);
         usage_exit(progname);
     };
 
     if (outfilename[0] == '-')
     {
-        printf("Error : Output filename (%s) looks like an option.\n\n",
-               outfilename);
+        printf("Error : Output filename (%s) looks like an option.\n\n", outfilename);
         usage_exit(progname);
     };
 
@@ -327,8 +323,7 @@ int main(int argc, char *argv[])
 
     if ((sfinfo.format = sfe_file_type_of_ext(outfilename, sfinfo.format)) == 0)
     {
-        printf("Error : Not able to determine output file type for %s.\n",
-               outfilename);
+        printf("Error : Not able to determine output file type for %s.\n", outfilename);
         return 1;
     };
 
@@ -360,8 +355,7 @@ int main(int argc, char *argv[])
     if (sf_format_check(&sfinfo) == 0)
         report_format_error_exit(argv[0], &sfinfo);
 
-    if ((sfinfo.format & SF_FORMAT_SUBMASK) == SF_FORMAT_GSM610 &&
-        sfinfo.samplerate != 8000)
+    if ((sfinfo.format & SF_FORMAT_SUBMASK) == SF_FORMAT_GSM610 && sfinfo.samplerate != 8000)
     {
         printf("WARNING: GSM 6.10 data format only supports 8kHz sample rate. "
                "The converted\n"
@@ -373,16 +367,14 @@ int main(int argc, char *argv[])
     /* Open the output file. */
     if ((outfile = sf_open(outfilename, SFM_WRITE, &sfinfo)) == NULL)
     {
-        printf("Not able to open output file %s : %s\n", outfilename,
-               sf_strerror(NULL));
+        printf("Not able to open output file %s : %s\n", outfilename, sf_strerror(NULL));
         return 1;
     };
 
     /* Copy the metadata */
     copy_metadata(outfile, infile, sfinfo.channels);
 
-    if (normalize || (outfileminor == SF_FORMAT_DOUBLE) ||
-        (outfileminor == SF_FORMAT_FLOAT) ||
+    if (normalize || (outfileminor == SF_FORMAT_DOUBLE) || (outfileminor == SF_FORMAT_FLOAT) ||
         (infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT) ||
         (infileminor == SF_FORMAT_VORBIS) || (outfileminor == SF_FORMAT_VORBIS))
         sfe_copy_data_fp(outfile, infile, sfinfo.channels, normalize);
@@ -418,8 +410,7 @@ static void copy_metadata(SNDFILE *outfile, SNDFILE *infile, int channels)
     {
         size_t size = channels * sizeof(chanmap[0]);
 
-        if (sf_command(infile, SFC_GET_CHANNEL_MAP_INFO, chanmap, size) ==
-            SF_TRUE)
+        if (sf_command(infile, SFC_GET_CHANNEL_MAP_INFO, chanmap, size) == SF_TRUE)
             sf_command(outfile, SFC_SET_CHANNEL_MAP_INFO, chanmap, size);
     };
 
@@ -429,7 +420,6 @@ static void copy_metadata(SNDFILE *outfile, SNDFILE *infile, int channels)
     if (sf_command(infile, SFC_GET_INSTRUMENT, &inst, sizeof(inst)) == SF_TRUE)
         sf_command(outfile, SFC_SET_INSTRUMENT, &inst, sizeof(inst));
 
-    if (sf_command(infile, SFC_GET_BROADCAST_INFO, &binfo, sizeof(binfo)) ==
-        SF_TRUE)
+    if (sf_command(infile, SFC_GET_BROADCAST_INFO, &binfo, sizeof(binfo)) == SF_TRUE)
         sf_command(outfile, SFC_SET_BROADCAST_INFO, &binfo, sizeof(binfo));
 }

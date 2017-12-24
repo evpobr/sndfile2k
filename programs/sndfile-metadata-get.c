@@ -46,8 +46,7 @@
 #define BUFFER_LEN (1 << 16)
 
 static void usage_exit(const char *progname, int exit_code);
-static void process_args(SNDFILE *file, const SF_BROADCAST_INFO_2K *binfo,
-                         int argc, char *argv[]);
+static void process_args(SNDFILE *file, const SF_BROADCAST_INFO_2K *binfo, int argc, char *argv[]);
 
 int main(int argc, char *argv[])
 {
@@ -62,8 +61,7 @@ int main(int argc, char *argv[])
     progname = program_name(argv[0]);
 
     /* Check if we've been asked for help. */
-    if (argc < 2 || strcmp(argv[1], "--help") == 0 ||
-        strcmp(argv[1], "-h") == 0)
+    if (argc < 2 || strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-h") == 0)
         usage_exit(progname, 0);
 
     if (argv[argc - 1][0] != '-')
@@ -86,8 +84,7 @@ int main(int argc, char *argv[])
     memset(&sfinfo, 0, sizeof(sfinfo));
     if ((file = sf_open(filename, SFM_READ, &sfinfo)) == NULL)
     {
-        printf("Error : Open of file '%s' failed : %s\n\n", filename,
-               sf_strerror(file));
+        printf("Error : Open of file '%s' failed : %s\n\n", filename, sf_strerror(file));
         exit(1);
     };
 
@@ -129,19 +126,17 @@ static void usage_exit(const char *progname, int exit_code)
     exit(exit_code);
 }
 
-static void process_args(SNDFILE *file, const SF_BROADCAST_INFO_2K *binfo,
-                         int argc, char *argv[])
+static void process_args(SNDFILE *file, const SF_BROADCAST_INFO_2K *binfo, int argc, char *argv[])
 {
     const char *str;
     int k, do_all = 0;
 
-#define HANDLE_BEXT_ARG(cmd, name, field)                         \
-    if (do_all || strcmp(argv[k], cmd) == 0)                      \
-    {                                                             \
-        printf("%-20s : %.*s\n", name, (int)sizeof(binfo->field), \
-               binfo->field);                                     \
-        if (!do_all)                                              \
-            continue;                                             \
+#define HANDLE_BEXT_ARG(cmd, name, field)                                        \
+    if (do_all || strcmp(argv[k], cmd) == 0)                                     \
+    {                                                                            \
+        printf("%-20s : %.*s\n", name, (int)sizeof(binfo->field), binfo->field); \
+        if (!do_all)                                                             \
+            continue;                                                            \
     };
 
 #define HANDLE_STR_ARG(cmd, name, id)                 \
@@ -166,13 +161,10 @@ static void process_args(SNDFILE *file, const SF_BROADCAST_INFO_2K *binfo,
 
         HANDLE_BEXT_ARG("--bext-description", "Description", description);
         HANDLE_BEXT_ARG("--bext-originator", "Originator", originator);
-        HANDLE_BEXT_ARG("--bext-orig-ref", "Origination ref",
-                        originator_reference);
+        HANDLE_BEXT_ARG("--bext-orig-ref", "Origination ref", originator_reference);
         HANDLE_BEXT_ARG("--bext-umid", "UMID", umid);
-        HANDLE_BEXT_ARG("--bext-orig-date", "Origination date",
-                        origination_date);
-        HANDLE_BEXT_ARG("--bext-orig-time", "Origination time",
-                        origination_time);
+        HANDLE_BEXT_ARG("--bext-orig-date", "Origination date", origination_date);
+        HANDLE_BEXT_ARG("--bext-orig-time", "Origination time", origination_time);
         HANDLE_BEXT_ARG("--bext-coding-hist", "Coding history", coding_history);
 
         HANDLE_STR_ARG("--str-title", "Name", SF_STR_TITLE);
@@ -185,9 +177,7 @@ static void process_args(SNDFILE *file, const SF_BROADCAST_INFO_2K *binfo,
 
         if (!do_all)
         {
-            printf(
-                "Error : Don't know what to do with command line arg '%s'.\n\n",
-                argv[k]);
+            printf("Error : Don't know what to do with command line arg '%s'.\n\n", argv[k]);
             exit(1);
         };
         break;

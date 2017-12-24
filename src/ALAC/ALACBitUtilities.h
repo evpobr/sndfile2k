@@ -56,7 +56,8 @@ enum
     ALAC_noErr = 0
 };
 
-typedef enum {
+typedef enum
+{
     ID_SCE = 0, /* Single Channel Element */
     ID_CPE = 1, /* Channel Pair Element */
     ID_CCE = 2, /* Coupling Channel Element */
@@ -83,14 +84,12 @@ typedef struct BitBuffer
 	- bounds checking must be done by the client
 */
 void BitBufferInit(BitBuffer *bits, uint8_t *buffer, uint32_t byteSize);
-uint32_t
-BitBufferRead(BitBuffer *bits,
-              uint8_t numBits); // note: cannot read more than 16 bits at a time
+uint32_t BitBufferRead(BitBuffer *bits,
+                       uint8_t numBits); // note: cannot read more than 16 bits at a time
 uint8_t BitBufferReadSmall(BitBuffer *bits, uint8_t numBits);
 uint8_t BitBufferReadOne(BitBuffer *bits);
-uint32_t
-BitBufferPeek(BitBuffer *bits,
-              uint8_t numBits); // note: cannot read more than 16 bits at a time
+uint32_t BitBufferPeek(BitBuffer *bits,
+                       uint8_t numBits); // note: cannot read more than 16 bits at a time
 uint32_t BitBufferPeekOne(BitBuffer *bits);
 uint32_t BitBufferUnpackBERSize(BitBuffer *bits);
 uint32_t BitBufferGetPosition(BitBuffer *bits);

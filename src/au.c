@@ -132,8 +132,7 @@ int au_open(SF_PRIVATE *psf)
     int subformat;
     int error = 0;
 
-    if (psf->file.mode == SFM_READ ||
-        (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = au_read_header(psf)))
             return error;
@@ -212,7 +211,6 @@ int au_open(SF_PRIVATE *psf)
     return error;
 }
 
-
 static int au_close(SF_PRIVATE *psf)
 {
     if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
@@ -267,15 +265,13 @@ static int au_write_header(SF_PRIVATE *psf, int calc_length)
 
     if (psf->endian == SF_ENDIAN_BIG)
     {
-        psf_binheader_writef(psf, "Em4", BHWm(DOTSND_MARKER),
-                             BHW4(AU_DATA_OFFSET));
+        psf_binheader_writef(psf, "Em4", BHWm(DOTSND_MARKER), BHW4(AU_DATA_OFFSET));
         psf_binheader_writef(psf, "E4444", BHW4(datalength), BHW4(encoding),
                              BHW4(psf->sf.samplerate), BHW4(psf->sf.channels));
     }
     else if (psf->endian == SF_ENDIAN_LITTLE)
     {
-        psf_binheader_writef(psf, "em4", BHWm(DNSDOT_MARKER),
-                             BHW4(AU_DATA_OFFSET));
+        psf_binheader_writef(psf, "em4", BHWm(DNSDOT_MARKER), BHW4(AU_DATA_OFFSET));
         psf_binheader_writef(psf, "e4444", BHW4(datalength), BHW4(encoding),
                              BHW4(psf->sf.samplerate), BHW4(psf->sf.channels));
     }
@@ -347,16 +343,14 @@ static int au_read_header(SF_PRIVATE *psf)
     {
         psf->endian = SF_ENDIAN_BIG;
 
-        psf_binheader_readf(psf, "E44444", &(au_fmt.dataoffset),
-                            &(au_fmt.datasize), &(au_fmt.encoding),
-                            &(au_fmt.samplerate), &(au_fmt.channels));
+        psf_binheader_readf(psf, "E44444", &(au_fmt.dataoffset), &(au_fmt.datasize),
+                            &(au_fmt.encoding), &(au_fmt.samplerate), &(au_fmt.channels));
     }
     else if (marker == DNSDOT_MARKER)
     {
         psf->endian = SF_ENDIAN_LITTLE;
-        psf_binheader_readf(psf, "e44444", &(au_fmt.dataoffset),
-                            &(au_fmt.datasize), &(au_fmt.encoding),
-                            &(au_fmt.samplerate), &(au_fmt.channels));
+        psf_binheader_readf(psf, "e44444", &(au_fmt.dataoffset), &(au_fmt.datasize),
+                            &(au_fmt.encoding), &(au_fmt.samplerate), &(au_fmt.channels));
     }
     else
         return SFE_AU_NO_DOTSND;
@@ -374,8 +368,7 @@ static int au_read_header(SF_PRIVATE *psf)
         psf->filelength = au_fmt.dataoffset + au_fmt.datasize;
         psf_log_printf(psf, "  Data Size   : %d\n", au_fmt.datasize);
     }
-    else if (au_fmt.datasize == -1 ||
-             au_fmt.dataoffset + au_fmt.datasize == psf->filelength)
+    else if (au_fmt.datasize == -1 || au_fmt.dataoffset + au_fmt.datasize == psf->filelength)
         psf_log_printf(psf, "  Data Size   : %d\n", au_fmt.datasize);
     else if (au_fmt.dataoffset + au_fmt.datasize < psf->filelength)
     {
@@ -385,8 +378,7 @@ static int au_read_header(SF_PRIVATE *psf)
     else
     {
         dword = psf->filelength - au_fmt.dataoffset;
-        psf_log_printf(psf, "  Data Size   : %d (should be %d)\n",
-                       au_fmt.datasize, dword);
+        psf_log_printf(psf, "  Data Size   : %d (should be %d)\n", au_fmt.datasize, dword);
         au_fmt.datasize = dword;
     };
 
@@ -493,14 +485,13 @@ static int au_read_header(SF_PRIVATE *psf)
     psf_log_printf(psf, "  Sample Rate : %d\n", au_fmt.samplerate);
     if (au_fmt.channels < 1)
     {
-        psf_log_printf(psf, "  Channels    : %d  **** should be >= 1\n",
-                       au_fmt.channels);
+        psf_log_printf(psf, "  Channels    : %d  **** should be >= 1\n", au_fmt.channels);
         return SFE_CHANNEL_COUNT_ZERO;
     }
     else if (au_fmt.channels > SF_MAX_CHANNELS)
     {
-        psf_log_printf(psf, "  Channels    : %d  **** should be <= %d\n",
-                       au_fmt.channels, SF_MAX_CHANNELS);
+        psf_log_printf(psf, "  Channels    : %d  **** should be <= %d\n", au_fmt.channels,
+                       SF_MAX_CHANNELS);
         return SFE_CHANNEL_COUNT;
     };
 

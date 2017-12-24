@@ -25,16 +25,14 @@
 
 #include "common.h"
 
-static int gen_coding_history(char *added_history, int added_history_max,
-                              const SF_INFO *psfinfo);
+static int gen_coding_history(char *added_history, int added_history_max, const SF_INFO *psfinfo);
 
 static inline size_t bc_min_size(const SF_BROADCAST_INFO *info)
 {
     if (info == NULL)
         return 0;
 
-    return offsetof(SF_BROADCAST_INFO, coding_history) +
-           info->coding_history_size;
+    return offsetof(SF_BROADCAST_INFO, coding_history) + info->coding_history_size;
 }
 
 SF_BROADCAST_INFO_16K *broadcast_var_alloc(void)
@@ -42,8 +40,7 @@ SF_BROADCAST_INFO_16K *broadcast_var_alloc(void)
     return calloc(1, sizeof(SF_BROADCAST_INFO_16K));
 }
 
-int broadcast_var_set(SF_PRIVATE *psf, const SF_BROADCAST_INFO *info,
-                      size_t datasize)
+int broadcast_var_set(SF_PRIVATE *psf, const SF_BROADCAST_INFO *info, size_t datasize)
 {
     size_t len;
 
@@ -72,8 +69,7 @@ int broadcast_var_set(SF_PRIVATE *psf, const SF_BROADCAST_INFO *info,
     };
 
     /* Only copy the first part of the struct. */
-    memcpy(psf->broadcast_16k, info,
-           offsetof(SF_BROADCAST_INFO, coding_history));
+    memcpy(psf->broadcast_16k, info, offsetof(SF_BROADCAST_INFO, coding_history));
 
     psf_strlcpy_crlf(psf->broadcast_16k->coding_history, info->coding_history,
                      sizeof(psf->broadcast_16k->coding_history),
@@ -81,16 +77,16 @@ int broadcast_var_set(SF_PRIVATE *psf, const SF_BROADCAST_INFO *info,
     len = strlen(psf->broadcast_16k->coding_history);
 
     if (len > 0 && psf->broadcast_16k->coding_history[len - 1] != '\n')
-        psf_strlcat(psf->broadcast_16k->coding_history,
-                    sizeof(psf->broadcast_16k->coding_history), "\r\n");
+        psf_strlcat(psf->broadcast_16k->coding_history, sizeof(psf->broadcast_16k->coding_history),
+                    "\r\n");
 
     if (psf->file.mode == SFM_WRITE)
     {
         char added_history[256];
 
         gen_coding_history(added_history, sizeof(added_history), &(psf->sf));
-        psf_strlcat(psf->broadcast_16k->coding_history,
-                    sizeof(psf->broadcast_16k->coding_history), added_history);
+        psf_strlcat(psf->broadcast_16k->coding_history, sizeof(psf->broadcast_16k->coding_history),
+                    added_history);
     };
 
     /* Force coding_history_size to be even. */
@@ -111,17 +107,14 @@ int broadcast_var_get(SF_PRIVATE *psf, SF_BROADCAST_INFO *data, size_t datasize)
     if (psf->broadcast_16k == NULL)
         return SF_FALSE;
 
-    size = SF_MIN(datasize,
-                  bc_min_size((const SF_BROADCAST_INFO *)psf->broadcast_16k));
+    size = SF_MIN(datasize, bc_min_size((const SF_BROADCAST_INFO *)psf->broadcast_16k));
 
     memcpy(data, psf->broadcast_16k, size);
 
     return SF_TRUE;
 }
 
-
-static int gen_coding_history(char *added_history, int added_history_max,
-                              const SF_INFO *psfinfo)
+static int gen_coding_history(char *added_history, int added_history_max, const SF_INFO *psfinfo)
 {
     char chnstr[16];
     int count, width;
@@ -192,9 +185,8 @@ static int gen_coding_history(char *added_history, int added_history_max,
         break;
     };
 
-    count = snprintf(added_history, added_history_max,
-                     "A=PCM,F=%u,W=%d,M=%s,T=%s-%s\r\n", psfinfo->samplerate,
-                     width, chnstr, PACKAGE_NAME, PACKAGE_VERSION);
+    count = snprintf(added_history, added_history_max, "A=PCM,F=%u,W=%d,M=%s,T=%s-%s\r\n",
+                     psfinfo->samplerate, width, chnstr, PACKAGE_NAME, PACKAGE_VERSION);
 
     if (count >= added_history_max)
         return 0;

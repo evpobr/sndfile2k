@@ -27,14 +27,14 @@
 
 typedef struct
 {
-	double buffer[SF_BUFFER_LEN / sizeof(double)];
+    double buffer[SF_BUFFER_LEN / sizeof(double)];
 
-	sf_count_t channel_len;
+    sf_count_t channel_len;
 
-	size_t (*read_short)(SF_PRIVATE *, short *ptr, size_t len);
-	size_t (*read_int)(SF_PRIVATE *, int *ptr, size_t len);
-	size_t (*read_float)(SF_PRIVATE *, float *ptr, size_t len);
-	size_t (*read_double)(SF_PRIVATE *, double *ptr, size_t len);
+    size_t (*read_short)(SF_PRIVATE *, short *ptr, size_t len);
+    size_t (*read_int)(SF_PRIVATE *, int *ptr, size_t len);
+    size_t (*read_float)(SF_PRIVATE *, float *ptr, size_t len);
+    size_t (*read_double)(SF_PRIVATE *, double *ptr, size_t len);
 } INTERLEAVE_DATA;
 
 static size_t interleave_read_short(SF_PRIVATE *psf, short *ptr, size_t len);
@@ -42,273 +42,271 @@ static size_t interleave_read_int(SF_PRIVATE *psf, int *ptr, size_t len);
 static size_t interleave_read_float(SF_PRIVATE *psf, float *ptr, size_t len);
 static size_t interleave_read_double(SF_PRIVATE *psf, double *ptr, size_t len);
 
-static sf_count_t interleave_seek(SF_PRIVATE *, int mode,
-                                  sf_count_t samples_from_start);
+static sf_count_t interleave_seek(SF_PRIVATE *, int mode, sf_count_t samples_from_start);
 
 int interleave_init(SF_PRIVATE *psf)
 {
-	INTERLEAVE_DATA *pdata;
+    INTERLEAVE_DATA *pdata;
 
-	if (psf->file.mode != SFM_READ)
-		return SFE_INTERLEAVE_MODE;
+    if (psf->file.mode != SFM_READ)
+        return SFE_INTERLEAVE_MODE;
 
-	if (psf->interleave)
-	{
-		psf_log_printf(psf, "*** Weird, already have interleave.\n");
-		return 666;
-	};
+    if (psf->interleave)
+    {
+        psf_log_printf(psf, "*** Weird, already have interleave.\n");
+        return 666;
+    };
 
-	/* Free this in sf_close() function. */
-	if (!(pdata = malloc(sizeof(INTERLEAVE_DATA))))
-		return SFE_MALLOC_FAILED;
+    /* Free this in sf_close() function. */
+    if (!(pdata = malloc(sizeof(INTERLEAVE_DATA))))
+        return SFE_MALLOC_FAILED;
 
-	puts("interleave_init");
+    puts("interleave_init");
 
-	psf->interleave = pdata;
+    psf->interleave = pdata;
 
-	/* Save the existing methods. */
-	pdata->read_short = psf->read_short;
-	pdata->read_int = psf->read_int;
-	pdata->read_float = psf->read_float;
-	pdata->read_double = psf->read_double;
+    /* Save the existing methods. */
+    pdata->read_short = psf->read_short;
+    pdata->read_int = psf->read_int;
+    pdata->read_float = psf->read_float;
+    pdata->read_double = psf->read_double;
 
-	pdata->channel_len = psf->sf.frames * psf->bytewidth;
+    pdata->channel_len = psf->sf.frames * psf->bytewidth;
 
-	/* Insert our new methods. */
-	psf->read_short = interleave_read_short;
-	psf->read_int = interleave_read_int;
-	psf->read_float = interleave_read_float;
-	psf->read_double = interleave_read_double;
+    /* Insert our new methods. */
+    psf->read_short = interleave_read_short;
+    psf->read_int = interleave_read_int;
+    psf->read_float = interleave_read_float;
+    psf->read_double = interleave_read_double;
 
-	psf->seek = interleave_seek;
+    psf->seek = interleave_seek;
 
-	return 0;
+    return 0;
 }
 
 static size_t interleave_read_short(SF_PRIVATE *psf, short *ptr, size_t len)
 {
-	INTERLEAVE_DATA *pdata;
-	sf_count_t offset, templen;
-	int chan;
-	size_t count, k;
-	short *inptr, *outptr;
+    INTERLEAVE_DATA *pdata;
+    sf_count_t offset, templen;
+    int chan;
+    size_t count, k;
+    short *inptr, *outptr;
 
-	if (!(pdata = psf->interleave))
-		return 0;
+    if (!(pdata = psf->interleave))
+        return 0;
 
-	inptr = (short *)pdata->buffer;
+    inptr = (short *)pdata->buffer;
 
-	for (chan = 0; chan < psf->sf.channels; chan++)
-	{
-		outptr = ptr + chan;
+    for (chan = 0; chan < psf->sf.channels; chan++)
+    {
+        outptr = ptr + chan;
 
-		offset = psf->dataoffset + chan * psf->bytewidth * psf->read_current;
+        offset = psf->dataoffset + chan * psf->bytewidth * psf->read_current;
 
-		if (psf_fseek(psf, offset, SEEK_SET) != offset)
-		{
-			psf->error = SFE_INTERLEAVE_SEEK;
-			return 0;
-		};
+        if (psf_fseek(psf, offset, SEEK_SET) != offset)
+        {
+            psf->error = SFE_INTERLEAVE_SEEK;
+            return 0;
+        };
 
-		templen = len / psf->sf.channels;
+        templen = len / psf->sf.channels;
 
-		while (templen > 0)
-		{
-			if (templen > SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(short))
-				count = SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(short);
-			else
-				count = (int)templen;
+        while (templen > 0)
+        {
+            if (templen > SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(short))
+                count = SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(short);
+            else
+                count = (int)templen;
 
-			if (pdata->read_short(psf, inptr, count) != count)
-			{
-				psf->error = SFE_INTERLEAVE_READ;
-				return 0;
-			};
+            if (pdata->read_short(psf, inptr, count) != count)
+            {
+                psf->error = SFE_INTERLEAVE_READ;
+                return 0;
+            };
 
-			for (k = 0; k < count; k++)
-			{
-				*outptr = inptr[k];
-				outptr += psf->sf.channels;
-			};
+            for (k = 0; k < count; k++)
+            {
+                *outptr = inptr[k];
+                outptr += psf->sf.channels;
+            };
 
-			templen -= count;
-		};
-	};
+            templen -= count;
+        };
+    };
 
-	return len;
+    return len;
 }
 
 static size_t interleave_read_int(SF_PRIVATE *psf, int *ptr, size_t len)
 {
-	INTERLEAVE_DATA *pdata;
-	sf_count_t offset, templen;
-	int chan;
-	size_t count, k;
-	int *inptr, *outptr;
+    INTERLEAVE_DATA *pdata;
+    sf_count_t offset, templen;
+    int chan;
+    size_t count, k;
+    int *inptr, *outptr;
 
-	if (!(pdata = psf->interleave))
-		return 0;
+    if (!(pdata = psf->interleave))
+        return 0;
 
-	inptr = (int *)pdata->buffer;
+    inptr = (int *)pdata->buffer;
 
-	for (chan = 0; chan < psf->sf.channels; chan++)
-	{
-		outptr = ptr + chan;
+    for (chan = 0; chan < psf->sf.channels; chan++)
+    {
+        outptr = ptr + chan;
 
-		offset = psf->dataoffset + chan * psf->bytewidth * psf->read_current;
+        offset = psf->dataoffset + chan * psf->bytewidth * psf->read_current;
 
-		if (psf_fseek(psf, offset, SEEK_SET) != offset)
-		{
-			psf->error = SFE_INTERLEAVE_SEEK;
-			return 0;
-		};
+        if (psf_fseek(psf, offset, SEEK_SET) != offset)
+        {
+            psf->error = SFE_INTERLEAVE_SEEK;
+            return 0;
+        };
 
-		templen = len / psf->sf.channels;
+        templen = len / psf->sf.channels;
 
-		while (templen > 0)
-		{
-			if (templen > sizeof(pdata->buffer) / sizeof(int))
-				count = sizeof(pdata->buffer) / sizeof(int);
-			else
-				count = (int)templen;
+        while (templen > 0)
+        {
+            if (templen > sizeof(pdata->buffer) / sizeof(int))
+                count = sizeof(pdata->buffer) / sizeof(int);
+            else
+                count = (int)templen;
 
-			if (pdata->read_int(psf, inptr, count) != count)
-			{
-				psf->error = SFE_INTERLEAVE_READ;
-				return 0;
-			};
+            if (pdata->read_int(psf, inptr, count) != count)
+            {
+                psf->error = SFE_INTERLEAVE_READ;
+                return 0;
+            };
 
-			for (k = 0; k < count; k++)
-			{
-				*outptr = inptr[k];
-				outptr += psf->sf.channels;
-			};
+            for (k = 0; k < count; k++)
+            {
+                *outptr = inptr[k];
+                outptr += psf->sf.channels;
+            };
 
-			templen -= count;
-		};
-	};
+            templen -= count;
+        };
+    };
 
-	return len;
+    return len;
 }
 
 static size_t interleave_read_float(SF_PRIVATE *psf, float *ptr, size_t len)
 {
-	INTERLEAVE_DATA *pdata;
-	sf_count_t offset, templen;
-	int chan;
-	size_t count, k;
-	float *inptr, *outptr;
+    INTERLEAVE_DATA *pdata;
+    sf_count_t offset, templen;
+    int chan;
+    size_t count, k;
+    float *inptr, *outptr;
 
-	if (!(pdata = psf->interleave))
-		return 0;
+    if (!(pdata = psf->interleave))
+        return 0;
 
-	inptr = (float *)pdata->buffer;
+    inptr = (float *)pdata->buffer;
 
-	for (chan = 0; chan < psf->sf.channels; chan++)
-	{
-		outptr = ptr + chan;
+    for (chan = 0; chan < psf->sf.channels; chan++)
+    {
+        outptr = ptr + chan;
 
-		offset = psf->dataoffset + pdata->channel_len * chan +
-		         psf->read_current * psf->bytewidth;
+        offset = psf->dataoffset + pdata->channel_len * chan + psf->read_current * psf->bytewidth;
 
-		/*-printf ("chan : %d     read_current : %6lld    offset : %6lld\n", chan, psf->read_current, offset) ;-*/
+        /*-printf ("chan : %d     read_current : %6lld    offset : %6lld\n", chan, psf->read_current, offset) ;-*/
 
-		if (psf_fseek(psf, offset, SEEK_SET) != offset)
-		{
-			psf->error = SFE_INTERLEAVE_SEEK;
-			/*-puts ("interleave_seek error") ; exit (1) ;-*/
-			return 0;
-		};
+        if (psf_fseek(psf, offset, SEEK_SET) != offset)
+        {
+            psf->error = SFE_INTERLEAVE_SEEK;
+            /*-puts ("interleave_seek error") ; exit (1) ;-*/
+            return 0;
+        };
 
-		templen = len / psf->sf.channels;
+        templen = len / psf->sf.channels;
 
-		while (templen > 0)
-		{
-			if (templen > SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(float))
-				count = SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(float);
-			else
-				count = (int)templen;
+        while (templen > 0)
+        {
+            if (templen > SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(float))
+                count = SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(float);
+            else
+                count = (int)templen;
 
-			if (pdata->read_float(psf, inptr, count) != count)
-			{
-				psf->error = SFE_INTERLEAVE_READ;
-				/*-puts ("interleave_read error") ; exit (1) ;-*/
-				return 0;
-			};
+            if (pdata->read_float(psf, inptr, count) != count)
+            {
+                psf->error = SFE_INTERLEAVE_READ;
+                /*-puts ("interleave_read error") ; exit (1) ;-*/
+                return 0;
+            };
 
-			for (k = 0; k < count; k++)
-			{
-				*outptr = inptr[k];
-				outptr += psf->sf.channels;
-			};
+            for (k = 0; k < count; k++)
+            {
+                *outptr = inptr[k];
+                outptr += psf->sf.channels;
+            };
 
-			templen -= count;
-		};
-	};
+            templen -= count;
+        };
+    };
 
-	return len;
+    return len;
 }
 
 static size_t interleave_read_double(SF_PRIVATE *psf, double *ptr, size_t len)
 {
-	INTERLEAVE_DATA *pdata;
-	sf_count_t offset, templen;
-	int chan;
-	size_t count, k;
-	double *inptr, *outptr;
+    INTERLEAVE_DATA *pdata;
+    sf_count_t offset, templen;
+    int chan;
+    size_t count, k;
+    double *inptr, *outptr;
 
-	if (!(pdata = psf->interleave))
-		return 0;
+    if (!(pdata = psf->interleave))
+        return 0;
 
-	inptr = (double *)pdata->buffer;
+    inptr = (double *)pdata->buffer;
 
-	for (chan = 0; chan < psf->sf.channels; chan++)
-	{
-		outptr = ptr + chan;
+    for (chan = 0; chan < psf->sf.channels; chan++)
+    {
+        outptr = ptr + chan;
 
-		offset = psf->dataoffset + chan * psf->bytewidth * psf->read_current;
+        offset = psf->dataoffset + chan * psf->bytewidth * psf->read_current;
 
-		if (psf_fseek(psf, offset, SEEK_SET) != offset)
-		{
-			psf->error = SFE_INTERLEAVE_SEEK;
-			return 0;
-		};
+        if (psf_fseek(psf, offset, SEEK_SET) != offset)
+        {
+            psf->error = SFE_INTERLEAVE_SEEK;
+            return 0;
+        };
 
-		templen = len / psf->sf.channels;
+        templen = len / psf->sf.channels;
 
-		while (templen > 0)
-		{
-			if (templen > SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(double))
-				count = SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(double);
-			else
-				count = (int)templen;
+        while (templen > 0)
+        {
+            if (templen > SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(double))
+                count = SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(double);
+            else
+                count = (int)templen;
 
-			if (pdata->read_double(psf, inptr, count) != count)
-			{
-				psf->error = SFE_INTERLEAVE_READ;
-				return 0;
-			};
+            if (pdata->read_double(psf, inptr, count) != count)
+            {
+                psf->error = SFE_INTERLEAVE_READ;
+                return 0;
+            };
 
-			for (k = 0; k < count; k++)
-			{
-				*outptr = inptr[k];
-				outptr += psf->sf.channels;
-			};
+            for (k = 0; k < count; k++)
+            {
+                *outptr = inptr[k];
+                outptr += psf->sf.channels;
+            };
 
-			templen -= count;
-		};
-	};
+            templen -= count;
+        };
+    };
 
-	return len;
+    return len;
 }
 
 static sf_count_t interleave_seek(SF_PRIVATE *UNUSED(psf), int UNUSED(mode),
                                   sf_count_t samples_from_start)
 {
-	/*
+    /*
 	 * Do nothing here. This is a place holder to prevent the default
 	 * seek function from being called.
 	 */
 
-	return samples_from_start;
+    return samples_from_start;
 }

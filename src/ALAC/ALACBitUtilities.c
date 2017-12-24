@@ -47,8 +47,8 @@ uint32_t BitBufferRead(BitBuffer *bits, uint8_t numBits)
 
     //Assert (numBits <= 16) ;
 
-    returnBits = ((uint32_t)bits->cur[0] << 16) |
-                 ((uint32_t)bits->cur[1] << 8) | ((uint32_t)bits->cur[2]);
+    returnBits =
+        ((uint32_t)bits->cur[0] << 16) | ((uint32_t)bits->cur[1] << 8) | ((uint32_t)bits->cur[2]);
     returnBits = returnBits << bits->bitIndex;
     returnBits &= 0x00FFFFFF;
 
@@ -132,8 +132,7 @@ uint32_t BitBufferUnpackBERSize(BitBuffer *bits)
     uint32_t size;
     uint8_t tmp;
 
-    for (size = 0, tmp = 0x80u; tmp &= 0x80u;
-         size = (size << 7u) | (tmp & 0x7fu))
+    for (size = 0, tmp = 0x80u; tmp &= 0x80u; size = (size << 7u) | (tmp & 0x7fu))
         tmp = (uint8_t)BitBufferReadSmall(bits, 8);
 
     return size;
@@ -237,14 +236,11 @@ void BitBufferWrite(BitBuffer *bits, uint32_t bitValues, uint32_t numBits)
         tmp = bitValues >> (numBits - curNum);
 
         shift = (uint8_t)(invBitIndex - curNum);
-        mask =
-            0xffu >>
-            (8 -
-             curNum); // must be done in two steps to avoid compiler sequencing ambiguity
+        mask = 0xffu >>
+               (8 - curNum); // must be done in two steps to avoid compiler sequencing ambiguity
         mask <<= shift;
 
-        bits->cur[0] =
-            (bits->cur[0] & ~mask) | (((uint8_t)tmp << shift) & mask);
+        bits->cur[0] = (bits->cur[0] & ~mask) | (((uint8_t)tmp << shift) & mask);
         numBits -= curNum;
 
         // increment to next byte if need be

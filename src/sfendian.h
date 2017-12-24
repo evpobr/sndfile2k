@@ -23,8 +23,7 @@
 #if defined(__x86_64__) || defined(_M_AMD64)
 #define CPU_IS_X86_64 1 /* Define both for x86_64 */
 #define CPU_IS_X86 1
-#elif defined(__i486__) || defined(__i586__) || defined(__i686__) || \
-    defined(_M_IX86)
+#elif defined(__i486__) || defined(__i586__) || defined(__i686__) || defined(_M_IX86)
 #define CPU_IS_X86 1
 #define CPU_IS_X86_64 0
 #else
@@ -87,9 +86,8 @@ static inline int64_t ENDSWAP_64X(int64_t x)
 #elif !defined(HAVE_BYTESWAP_H) && (COMPILER_IS_GCC == 0)
 
 #define ENDSWAP_16(x) ((((x) >> 8) & 0xFF) + (((x)&0xFF) << 8))
-#define ENDSWAP_32(x)                                                     \
-    ((((x) >> 24) & 0xFF) + (((x) >> 8) & 0xFF00) + (((x)&0xFF00) << 8) + \
-     (((x)&0xFF) << 24))
+#define ENDSWAP_32(x) \
+    ((((x) >> 24) & 0xFF) + (((x) >> 8) & 0xFF00) + (((x)&0xFF00) << 8) + (((x)&0xFF) << 24))
 
 #endif
 
@@ -343,8 +341,7 @@ static inline void endswap_int64_t_array(int64_t *ptr, size_t len)
     };
 } /* endswap_int64_t_array */
 
-static inline void endswap_int64_t_copy(int64_t *dest, const int64_t *src,
-                                        size_t len)
+static inline void endswap_int64_t_copy(int64_t *dest, const int64_t *src, size_t len)
 {
     int64_t value;
 

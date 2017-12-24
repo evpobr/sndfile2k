@@ -94,8 +94,7 @@ int ogg_open(SF_PRIVATE *psf)
         break;
     };
 
-    psf_log_printf(psf, "%s : bad psf->sf.format 0x%x.\n", __func__,
-                   psf->sf.format);
+    psf_log_printf(psf, "%s : bad psf->sf.format 0x%x.\n", __func__, psf->sf.format);
     return SFE_INTERNAL;
 }
 
@@ -138,8 +137,7 @@ static int ogg_stream_classify(SF_PRIVATE *psf, OGG_PRIVATE *odata)
     bytes = psf->header.indx;
 
     /* Submit a 4k block to libvorbis' Ogg layer */
-    bytes +=
-        psf_fread(buffer + psf->header.indx, 1, 4096 - psf->header.indx, psf);
+    bytes += psf_fread(buffer + psf->header.indx, 1, 4096 - psf->header.indx, psf);
     ogg_sync_wrote(&odata->osync, bytes);
 
     /* Get the first page. */
@@ -193,8 +191,7 @@ static int ogg_stream_classify(SF_PRIVATE *psf, OGG_PRIVATE *odata)
         return 0;
 
     case OGG_PCM:
-        psf_log_printf(psf,
-                       "Detected Ogg/PCM data. This is not supported yet.\n");
+        psf_log_printf(psf, "Detected Ogg/PCM data. This is not supported yet.\n");
         return SFE_UNIMPLEMENTED;
 
     default:
@@ -210,12 +207,9 @@ static struct
     const char *str, *name;
     int len, codec;
 } codec_lookup[] = {
-    {"Annodex", "Annodex", 8, OGG_ANNODEX},
-    {"AnxData", "AnxData", 7, OGG_ANXDATA},
-    {"\177FLAC", "Flac1", 5, OGG_FLAC},
-    {"fLaC", "Flac0", 4, OGG_FLAC0},
-    {"PCM     ", "PCM", 8, OGG_PCM},
-    {"Speex", "Speex", 5, OGG_SPEEX},
+    {"Annodex", "Annodex", 8, OGG_ANNODEX},  {"AnxData", "AnxData", 7, OGG_ANXDATA},
+    {"\177FLAC", "Flac1", 5, OGG_FLAC},      {"fLaC", "Flac0", 4, OGG_FLAC0},
+    {"PCM     ", "PCM", 8, OGG_PCM},         {"Speex", "Speex", 5, OGG_SPEEX},
     {"\001vorbis", "Vorbis", 7, OGG_VORBIS},
 };
 
@@ -231,8 +225,7 @@ static int ogg_page_classify(SF_PRIVATE *psf, const ogg_page *og)
         if (memcmp(og->body, codec_lookup[k].str, codec_lookup[k].len) == 0)
         {
             psf_log_printf(psf, "Ogg stream data : %s\n", codec_lookup[k].name);
-            psf_log_printf(psf, "Stream serialno : %u\n",
-                           (uint32_t)ogg_page_serialno(og));
+            psf_log_printf(psf, "Stream serialno : %u\n", (uint32_t)ogg_page_serialno(og));
             return codec_lookup[k].codec;
         };
     };

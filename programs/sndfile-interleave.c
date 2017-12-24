@@ -86,8 +86,7 @@ int main(int argc, char **argv)
 
     if (argc - 3 > MAX_INPUTS)
     {
-        printf("\nError : Cannot handle more than %d input channels.\n\n",
-               MAX_INPUTS);
+        printf("\nError : Cannot handle more than %d input channels.\n\n", MAX_INPUTS);
         exit(1);
     };
 
@@ -98,16 +97,14 @@ int main(int argc, char **argv)
     {
         if ((state.infile[k - 1] = sf_open(argv[k], SFM_READ, &sfinfo)) == NULL)
         {
-            printf("\nError : Not able to open input file '%s'\n%s\n", argv[k],
-                   sf_strerror(NULL));
+            printf("\nError : Not able to open input file '%s'\n%s\n", argv[k], sf_strerror(NULL));
             exit(1);
         };
 
         if (sfinfo.channels != 1)
         {
-            printf(
-                "\bError : Input file '%s' should be mono (has %d channels).\n",
-                argv[k], sfinfo.channels);
+            printf("\bError : Input file '%s' should be mono (has %d channels).\n", argv[k],
+                   sfinfo.channels);
             exit(1);
         };
 
@@ -131,8 +128,7 @@ int main(int argc, char **argv)
 
     if ((state.outfile = sf_open(argv[argc - 1], SFM_WRITE, &sfinfo)) == NULL)
     {
-        printf("Not able to open output file '%s'\n%s\n", argv[argc - 1],
-               sf_strerror(NULL));
+        printf("Not able to open output file '%s'\n%s\n", argv[argc - 1], sf_strerror(NULL));
         exit(1);
     };
 
@@ -195,8 +191,7 @@ static void interleave_double(STATE *state)
 
         for (ch = 0; ch < state->channels; ch++)
         {
-            read_len =
-                sf_read_double(state->infile[ch], state->din.d, BUFFER_LEN);
+            read_len = sf_read_double(state->infile[ch], state->din.d, BUFFER_LEN);
             if (read_len < BUFFER_LEN)
                 memset(state->din.d + read_len, 0,
                        sizeof(state->din.d[0]) * (BUFFER_LEN - read_len));

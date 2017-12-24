@@ -83,24 +83,19 @@ typedef struct alac_encoder_s
     uint32_t mOutputSampleRate;
 } ALAC_ENCODER;
 
-int32_t alac_decoder_init(ALAC_DECODER *p, void *inMagicCookie,
-                          uint32_t inMagicCookieSize);
-int32_t alac_encoder_init(ALAC_ENCODER *p, uint32_t samplerate,
-                          uint32_t channels, uint32_t format_flags,
-                          uint32_t frameSize);
+int32_t alac_decoder_init(ALAC_DECODER *p, void *inMagicCookie, uint32_t inMagicCookieSize);
+int32_t alac_encoder_init(ALAC_ENCODER *p, uint32_t samplerate, uint32_t channels,
+                          uint32_t format_flags, uint32_t frameSize);
 
-int32_t alac_decode(ALAC_DECODER *, struct BitBuffer *bits,
-                    int32_t *sampleBuffer, uint32_t numSamples,
-                    uint32_t *outNumSamples);
+int32_t alac_decode(ALAC_DECODER *, struct BitBuffer *bits, int32_t *sampleBuffer,
+                    uint32_t numSamples, uint32_t *outNumSamples);
 
-int32_t alac_encode(ALAC_ENCODER *p, uint32_t numSamples,
-                    const int32_t *theReadBuffer, unsigned char *theWriteBuffer,
-                    uint32_t *ioNumBytes);
+int32_t alac_encode(ALAC_ENCODER *p, uint32_t numSamples, const int32_t *theReadBuffer,
+                    unsigned char *theWriteBuffer, uint32_t *ioNumBytes);
 
 void alac_set_fastmode(ALAC_ENCODER *p, int32_t fast);
 
 uint32_t alac_get_magic_cookie_size(uint32_t inNumChannels);
 void alac_get_magic_cookie(ALAC_ENCODER *p, void *config, uint32_t *ioSize);
-void alac_get_source_format(ALAC_ENCODER *p,
-                            const AudioFormatDescription *source,
+void alac_get_source_format(ALAC_ENCODER *p, const AudioFormatDescription *source,
                             AudioFormatDescription *output);

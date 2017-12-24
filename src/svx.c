@@ -75,8 +75,7 @@ int svx_open(SF_PRIVATE *psf)
 {
     int error;
 
-    if (psf->file.mode == SFM_READ ||
-        (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = svx_read_header(psf)))
             return error;
@@ -129,8 +128,7 @@ static int svx_read_header(SF_PRIVATE *psf)
     int bytecount = 0, channels;
 
     if (psf->filelength > SF_PLATFORM_S64(0xffffffff))
-        psf_log_printf(psf,
-                       "Warning : filelength > 0xffffffff. This is bad!!!!\n");
+        psf_log_printf(psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n");
 
     memset(&vhdr, 0, sizeof(vhdr));
     psf_binheader_readf(psf, "p", 0);
@@ -152,8 +150,7 @@ static int svx_read_header(SF_PRIVATE *psf)
 
             if (chunk_size != psf->filelength - 2 * sizeof(chunk_size))
                 psf_log_printf(psf, "FORM : %u (should be %u)\n", chunk_size,
-                               (uint32_t)psf->filelength -
-                                   2 * sizeof(chunk_size));
+                               (uint32_t)psf->filelength - 2 * sizeof(chunk_size));
             else
                 psf_log_printf(psf, "FORM : %u\n", chunk_size);
             parsestage |= HAVE_FORM;
@@ -171,24 +168,17 @@ static int svx_read_header(SF_PRIVATE *psf)
 
             psf_log_printf(psf, " VHDR : %d\n", chunk_size);
 
-            psf_binheader_readf(psf, "E4442114", &(vhdr.oneShotHiSamples),
-                                &(vhdr.repeatHiSamples),
-                                &(vhdr.samplesPerHiCycle),
-                                &(vhdr.samplesPerSec), &(vhdr.octave),
+            psf_binheader_readf(psf, "E4442114", &(vhdr.oneShotHiSamples), &(vhdr.repeatHiSamples),
+                                &(vhdr.samplesPerHiCycle), &(vhdr.samplesPerSec), &(vhdr.octave),
                                 &(vhdr.compression), &(vhdr.volume));
 
-            psf_log_printf(psf, "  OneShotHiSamples  : %d\n",
-                           vhdr.oneShotHiSamples);
-            psf_log_printf(psf, "  RepeatHiSamples   : %d\n",
-                           vhdr.repeatHiSamples);
-            psf_log_printf(psf, "  samplesPerHiCycle : %d\n",
-                           vhdr.samplesPerHiCycle);
-            psf_log_printf(psf, "  Sample Rate       : %d\n",
-                           vhdr.samplesPerSec);
+            psf_log_printf(psf, "  OneShotHiSamples  : %d\n", vhdr.oneShotHiSamples);
+            psf_log_printf(psf, "  RepeatHiSamples   : %d\n", vhdr.repeatHiSamples);
+            psf_log_printf(psf, "  samplesPerHiCycle : %d\n", vhdr.samplesPerHiCycle);
+            psf_log_printf(psf, "  Sample Rate       : %d\n", vhdr.samplesPerSec);
             psf_log_printf(psf, "  Octave            : %d\n", vhdr.octave);
 
-            psf_log_printf(psf, "  Compression       : %d => ",
-                           vhdr.compression);
+            psf_log_printf(psf, "  Compression       : %d => ", vhdr.compression);
 
             switch (vhdr.compression)
             {
@@ -233,8 +223,7 @@ static int svx_read_header(SF_PRIVATE *psf)
 
             if (psf->datalength > psf->filelength - psf->dataoffset)
             {
-                psf_log_printf(psf, " BODY : %D (should be %D)\n",
-                               psf->datalength,
+                psf_log_printf(psf, " BODY : %D (should be %D)\n", psf->datalength,
                                psf->filelength - psf->dataoffset);
                 psf->datalength = psf->filelength - psf->dataoffset;
             }
@@ -292,8 +281,7 @@ static int svx_read_header(SF_PRIVATE *psf)
                 psf_log_printf(psf, "  Channels : %d => stereo\n", channels);
             }
             else
-                psf_log_printf(psf, "  Channels : %d *** assuming mono\n",
-                               channels);
+                psf_log_printf(psf, "  Channels : %d *** assuming mono\n", channels);
 
             psf_binheader_readf(psf, "j", chunk_size - bytecount);
             break;
@@ -312,32 +300,31 @@ static int svx_read_header(SF_PRIVATE *psf)
             if (chunk_size >= 0xffff0000)
             {
                 done = SF_TRUE;
-                psf_log_printf(psf, "*** Unknown chunk marker (%X) at position "
-                                    "%D with length %u. Exiting parser.\n",
+                psf_log_printf(psf,
+                               "*** Unknown chunk marker (%X) at position "
+                               "%D with length %u. Exiting parser.\n",
                                marker, psf_ftell(psf) - 8, chunk_size);
                 break;
             };
 
-            if (psf_isprint((marker >> 24) & 0xFF) &&
-                psf_isprint((marker >> 16) & 0xFF) &&
+            if (psf_isprint((marker >> 24) & 0xFF) && psf_isprint((marker >> 16) & 0xFF) &&
                 psf_isprint((marker >> 8) & 0xFF) && psf_isprint(marker & 0xFF))
             {
-                psf_log_printf(psf, "%M : %u (unknown marker)\n", marker,
-                               chunk_size);
+                psf_log_printf(psf, "%M : %u (unknown marker)\n", marker, chunk_size);
                 psf_binheader_readf(psf, "j", chunk_size);
                 break;
             };
             if ((chunk_size = psf_ftell(psf)) & 0x03)
             {
-                psf_log_printf(
-                    psf, "  Unknown chunk marker at position %d. Resynching.\n",
-                    chunk_size - 4);
+                psf_log_printf(psf, "  Unknown chunk marker at position %d. Resynching.\n",
+                               chunk_size - 4);
 
                 psf_binheader_readf(psf, "j", -3);
                 break;
             };
-            psf_log_printf(psf, "*** Unknown chunk marker (%X) at position %D. "
-                                "Exiting parser.\n",
+            psf_log_printf(psf,
+                           "*** Unknown chunk marker (%X) at position %D. "
+                           "Exiting parser.\n",
                            marker, psf_ftell(psf) - 8);
             done = SF_TRUE;
         };
@@ -391,36 +378,29 @@ static int svx_write_header(SF_PRIVATE *psf, int calc_length)
 
     /* FORM marker and FORM size. */
     psf_binheader_writef(psf, "Etm8", BHWm(FORM_MARKER),
-                         BHW8((psf->filelength < 8) ? psf->filelength * 0
-                                                    : psf->filelength - 8));
+                         BHW8((psf->filelength < 8) ? psf->filelength * 0 : psf->filelength - 8));
 
-    psf_binheader_writef(
-        psf, "m", BHWm((psf->bytewidth == 1) ? SVX8_MARKER : SV16_MARKER));
+    psf_binheader_writef(psf, "m", BHWm((psf->bytewidth == 1) ? SVX8_MARKER : SV16_MARKER));
 
     /* VHDR chunk. */
-    psf_binheader_writef(psf, "Em4", BHWm(VHDR_MARKER),
-                         BHW4(sizeof(VHDR_CHUNK)));
+    psf_binheader_writef(psf, "Em4", BHWm(VHDR_MARKER), BHW4(sizeof(VHDR_CHUNK)));
     /* VHDR : oneShotHiSamples, repeatHiSamples, samplesPerHiCycle */
     psf_binheader_writef(psf, "E444", BHW4(psf->sf.frames), BHW4(0), BHW4(0));
     /* VHDR : samplesPerSec, octave, compression */
-    psf_binheader_writef(psf, "E211", BHW2(psf->sf.samplerate), BHW1(1),
-                         BHW1(0));
+    psf_binheader_writef(psf, "E211", BHW2(psf->sf.samplerate), BHW1(1), BHW1(0));
     /* VHDR : volume */
-    psf_binheader_writef(psf, "E4",
-                         BHW4((psf->bytewidth == 1) ? 0xFF : 0xFFFF));
+    psf_binheader_writef(psf, "E4", BHW4((psf->bytewidth == 1) ? 0xFF : 0xFFFF));
 
     if (psf->sf.channels == 2)
         psf_binheader_writef(psf, "Em44", BHWm(CHAN_MARKER), BHW4(4), BHW4(6));
 
     /* Filename and annotation strings. */
-    psf_binheader_writef(psf, "Emsms", BHWm(NAME_MARKER),
-                         BHWs(psf->file.name.c), BHWm(ANNO_MARKER),
+    psf_binheader_writef(psf, "Emsms", BHWm(NAME_MARKER), BHWs(psf->file.name.c), BHWm(ANNO_MARKER),
                          BHWs(annotation));
 
     /* BODY marker and size. */
-    psf_binheader_writef(
-        psf, "Etm8", BHWm(BODY_MARKER),
-        BHW8((psf->datalength < 0) ? psf->datalength * 0 : psf->datalength));
+    psf_binheader_writef(psf, "Etm8", BHWm(BODY_MARKER),
+                         BHW8((psf->datalength < 0) ? psf->datalength * 0 : psf->datalength));
 
     psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
 
