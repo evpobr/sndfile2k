@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -107,6 +107,7 @@ static void report_format_error_exit(const char *argv0, SF_INFO *sfinfo)
 {
     int old_format = sfinfo->format;
     int endian = sfinfo->format & SF_FORMAT_ENDMASK;
+    int channels = sfinfo->channels;
 
     sfinfo->format = old_format & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
@@ -114,6 +115,13 @@ static void report_format_error_exit(const char *argv0, SF_INFO *sfinfo)
     {
         printf("Error : output file format does not support %s endian-ness.\n",
                sfe_endian_name(endian));
+        exit(1);
+    };
+
+    sfinfo->channels = 1;
+    if (sf_format_check(sfinfo))
+    {
+        printf("Error : output file format does not support %d channels.\n", channels);
         exit(1);
     };
 
