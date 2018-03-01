@@ -932,7 +932,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         {
             if (psf)
                 psf->error = SFE_BAD_COMMAND_PARAM;
-            return SFE_BAD_COMMAND_PARAM;
+            return 0;
         };
         snprintf(data, datasize, "%s", sf_version_string());
         return strlen(data);
