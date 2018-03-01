@@ -39,8 +39,11 @@ typedef struct
     short dummydata[];
 } MSADPCM_PRIVATE;
 
-static int AdaptationTable[] = {230, 230, 230, 230, 307, 409, 512, 614,
-                                768, 614, 512, 409, 307, 230, 230, 230};
+static int AdaptationTable[] =
+{
+    230, 230, 230, 230, 307, 409, 512, 614,
+    768, 614, 512, 409, 307, 230, 230, 230
+};
 
 /* TODO : The first 7 coef's are are always hardcode and must
  * appear in the actual WAVE file.  They should be read in
@@ -254,19 +257,19 @@ static int msadpcm_decode_block(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
     };
 
     /*--------------------------------------------------------
-	This was left over from a time when calculations were done
-	as ints rather than shorts. Keep this around as a reminder
-	in case I ever find a file which decodes incorrectly.
+    This was left over from a time when calculations were done
+    as ints rather than shorts. Keep this around as a reminder
+    in case I ever find a file which decodes incorrectly.
 
-	if (chan_idelta [0] & 0x8000)
-		chan_idelta [0] -= 0x10000 ;
-	if (chan_idelta [1] & 0x8000)
-		chan_idelta [1] -= 0x10000 ;
-	--------------------------------------------------------*/
+    if (chan_idelta [0] & 0x8000)
+        chan_idelta [0] -= 0x10000 ;
+    if (chan_idelta [1] & 0x8000)
+        chan_idelta [1] -= 0x10000 ;
+    --------------------------------------------------------*/
 
     /* Pull apart the packed 4 bit samples and store them in their
-	** correct sample positions.
-	*/
+    ** correct sample positions.
+    */
 
     sampleindx = 2 * pms->channels;
     while (blockindx < pms->blocksize)
@@ -798,8 +801,8 @@ static int msadpcm_close(SF_PRIVATE *psf)
     if (psf->file.mode == SFM_WRITE)
     {
         /*  Now we know static int for certain the length of the file we can
-		**  re-write the header.
-		*/
+        **  re-write the header.
+        */
 
         if (pms->samplecount && pms->samplecount < pms->samplesperblock)
             msadpcm_encode_block(psf, pms);

@@ -718,6 +718,7 @@ enum
 
     SFE_DWVW_BAD_BITWIDTH,
     SFE_G72X_NOT_MONO,
+    SFE_NMS_ADPCM_NOT_MONO,
 
     SFE_XI_BAD_HEADER,
     SFE_XI_EXCESS_SAMPLES,
@@ -934,6 +935,7 @@ int float32_init(SF_PRIVATE *psf);
 int double64_init(SF_PRIVATE *psf);
 int dwvw_init(SF_PRIVATE *psf, int bitwidth);
 int gsm610_init(SF_PRIVATE *psf);
+int nms_adpcm_init(SF_PRIVATE *psf);
 int vox_adpcm_init(SF_PRIVATE *psf);
 int flac_init(SF_PRIVATE *psf);
 int g72x_init(SF_PRIVATE *psf);

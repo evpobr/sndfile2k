@@ -68,6 +68,12 @@ int raw_open(SF_PRIVATE *psf)
         error = gsm610_init(psf);
         break;
 
+    case SF_FORMAT_NMS_ADPCM_16:
+    case SF_FORMAT_NMS_ADPCM_24:
+    case SF_FORMAT_NMS_ADPCM_32:
+        error = nms_adpcm_init(psf);
+        break;
+
     case SF_FORMAT_FLOAT:
         error = float32_init(psf);
         break;

@@ -139,6 +139,12 @@ typedef enum SF_FORMAT
     SF_FORMAT_GSM610 = 0x0020,
     //! OKI / Dialogix ADPCM
     SF_FORMAT_VOX_ADPCM = 0x0021,
+    //! 16kbs NMS G721-variant encoding
+    SF_FORMAT_NMS_ADPCM_16 = 0x0022,
+    //! 24kbs NMS G721-variant encoding
+    SF_FORMAT_NMS_ADPCM_24 = 0x0023,
+    //! 32kbs NMS G721-variant encoding
+    SF_FORMAT_NMS_ADPCM_32 = 0x0024,
     //! 32kbs G721 ADPCM encoding
     SF_FORMAT_G721_32 = 0x0030,
     //! 24kbs G723 ADPCM encoding
