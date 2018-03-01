@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -925,10 +925,6 @@ int main(int argc, char *argv[])
     solaris_play(argc, argv);
 #elif defined(_WIN32) || defined(__CYGWIN__)
     win32_play(argc, argv);
-#elif defined(__BEOS__)
-    printf("This program cannot be compiled on BeOS.\n");
-    printf("Instead, compile the file sfplay_beos.cpp.\n");
-    return 1;
 #else
     puts("*** Playing sound not supported on this platform.");
     puts("*** Please feel free to submit a patch.");

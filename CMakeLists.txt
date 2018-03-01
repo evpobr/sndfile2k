@@ -346,14 +346,10 @@ if(BUILD_PROGRAMS)
 
 # sndfile-play
 
-  if(NOT BEOS)
-    set(sndfile_play_SOURCES
-      programs/sndfile-play.c
-      programs/common.c
-      programs/common.h)
-  else()
-    set(sndfile_play_SOURCES programs/sndfile-play-beos.cpp)
-  endif()
+  set(sndfile_play_SOURCES
+    programs/sndfile-play.c
+    programs/common.c
+    programs/common.h)
 
   add_executable(sndfile2k-play ${sndfile_play_SOURCES})
   target_include_directories(sndfile2k-play
@@ -363,12 +359,10 @@ if(BUILD_PROGRAMS)
   target_link_libraries(sndfile2k-play PUBLIC sndfile2k)
   if(WIN32 OR CYGWIN)
     target_link_libraries(sndfile2k-play PRIVATE ${WINMM_LIBRARY})
-  # Maybe ALSA & Sndio are present in BeOS. They are not required
-  # so skip them anyway.
-  elseif((NOT BEOS) AND ALSA_FOUND)
+  elseif(ALSA_FOUND)
     target_include_directories(sndfile2k-play PRIVATE ${ALSA_INCLUDE_DIRS})
     target_link_libraries(sndfile2k-play PRIVATE ${ALSA_LIBRARIES})
-  elseif((NOT BEOS) AND Sndio_FOUND)
+  elseif(Sndio_FOUND)
     target_include_directories(sndfile2k-play PRIVATE ${Sndio_INCLUDE_DIRS})
     target_link_libraries(sndfile2k-play PRIVATE ${Sndio_LIBRARIES})
   endif()
