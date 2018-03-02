@@ -19,5 +19,6 @@ build_script:
 test_script:
   - ctest -V -C "Release"
 cache:
+  # last updated: 2018-03-02
   C:\Tools\vcpkg\Installed -> appveyor.yml
 
