@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.1.0] - 2018-03-02
+
+### Added
+
+- NMS ADPCM codec support
+
+### Fixed
+
+- `sndfile-convert` fail due to no. of channels
+- `SFC_GET_LIB_VERSION` command behavior on error, now it returns 0
+
+### Removed
+
+- MacOSX & BeOS support from `sndfile-play`
+
 ## [1.0.0] - 2017-12-24
 
 ### Changed
@@ -130,3 +145,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 [1.0.0-rc.1]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta4...v1.0.0-rc.1
 [1.0.0-rc.2]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-rc.1...v1.0.0-rc.2
 [1.0.0]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-rc.2...v1.0.0
+[1.1.0]: https://github.com/evpobr/sndfile2k/compare/v1.0.0...v1.1.0
