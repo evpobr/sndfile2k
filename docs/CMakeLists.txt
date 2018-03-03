@@ -1,0 +1,15 @@
+set(DOXYGEN_JAVADOC_AUTOBRIEF YES)
+set(DOXYGEN_OPTIMIZE_OUTPUT_FOR_C YES)
+set(DOXYGEN_TYPEDEF_HIDES_STRUCT YES)
+set(DOXYGEN_USE_MDFILE_AS_MAINPAGE INDEX.md)
+doxygen_add_docs(docs
+  ${PROJECT_SOURCE_DIR}/include/sndfile2k/sndfile2k.h
+  ${PROJECT_SOURCE_DIR}/include/sndfile2k/sndfile2k.hpp
+  INDEX.md
+  embedded_files.md)
+
+install(
+  DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
+  DESTINATION ${CMAKE_INSTALL_DOCDIR}
+  COMPONENT DOC
+)
