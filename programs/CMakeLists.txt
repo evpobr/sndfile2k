@@ -4,10 +4,9 @@ add_executable(sndfile2k-info
   sndfile-info.c
   common.c
   common.h)
-target_link_libraries(sndfile2k-info PUBLIC sndfile2k)
-if(BUILD_SHARED_LIBS AND LIBM_REQUIRED)
-  target_link_libraries(sndfile2k-info PRIVATE ${M_LIBRARY})
-endif()
+target_link_libraries(sndfile2k-info PRIVATE
+  sndfile2k
+  $<$<BOOL:${LIBM_REQUIRED}>:m>)
 
 # sndfile-play
 
@@ -18,17 +17,17 @@ add_executable(sndfile2k-play
 target_include_directories(sndfile2k-play
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_BINARY_DIR}/src)
-target_link_libraries(sndfile2k-play PUBLIC sndfile2k)
-if(WIN32 OR CYGWIN)
-  target_link_libraries(sndfile2k-play PRIVATE ${WINMM_LIBRARY})
-elseif(ALSA_FOUND)
-  target_include_directories(sndfile2k-play PRIVATE ${ALSA_INCLUDE_DIRS})
-  target_link_libraries(sndfile2k-play PRIVATE ${ALSA_LIBRARIES})
-elseif(Sndio_FOUND)
-  target_include_directories(sndfile2k-play PRIVATE ${Sndio_INCLUDE_DIRS})
-  target_link_libraries(sndfile2k-play PRIVATE ${Sndio_LIBRARIES})
-endif()
+    ${PROJECT_BINARY_DIR}/src
+    $<$<BOOL:${ALSA_FOUND}>:${ALSA_INCLUDE_DIRS}>
+    $<$<BOOL:${SNDIO_FOUND}>:${SNDIO_INCLUDE_DIRS}>
+)
+target_link_libraries(sndfile2k-play
+  PRIVATE
+    sndfile2k
+    $<$<OR:$<BOOL:${WIN32}>,$<BOOL:${CYGWIN}>>:${WINMM_LIBRARY}>
+    $<$<BOOL:${ALSA_FOUND}>:${ALSA_LIBRARIES}>
+    $<$<BOOL:${SNDIO_FOUND}>:${SNDIO_LIBRARIES}>
+)
 
 # sndfile-convert
 

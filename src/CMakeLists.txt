@@ -158,25 +158,18 @@ target_include_directories(sndfile2k
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     PRIVATE
-      ${CMAKE_CURRENT_SOURCE_DIR})
+      ${CMAKE_CURRENT_SOURCE_DIR}
+      $<$<AND:$<BOOL:${HAVE_XIPH_CODECS}>,$<BOOL:${ENABLE_EXPERIMENTAL}>>:${SPEEX_INCLUDE_DIRS}>
+)
 
 target_sources(sndfile2k PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/sndfile2k_export.h)
 list(APPEND libsndfile2k_PUBLIC_HEADERS ${CMAKE_CURRENT_BINARY_DIR}/sndfile2k_export.h)
-
-if(LIBM_REQUIRED)
-  target_link_libraries(sndfile2k PRIVATE ${M_LIBRARY})
-endif()
-
-if(HAVE_XIPH_CODECS)
-  target_link_libraries(sndfile2k
-    PRIVATE
-      VorbisEnc
-      FLAC)
-  if(ENABLE_EXPERIMENTAL)
-    target_link_libraries(sndfile2k PRIVATE ${SPEEX_LIBRARIES})
-    target_include_directories(sndfile2k PRIVATE ${SPEEX_INCLUDE_DIRS})
-  endif()
-endif()
+target_link_libraries(sndfile2k PRIVATE
+  $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>
+  $<$<BOOL:${HAVE_XIPH_CODECS}>:VorbisEnc>
+  $<$<BOOL:${HAVE_XIPH_CODECS}>:FLAC>
+  $<$<AND:$<BOOL:${HAVE_XIPH_CODECS}>,$<BOOL:${ENABLE_EXPERIMENTAL}>>:${SPEEX_LIBRARIES}>
+)
 
 set_target_properties(sndfile2k
   PROPERTIES
