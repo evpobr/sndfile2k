@@ -1,6 +1,7 @@
 /*
 ** Copyright (C) 2002-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2007 Reuben Thomas
+** Copyright (C) 2018 evpobr <evpobr@github.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -76,11 +77,8 @@ int wve_open(SF_PRIVATE *psf)
 
 static int wve_read_header(SF_PRIVATE *psf)
 {
-    int marker;
-    unsigned short version, padding, repeats, trash;
-    unsigned datalength;
-
     /* Set position to start of file to begin reading header. */
+    uint32_t marker;
     psf_binheader_readf(psf, "pm", 0, &marker);
     if (marker != ALAW_MARKER)
     {
@@ -109,6 +107,7 @@ static int wve_read_header(SF_PRIVATE *psf)
         return SFE_WVE_NOT_WVE;
     };
 
+    uint16_t version;
     psf_binheader_readf(psf, "E2", &version);
 
     psf_log_printf(psf, "Psion Palmtop Alaw (.wve)\n"
@@ -119,6 +118,7 @@ static int wve_read_header(SF_PRIVATE *psf)
     if (version != PSION_VERSION)
         psf_log_printf(psf, "Psion version %d should be %d\n", version, PSION_VERSION);
 
+    uint32_t datalength;
     psf_binheader_readf(psf, "E4", &datalength);
     psf->dataoffset = PSION_DATAOFFSET;
     if (datalength != psf->filelength - psf->dataoffset)
@@ -127,8 +127,11 @@ static int wve_read_header(SF_PRIVATE *psf)
         psf_log_printf(psf, "Data length %d should be %D\n", datalength, psf->datalength);
     }
     else
+    {
         psf->datalength = datalength;
+    }
 
+    uint16_t padding, repeats, trash;
     psf_binheader_readf(psf, "E22222", &padding, &repeats, &trash, &trash, &trash);
 
     psf->sf.format = SF_FORMAT_WVE | SF_FORMAT_ALAW;
@@ -141,10 +144,7 @@ static int wve_read_header(SF_PRIVATE *psf)
 
 static int wve_write_header(SF_PRIVATE *psf, int calc_length)
 {
-    sf_count_t current;
-    unsigned datalen;
-
-    current = psf_ftell(psf);
+    sf_count_t current = current = psf_ftell(psf);
 
     if (calc_length)
     {
@@ -163,7 +163,7 @@ static int wve_write_header(SF_PRIVATE *psf, int calc_length)
     psf_fseek(psf, 0, SEEK_SET);
 
     /* Write header. */
-    datalen = psf->datalength;
+    uint32_t datalen = (uint32_t)psf->datalength;
     psf_binheader_writef(psf, "Emmmm", BHWm(ALAW_MARKER), BHWm(SOUN_MARKER), BHWm(DFIL_MARKER),
                          BHWm(ESSN_MARKER));
     psf_binheader_writef(psf, "E2422222", BHW2(PSION_VERSION), BHW4(datalen), BHW2(0), BHW2(0),
