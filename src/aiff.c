@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2005 David Viens <davidv@plogue.com>
 ** Copyright (C) 2018 evpobr <evpobr@gmail.com>
 **
@@ -1050,7 +1050,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
     if (psf->sf.channels < 1)
         return SFE_CHANNEL_COUNT_ZERO;
 
-    if (psf->sf.channels >= SF_MAX_CHANNELS)
+    if (psf->sf.channels > SF_MAX_CHANNELS)
         return SFE_CHANNEL_COUNT;
 
     if (!(found_chunk & HAVE_FORM))
@@ -1143,7 +1143,7 @@ static int aiff_read_comm_chunk(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
                    (comm_fmt->numSampleFrames == 0 && psf->filelength > 104) ? " (Should not be 0)"
                                                                              : "");
 
-    if (comm_fmt->numChannels < 1 || comm_fmt->numChannels >= SF_MAX_CHANNELS)
+    if (comm_fmt->numChannels < 1 || comm_fmt->numChannels > SF_MAX_CHANNELS)
     {
         psf_log_printf(psf, "  Channels    : %d (should be >= 1 and < %d)\n", comm_fmt->numChannels,
                        SF_MAX_CHANNELS);

@@ -655,7 +655,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
     if (psf->sf.channels < 1)
         return SFE_CHANNEL_COUNT_ZERO;
 
-    if (psf->sf.channels >= SF_MAX_CHANNELS)
+    if (psf->sf.channels > SF_MAX_CHANNELS)
         return SFE_CHANNEL_COUNT;
 
     if (format != WAVE_FORMAT_PCM && (parsestage & HAVE_fact) == 0)
