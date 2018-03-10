@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(sndfile2k VERSION 1.1.0)
+project(sndfile2k VERSION 1.1.1)
 
 #
 # Variables

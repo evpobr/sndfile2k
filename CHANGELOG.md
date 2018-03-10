@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.1.1] - 2018-03-10
+
+### Added
+
+- NMS ADPCM codec in WAV support
+
+### Fixed
+
+- Max channel count bug
+
 ## [1.1.0] - 2018-03-02
 
 ### Added
@@ -137,7 +147,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `Win32` directory. Test file inside was useless, since Windows is supported now.
 - Travis CI MacOS GCC test removed
 
-[Unreleased]: https://github.com/evpobr/sndfile2k/compare/master...develop
+[Unreleased]: https://github.com/evpobr/sndfile2k/compare/v1.1.1...HEAD
 [1.0.0-beta1]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-alpha1...v1.0.0-beta1
 [1.0.0-beta2]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta1...v1.0.0-beta2
 [1.0.0-beta3]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta2...v1.0.0-beta3
@@ -146,3 +156,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 [1.0.0-rc.2]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-rc.1...v1.0.0-rc.2
 [1.0.0]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-rc.2...v1.0.0
 [1.1.0]: https://github.com/evpobr/sndfile2k/compare/v1.0.0...v1.1.0
+[1.1.1]: https://github.com/evpobr/sndfile2k/compare/v1.1.0...v1.1.1
