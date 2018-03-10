@@ -148,6 +148,7 @@ static ErrorStruct SndfileErrors[] = {
     {SFE_WAV_ADPCM_CHANNELS, "Error in ADPCM WAV file. Invalid number of channels."},
     {SFE_WAV_ADPCM_SAMPLES, "Error in ADPCM WAV file. Invalid number of samples per block."},
     {SFE_WAV_GSM610_FORMAT, "Error in GSM610 WAV file. Invalid format chunk."},
+    {SFE_WAV_NMS_FORMAT, "Error in NMS ADPCM WAV file. Invalid format chunk."},
 
     {SFE_AIFF_NO_FORM, "Error in AIFF file, bad 'FORM' marker."},
     {SFE_AIFF_AIFF_NO_FORM, "Error in AIFF file, 'AIFF' marker without 'FORM'."},
@@ -618,6 +619,9 @@ int sf_format_check(const SF_INFO *info)
         if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
             return 1;
         if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
+            return 1;
+        if ((subformat == SF_FORMAT_NMS_ADPCM_16 || subformat == SF_FORMAT_NMS_ADPCM_24 ||
+             subformat == SF_FORMAT_NMS_ADPCM_32) && info->channels == 1)
             return 1;
         break;
 

@@ -251,6 +251,12 @@ int wav_open(SF_PRIVATE *psf)
         error = g72x_init(psf);
         break;
 
+    case SF_FORMAT_NMS_ADPCM_16:
+    case SF_FORMAT_NMS_ADPCM_24:
+    case SF_FORMAT_NMS_ADPCM_32:
+        error = nms_adpcm_init(psf);
+        break;
+
     case SF_FORMAT_GSM610:
         error = gsm610_init(psf);
         break;
@@ -692,6 +698,26 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
         };
         break;
 
+    case WAVE_FORMAT_NMS_VBXADPCM:
+        *blockalign = wav_fmt->min.blockalign;
+        *framesperblock = 160;
+        switch (wav_fmt->min.bitwidth)
+        {
+        case 2:
+            psf->sf.format = SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_16;
+            break;
+        case 3:
+            psf->sf.format = SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_24;
+            break;
+        case 4:
+            psf->sf.format = SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_32;
+            break;
+
+        default:
+            return SFE_UNIMPLEMENTED;
+        }
+        break;
+
     case WAVE_FORMAT_PCM:
         psf->sf.format = SF_FORMAT_WAV | u_bitwidth_to_subformat(psf->bytewidth * 8);
         break;
@@ -882,6 +908,28 @@ static int wav_write_fmt_chunk(SF_PRIVATE *psf)
 
         add_fact_chunk = SF_TRUE;
         break;
+
+    case SF_FORMAT_NMS_ADPCM_16:
+    case SF_FORMAT_NMS_ADPCM_24:
+    case SF_FORMAT_NMS_ADPCM_32:
+    {
+        int bytespersec, blockalign, bitwidth;
+
+        bitwidth = subformat == SF_FORMAT_NMS_ADPCM_16 ? 2 : subformat == SF_FORMAT_NMS_ADPCM_24 ? 3 : 4;
+        blockalign = 20 * bitwidth + 2;
+        bytespersec = psf->sf.samplerate * blockalign / 160;
+
+        /* fmt chunk. */
+        fmt_size = 2 + 2 + 4 + 4 + 2 + 2;
+
+        /* fmt : format, channels, samplerate */
+        psf_binheader_writef(psf, "4224", BHW4(fmt_size), BHW2(WAVE_FORMAT_NMS_VBXADPCM), BHW2(psf->sf.channels), BHW4(psf->sf.samplerate));
+        /*  fmt : bytespersec, blockalign, bitwidth */
+        psf_binheader_writef(psf, "422", BHW4(bytespersec), BHW2(blockalign), BHW2(bitwidth));
+
+        add_fact_chunk = SF_TRUE;
+        break;
+    }
 
     case SF_FORMAT_GSM610:
     {
