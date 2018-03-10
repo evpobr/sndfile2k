@@ -479,6 +479,7 @@ add_test(NAME lossy_comp_test_wav_ulaw COMMAND $<TARGET_FILE:lossy_comp_test> wa
 add_test(NAME lossy_comp_test_wav_alaw COMMAND $<TARGET_FILE:lossy_comp_test> wav_alaw)
 add_test(NAME lossy_comp_test_wav_gsm610 COMMAND $<TARGET_FILE:lossy_comp_test> wav_gsm610)
 add_test(NAME lossy_comp_test_wav_g721 COMMAND $<TARGET_FILE:lossy_comp_test> wav_g721)
+add_test(NAME lossy_comp_test_wav_nmsadpcm COMMAND $<TARGET_FILE:lossy_comp_test> wav_nmsadpcm)
 add_test(NAME peak_chunk_test_wav COMMAND $<TARGET_FILE:peak_chunk_test> wav)
 add_test(NAME header_test_wav COMMAND $<TARGET_FILE:header_test> wav)
 add_test(NAME misc_test_wav COMMAND $<TARGET_FILE:misc_test> wav)
