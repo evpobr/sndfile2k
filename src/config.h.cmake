@@ -52,9 +52,6 @@
 /* Define if you have the `gmtime_r' function. */
 #cmakedefine HAVE_GMTIME_R
 
-/* Define if you have the <inttypes.h> header file. */
-#cmakedefine HAVE_INTTYPES_H
-
 /* Define to 1 if you have the <io.h> header file. */
 #cmakedefine HAVE_IO_H
 
@@ -87,9 +84,6 @@
 
 /* Define if the system has the type `ssize_t'. */
 #cmakedefine HAVE_SSIZE_T
-
-/* Define if you have the <stdint.h> header file. */
-#cmakedefine HAVE_STDINT_H
 
 /* Define if you have the <sys/time.h> header file. */
 #cmakedefine HAVE_SYS_TIME_H

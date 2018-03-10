@@ -421,7 +421,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
     char *cptr;
     int instr_found = 0, mark_found = 0;
 
-    if (psf->filelength > SF_PLATFORM_S64(0xffffffff))
+    if (psf->filelength > INT64_C(0xffffffff))
         psf_log_printf(psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n");
 
     struct AIFF_PRIVATE *paiff = psf->container_data;

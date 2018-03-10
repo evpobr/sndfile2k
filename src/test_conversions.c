@@ -49,7 +49,7 @@ static void conversion_test(char endian)
 {
     SF_PRIVATE sf_private, *psf;
     const char *filename = "conversion.bin";
-    int64_t i64 = SF_PLATFORM_S64(0x0123456789abcdef), t64 = 0;
+    int64_t i64 = INT64_C(0x0123456789abcdef), t64 = 0;
     char format_str[16];
     char test_name[64];
     char i8 = 12, t8 = 0;

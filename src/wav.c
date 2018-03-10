@@ -279,7 +279,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
     uint32_t marker, chunk_size = 0, RIFFsize = 0, done = 0;
     int parsestage = 0, error, format = 0;
 
-    if (psf->is_pipe == 0 && psf->filelength > SF_PLATFORM_S64(0xffffffff))
+    if (psf->is_pipe == 0 && psf->filelength > INT64_C(0xffffffff))
         psf_log_printf(psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n");
 
     if ((wpriv = psf->container_data) == NULL)

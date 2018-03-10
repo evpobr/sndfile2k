@@ -23,11 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef HAVE_STDINT_H
-#include <stdint.h>
-#elif defined(HAVE_INTTYPES_H)
 #include <inttypes.h>
-#endif
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -38,10 +34,6 @@
 
 #ifdef __cplusplus
 #error "This code is not designed to be compiled with a C++ compiler."
-#endif
-
-#ifdef INT64_C
-#define SF_PLATFORM_S64(x) INT64_C(x)
 #endif
 
 /*
