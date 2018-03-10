@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">sndfile2k
-   &#160;<span id="projectnumber">1.1.0</span>
+   &#160;<span id="projectnumber">1.1.1</span>
    </div>
   </td>
  </tr>
@@ -318,7 +318,7 @@ Functions</h2></td></tr>
 <p>This function is useful in the following circumstances:</p><ul>
 <li>Opening temporary files securely (ie use the <code>tmpfile()</code> to return a <code>FILE*</code> pointer and then using <code>fileno()</code> to retrieve the file descriptor which is then passed to sndfile2k.</li>
 <li>Opening files with file names using OS specific character encodings and then passing the file descriptor to <a class="el" href="group__file-base.html#gad6635d6c4c00e16a48e14542a27efd91" title="Opens sound file using POSIX file descriptor. ">sf_open_fd()</a>.</li>
-<li>Opening <a class="el" href="md_docs_embedded_files.html">sound files embedded within larger files</a>.</li>
+<li>Opening sound files embedded within larger files.</li>
 </ul>
 <p>When <a class="el" href="sndfile2k_8h.html#a654c4c7efbf9db9017e7e4c5a2d9538c" title="Closes the SNDFILE object. ">sf_close()</a> is called, the file descriptor is only closed if the <code>close_desc</code> parameter was <a class="el" href="sndfile2k_8h.html#a8bef0a7559a7d0f9f3b3c1c3f0ccafcba74a076892285b06bce678d01893ac6f7" title="True. ">SF_TRUE</a> when the <a class="el" href="group__file-base.html#gad6635d6c4c00e16a48e14542a27efd91" title="Opens sound file using POSIX file descriptor. ">sf_open_fd()</a> function was called.</p>
 <dl class="section note"><dt>Note</dt><dd>On Microsoft Windows, this function does not work if the application and the sndfile2k DLL are linked to different versions of the Microsoft C runtime DLL.</dd></dl>

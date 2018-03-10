@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">sndfile2k
-   &#160;<span id="projectnumber">1.1.0</span>
+   &#160;<span id="projectnumber">1.1.1</span>
    </div>
   </td>
  </tr>
@@ -71,7 +71,7 @@ $(function() {
 <p>SndFile class.  
  <a href="class_sndfile_handle.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="sndfile2k_8hpp_source.html">sndfile2k.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="sndfile2k_8hpp_source.html">sndfile2k/sndfile2k.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -441,7 +441,7 @@ Static Public Member Functions</h2></td></tr>
 <p>This function is useful in the following circumstances:</p><ul>
 <li>Opening temporary files securely (ie use the <code>tmpfile()</code> to return a <code>FILE*</code> pointer and then using <code>fileno()</code> to retrieve the file descriptor which is then passed to sndfile2k.</li>
 <li>Opening files with file names using OS specific character encodings and then passing the file descriptor to <a class="el" href="group__file-base.html#gad6635d6c4c00e16a48e14542a27efd91" title="Opens sound file using POSIX file descriptor. ">sf_open_fd()</a>.</li>
-<li>Opening <a class="el" href="md_docs_embedded_files.html">sound files embedded within larger files</a>.</li>
+<li>Opening sound files embedded within larger files.</li>
 </ul>
 <p>When destructor is called, the file descriptor is only closed if the <code>close_desc</code> parameter is set <a class="el" href="sndfile2k_8h.html#a8bef0a7559a7d0f9f3b3c1c3f0ccafcba74a076892285b06bce678d01893ac6f7" title="True. ">SF_TRUE</a>.</p>
 <dl class="section note"><dt>Note</dt><dd>On Microsoft Windows, this function does not work if the application and the sndfile2k DLL are linked to different versions of the Microsoft C runtime DLL.</dd></dl>
@@ -1729,7 +1729,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>include/sndfile2k/<a class="el" href="sndfile2k_8hpp_source.html">sndfile2k.hpp</a></li>
+<li>C:/Users/evpob/Source/Repos/sndfile2k/include/sndfile2k/<a class="el" href="sndfile2k_8hpp_source.html">sndfile2k.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
