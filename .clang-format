@@ -10,7 +10,7 @@ BraceWrapping:
   BeforeElse: true
 IndentWidth: 4
 SortIncludes: false
-ColumnLimit: 100
+ColumnLimit: 132
 UseTab: Never
 AlignAfterOpenBracket: true
 AlignOperands: true

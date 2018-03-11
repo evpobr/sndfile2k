@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- Coding style rules: bump column width limit of C source files to 132 chars.
+  We have too long lines, so i choose 132 for readability. It is another
+  historical limit. More explained [here](https://lkml.org/lkml/2009/12/17/229).
+
 ## [1.1.1] - 2018-03-10
 
 ### Added
