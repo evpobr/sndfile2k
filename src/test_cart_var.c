@@ -32,30 +32,28 @@ typedef SF_CART_INFO_VAR(CART_MAX) SF_CART_INFO_512;
 
 static void fill_tag_text(SF_CART_INFO_512 *ci)
 {
-    static const char *lines[] = {
-        "Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit.",
-        "Donec dignissim erat\nvehicula libero condimentum\ndictum porta augue "
-        "faucibus.",
-        "Maecenas nec turpis\nsit amet quam\nfaucibus adipiscing.",
-        "Mauris aliquam,\nlectus interdum\ntincidunt luctus.",
-        "\n\n\n\n\n\n\n\n\n\n\n\n",
-        "In auctor lorem\nvel est euismod\ncondimentum.",
-        "\n\n\n\n\n\n\n\n\n\n\n\n",
-        "Ut vitae magna\nid dui placerat vehicula\nin id lectus.",
-        "\n\n\n\n\n\n\n\n\n\n\n\n",
-        "Sed lacus leo,\nmolestie et luctus ac,\ntincidunt sit amet nisi.",
-        "\n\n\n\n\n\n\n\n\n\n\n\n",
-        "Sed ligula neque,\ngravida semper vulputate laoreet,\ngravida eu "
-        "tellus.",
-        "Donec dolor dolor,\nscelerisque in consequat ornare,\ntempor nec "
-        "nisl."};
+    static const char *lines[] = {"Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit.",
+                                  "Donec dignissim erat\nvehicula libero condimentum\ndictum porta augue "
+                                  "faucibus.",
+                                  "Maecenas nec turpis\nsit amet quam\nfaucibus adipiscing.",
+                                  "Mauris aliquam,\nlectus interdum\ntincidunt luctus.",
+                                  "\n\n\n\n\n\n\n\n\n\n\n\n",
+                                  "In auctor lorem\nvel est euismod\ncondimentum.",
+                                  "\n\n\n\n\n\n\n\n\n\n\n\n",
+                                  "Ut vitae magna\nid dui placerat vehicula\nin id lectus.",
+                                  "\n\n\n\n\n\n\n\n\n\n\n\n",
+                                  "Sed lacus leo,\nmolestie et luctus ac,\ntincidunt sit amet nisi.",
+                                  "\n\n\n\n\n\n\n\n\n\n\n\n",
+                                  "Sed ligula neque,\ngravida semper vulputate laoreet,\ngravida eu "
+                                  "tellus.",
+                                  "Donec dolor dolor,\nscelerisque in consequat ornare,\ntempor nec "
+                                  "nisl."};
     int k;
 
     ci->tag_text[0] = 0;
 
     for (k = 0; strlen(ci->tag_text) < ci->tag_text_size - 1; k++)
-        append_snprintf(ci->tag_text, ci->tag_text_size, "%s\n",
-                        lines[k % ARRAY_LEN(lines)]);
+        append_snprintf(ci->tag_text, ci->tag_text_size, "%s\n", lines[k % ARRAY_LEN(lines)]);
 
     return;
 }

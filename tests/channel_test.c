@@ -41,8 +41,7 @@
 #define LOG_BUFFER_SIZE (1024)
 
 static void channel_test(void);
-static double max_diff(const float *a, const float *b, unsigned int len,
-                       unsigned int *position);
+static double max_diff(const float *a, const float *b, unsigned int len, unsigned int *position);
 
 int main(void) // int argc, char *argv [])
 {
@@ -79,27 +78,20 @@ static void channel_test(void)
         sf_info_clear(&rsfinfo);
 
         /* Write the test file. */
-        file = test_open_file_or_die(filename, SFM_WRITE, &wsfinfo, SF_FALSE,
-                                     __LINE__);
+        file = test_open_file_or_die(filename, SFM_WRITE, &wsfinfo, SF_FALSE, __LINE__);
         test_writef_float_or_die(file, 0, float_data, wframes, __LINE__);
         sf_close(file);
 
         /* Read it as float and test. */
-        file = test_open_file_or_die(filename, SFM_READ, &rsfinfo, SF_FALSE,
-                                     __LINE__);
-        exit_if_true(rsfinfo.frames == 0,
-                     "\n\nLine %d : Frames in file %" PRId64 ".\n\n", __LINE__,
+        file = test_open_file_or_die(filename, SFM_READ, &rsfinfo, SF_FALSE, __LINE__);
+        exit_if_true(rsfinfo.frames == 0, "\n\nLine %d : Frames in file %" PRId64 ".\n\n", __LINE__, rsfinfo.frames);
+        exit_if_true(wframes != rsfinfo.frames, "\n\nLine %d : Wrote %" PRId64 ", read %" PRId64 " frames.\n\n", __LINE__, wframes,
                      rsfinfo.frames);
-        exit_if_true(wframes != rsfinfo.frames,
-                     "\n\nLine %d : Wrote %" PRId64 ", read %" PRId64
-                     " frames.\n\n",
-                     __LINE__, wframes, rsfinfo.frames);
 
         sf_command(file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE);
 
         test_readf_float_or_die(file, 0, read_float, rsfinfo.frames, __LINE__);
-        compare_float_or_die(float_data, read_float, ch * rsfinfo.frames,
-                             __LINE__);
+        compare_float_or_die(float_data, read_float, ch * rsfinfo.frames, __LINE__);
 
         /* Read it as short and test. */
         test_seek_or_die(file, 0, SEEK_SET, 0, ch, __LINE__);
@@ -108,11 +100,8 @@ static void channel_test(void)
         for (k = 0; k < ARRAY_LEN(read_float); k++)
             read_float[k] = read_short[k] * (0.9 / 0x8000);
 
-        maxdiff =
-            max_diff(float_data, read_float, ch * rsfinfo.frames, &position);
-        exit_if_true(maxdiff > 0.5,
-                     "\n\nLine %d : Max diff is %f at index %u\n\n", __LINE__,
-                     maxdiff, position);
+        maxdiff = max_diff(float_data, read_float, ch * rsfinfo.frames, &position);
+        exit_if_true(maxdiff > 0.5, "\n\nLine %d : Max diff is %f at index %u\n\n", __LINE__, maxdiff, position);
 
         /* Read it as int and test. */
         test_seek_or_die(file, 0, SEEK_SET, 0, ch, __LINE__);
@@ -121,11 +110,8 @@ static void channel_test(void)
         for (k = 0; k < ARRAY_LEN(read_float); k++)
             read_float[k] = read_int[k] * (0.9 / 0x80000000);
 
-        maxdiff =
-            max_diff(float_data, read_float, ch * rsfinfo.frames, &position);
-        exit_if_true(maxdiff > 0.5,
-                     "\n\nLine %d : Max diff is %f at index %u\n\n", __LINE__,
-                     maxdiff, position);
+        maxdiff = max_diff(float_data, read_float, ch * rsfinfo.frames, &position);
+        exit_if_true(maxdiff > 0.5, "\n\nLine %d : Max diff is %f at index %u\n\n", __LINE__, maxdiff, position);
 
         sf_close(file);
         unlink(filename);
@@ -135,8 +121,7 @@ static void channel_test(void)
     return;
 }
 
-static double max_diff(const float *a, const float *b, unsigned int len,
-                       unsigned int *position)
+static double max_diff(const float *a, const float *b, unsigned int len, unsigned int *position)
 {
     double mdiff = 0.0, diff;
     unsigned int k;

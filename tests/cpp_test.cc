@@ -72,8 +72,7 @@ static void create_file(const char *filename, int format)
 
     if (file.refCount() != 0)
     {
-        printf("\n\n%s %d : Error : Reference count (%d) should be zero.\n\n",
-               __func__, __LINE__, file.refCount());
+        printf("\n\n%s %d : Error : Reference count (%d) should be zero.\n\n", __func__, __LINE__, file.refCount());
         exit(1);
     };
 
@@ -81,8 +80,7 @@ static void create_file(const char *filename, int format)
 
     if (file.refCount() != 1)
     {
-        printf("\n\n%s %d : Error : Reference count (%d) should be 1.\n\n",
-               __func__, __LINE__, file.refCount());
+        printf("\n\n%s %d : Error : Reference count (%d) should be 1.\n\n", __func__, __LINE__, file.refCount());
         exit(1);
     };
 
@@ -117,8 +115,7 @@ static void check_title(const SndfileHandle &file, const char *filename)
 
     if (strcmp(filename, title) != 0)
     {
-        printf("\n\n%s %d : Error : title '%s' should be '%s'\n\n", __func__,
-               __LINE__, title, filename);
+        printf("\n\n%s %d : Error : title '%s' should be '%s'\n\n", __func__, __LINE__, title, filename);
         exit(1);
     };
 
@@ -132,8 +129,7 @@ static void read_file(const char *filename, int format)
 
     if (file)
     {
-        printf("\n\n%s %d : Error : should not be here.\n\n", __func__,
-               __LINE__);
+        printf("\n\n%s %d : Error : should not be here.\n\n", __func__, __LINE__);
         exit(1);
     };
 
@@ -145,45 +141,39 @@ static void read_file(const char *filename, int format)
 
         if (file.refCount() != 2 || file2.refCount() != 2)
         {
-            printf(
-                "\n\n%s %d : Error : Reference count (%d) should be two.\n\n",
-                __func__, __LINE__, file.refCount());
+            printf("\n\n%s %d : Error : Reference count (%d) should be two.\n\n", __func__, __LINE__, file.refCount());
             exit(1);
         };
     };
 
     if (file.refCount() != 1)
     {
-        printf("\n\n%s %d : Error : Reference count (%d) should be one.\n\n",
-               __func__, __LINE__, file.refCount());
+        printf("\n\n%s %d : Error : Reference count (%d) should be one.\n\n", __func__, __LINE__, file.refCount());
         exit(1);
     };
 
     if (!file)
     {
-        printf("\n\n%s %d : Error : should not be here.\n\n", __func__,
-               __LINE__);
+        printf("\n\n%s %d : Error : should not be here.\n\n", __func__, __LINE__);
         exit(1);
     };
 
     if (file.format() != format)
     {
-        printf("\n\n%s %d : Error : format 0x%08x should be 0x%08x.\n\n",
-               __func__, __LINE__, file.format(), format);
+        printf("\n\n%s %d : Error : format 0x%08x should be 0x%08x.\n\n", __func__, __LINE__, file.format(), format);
         exit(1);
     };
 
     if (file.channels() != 2)
     {
-        printf("\n\n%s %d : Error : channels %d should be 2.\n\n", __func__,
-               __LINE__, file.channels());
+        printf("\n\n%s %d : Error : channels %d should be 2.\n\n", __func__, __LINE__, file.channels());
         exit(1);
     };
 
     if (file.frames() != ARRAY_LEN(sbuffer) * 4)
     {
-        printf("\n\n%s %d : Error : frames %ld should be %lu.\n\n", __func__,
-               __LINE__, (long)file.frames(), (long)ARRAY_LEN(sbuffer) * 4 / 2);
+        printf("\n\n%s %d : Error : frames %ld should be %lu.\n\n", __func__, __LINE__, (long)file.frames(),
+               (long)ARRAY_LEN(sbuffer) * 4 / 2);
         exit(1);
     };
 
@@ -212,16 +202,14 @@ static void read_file(const char *filename, int format)
     count = file.seek(file.frames() - 10, SEEK_SET);
     if (count != file.frames() - 10)
     {
-        printf("\n\n%s %d : Error : offset (%ld) should be %ld\n\n", __func__,
-               __LINE__, (long)count, (long)(file.frames() - 10));
+        printf("\n\n%s %d : Error : offset (%ld) should be %ld\n\n", __func__, __LINE__, (long)count, (long)(file.frames() - 10));
         exit(1);
     };
 
     count = file.read(sbuffer, ARRAY_LEN(sbuffer));
     if (count != 10 * file.channels())
     {
-        printf("\n\n%s %d : Error : count (%ld) should be %ld\n\n", __func__,
-               __LINE__, (long)count, (long)(10 * file.channels()));
+        printf("\n\n%s %d : Error : count (%ld) should be %ld\n\n", __func__, __LINE__, (long)count, (long)(10 * file.channels()));
         exit(1);
     };
 
@@ -258,8 +246,7 @@ static void ceeplusplus_extra_test(void)
 
     if (file.strError() == NULL)
     {
-        printf("\n\n%s %d : strError should not return NULL.\n\n", __func__,
-               __LINE__);
+        printf("\n\n%s %d : strError should not return NULL.\n\n", __func__, __LINE__);
         exit(1);
     };
 
@@ -292,8 +279,7 @@ static void ceeplusplus_takeOwnership_test(const char *filename)
 
     if (sf_read_float(handle, fbuffer, ARRAY_LEN(fbuffer)) <= 0)
     {
-        printf("\n\n%s %d : error when taking ownership of handle.\n\n",
-               __func__, __LINE__);
+        printf("\n\n%s %d : error when taking ownership of handle.\n\n", __func__, __LINE__);
         exit(1);
     }
 
@@ -308,9 +294,7 @@ static void ceeplusplus_takeOwnership_test(const char *filename)
 
     if (file2.takeOwnership())
     {
-        printf(
-            "\n\n%s %d : taking ownership of shared handle is not allowed.\n\n",
-            __func__, __LINE__);
+        printf("\n\n%s %d : taking ownership of shared handle is not allowed.\n\n", __func__, __LINE__);
         exit(1);
     }
 }

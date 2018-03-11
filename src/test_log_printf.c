@@ -30,77 +30,76 @@
 
 #define CMP_0_ARGS(line, err, fmt)                                           \
     \
-do                                                                    \
+do                                                                       \
     \
-{                                                                     \
+{                                                                       \
         psf->parselog.indx = 0;                                              \
         snprintf(buffer, sizeof(buffer), (fmt));                             \
         psf_log_printf(psf, (fmt));                                          \
         err += compare_strings_or_die(line, fmt, buffer, psf->parselog.buf); \
     \
-}                                                                     \
+}                                                                       \
     while (0)                                                                \
         ;
 
 #define CMP_2_ARGS(line, err, fmt, a)                                        \
     \
-do                                                                    \
+do                                                                       \
     \
-{                                                                     \
+{                                                                       \
         psf->parselog.indx = 0;                                              \
         snprintf(buffer, sizeof(buffer), (fmt), (a), (a));                   \
         psf_log_printf(psf, (fmt), (a), (a));                                \
         err += compare_strings_or_die(line, fmt, buffer, psf->parselog.buf); \
     \
-}                                                                     \
+}                                                                       \
     while (0)                                                                \
         ;
 
 #define CMP_4_ARGS(line, err, fmt, a)                                        \
     \
-do                                                                    \
+do                                                                       \
     \
-{                                                                     \
+{                                                                       \
         psf->parselog.indx = 0;                                              \
         snprintf(buffer, sizeof(buffer), (fmt), (a), (a), (a), (a));         \
         psf_log_printf(psf, (fmt), (a), (a), (a), (a));                      \
         err += compare_strings_or_die(line, fmt, buffer, psf->parselog.buf); \
     \
-}                                                                     \
+}                                                                       \
     while (0)                                                                \
         ;
 
 #define CMP_5_ARGS(line, err, fmt, a)                                        \
     \
-do                                                                    \
+do                                                                       \
     \
-{                                                                     \
+{                                                                       \
                                                                              \
         psf->parselog.indx = 0;                                              \
         snprintf(buffer, sizeof(buffer), (fmt), (a), (a), (a), (a), (a));    \
         psf_log_printf(psf, (fmt), (a), (a), (a), (a), (a));                 \
         err += compare_strings_or_die(line, fmt, buffer, psf->parselog.buf); \
     \
-}                                                                     \
+}                                                                       \
     while (0)                                                                \
         ;
 
 #define CMP_6_ARGS(line, err, fmt, a)                                          \
     \
-do                                                                      \
+do                                                                         \
     \
-{                                                                       \
+{                                                                         \
         psf->parselog.indx = 0;                                                \
         snprintf(buffer, sizeof(buffer), (fmt), (a), (a), (a), (a), (a), (a)); \
         psf_log_printf(psf, (fmt), (a), (a), (a), (a), (a), (a));              \
         err += compare_strings_or_die(line, fmt, buffer, psf->parselog.buf);   \
     \
-}                                                                       \
+}                                                                         \
     while (0)                                                                  \
         ;
 
-static int compare_strings_or_die(int linenum, const char *fmt, const char *s1,
-                                  const char *s2)
+static int compare_strings_or_die(int linenum, const char *fmt, const char *s1, const char *s2)
 {
     int errors = 0;
     /*-puts (s1) ;puts (s2) ;-*/
@@ -121,8 +120,7 @@ void test_log_printf(void)
     static char buffer[2048];
     SF_PRIVATE sf_private, *psf;
     int k, errors = 0;
-    int int_values[] = {0,  1,   12,   123,   1234,   123456,
-                        -1, -12, -123, -1234, -123456};
+    int int_values[] = {0, 1, 12, 123, 1234, 123456, -1, -12, -123, -1234, -123456};
 
     print_test_name("Testing psf_log_printf");
 
@@ -133,12 +131,10 @@ void test_log_printf(void)
 
     /* Test printing of ints. */
     for (k = 0; k < ARRAY_LEN(int_values); k++)
-        CMP_6_ARGS(__LINE__, errors, "int A : %d, % d, %4d, % 4d, %04d, % 04d",
-                   int_values[k]);
+        CMP_6_ARGS(__LINE__, errors, "int A : %d, % d, %4d, % 4d, %04d, % 04d", int_values[k]);
 
     for (k = 0; k < ARRAY_LEN(int_values); k++)
-        CMP_5_ARGS(__LINE__, errors, "int B : %+d, %+4d, %+04d, %-d, %-4d",
-                   int_values[k]);
+        CMP_5_ARGS(__LINE__, errors, "int B : %+d, %+4d, %+04d, %-d, %-4d", int_values[k]);
 
     for (k = 0; k < ARRAY_LEN(int_values); k++)
         CMP_2_ARGS(__LINE__, errors, "int C : %- d, %- 4d", int_values[k]);

@@ -43,10 +43,8 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash);
 static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash);
 static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash);
 
-static void pcm_test_float(const char *filename, int filetype, uint64_t hash,
-                           int replace_float);
-static void pcm_test_double(const char *filename, int filetype, uint64_t hash,
-                            int replace_float);
+static void pcm_test_float(const char *filename, int filetype, uint64_t hash, int replace_float);
+static void pcm_test_double(const char *filename, int filetype, uint64_t hash, int replace_float);
 
 typedef union
 {
@@ -66,58 +64,28 @@ int main(void)
 {
     lrintf_test();
 
-    pcm_test_bits_8("pcm-s8.raw", SF_FORMAT_RAW | SF_FORMAT_PCM_S8,
-                    0xa335091249dbfLL);
-    pcm_test_bits_8("pcm-u8.raw", SF_FORMAT_RAW | SF_FORMAT_PCM_U8,
-                    0x48c433d695f3fLL);
+    pcm_test_bits_8("pcm-s8.raw", SF_FORMAT_RAW | SF_FORMAT_PCM_S8, 0xa335091249dbfLL);
+    pcm_test_bits_8("pcm-u8.raw", SF_FORMAT_RAW | SF_FORMAT_PCM_U8, 0x48c433d695f3fLL);
 
-    pcm_test_bits_16("le-pcm16.raw",
-                     SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_PCM_16,
-                     0xb956c881ebf08LL);
-    pcm_test_bits_16("be-pcm16.raw",
-                     SF_ENDIAN_BIG | SF_FORMAT_RAW | SF_FORMAT_PCM_16,
-                     0x2f840c55750f8LL);
+    pcm_test_bits_16("le-pcm16.raw", SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_PCM_16, 0xb956c881ebf08LL);
+    pcm_test_bits_16("be-pcm16.raw", SF_ENDIAN_BIG | SF_FORMAT_RAW | SF_FORMAT_PCM_16, 0x2f840c55750f8LL);
 
-    pcm_test_bits_24("le-pcm24.raw",
-                     SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_PCM_24,
-                     0xb6a759ab496f8LL);
-    pcm_test_bits_24("be-pcm24.raw",
-                     SF_ENDIAN_BIG | SF_FORMAT_RAW | SF_FORMAT_PCM_24,
-                     0xf3eaf9c30b6f8LL);
+    pcm_test_bits_24("le-pcm24.raw", SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_PCM_24, 0xb6a759ab496f8LL);
+    pcm_test_bits_24("be-pcm24.raw", SF_ENDIAN_BIG | SF_FORMAT_RAW | SF_FORMAT_PCM_24, 0xf3eaf9c30b6f8LL);
 
-    pcm_test_bits_32("le-pcm32.raw",
-                     SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_PCM_32,
-                     0xaece1c1c17f08LL);
-    pcm_test_bits_32("be-pcm32.raw",
-                     SF_ENDIAN_BIG | SF_FORMAT_RAW | SF_FORMAT_PCM_32,
-                     0x9ddf142d0b0f8LL);
-    pcm_test_float("le-float.raw",
-                   SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_FLOAT,
-                   0xad04f7554267aLL, SF_FALSE);
-    pcm_test_float("be-float.raw",
-                   SF_ENDIAN_BIG | SF_FORMAT_RAW | SF_FORMAT_FLOAT,
-                   0xde3e248fa9186LL, SF_FALSE);
+    pcm_test_bits_32("le-pcm32.raw", SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_PCM_32, 0xaece1c1c17f08LL);
+    pcm_test_bits_32("be-pcm32.raw", SF_ENDIAN_BIG | SF_FORMAT_RAW | SF_FORMAT_PCM_32, 0x9ddf142d0b0f8LL);
+    pcm_test_float("le-float.raw", SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_FLOAT, 0xad04f7554267aLL, SF_FALSE);
+    pcm_test_float("be-float.raw", SF_ENDIAN_BIG | SF_FORMAT_RAW | SF_FORMAT_FLOAT, 0xde3e248fa9186LL, SF_FALSE);
 
-    pcm_test_double("le-double.raw",
-                    SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_DOUBLE,
-                    0x2726f958f669cLL, SF_FALSE);
-    pcm_test_double("be-double.raw",
-                    SF_ENDIAN_BIG | SF_FORMAT_RAW | SF_FORMAT_DOUBLE,
-                    0x3583f8ee51164LL, SF_FALSE);
+    pcm_test_double("le-double.raw", SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_DOUBLE, 0x2726f958f669cLL, SF_FALSE);
+    pcm_test_double("be-double.raw", SF_ENDIAN_BIG | SF_FORMAT_RAW | SF_FORMAT_DOUBLE, 0x3583f8ee51164LL, SF_FALSE);
 
-    pcm_test_float("le-float.raw",
-                   SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_FLOAT,
-                   0xad04f7554267aLL, SF_TRUE);
-    pcm_test_float("be-float.raw",
-                   SF_ENDIAN_BIG | SF_FORMAT_RAW | SF_FORMAT_FLOAT,
-                   0xde3e248fa9186LL, SF_TRUE);
+    pcm_test_float("le-float.raw", SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_FLOAT, 0xad04f7554267aLL, SF_TRUE);
+    pcm_test_float("be-float.raw", SF_ENDIAN_BIG | SF_FORMAT_RAW | SF_FORMAT_FLOAT, 0xde3e248fa9186LL, SF_TRUE);
 
-    pcm_test_double("le-double.raw",
-                    SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_DOUBLE,
-                    0x2726f958f669cLL, SF_TRUE);
-    pcm_test_double("be-double.raw",
-                    SF_ENDIAN_BIG | SF_FORMAT_RAW | SF_FORMAT_DOUBLE,
-                    0x3583f8ee51164LL, SF_TRUE);
+    pcm_test_double("le-double.raw", SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_DOUBLE, 0x2726f958f669cLL, SF_TRUE);
+    pcm_test_double("be-double.raw", SF_ENDIAN_BIG | SF_FORMAT_RAW | SF_FORMAT_DOUBLE, 0x3583f8ee51164LL, SF_TRUE);
 
     return 0;
 }
@@ -144,8 +112,7 @@ static void lrintf_test(void)
     for (k = 0; k < items; k++)
         if (fabs(int_data[k] - float_data[k]) > 1.0)
         {
-            printf("\n\nLine %d: float : Incorrect sample (#%d : %f => %d).\n",
-                   __LINE__, k, float_data[k], int_data[k]);
+            printf("\n\nLine %d: float : Incorrect sample (#%d : %f => %d).\n", __LINE__, k, float_data[k], int_data[k]);
             exit(1);
         };
 
@@ -185,13 +152,11 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_short_or_die(file, 0, short_out, items, __LINE__);
 
@@ -199,29 +164,23 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
 
     memset(short_in, 0, items * sizeof(short));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != items)
     {
-        printf(
-            "\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64
-            ")\n",
-            __LINE__, items, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
@@ -232,8 +191,7 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
         if (short_out[k] != short_in[k])
         {
-            printf("\n\nLine %d: Incorrect sample (#%d : 0x%x => 0x%x).\n",
-                   __LINE__, k, short_out[k], short_in[k]);
+            printf("\n\nLine %d: Incorrect sample (#%d : 0x%x => 0x%x).\n", __LINE__, k, short_out[k], short_in[k]);
             exit(1);
         };
 
@@ -261,13 +219,11 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_int_or_die(file, 0, int_out, items, __LINE__);
 
@@ -275,29 +231,23 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
 
     memset(int_in, 0, items * sizeof(int));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != items)
     {
-        printf(
-            "\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64
-            ")\n",
-            __LINE__, items, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
@@ -308,9 +258,7 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
         if (int_out[k] != int_in[k])
         {
-            printf(
-                "\n\nLine %d: int : Incorrect sample (#%d : 0x%x => 0x%x).\n",
-                __LINE__, k, int_out[k], int_in[k]);
+            printf("\n\nLine %d: int : Incorrect sample (#%d : 0x%x => 0x%x).\n", __LINE__, k, int_out[k], int_in[k]);
             exit(1);
         };
 
@@ -330,19 +278,16 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
 
     if (zero_count > items / 4)
     {
-        printf("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count,
-               items);
+        printf("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count, items);
         exit(1);
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     sf_command(file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE);
 
@@ -352,29 +297,23 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
 
     memset(float_in, 0, items * sizeof(float));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != items)
     {
-        printf(
-            "\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64
-            ")\n",
-            __LINE__, items, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
@@ -387,8 +326,8 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
         if (fabs(float_out[k] - float_in[k]) > 1e-10)
         {
-            printf("\n\nLine %d: float : Incorrect sample (#%d : %f => %f).\n",
-                   __LINE__, k, (double)float_out[k], (double)float_in[k]);
+            printf("\n\nLine %d: float : Incorrect sample (#%d : %f => %f).\n", __LINE__, k, (double)float_out[k],
+                   (double)float_in[k]);
             exit(1);
         };
 
@@ -403,25 +342,21 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
     {
         double_out[k] = (k * ((k % 2) ? 1 : -1));
-        zero_count =
-            (fabs(double_out[k]) > 1e-10) ? zero_count : zero_count + 1;
+        zero_count = (fabs(double_out[k]) > 1e-10) ? zero_count : zero_count + 1;
     };
 
     if (zero_count > items / 4)
     {
-        printf("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count,
-               items);
+        printf("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count, items);
         exit(1);
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     sf_command(file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
 
@@ -431,29 +366,23 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
 
     memset(double_in, 0, items * sizeof(double));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != items)
     {
-        printf(
-            "\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64
-            ")\n",
-            __LINE__, items, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
@@ -466,8 +395,7 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
         if (fabs(double_out[k] - double_in[k]) > 1e-10)
         {
-            printf("\n\nLine %d: double : Incorrect sample (#%d : %f => %f).\n",
-                   __LINE__, k, double_out[k], double_in[k]);
+            printf("\n\nLine %d: double : Incorrect sample (#%d : %f => %f).\n", __LINE__, k, double_out[k], double_in[k]);
             exit(1);
         };
 
@@ -508,13 +436,11 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_short_or_die(file, 0, short_out, items, __LINE__);
 
@@ -522,29 +448,23 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
 
     memset(short_in, 0, items * sizeof(short));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != items)
     {
-        printf(
-            "\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64
-            ")\n",
-            __LINE__, items, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
@@ -555,8 +475,7 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
         if (short_out[k] != short_in[k])
         {
-            printf("\n\nLine %d: Incorrect sample (#%d : 0x%x => 0x%x).\n",
-                   __LINE__, k, short_out[k], short_in[k]);
+            printf("\n\nLine %d: Incorrect sample (#%d : 0x%x => 0x%x).\n", __LINE__, k, short_out[k], short_in[k]);
             exit(1);
         };
 
@@ -584,13 +503,11 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_int_or_die(file, 0, int_out, items, __LINE__);
 
@@ -598,29 +515,23 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
 
     memset(int_in, 0, items * sizeof(int));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != items)
     {
-        printf(
-            "\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64
-            ")\n",
-            __LINE__, items, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
@@ -631,9 +542,7 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
         if (int_out[k] != int_in[k])
         {
-            printf(
-                "\n\nLine %d: int : Incorrect sample (#%d : 0x%x => 0x%x).\n",
-                __LINE__, k, int_out[k], int_in[k]);
+            printf("\n\nLine %d: int : Incorrect sample (#%d : 0x%x => 0x%x).\n", __LINE__, k, int_out[k], int_in[k]);
             exit(1);
         };
 
@@ -653,19 +562,16 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
 
     if (zero_count > items / 4)
     {
-        printf("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count,
-               items);
+        printf("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count, items);
         exit(1);
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     sf_command(file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE);
 
@@ -675,29 +581,23 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
 
     memset(float_in, 0, items * sizeof(float));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != items)
     {
-        printf(
-            "\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64
-            ")\n",
-            __LINE__, items, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
@@ -710,8 +610,8 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
         if (fabs(float_out[k] - float_in[k]) > 1e-10)
         {
-            printf("\n\nLine %d: float : Incorrect sample (#%d : %f => %f).\n",
-                   __LINE__, k, (double)float_out[k], (double)float_in[k]);
+            printf("\n\nLine %d: float : Incorrect sample (#%d : %f => %f).\n", __LINE__, k, (double)float_out[k],
+                   (double)float_in[k]);
             exit(1);
         };
 
@@ -726,25 +626,21 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
     {
         double_out[k] = (k * ((k % 2) ? 3 : -3));
-        zero_count =
-            (fabs(double_out[k]) > 1e-10) ? zero_count : zero_count + 1;
+        zero_count = (fabs(double_out[k]) > 1e-10) ? zero_count : zero_count + 1;
     };
 
     if (zero_count > items / 4)
     {
-        printf("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count,
-               items);
+        printf("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count, items);
         exit(1);
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     sf_command(file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
 
@@ -754,29 +650,23 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
 
     memset(double_in, 0, items * sizeof(double));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != items)
     {
-        printf(
-            "\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64
-            ")\n",
-            __LINE__, items, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
@@ -789,8 +679,7 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
         if (fabs(double_out[k] - double_in[k]) > 1e-10)
         {
-            printf("\n\nLine %d: double : Incorrect sample (#%d : %f => %f).\n",
-                   __LINE__, k, double_out[k], double_in[k]);
+            printf("\n\nLine %d: double : Incorrect sample (#%d : %f => %f).\n", __LINE__, k, double_out[k], double_in[k]);
             exit(1);
         };
 
@@ -831,13 +720,11 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_short_or_die(file, 0, short_out, items, __LINE__);
 
@@ -845,29 +732,23 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
 
     memset(short_in, 0, items * sizeof(short));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != items)
     {
-        printf(
-            "\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64
-            ")\n",
-            __LINE__, items, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
@@ -878,8 +759,7 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
         if (short_out[k] != short_in[k])
         {
-            printf("\n\nLine %d: Incorrect sample (#%d : 0x%x => 0x%x).\n",
-                   __LINE__, k, short_out[k], short_in[k]);
+            printf("\n\nLine %d: Incorrect sample (#%d : 0x%x => 0x%x).\n", __LINE__, k, short_out[k], short_in[k]);
             exit(1);
         };
 
@@ -907,13 +787,11 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_int_or_die(file, 0, int_out, items, __LINE__);
 
@@ -921,29 +799,23 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
 
     memset(int_in, 0, items * sizeof(int));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != items)
     {
-        printf(
-            "\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64
-            ")\n",
-            __LINE__, items, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
@@ -954,9 +826,7 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
         if (int_out[k] != int_in[k])
         {
-            printf(
-                "\n\nLine %d: int : Incorrect sample (#%d : 0x%x => 0x%x).\n",
-                __LINE__, k, int_out[k], int_in[k]);
+            printf("\n\nLine %d: int : Incorrect sample (#%d : 0x%x => 0x%x).\n", __LINE__, k, int_out[k], int_in[k]);
             exit(1);
         };
 
@@ -976,19 +846,16 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
 
     if (zero_count > items / 4)
     {
-        printf("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count,
-               items);
+        printf("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count, items);
         exit(1);
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     sf_command(file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE);
 
@@ -998,29 +865,23 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
 
     memset(float_in, 0, items * sizeof(float));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != items)
     {
-        printf(
-            "\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64
-            ")\n",
-            __LINE__, items, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
@@ -1033,8 +894,8 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
         if (fabs(float_out[k] - float_in[k]) > 1e-10)
         {
-            printf("\n\nLine %d: float : Incorrect sample (#%d : %f => %f).\n",
-                   __LINE__, k, (double)float_out[k], (double)float_in[k]);
+            printf("\n\nLine %d: float : Incorrect sample (#%d : %f => %f).\n", __LINE__, k, (double)float_out[k],
+                   (double)float_in[k]);
             exit(1);
         };
 
@@ -1049,25 +910,21 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
     {
         double_out[k] = (k * ((k % 2) ? 3333 : -3333));
-        zero_count =
-            (fabs(double_out[k]) > 1e-10) ? zero_count : zero_count + 1;
+        zero_count = (fabs(double_out[k]) > 1e-10) ? zero_count : zero_count + 1;
     };
 
     if (zero_count > items / 4)
     {
-        printf("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count,
-               items);
+        printf("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count, items);
         exit(1);
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     sf_command(file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
 
@@ -1077,29 +934,23 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
 
     memset(double_in, 0, items * sizeof(double));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != items)
     {
-        printf(
-            "\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64
-            ")\n",
-            __LINE__, items, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
@@ -1112,8 +963,7 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
         if (fabs(double_out[k] - double_in[k]) > 1e-10)
         {
-            printf("\n\nLine %d: double : Incorrect sample (#%d : %f => %f).\n",
-                   __LINE__, k, double_out[k], double_in[k]);
+            printf("\n\nLine %d: double : Incorrect sample (#%d : %f => %f).\n", __LINE__, k, double_out[k], double_in[k]);
             exit(1);
         };
 
@@ -1154,13 +1004,11 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_short_or_die(file, 0, short_out, items, __LINE__);
 
@@ -1168,29 +1016,23 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
 
     memset(short_in, 0, items * sizeof(short));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != items)
     {
-        printf(
-            "\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64
-            ")\n",
-            __LINE__, items, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
@@ -1201,8 +1043,7 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
         if (short_out[k] != short_in[k])
         {
-            printf("\n\nLine %d: Incorrect sample (#%d : 0x%x => 0x%x).\n",
-                   __LINE__, k, short_out[k], short_in[k]);
+            printf("\n\nLine %d: Incorrect sample (#%d : 0x%x => 0x%x).\n", __LINE__, k, short_out[k], short_in[k]);
             exit(1);
         };
 
@@ -1230,13 +1071,11 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; // Wrong length. Library should correct this on sf_close.
+    sfinfo.frames = 123456789; // Wrong length. Library should correct this on sf_close.
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_int_or_die(file, 0, int_out, items, __LINE__);
 
@@ -1244,29 +1083,23 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
 
     memset(int_in, 0, items * sizeof(int));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != items)
     {
-        printf(
-            "\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64
-            ")\n",
-            __LINE__, items, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
@@ -1277,9 +1110,7 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
         if (int_out[k] != int_in[k])
         {
-            printf(
-                "\n\nLine %d: int : Incorrect sample (#%d : 0x%x => 0x%x).\n",
-                __LINE__, k, int_out[k], int_in[k]);
+            printf("\n\nLine %d: int : Incorrect sample (#%d : 0x%x => 0x%x).\n", __LINE__, k, int_out[k], int_in[k]);
             exit(1);
         };
 
@@ -1299,19 +1130,16 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
 
     if (zero_count > items / 4)
     {
-        printf("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count,
-               items);
+        printf("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count, items);
         exit(1);
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     sf_command(file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE);
 
@@ -1321,29 +1149,23 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
 
     memset(float_in, 0, items * sizeof(float));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != items)
     {
-        printf(
-            "\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64
-            ")\n",
-            __LINE__, items, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
@@ -1356,8 +1178,8 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
         if (fabs(float_out[k] - float_in[k]) > 1e-10)
         {
-            printf("\n\nLine %d: float : Incorrect sample (#%d : %f => %f).\n",
-                   __LINE__, k, (double)float_out[k], (double)float_in[k]);
+            printf("\n\nLine %d: float : Incorrect sample (#%d : %f => %f).\n", __LINE__, k, (double)float_out[k],
+                   (double)float_in[k]);
             exit(1);
         };
 
@@ -1372,25 +1194,21 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
     {
         double_out[k] = (k * ((k % 2) ? 333333 : -333333));
-        zero_count =
-            (fabs(double_out[k]) > 1e-10) ? zero_count : zero_count + 1;
+        zero_count = (fabs(double_out[k]) > 1e-10) ? zero_count : zero_count + 1;
     };
 
     if (zero_count > items / 4)
     {
-        printf("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count,
-               items);
+        printf("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count, items);
         exit(1);
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     sf_command(file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
 
@@ -1400,29 +1218,23 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
 
     memset(double_in, 0, items * sizeof(double));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != items)
     {
-        printf(
-            "\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64
-            ")\n",
-            __LINE__, items, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
@@ -1435,8 +1247,7 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
     for (k = 0; k < items; k++)
         if (fabs(double_out[k] - double_in[k]) > 1e-10)
         {
-            printf("\n\nLine %d: double : Incorrect sample (#%d : %f => %f).\n",
-                   __LINE__, k, double_out[k], double_in[k]);
+            printf("\n\nLine %d: double : Incorrect sample (#%d : %f => %f).\n", __LINE__, k, double_out[k], double_in[k]);
             exit(1);
         };
 
@@ -1446,8 +1257,7 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
     puts("ok");
 }
 
-static void pcm_test_float(const char *filename, int filetype, uint64_t hash,
-                           int replace_float)
+static void pcm_test_float(const char *filename, int filetype, uint64_t hash, int replace_float)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -1455,9 +1265,7 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash,
     int sign;
     double *data, error;
 
-    print_test_name(replace_float ? "pcm_test_float (replace)"
-                                  : "pcm_test_float",
-                    filename);
+    print_test_name(replace_float ? "pcm_test_float (replace)" : "pcm_test_float", filename);
 
     items = BUFFER_SIZE;
 
@@ -1473,14 +1281,11 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash,
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
-    if (replace_float &&
-        string_in_log_buffer(file, "Using IEEE replacement") == 0)
+    if (replace_float && string_in_log_buffer(file, "Using IEEE replacement") == 0)
     {
-        printf("\n\nLine %d : Float replacement code not working.\n\n",
-               __LINE__);
+        printf("\n\nLine %d : Float replacement code not working.\n\n", __LINE__);
         dump_log_buffer(file);
         exit(1);
     };
@@ -1496,14 +1301,11 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash,
     if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
-    if (replace_float &&
-        string_in_log_buffer(file, "Using IEEE replacement") == 0)
+    if (replace_float && string_in_log_buffer(file, "Using IEEE replacement") == 0)
     {
-        printf("\n\nLine %d : Float replacement code not working.\n\n",
-               __LINE__);
+        printf("\n\nLine %d : Float replacement code not working.\n\n", __LINE__);
         dump_log_buffer(file);
         exit(1);
     };
@@ -1526,9 +1328,7 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash,
 
     if (sfinfo.channels != 1)
     {
-        printf(
-            "\n\nError (%s:%d) Mono : Incorrect number of channels in file.\n",
-            __FILE__, __LINE__);
+        printf("\n\nError (%s:%d) Mono : Incorrect number of channels in file.\n", __FILE__, __LINE__);
         exit(1);
     };
 
@@ -1541,16 +1341,14 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash,
         error = fabs(data[k] - ((double)k) / 100.0 * (sign *= -1));
         if (fabs(data[k]) > 1e-100 && fabs(error / data[k]) > 1e-5)
         {
-            printf(
-                "\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n",
-                __FILE__, __LINE__, k, ((double)k) / 100.0, data[k]);
+            printf("\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n", __FILE__, __LINE__, k, ((double)k) / 100.0,
+                   data[k]);
             exit(1);
         };
     };
 
     /* Seek to end of file. */
-    test_seek_or_die(file, 0, SEEK_END, sfinfo.frames, sfinfo.channels,
-                     __LINE__);
+    test_seek_or_die(file, 0, SEEK_END, sfinfo.frames, sfinfo.channels, __LINE__);
 
     /* Seek to start of file. */
     test_seek_or_die(file, 0, SEEK_SET, 0, sfinfo.channels, __LINE__);
@@ -1561,9 +1359,8 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash,
         error = fabs(data[k] - ((double)k) / 100.0 * (sign *= -1));
         if (fabs(data[k]) > 1e-100 && fabs(error / data[k]) > 1e-5)
         {
-            printf(
-                "\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n",
-                __FILE__, __LINE__, k, ((double)k) / 100.0, data[k]);
+            printf("\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n", __FILE__, __LINE__, k, ((double)k) / 100.0,
+                   data[k]);
             exit(1);
         };
     };
@@ -1577,9 +1374,8 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash,
         error = fabs(data[k] - ((double)k) / 100.0 * (sign *= -1));
         if (fabs(data[k]) > 1e-100 && fabs(error / data[k]) > 1e-5)
         {
-            printf(
-                "\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n",
-                __FILE__, __LINE__, k, ((double)k) / 100.0, data[k]);
+            printf("\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n", __FILE__, __LINE__, k, ((double)k) / 100.0,
+                   data[k]);
             exit(1);
         };
     };
@@ -1593,16 +1389,14 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash,
         error = fabs(data[k] - ((double)k) / 100.0 * (sign *= -1));
         if (fabs(data[k]) > 1e-100 && fabs(error / data[k]) > 1e-5)
         {
-            printf(
-                "\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n",
-                __FILE__, __LINE__, k, ((double)k) / 100.0, data[k]);
+            printf("\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n", __FILE__, __LINE__, k, ((double)k) / 100.0,
+                   data[k]);
             exit(1);
         };
     };
 
     /* Seek to offset from end of file. */
-    test_seek_or_die(file, -1 * (sfinfo.frames - 10), SEEK_END, 10,
-                     sfinfo.channels, __LINE__);
+    test_seek_or_die(file, -1 * (sfinfo.frames - 10), SEEK_END, 10, sfinfo.channels, __LINE__);
 
     test_read_double_or_die(file, 0, data + 10, 4, __LINE__);
     for (k = 10; k < 14; k++)
@@ -1610,9 +1404,8 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash,
         error = fabs(data[k] - ((double)k) / 100.0 * (sign *= -1));
         if (fabs(data[k]) > 1e-100 && fabs(error / data[k]) > 1e-5)
         {
-            printf(
-                "\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n",
-                __FILE__, __LINE__, k, ((double)k) / 100.0, data[k]);
+            printf("\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n", __FILE__, __LINE__, k, ((double)k) / 100.0,
+                   data[k]);
             exit(1);
         };
     };
@@ -1640,14 +1433,11 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash,
 
     frames = items / sfinfo.channels;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
-    if (replace_float &&
-        string_in_log_buffer(file, "Using IEEE replacement") == 0)
+    if (replace_float && string_in_log_buffer(file, "Using IEEE replacement") == 0)
     {
-        printf("\n\nLine %d : Float replacement code not working.\n\n",
-               __LINE__);
+        printf("\n\nLine %d : Float replacement code not working.\n\n", __LINE__);
         dump_log_buffer(file);
         exit(1);
     };
@@ -1663,14 +1453,11 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash,
     if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
-    if (replace_float &&
-        string_in_log_buffer(file, "Using IEEE replacement") == 0)
+    if (replace_float && string_in_log_buffer(file, "Using IEEE replacement") == 0)
     {
-        printf("\n\nLine %d : Float replacement code not working.\n\n",
-               __LINE__);
+        printf("\n\nLine %d : Float replacement code not working.\n\n", __LINE__);
         dump_log_buffer(file);
         exit(1);
     };
@@ -1763,8 +1550,7 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash,
     };
 
     /* Seek to offset from end of file. */
-    test_seek_or_die(file, -1 * (sfinfo.frames - 10), SEEK_END, 10,
-                     sfinfo.channels, __LINE__);
+    test_seek_or_die(file, -1 * (sfinfo.frames - 10), SEEK_END, 10, sfinfo.channels, __LINE__);
 
     test_readf_double_or_die(file, 0, data + 20, 2, __LINE__);
     for (k = 20; k < 24; k++)
@@ -1785,8 +1571,7 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash,
     unlink(filename);
 }
 
-static void pcm_test_double(const char *filename, int filetype, uint64_t hash,
-                            int replace_float)
+static void pcm_test_double(const char *filename, int filetype, uint64_t hash, int replace_float)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -1796,9 +1581,7 @@ static void pcm_test_double(const char *filename, int filetype, uint64_t hash,
 
     /* This is the best test routine. Other should be brought up to this standard. */
 
-    print_test_name(replace_float ? "pcm_test_double (replace)"
-                                  : "pcm_test_double",
-                    filename);
+    print_test_name(replace_float ? "pcm_test_double (replace)" : "pcm_test_double", filename);
 
     items = BUFFER_SIZE;
 
@@ -1814,14 +1597,11 @@ static void pcm_test_double(const char *filename, int filetype, uint64_t hash,
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
-    if (replace_float &&
-        string_in_log_buffer(file, "Using IEEE replacement") == 0)
+    if (replace_float && string_in_log_buffer(file, "Using IEEE replacement") == 0)
     {
-        printf("\n\nLine %d : Float replacement code not working.\n\n",
-               __LINE__);
+        printf("\n\nLine %d : Float replacement code not working.\n\n", __LINE__);
         dump_log_buffer(file);
         exit(1);
     };
@@ -1845,14 +1625,11 @@ static void pcm_test_double(const char *filename, int filetype, uint64_t hash,
     if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
-    if (replace_float &&
-        string_in_log_buffer(file, "Using IEEE replacement") == 0)
+    if (replace_float && string_in_log_buffer(file, "Using IEEE replacement") == 0)
     {
-        printf("\n\nLine %d : Float replacement code not working.\n\n",
-               __LINE__);
+        printf("\n\nLine %d : Float replacement code not working.\n\n", __LINE__);
         dump_log_buffer(file);
         exit(1);
     };
@@ -1875,9 +1652,7 @@ static void pcm_test_double(const char *filename, int filetype, uint64_t hash,
 
     if (sfinfo.channels != 1)
     {
-        printf(
-            "\n\nError (%s:%d) Mono : Incorrect number of channels in file.\n",
-            __FILE__, __LINE__);
+        printf("\n\nError (%s:%d) Mono : Incorrect number of channels in file.\n", __FILE__, __LINE__);
         exit(1);
     };
 
@@ -1890,9 +1665,8 @@ static void pcm_test_double(const char *filename, int filetype, uint64_t hash,
         error = fabs(data[k] - ((double)k) / 100.0 * (sign *= -1));
         if (fabs(data[k]) > 1e-100 && fabs(error / data[k]) > 1e-5)
         {
-            printf(
-                "\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n",
-                __FILE__, __LINE__, k, ((double)k) / 100.0, data[k]);
+            printf("\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n", __FILE__, __LINE__, k, ((double)k) / 100.0,
+                   data[k]);
             exit(1);
         };
     };
@@ -1906,9 +1680,8 @@ static void pcm_test_double(const char *filename, int filetype, uint64_t hash,
         error = fabs(data[k] - ((double)k) / 100.0 * (sign *= -1));
         if (fabs(data[k]) > 1e-100 && fabs(error / data[k]) > 1e-5)
         {
-            printf(
-                "\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n",
-                __FILE__, __LINE__, k, ((double)k) / 100.0, data[k]);
+            printf("\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n", __FILE__, __LINE__, k, ((double)k) / 100.0,
+                   data[k]);
             exit(1);
         };
     };
@@ -1925,9 +1698,8 @@ static void pcm_test_double(const char *filename, int filetype, uint64_t hash,
         error = fabs(data[k] - ((double)k) / 100.0 * (sign *= -1));
         if (fabs(data[k]) > 1e-100 && fabs(error / data[k]) > 1e-5)
         {
-            printf(
-                "\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n",
-                __FILE__, __LINE__, k, ((double)k) / 100.0, data[k]);
+            printf("\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n", __FILE__, __LINE__, k, ((double)k) / 100.0,
+                   data[k]);
             exit(1);
         };
     };
@@ -1941,16 +1713,14 @@ static void pcm_test_double(const char *filename, int filetype, uint64_t hash,
         error = fabs(data[k] - ((double)k) / 100.0 * (sign *= -1));
         if (fabs(data[k]) > 1e-100 && fabs(error / data[k]) > 1e-5)
         {
-            printf(
-                "\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n",
-                __FILE__, __LINE__, k, ((double)k) / 100.0, data[k]);
+            printf("\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n", __FILE__, __LINE__, k, ((double)k) / 100.0,
+                   data[k]);
             exit(1);
         };
     };
 
     /* Seek to offset from end of file. */
-    test_seek_or_die(file, -1 * (sfinfo.frames - 10), SEEK_END, 10,
-                     sfinfo.channels, __LINE__);
+    test_seek_or_die(file, -1 * (sfinfo.frames - 10), SEEK_END, 10, sfinfo.channels, __LINE__);
 
     test_read_double_or_die(file, 0, data + 10, 4, __LINE__);
     for (k = 10; k < 14; k++)
@@ -1958,9 +1728,8 @@ static void pcm_test_double(const char *filename, int filetype, uint64_t hash,
         error = fabs(data[k] - ((double)k) / 100.0 * (sign *= -1));
         if (fabs(data[k]) > 1e-100 && fabs(error / data[k]) > 1e-5)
         {
-            printf(
-                "\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n",
-                __FILE__, __LINE__, k, ((double)k) / 100.0, data[k]);
+            printf("\n\nError (%s:%d) Mono : Incorrect sample (#%d : %f => %f).\n", __FILE__, __LINE__, k, ((double)k) / 100.0,
+                   data[k]);
             exit(1);
         };
     };
@@ -1988,14 +1757,11 @@ static void pcm_test_double(const char *filename, int filetype, uint64_t hash,
 
     frames = items / sfinfo.channels;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
-    if (replace_float &&
-        string_in_log_buffer(file, "Using IEEE replacement") == 0)
+    if (replace_float && string_in_log_buffer(file, "Using IEEE replacement") == 0)
     {
-        printf("\n\nLine %d : Float replacement code not working.\n\n",
-               __LINE__);
+        printf("\n\nLine %d : Float replacement code not working.\n\n", __LINE__);
         dump_log_buffer(file);
         exit(1);
     };
@@ -2019,14 +1785,11 @@ static void pcm_test_double(const char *filename, int filetype, uint64_t hash,
     if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
-    if (replace_float &&
-        string_in_log_buffer(file, "Using IEEE replacement") == 0)
+    if (replace_float && string_in_log_buffer(file, "Using IEEE replacement") == 0)
     {
-        printf("\n\nLine %d : Float replacement code not working.\n\n",
-               __LINE__);
+        printf("\n\nLine %d : Float replacement code not working.\n\n", __LINE__);
         dump_log_buffer(file);
         exit(1);
     };
@@ -2120,8 +1883,7 @@ static void pcm_test_double(const char *filename, int filetype, uint64_t hash,
     };
 
     /* Seek to offset from end of file. */
-    test_seek_or_die(file, -1 * (sfinfo.frames - 10), SEEK_END, 10,
-                     sfinfo.channels, __LINE__);
+    test_seek_or_die(file, -1 * (sfinfo.frames - 10), SEEK_END, 10, sfinfo.channels, __LINE__);
 
     test_readf_double_or_die(file, 0, data + 20, 4, __LINE__);
     for (k = 20; k < 24; k++)

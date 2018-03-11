@@ -68,8 +68,7 @@ static void raw_offset_test(const char *filename, int typeminor)
     sfinfo.channels = 1;
     sfinfo.frames = 0;
 
-    sndfile =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    sndfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
 
     start = 0;
     sf_command(sndfile, SFC_FILE_TRUNCATE, &start, sizeof(start));
@@ -80,15 +79,12 @@ static void raw_offset_test(const char *filename, int typeminor)
 
     sf_close(sndfile);
 
-    sndfile =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    sndfile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
     check_log_buffer_or_die(sndfile, __LINE__);
 
     if (ABS(BUFFER_LEN - sfinfo.frames) > 1)
     {
-        printf("\n\nLine %d : Incorrect sample count (%" PRId64
-               " should be %d)\n",
-               __LINE__, sfinfo.frames, BUFFER_LEN);
+        printf("\n\nLine %d : Incorrect sample count (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, BUFFER_LEN);
         dump_log_buffer(sndfile);
         exit(1);
     };
@@ -164,8 +160,7 @@ static void bad_raw_test(void)
 
     if ((textfile = fopen(filename, "w")) == NULL)
     {
-        printf("\n\nLine %d : not able to open text file for write.\n",
-               __LINE__);
+        printf("\n\nLine %d : not able to open text file for write.\n", __LINE__);
         exit(1);
     };
 
@@ -178,8 +173,7 @@ static void bad_raw_test(void)
 
     if ((file = sf_open(filename, SFM_READ, &sfinfo)) != NULL)
     {
-        printf("\n\nLine %d : Error, file should not have opened.\n",
-               __LINE__ - 1);
+        printf("\n\nLine %d : Error, file should not have opened.\n", __LINE__ - 1);
         exit(1);
     };
 
@@ -187,8 +181,7 @@ static void bad_raw_test(void)
 
     if (strstr(errorstr, "Bad format field in SF_INFO struct") == NULL)
     {
-        printf("\n\nLine %d : Error bad error string : %s.\n", __LINE__ - 1,
-               errorstr);
+        printf("\n\nLine %d : Error bad error string : %s.\n", __LINE__ - 1, errorstr);
         exit(1);
     };
 

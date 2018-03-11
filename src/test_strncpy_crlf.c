@@ -52,8 +52,7 @@ void test_psf_strlcpy_crlf(void)
 
         if (dest[dest_len] != '\x5a')
         {
-            printf("\n\nLine %d: buffer overrun for dest_len == %d\n\n",
-                   __LINE__, dest_len);
+            printf("\n\nLine %d: buffer overrun for dest_len == %d\n\n", __LINE__, dest_len);
             exit(1);
         };
 

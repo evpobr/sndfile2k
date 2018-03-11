@@ -39,8 +39,7 @@
 
 static void chunk_test(const char *filename, int format);
 static void wav_subchunk_test(size_t chunk_size);
-static void large_free_test(const char *filename, int format,
-                            size_t chunk_size);
+static void large_free_test(const char *filename, int format, size_t chunk_size);
 
 int main(int argc, char *argv[])
 {
@@ -64,8 +63,7 @@ int main(int argc, char *argv[])
     if (do_all || !strcmp(argv[1], "wav"))
     {
         chunk_test("chunks_pcm16.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16);
-        chunk_test("chunks_pcm16.rifx",
-                   SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_16);
+        chunk_test("chunks_pcm16.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_16);
         chunk_test("chunks_pcm16.wavex", SF_FORMAT_WAVEX | SF_FORMAT_PCM_16);
 
         for (k = 100; k < 10000; k *= 4)
@@ -84,10 +82,8 @@ int main(int argc, char *argv[])
     {
         chunk_test("chunks_pcm16.caf", SF_FORMAT_CAF | SF_FORMAT_PCM_16);
         chunk_test("chunks_alac.caf", SF_FORMAT_CAF | SF_FORMAT_ALAC_16);
-        large_free_test("large_free.caf", SF_FORMAT_CAF | SF_FORMAT_PCM_16,
-                        100);
-        large_free_test("large_free.caf", SF_FORMAT_CAF | SF_FORMAT_PCM_16,
-                        20000);
+        large_free_test("large_free.caf", SF_FORMAT_CAF | SF_FORMAT_PCM_16, 100);
+        large_free_test("large_free.caf", SF_FORMAT_CAF | SF_FORMAT_PCM_16, 20000);
         test_count++;
     };
 
@@ -108,8 +104,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-static void chunk_test_helper(const char *filename, int format,
-                              const char *testdata)
+static void chunk_test_helper(const char *filename, int format, const char *testdata)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -133,8 +128,7 @@ static void chunk_test_helper(const char *filename, int format,
     sfinfo.frames = 0;
     sfinfo.format = format;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
 
     /* Set up the chunk to write. */
     memset(&chunk_info, 0, sizeof(chunk_info));
@@ -146,18 +140,15 @@ static void chunk_test_helper(const char *filename, int format,
     length_before = chunk_info.datalen;
 
     err = sf_set_chunk(file, &chunk_info);
-    exit_if_true(
-        err != SF_ERR_NO_ERROR,
-        "\n\nLine %d : sf_set_chunk returned for testdata '%s' : %s\n\n",
-        __LINE__, testdata, sf_error_number(err));
+    exit_if_true(err != SF_ERR_NO_ERROR, "\n\nLine %d : sf_set_chunk returned for testdata '%s' : %s\n\n", __LINE__, testdata,
+                 sf_error_number(err));
 
     memset(chunk_info.data, 0, chunk_info.datalen);
     free(chunk_info.data);
 
     sf_close(file);
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
 
     memset(&chunk_info, 0, sizeof(chunk_info));
     snprintf(chunk_info.id, sizeof(chunk_info.id), "Test");
@@ -165,26 +156,19 @@ static void chunk_test_helper(const char *filename, int format,
 
     iterator = sf_get_chunk_iterator(file, &chunk_info);
     err = sf_get_chunk_size(iterator, &chunk_info);
-    exit_if_true(
-        err != SF_ERR_NO_ERROR,
-        "\n\nLine %d : sf_get_chunk_size returned for testdata '%s' : %s\n\n",
-        __LINE__, testdata, sf_error_number(err));
+    exit_if_true(err != SF_ERR_NO_ERROR, "\n\nLine %d : sf_get_chunk_size returned for testdata '%s' : %s\n\n", __LINE__, testdata,
+                 sf_error_number(err));
 
-    exit_if_true(length_before > chunk_info.datalen ||
-                     chunk_info.datalen - length_before > 4,
-                 "\n\nLine %d : testdata '%s' : Bad chunk length %u (previous "
-                 "length %u)\n\n",
-                 __LINE__, testdata, chunk_info.datalen, length_before);
+    exit_if_true(length_before > chunk_info.datalen || chunk_info.datalen - length_before > 4,
+                 "\n\nLine %d : testdata '%s' : Bad chunk length %u (previous length %u)\n\n", __LINE__, testdata,
+                 chunk_info.datalen, length_before);
 
     chunk_info.data = malloc(chunk_info.datalen);
     err = sf_get_chunk_data(iterator, &chunk_info);
-    exit_if_true(
-        err != SF_ERR_NO_ERROR,
-        "\n\nLine %d : sf_get_chunk_size returned for testdata '%s' : %s\n\n",
-        __LINE__, testdata, sf_error_number(err));
+    exit_if_true(err != SF_ERR_NO_ERROR, "\n\nLine %d : sf_get_chunk_size returned for testdata '%s' : %s\n\n", __LINE__, testdata,
+                 sf_error_number(err));
 
-    exit_if_true(memcmp(testdata, chunk_info.data, length_before),
-                 "\n\nLine %d : Data compare failed.\n    %s\n    %s\n\n",
+    exit_if_true(memcmp(testdata, chunk_info.data, length_before), "\n\nLine %d : Data compare failed.\n    %s\n    %s\n\n",
                  __LINE__, testdata, (char *)chunk_info.data);
 
     free(chunk_info.data);
@@ -193,8 +177,7 @@ static void chunk_test_helper(const char *filename, int format,
     unlink(filename);
 }
 
-static void multichunk_test_helper(const char *filename, int format,
-                                   const char *testdata[], size_t testdata_len)
+static void multichunk_test_helper(const char *filename, int format, const char *testdata[], size_t testdata_len)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -204,8 +187,7 @@ static void multichunk_test_helper(const char *filename, int format,
     int err, allow_fd;
     size_t i;
 
-    exit_if_true(ARRAY_LEN(length_before) < testdata_len,
-                 "\n\nLine %d : Bad array length.\n\n", __LINE__);
+    exit_if_true(ARRAY_LEN(length_before) < testdata_len, "\n\nLine %d : Bad array length.\n\n", __LINE__);
 
     sfinfo.samplerate = 44100;
     sfinfo.channels = 1;
@@ -222,8 +204,7 @@ static void multichunk_test_helper(const char *filename, int format,
         break;
     };
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
 
     /* Set up the chunk to write. */
     for (i = 0; i < testdata_len; i++)
@@ -238,10 +219,8 @@ static void multichunk_test_helper(const char *filename, int format,
         length_before[i] = chunk_info.datalen;
 
         err = sf_set_chunk(file, &chunk_info);
-        exit_if_true(err != SF_ERR_NO_ERROR, "\n\nLine %d : sf_set_chunk "
-                                             "returned for testdata[%d] '%s' : "
-                                             "%s\n\n",
-                     __LINE__, (int)i, testdata[i], sf_error_number(err));
+        exit_if_true(err != SF_ERR_NO_ERROR, "\n\nLine %d : sf_set_chunk returned for testdata[%d] '%s' : %s\n\n", __LINE__, (int)i,
+                     testdata[i], sf_error_number(err));
 
         memset(chunk_info.data, 0, chunk_info.datalen);
         free(chunk_info.data);
@@ -249,8 +228,7 @@ static void multichunk_test_helper(const char *filename, int format,
 
     sf_close(file);
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
 
     memset(&chunk_info, 0, sizeof(chunk_info));
     snprintf(chunk_info.id, sizeof(chunk_info.id), "Test");
@@ -263,43 +241,29 @@ static void multichunk_test_helper(const char *filename, int format,
     {
         memset(&chunk_info, 0, sizeof(chunk_info));
         err = sf_get_chunk_size(iterator, &chunk_info);
-        exit_if_true(i > testdata_len, "\n\nLine %d : iterated to chunk #%d, "
-                                       "but only %d chunks have been "
-                                       "written\n\n",
-                     __LINE__, (int)i, (int)testdata_len);
+        exit_if_true(i > testdata_len, "\n\nLine %d : iterated to chunk #%d, but only %d chunks have been written\n\n", __LINE__,
+                     (int)i, (int)testdata_len);
 
-        exit_if_true(err != SF_ERR_NO_ERROR, "\n\nLine %d : sf_get_chunk_size "
-                                             "returned for testdata[%d] '%s' : "
-                                             "%s\n\n",
-                     __LINE__, (int)i, testdata[i], sf_error_number(err));
+        exit_if_true(err != SF_ERR_NO_ERROR, "\n\nLine %d : sf_get_chunk_size returned for testdata[%d] '%s' : %s\n\n", __LINE__,
+                     (int)i, testdata[i], sf_error_number(err));
 
-        exit_if_true(length_before[i] > chunk_info.datalen ||
-                         chunk_info.datalen - length_before[i] > 4,
-                     "\n\nLine %d : testdata[%d] '%s' : Bad chunk length %u "
-                     "(previous length %u)\n\n",
-                     __LINE__, (int)i, testdata[i], chunk_info.datalen,
-                     length_before[i]);
+        exit_if_true(length_before[i] > chunk_info.datalen || chunk_info.datalen - length_before[i] > 4,
+                     "\n\nLine %d : testdata[%d] '%s' : Bad chunk length %u (previous length %u)\n\n", __LINE__, (int)i,
+                     testdata[i], chunk_info.datalen, length_before[i]);
 
         chunk_info.data = malloc(chunk_info.datalen);
         err = sf_get_chunk_data(iterator, &chunk_info);
-        exit_if_true(err != SF_ERR_NO_ERROR, "\n\nLine %d : sf_get_chunk_size "
-                                             "returned for testdata[%d] '%s' : "
-                                             "%s\n\n",
-                     __LINE__, (int)i, testdata[i], sf_error_number(err));
+        exit_if_true(err != SF_ERR_NO_ERROR, "\n\nLine %d : sf_get_chunk_size returned for testdata[%d] '%s' : %s\n\n", __LINE__,
+                     (int)i, testdata[i], sf_error_number(err));
 
-        exit_if_true(4 != chunk_info.id_size, "\n\nLine %d : testdata[%d] : "
-                                              "Bad ID length %u (previous "
-                                              "length %u)\n\n",
-                     __LINE__, (int)i, chunk_info.id_size, 4);
-        exit_if_true(
-            memcmp("Test", chunk_info.id, 4),
-            "\n\nLine %d : ID compare failed at %d.\n    %s\n    %s\n\n",
-            __LINE__, (int)i, "Test", (char *)chunk_info.id);
+        exit_if_true(4 != chunk_info.id_size, "\n\nLine %d : testdata[%d] : Bad ID length %u (previous length %u)\n\n", __LINE__,
+                     (int)i, chunk_info.id_size, 4);
+        exit_if_true(memcmp("Test", chunk_info.id, 4), "\n\nLine %d : ID compare failed at %d.\n    %s\n    %s\n\n", __LINE__,
+                     (int)i, "Test", (char *)chunk_info.id);
 
-        exit_if_true(
-            memcmp(testdata[i], chunk_info.data, length_before[i]),
-            "\n\nLine %d : Data compare failed at %d.\n    %s\n    %s\n\n",
-            __LINE__, (int)i, testdata[i], (char *)chunk_info.data);
+        exit_if_true(memcmp(testdata[i], chunk_info.data, length_before[i]),
+                     "\n\nLine %d : Data compare failed at %d.\n    %s\n    %s\n\n", __LINE__, (int)i, testdata[i],
+                     (char *)chunk_info.data);
 
         free(chunk_info.data);
         iterator = sf_next_chunk_iterator(iterator);
@@ -312,8 +276,7 @@ static void multichunk_test_helper(const char *filename, int format,
 
 static void chunk_test(const char *filename, int format)
 {
-    const char *testdata[] = {
-        "There can be only one.", "", "A", "AB", "ABC", "ABCD", "ABCDE"};
+    const char *testdata[] = {"There can be only one.", "", "A", "AB", "ABC", "ABCD", "ABCDE"};
     uint32_t k;
 
     print_test_name(__func__, filename);
@@ -339,8 +302,7 @@ static void wav_subchunk_test(size_t chunk_size)
     snprintf(filename, sizeof(filename), "subchunk_%04d.wav", (int)chunk_size);
     print_test_name(__func__, filename);
 
-    exit_if_true(sizeof(chunk_data) < chunk_size,
-                 "\n\nLine %d : sizeof (data) < chunk_size\n\n", __LINE__);
+    exit_if_true(sizeof(chunk_data) < chunk_size, "\n\nLine %d : sizeof (data) < chunk_size\n\n", __LINE__);
 
     memset(chunk_data, 53, sizeof(chunk_data));
     chunk_data[chunk_size] = 0;
@@ -358,8 +320,7 @@ static void wav_subchunk_test(size_t chunk_size)
     sfinfo.frames = 0;
     sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     /* Set up the chunk to write. */
     memset(&chunk_info, 0, sizeof(chunk_info));
@@ -369,9 +330,8 @@ static void wav_subchunk_test(size_t chunk_size)
     chunk_info.datalen = chunk_size;
 
     err = sf_set_chunk(file, &chunk_info);
-    exit_if_true(err != SF_ERR_NO_ERROR,
-                 "\n\nLine %d : sf_set_chunk returned for testdata : %s\n\n",
-                 __LINE__, sf_error_number(err));
+    exit_if_true(err != SF_ERR_NO_ERROR, "\n\nLine %d : sf_set_chunk returned for testdata : %s\n\n", __LINE__,
+                 sf_error_number(err));
 
     memset(chunk_info.data, 0, chunk_info.datalen);
 
@@ -381,12 +341,10 @@ static void wav_subchunk_test(size_t chunk_size)
 
     sf_close(file);
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
-    exit_if_true(sfinfo.frames != ARRAY_LEN(audio),
-                 "\n\nLine %d : Incorrect sample count (%d should be %d)\n",
-                 __LINE__, (int)sfinfo.frames, (int)ARRAY_LEN(audio));
+    exit_if_true(sfinfo.frames != ARRAY_LEN(audio), "\n\nLine %d : Incorrect sample count (%d should be %d)\n", __LINE__,
+                 (int)sfinfo.frames, (int)ARRAY_LEN(audio));
 
     if (chunk_size < 512)
         check_log_buffer_or_die(file, __LINE__);
@@ -408,8 +366,7 @@ static void large_free_test(const char *filename, int format, size_t chunk_size)
 
     print_test_name(__func__, filename);
 
-    exit_if_true(sizeof(chunk_data) <= chunk_size,
-                 "\n\nLine %d : sizeof (data) < chunk_size\n\n", __LINE__);
+    exit_if_true(sizeof(chunk_data) <= chunk_size, "\n\nLine %d : sizeof (data) < chunk_size\n\n", __LINE__);
 
     memset(chunk_data, 53, sizeof(chunk_data));
     chunk_data[chunk_size] = 0;
@@ -419,8 +376,7 @@ static void large_free_test(const char *filename, int format, size_t chunk_size)
     sfinfo.frames = 0;
     sfinfo.format = format;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     /* Set up the chunk to write. */
     memset(&chunk_info, 0, sizeof(chunk_info));
@@ -430,9 +386,8 @@ static void large_free_test(const char *filename, int format, size_t chunk_size)
     chunk_info.datalen = chunk_size;
 
     err = sf_set_chunk(file, &chunk_info);
-    exit_if_true(err != SF_ERR_NO_ERROR,
-                 "\n\nLine %d : sf_set_chunk returned for testdata : %s\n\n",
-                 __LINE__, sf_error_number(err));
+    exit_if_true(err != SF_ERR_NO_ERROR, "\n\nLine %d : sf_set_chunk returned for testdata : %s\n\n", __LINE__,
+                 sf_error_number(err));
 
     memset(chunk_info.data, 0, chunk_info.datalen);
 
@@ -442,12 +397,10 @@ static void large_free_test(const char *filename, int format, size_t chunk_size)
 
     sf_close(file);
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
-    exit_if_true(sfinfo.frames != ARRAY_LEN(audio),
-                 "\n\nLine %d : Incorrect sample count (%d should be %d)\n",
-                 __LINE__, (int)sfinfo.frames, (int)ARRAY_LEN(audio));
+    exit_if_true(sfinfo.frames != ARRAY_LEN(audio), "\n\nLine %d : Incorrect sample count (%d should be %d)\n", __LINE__,
+                 (int)sfinfo.frames, (int)ARRAY_LEN(audio));
 
     if (chunk_size < 512)
         check_log_buffer_or_die(file, __LINE__);

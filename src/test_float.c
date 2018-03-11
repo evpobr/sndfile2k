@@ -31,9 +31,7 @@
 void test_float_convert(void)
 {
     static float data[] = {
-        0.0,    1.0,  -1.0,  1.0 * M_PI, -1.0 * M_PI, 1e9,
-        -1e9,   1e-9, -1e-9, 1e-10,      -1e-10,      1e-19,
-        -1e-19, 1e19, -1e19, 1e-20,      -1e-20,
+        0.0, 1.0, -1.0, 1.0 * M_PI, -1.0 * M_PI, 1e9, -1e9, 1e-9, -1e-9, 1e-10, -1e-10, 1e-19, -1e-19, 1e19, -1e19, 1e-20, -1e-20,
     };
 
     int k;
@@ -61,9 +59,7 @@ void test_float_convert(void)
 
         if (fabs(data[k] - test) > 1e-20)
         {
-            printf(
-                "\n\nLine %d : Test %d, big endian error %.15g -> %.15g.\n\n",
-                __LINE__, k, data[k], test);
+            printf("\n\nLine %d : Test %d, big endian error %.15g -> %.15g.\n\n", __LINE__, k, data[k], test);
             exit(1);
         };
     };
@@ -74,9 +70,7 @@ void test_float_convert(void)
 void test_double_convert(void)
 {
     static double data[] = {
-        0.0,    1.0,  -1.0,  1.0 * M_PI, -1.0 * M_PI, 1e9,
-        -1e9,   1e-9, -1e-9, 1e-10,      -1e-10,      1e-19,
-        -1e-19, 1e19, -1e19, 1e-20,      -1e-20,
+        0.0, 1.0, -1.0, 1.0 * M_PI, -1.0 * M_PI, 1e9, -1e9, 1e-9, -1e-9, 1e-10, -1e-10, 1e-19, -1e-19, 1e19, -1e19, 1e-20, -1e-20,
     };
 
     int k;
@@ -104,9 +98,7 @@ void test_double_convert(void)
 
         if (fabs(data[k] - test) > 1e-20)
         {
-            printf(
-                "\n\nLine %d : Test %d, big endian error %.15g -> %.15g.\n\n",
-                __LINE__, k, data[k], test);
+            printf("\n\nLine %d : Test %d, big endian error %.15g -> %.15g.\n\n", __LINE__, k, data[k], test);
             exit(1);
         };
     };

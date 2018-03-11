@@ -156,15 +156,13 @@ static void stdout_test(int typemajor, int count)
 
     if ((file = sf_open("-", SFM_WRITE, &sfinfo)) == NULL)
     {
-        fprintf(stderr, "%s % d: sf_open_write failed with error : %s\n",
-                __func__, __LINE__, sf_strerror(NULL));
+        fprintf(stderr, "%s % d: sf_open_write failed with error : %s\n", __func__, __LINE__, sf_strerror(NULL));
         exit(1);
     };
 
     if (sfinfo.frames != 0)
     {
-        fprintf(stderr, "%s % d: Frames is %d (should be 0).\n", __func__,
-                __LINE__, (int)sfinfo.frames);
+        fprintf(stderr, "%s % d: Frames is %d (should be 0).\n", __func__, __LINE__, (int)sfinfo.frames);
         exit(1);
     };
 
@@ -175,9 +173,7 @@ static void stdout_test(int typemajor, int count)
         this_write = (count - total > 1024) ? 1024 : count - total;
         if ((k = sf_write_short(file, data + total, this_write)) != this_write)
         {
-            fprintf(stderr,
-                    "sf_write_short # %d failed with short write (%d -> %d)\n",
-                    count, this_write, k);
+            fprintf(stderr, "sf_write_short # %d failed with short write (%d -> %d)\n", count, this_write, k);
             exit(1);
         };
         total += k;

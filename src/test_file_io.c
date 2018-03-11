@@ -44,17 +44,12 @@ static void file_truncate_test(const char *filename);
 static void test_open_or_die(SF_PRIVATE *psf, int linenum);
 static void test_close_or_die(SF_PRIVATE *psf, int linenum);
 
-static void test_write_or_die(SF_PRIVATE *psf, void *data, sf_count_t bytes,
-                              sf_count_t items, sf_count_t new_position,
+static void test_write_or_die(SF_PRIVATE *psf, void *data, sf_count_t bytes, sf_count_t items, sf_count_t new_position,
                               int linenum);
-static void test_read_or_die(SF_PRIVATE *psf, void *data, sf_count_t bytes,
-                             sf_count_t items, sf_count_t new_position,
-                             int linenum);
+static void test_read_or_die(SF_PRIVATE *psf, void *data, sf_count_t bytes, sf_count_t items, sf_count_t new_position, int linenum);
 static void test_equal_or_die(int *array1, int *array2, int len, int linenum);
-static void test_seek_or_die(SF_PRIVATE *psf, sf_count_t offset, int whence,
-                             sf_count_t new_position, int linenum);
-static void test_tell_or_die(SF_PRIVATE *psf, sf_count_t expected_position,
-                             int linenum);
+static void test_seek_or_die(SF_PRIVATE *psf, sf_count_t offset, int whence, sf_count_t new_position, int linenum);
+static void test_tell_or_die(SF_PRIVATE *psf, sf_count_t expected_position, int linenum);
 
 static void file_open_test(const char *filename)
 {
@@ -69,8 +64,7 @@ static void file_open_test(const char *filename)
     /* Ensure that the file doesn't already exist. */
     if (unlink(filename) != 0 && errno != ENOENT)
     {
-        printf("\n\nLine %d: unlink failed (%d) : %s\n\n", __LINE__, errno,
-               strerror(errno));
+        printf("\n\nLine %d: unlink failed (%d) : %s\n\n", __LINE__, errno, strerror(errno));
         exit(1);
     };
 
@@ -136,14 +130,12 @@ static void file_read_write_test(const char *filename)
     test_open_or_die(psf, __LINE__);
 
     make_data(data_out, ARRAY_LEN(data_out), 1);
-    test_write_or_die(psf, data_out, sizeof(data_out[0]), ARRAY_LEN(data_out),
-                      sizeof(data_out), __LINE__);
+    test_write_or_die(psf, data_out, sizeof(data_out[0]), ARRAY_LEN(data_out), sizeof(data_out), __LINE__);
 
     if ((retval = psf_get_filelen(psf)) != sizeof(data_out))
     {
-        printf("\n\nLine %d: file length after write is not correct (%" PRId64
-               " should be %zd).\n\n",
-               __LINE__, retval, sizeof(data_out));
+        printf("\n\nLine %d: file length after write is not correct (%" PRId64 " should be %zd).\n\n", __LINE__, retval,
+               sizeof(data_out));
         if (retval == 0)
             printf("An fsync() may be necessary before fstat() in "
                    "psf_get_filelen().\n\n");
@@ -151,14 +143,12 @@ static void file_read_write_test(const char *filename)
     };
 
     make_data(data_out, ARRAY_LEN(data_out), 2);
-    test_write_or_die(psf, data_out, ARRAY_LEN(data_out), sizeof(data_out[0]),
-                      2 * sizeof(data_out), __LINE__);
+    test_write_or_die(psf, data_out, ARRAY_LEN(data_out), sizeof(data_out[0]), 2 * sizeof(data_out), __LINE__);
 
     if ((retval = psf_get_filelen(psf)) != 2 * sizeof(data_out))
     {
-        printf("\n\nLine %d: file length after write is not correct. (%" PRId64
-               " should be %zd)\n\n",
-               __LINE__, retval, 2 * sizeof(data_out));
+        printf("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %zd)\n\n", __LINE__, retval,
+               2 * sizeof(data_out));
         exit(1);
     };
 
@@ -177,13 +167,11 @@ static void file_read_write_test(const char *filename)
     test_open_or_die(psf, __LINE__);
 
     make_data(data_out, ARRAY_LEN(data_out), 1);
-    test_read_or_die(psf, data_in, 1, sizeof(data_in), sizeof(data_in),
-                     __LINE__);
+    test_read_or_die(psf, data_in, 1, sizeof(data_in), sizeof(data_in), __LINE__);
     test_equal_or_die(data_out, data_in, ARRAY_LEN(data_out), __LINE__);
 
     make_data(data_out, ARRAY_LEN(data_out), 2);
-    test_read_or_die(psf, data_in, sizeof(data_in[0]), ARRAY_LEN(data_in),
-                     2 * sizeof(data_in), __LINE__);
+    test_read_or_die(psf, data_in, sizeof(data_in[0]), ARRAY_LEN(data_in), 2 * sizeof(data_in), __LINE__);
     test_equal_or_die(data_out, data_in, ARRAY_LEN(data_out), __LINE__);
 
     test_close_or_die(psf, __LINE__);
@@ -204,33 +192,25 @@ static void file_read_write_test(const char *filename)
 
     test_seek_or_die(psf, 0, SEEK_SET, 0, __LINE__);
     test_seek_or_die(psf, 0, SEEK_END, 2 * SIGNED_SIZEOF(data_out), __LINE__);
-    test_seek_or_die(psf, -1 * SIGNED_SIZEOF(data_out), SEEK_CUR,
-                     (sf_count_t)sizeof(data_out), __LINE__);
+    test_seek_or_die(psf, -1 * SIGNED_SIZEOF(data_out), SEEK_CUR, (sf_count_t)sizeof(data_out), __LINE__);
 
-    test_seek_or_die(psf, SIGNED_SIZEOF(data_out), SEEK_CUR,
-                     2 * SIGNED_SIZEOF(data_out), __LINE__);
+    test_seek_or_die(psf, SIGNED_SIZEOF(data_out), SEEK_CUR, 2 * SIGNED_SIZEOF(data_out), __LINE__);
     make_data(data_out, ARRAY_LEN(data_out), 3);
-    test_write_or_die(psf, data_out, sizeof(data_out[0]), ARRAY_LEN(data_out),
-                      3 * sizeof(data_out), __LINE__);
+    test_write_or_die(psf, data_out, sizeof(data_out[0]), ARRAY_LEN(data_out), 3 * sizeof(data_out), __LINE__);
 
     test_seek_or_die(psf, 0, SEEK_SET, 0, __LINE__);
     make_data(data_out, ARRAY_LEN(data_out), 1);
-    test_read_or_die(psf, data_in, 1, sizeof(data_in), sizeof(data_in),
-                     __LINE__);
+    test_read_or_die(psf, data_in, 1, sizeof(data_in), sizeof(data_in), __LINE__);
     test_equal_or_die(data_out, data_in, ARRAY_LEN(data_out), __LINE__);
 
-    test_seek_or_die(psf, 2 * SIGNED_SIZEOF(data_out), SEEK_SET,
-                     2 * SIGNED_SIZEOF(data_out), __LINE__);
+    test_seek_or_die(psf, 2 * SIGNED_SIZEOF(data_out), SEEK_SET, 2 * SIGNED_SIZEOF(data_out), __LINE__);
     make_data(data_out, ARRAY_LEN(data_out), 3);
-    test_read_or_die(psf, data_in, 1, sizeof(data_in), 3 * sizeof(data_in),
-                     __LINE__);
+    test_read_or_die(psf, data_in, 1, sizeof(data_in), 3 * sizeof(data_in), __LINE__);
     test_equal_or_die(data_out, data_in, ARRAY_LEN(data_out), __LINE__);
 
-    test_seek_or_die(psf, SIGNED_SIZEOF(data_out), SEEK_SET,
-                     SIGNED_SIZEOF(data_out), __LINE__);
+    test_seek_or_die(psf, SIGNED_SIZEOF(data_out), SEEK_SET, SIGNED_SIZEOF(data_out), __LINE__);
     make_data(data_out, ARRAY_LEN(data_out), 2);
-    test_read_or_die(psf, data_in, 1, sizeof(data_in), 2 * sizeof(data_in),
-                     __LINE__);
+    test_read_or_die(psf, data_in, 1, sizeof(data_in), 2 * sizeof(data_in), __LINE__);
     test_equal_or_die(data_out, data_in, ARRAY_LEN(data_out), __LINE__);
 
     test_close_or_die(psf, __LINE__);
@@ -251,17 +231,14 @@ static void file_read_write_test(const char *filename)
 
     if ((retval = psf_get_filelen(psf)) != 3 * sizeof(data_out))
     {
-        printf("\n\nLine %d: file length after write is not correct. (%" PRId64
-               " should be %zd)\n\n",
-               __LINE__, retval, 3 * sizeof(data_out));
+        printf("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %zd)\n\n", __LINE__, retval,
+               3 * sizeof(data_out));
         exit(1);
     };
 
-    test_seek_or_die(psf, SIGNED_SIZEOF(data_out), SEEK_SET,
-                     SIGNED_SIZEOF(data_out), __LINE__);
+    test_seek_or_die(psf, SIGNED_SIZEOF(data_out), SEEK_SET, SIGNED_SIZEOF(data_out), __LINE__);
     make_data(data_out, ARRAY_LEN(data_out), 5);
-    test_write_or_die(psf, data_out, sizeof(data_out[0]), ARRAY_LEN(data_out),
-                      2 * sizeof(data_out), __LINE__);
+    test_write_or_die(psf, data_out, sizeof(data_out[0]), ARRAY_LEN(data_out), 2 * sizeof(data_out), __LINE__);
     test_close_or_die(psf, __LINE__);
 
     /* final test with psf->fileoffset == 0. */
@@ -272,25 +249,21 @@ static void file_read_write_test(const char *filename)
 
     if ((retval = psf_get_filelen(psf)) != 3 * sizeof(data_out))
     {
-        printf("\n\nLine %d: file length after write is not correct. (%" PRId64
-               " should be %zd)\n\n",
-               __LINE__, retval, 3 * sizeof(data_out));
+        printf("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %zd)\n\n", __LINE__, retval,
+               3 * sizeof(data_out));
         exit(1);
     };
 
     make_data(data_out, ARRAY_LEN(data_out), 1);
-    test_read_or_die(psf, data_in, 1, sizeof(data_in), sizeof(data_in),
-                     __LINE__);
+    test_read_or_die(psf, data_in, 1, sizeof(data_in), sizeof(data_in), __LINE__);
     test_equal_or_die(data_out, data_in, ARRAY_LEN(data_out), __LINE__);
 
     make_data(data_out, ARRAY_LEN(data_out), 2);
-    test_read_or_die(psf, data_in, 1, sizeof(data_in), 2 * sizeof(data_in),
-                     __LINE__);
+    test_read_or_die(psf, data_in, 1, sizeof(data_in), 2 * sizeof(data_in), __LINE__);
     test_equal_or_die(data_out, data_in, ARRAY_LEN(data_out), __LINE__);
 
     make_data(data_out, ARRAY_LEN(data_out), 5);
-    test_read_or_die(psf, data_in, 1, sizeof(data_in), 3 * sizeof(data_in),
-                     __LINE__);
+    test_read_or_die(psf, data_in, 1, sizeof(data_in), 3 * sizeof(data_in), __LINE__);
     test_equal_or_die(data_out, data_in, ARRAY_LEN(data_out), __LINE__);
 
     test_close_or_die(psf, __LINE__);
@@ -323,8 +296,7 @@ static void file_truncate_test(const char *filename)
 	 */
     psf->file.mode = SFM_WRITE;
     test_open_or_die(psf, __LINE__);
-    test_write_or_die(psf, buffer, sizeof(buffer) / 2, 1, sizeof(buffer) / 2,
-                      __LINE__);
+    test_write_or_die(psf, buffer, sizeof(buffer) / 2, 1, sizeof(buffer) / 2, __LINE__);
     psf_ftruncate(psf, sizeof(buffer));
     test_close_or_die(psf, __LINE__);
 
@@ -337,16 +309,14 @@ static void file_truncate_test(const char *filename)
     for (k = 0; k < SIGNED_SIZEOF(buffer) / 2; k++)
         if (buffer[k] != 0xEE)
         {
-            printf("\n\nLine %d : buffer [%d] = %d (should be 0xEE)\n\n",
-                   __LINE__, k, buffer[k]);
+            printf("\n\nLine %d : buffer [%d] = %d (should be 0xEE)\n\n", __LINE__, k, buffer[k]);
             exit(1);
         };
 
     for (k = SIGNED_SIZEOF(buffer) / 2; k < SIGNED_SIZEOF(buffer); k++)
         if (buffer[k] != 0)
         {
-            printf("\n\nLine %d : buffer [%d] = %d (should be 0)\n\n", __LINE__,
-                   k, buffer[k]);
+            printf("\n\nLine %d : buffer [%d] = %d (should be 0)\n\n", __LINE__, k, buffer[k]);
             exit(1);
         };
 
@@ -409,8 +379,7 @@ static void test_open_or_die(SF_PRIVATE *psf, int linenum)
     error = psf_fopen(psf);
     if (error)
     {
-        printf("\n\nLine %d: psf_fopen() failed : %s\n\n", linenum,
-               strerror(errno));
+        printf("\n\nLine %d: psf_fopen() failed : %s\n\n", linenum, strerror(errno));
         exit(1);
     };
 }
@@ -420,66 +389,54 @@ static void test_close_or_die(SF_PRIVATE *psf, int linenum)
     psf_fclose(psf);
     if (psf_file_valid(psf))
     {
-        printf("\n\nLine %d: psf->file.filedes should not be valid.\n\n",
-               linenum);
+        printf("\n\nLine %d: psf->file.filedes should not be valid.\n\n", linenum);
         exit(1);
     };
 }
 
-static void test_write_or_die(SF_PRIVATE *psf, void *data, sf_count_t bytes,
-                              sf_count_t items, sf_count_t new_position,
-                              int linenum)
+static void test_write_or_die(SF_PRIVATE *psf, void *data, sf_count_t bytes, sf_count_t items, sf_count_t new_position, int linenum)
 {
     sf_count_t retval;
 
     retval = psf_fwrite(data, bytes, items, psf);
     if (retval != items)
     {
-        printf("\n\nLine %d: psf_write() returned %" PRId64
-               " (should be %" PRId64 ")\n\n",
-               linenum, retval, items);
+        printf("\n\nLine %d: psf_write() returned %" PRId64 " (should be %" PRId64 ")\n\n", linenum, retval, items);
         exit(1);
     };
 
     if ((retval = psf_ftell(psf)) != new_position)
     {
-        printf("\n\nLine %d: file length after write is not correct. (%" PRId64
-               " should be %" PRId64 ")\n\n",
-               linenum, retval, new_position);
+        printf("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %" PRId64 ")\n\n", linenum, retval,
+               new_position);
         exit(1);
     };
 
     return;
 }
 
-static void test_read_or_die(SF_PRIVATE *psf, void *data, sf_count_t bytes,
-                             sf_count_t items, sf_count_t new_position,
-                             int linenum)
+static void test_read_or_die(SF_PRIVATE *psf, void *data, sf_count_t bytes, sf_count_t items, sf_count_t new_position, int linenum)
 {
     sf_count_t retval;
 
     retval = psf_fread(data, bytes, items, psf);
     if (retval != items)
     {
-        printf("\n\nLine %d: psf_write() returned %" PRId64
-               " (should be %" PRId64 ")\n\n",
-               linenum, retval, items);
+        printf("\n\nLine %d: psf_write() returned %" PRId64 " (should be %" PRId64 ")\n\n", linenum, retval, items);
         exit(1);
     };
 
     if ((retval = psf_ftell(psf)) != new_position)
     {
-        printf("\n\nLine %d: file length after write is not correct. (%" PRId64
-               " should be %" PRId64 ")\n\n",
-               linenum, retval, new_position);
+        printf("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %" PRId64 ")\n\n", linenum, retval,
+               new_position);
         exit(1);
     };
 
     return;
 }
 
-static void test_seek_or_die(SF_PRIVATE *psf, sf_count_t offset, int whence,
-                             sf_count_t new_position, int linenum)
+static void test_seek_or_die(SF_PRIVATE *psf, sf_count_t offset, int whence, sf_count_t new_position, int linenum)
 {
     sf_count_t retval;
 
@@ -487,15 +444,13 @@ static void test_seek_or_die(SF_PRIVATE *psf, sf_count_t offset, int whence,
 
     if (retval != new_position)
     {
-        printf("\n\nLine %d: psf_fseek() failed. New position is %" PRId64
-               " (should be %" PRId64 ").\n\n",
-               linenum, retval, new_position);
+        printf("\n\nLine %d: psf_fseek() failed. New position is %" PRId64 " (should be %" PRId64 ").\n\n", linenum, retval,
+               new_position);
         exit(1);
     };
 }
 
-static void test_tell_or_die(SF_PRIVATE *psf, sf_count_t expected_position,
-                             int linenum)
+static void test_tell_or_die(SF_PRIVATE *psf, sf_count_t expected_position, int linenum)
 {
     sf_count_t retval;
 
@@ -503,8 +458,8 @@ static void test_tell_or_die(SF_PRIVATE *psf, sf_count_t expected_position,
 
     if (retval != expected_position)
     {
-        printf("\n\nLine %d: psf_ftell() failed. Position reported as %" PRId64 " (should be %" PRId64 ").\n\n",
-               linenum, retval, expected_position);
+        printf("\n\nLine %d: psf_ftell() failed. Position reported as %" PRId64 " (should be %" PRId64 ").\n\n", linenum, retval,
+               expected_position);
         exit(1);
     };
 }
@@ -515,8 +470,7 @@ static void test_equal_or_die(int *array1, int *array2, int len, int linenum)
 
     for (k = 0; k < len; k++)
         if (array1[k] != array2[k])
-            printf("\n\nLine %d: error at index %d (%d != %d).\n\n", linenum, k,
-                   array1[k], array2[k]);
+            printf("\n\nLine %d: error at index %d (%d != %d).\n\n", linenum, k, array1[k], array2[k]);
 
     return;
 }

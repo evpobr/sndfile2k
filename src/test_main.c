@@ -36,8 +36,7 @@ static void test_file_offsets_are_64_bit(void)
     // The Windows specific code path uses the 64 bit file I/O APIs.
     if (!USE_WINDOWS_API && sizeof(off_t) != 8)
     {
-        printf("\n\nError : sizeof (off_t) is %zd (should be 8).\n\n",
-               sizeof(off_t));
+        printf("\n\nError : sizeof (off_t) is %zd (should be 8).\n\n", sizeof(off_t));
         exit(1);
     };
 

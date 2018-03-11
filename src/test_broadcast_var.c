@@ -32,30 +32,28 @@ typedef SF_BROADCAST_INFO_VAR(BCAST_MAX) SF_BROADCAST_INFO_512;
 
 static void fill_coding_history(SF_BROADCAST_INFO_512 *bi)
 {
-    static const char *lines[] = {
-        "Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit.",
-        "Donec dignissim erat\nvehicula libero condimentum\ndictum porta augue "
-        "faucibus.",
-        "Maecenas nec turpis\nsit amet quam\nfaucibus adipiscing.",
-        "Mauris aliquam,\nlectus interdum\ntincidunt luctus.",
-        "\n\n\n\n\n\n\n\n\n\n\n\n",
-        "In auctor lorem\nvel est euismod\ncondimentum.",
-        "\n\n\n\n\n\n\n\n\n\n\n\n",
-        "Ut vitae magna\nid dui placerat vehicula\nin id lectus.",
-        "\n\n\n\n\n\n\n\n\n\n\n\n",
-        "Sed lacus leo,\nmolestie et luctus ac,\ntincidunt sit amet nisi.",
-        "\n\n\n\n\n\n\n\n\n\n\n\n",
-        "Sed ligula neque,\ngravida semper vulputate laoreet,\ngravida eu "
-        "tellus.",
-        "Donec dolor dolor,\nscelerisque in consequat ornare,\ntempor nec "
-        "nisl."};
+    static const char *lines[] = {"Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit.",
+                                  "Donec dignissim erat\nvehicula libero condimentum\ndictum porta augue "
+                                  "faucibus.",
+                                  "Maecenas nec turpis\nsit amet quam\nfaucibus adipiscing.",
+                                  "Mauris aliquam,\nlectus interdum\ntincidunt luctus.",
+                                  "\n\n\n\n\n\n\n\n\n\n\n\n",
+                                  "In auctor lorem\nvel est euismod\ncondimentum.",
+                                  "\n\n\n\n\n\n\n\n\n\n\n\n",
+                                  "Ut vitae magna\nid dui placerat vehicula\nin id lectus.",
+                                  "\n\n\n\n\n\n\n\n\n\n\n\n",
+                                  "Sed lacus leo,\nmolestie et luctus ac,\ntincidunt sit amet nisi.",
+                                  "\n\n\n\n\n\n\n\n\n\n\n\n",
+                                  "Sed ligula neque,\ngravida semper vulputate laoreet,\ngravida eu "
+                                  "tellus.",
+                                  "Donec dolor dolor,\nscelerisque in consequat ornare,\ntempor nec "
+                                  "nisl."};
     int k;
 
     bi->coding_history[0] = 0;
 
     for (k = 0; strlen(bi->coding_history) < bi->coding_history_size - 1; k++)
-        append_snprintf(bi->coding_history, bi->coding_history_size, "%s\n",
-                        lines[k % ARRAY_LEN(lines)]);
+        append_snprintf(bi->coding_history, bi->coding_history_size, "%s\n", lines[k % ARRAY_LEN(lines)]);
 
     return;
 }
@@ -106,8 +104,7 @@ static void test_broadcast_var_zero(void)
 
     if (psf->broadcast_16k->coding_history_size != 0)
     {
-        printf("\n\nLine %d: coding_history_size %d should be zero.\n\n",
-               __LINE__, psf->broadcast_16k->coding_history_size);
+        printf("\n\nLine %d: coding_history_size %d should be zero.\n\n", __LINE__, psf->broadcast_16k->coding_history_size);
         exit(1);
     };
 

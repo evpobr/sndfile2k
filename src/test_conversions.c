@@ -37,11 +37,11 @@
 do \
 if(ival != tval)                        \
     \
-{                                \
+{                                  \
         printf(str, line, ival, tval);  \
         exit(1);                        \
     \
-}                                \
+}                                  \
     while (0)                           \
         ;
 
@@ -60,8 +60,7 @@ static void conversion_test(char endian)
 
     snprintf(format_str, sizeof(format_str), "%c12348", endian);
 
-    snprintf(test_name, sizeof(test_name), "Testing %s conversions",
-             endian == 'e' ? "little endian" : "big endian");
+    snprintf(test_name, sizeof(test_name), "Testing %s conversions", endian == 'e' ? "little endian" : "big endian");
     print_test_name(test_name);
 
     psf = &sf_private;
@@ -103,14 +102,10 @@ static void conversion_test(char endian)
     };
 
     cmp_test(__LINE__, i8, t8, "\n\nLine %d : 8 bit int failed %d -> %d.\n\n");
-    cmp_test(__LINE__, i16, t16,
-             "\n\nLine %d : 16 bit int failed 0x%x -> 0x%x.\n\n");
-    cmp_test(__LINE__, i24, t24,
-             "\n\nLine %d : 24 bit int failed 0x%x -> 0x%x.\n\n");
-    cmp_test(__LINE__, i32, t32,
-             "\n\nLine %d : 32 bit int failed 0x%x -> 0x%x.\n\n");
-    cmp_test(__LINE__, i64, t64, "\n\nLine %d : 64 bit int failed 0x%" PRIx64
-                                 "x -> 0x%" PRIx64 "x.\n\n");
+    cmp_test(__LINE__, i16, t16, "\n\nLine %d : 16 bit int failed 0x%x -> 0x%x.\n\n");
+    cmp_test(__LINE__, i24, t24, "\n\nLine %d : 24 bit int failed 0x%x -> 0x%x.\n\n");
+    cmp_test(__LINE__, i32, t32, "\n\nLine %d : 32 bit int failed 0x%x -> 0x%x.\n\n");
+    cmp_test(__LINE__, i64, t64, "\n\nLine %d : 64 bit int failed 0x%" PRIx64 "x -> 0x%" PRIx64 "x.\n\n");
 
     remove(filename);
     puts("ok");

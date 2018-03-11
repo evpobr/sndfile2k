@@ -33,6 +33,7 @@
 
 #include "utils.h"
 
+// clang-format off
 static unsigned char aifc_data[] = {
     'F', 'O', 'R', 'M', 0x00, 0x00, 0x01, 0xE8, /* FORM length */
 
@@ -83,6 +84,7 @@ static unsigned char aifc_data[] = {
     0xFA, 0x33, 0xEC, 0x32, 0xC8, 0xCF, 0x05, 0xB0, 0x0B, 0x61, 0x33, 0x19,
     0xCE, 0x37, 0xEF, 0xD4, 0x21, 0x9D, 0xFA, 0xAE,
 };
+// clang-format on
 
 static void rw_test(const char *filename);
 
@@ -113,8 +115,7 @@ static void rw_test(const char *filename)
     /* Open the file in read only mode and fill in the SF_INFO struct. */
     if ((file = sf_open(filename, SFM_READ, &sfinfo_rd)) == NULL)
     {
-        printf("\n\nLine %d : sf_open SFM_READ failed : %s\n\n", __LINE__,
-               sf_strerror(NULL));
+        printf("\n\nLine %d : sf_open SFM_READ failed : %s\n\n", __LINE__, sf_strerror(NULL));
         exit(1);
     };
     check_log_buffer_or_die(file, __LINE__);
@@ -123,8 +124,7 @@ static void rw_test(const char *filename)
     /* Now open read/write and close the file. */
     if ((file = sf_open(filename, SFM_RDWR, &sfinfo_rw)) == NULL)
     {
-        printf("\n\nLine %d : sf_open SFM_RDWR failed : %s\n\n", __LINE__,
-               sf_strerror(NULL));
+        printf("\n\nLine %d : sf_open SFM_RDWR failed : %s\n\n", __LINE__, sf_strerror(NULL));
         exit(1);
     };
     check_log_buffer_or_die(file, __LINE__);
@@ -134,8 +134,7 @@ static void rw_test(const char *filename)
     memset(&sfinfo_rw, 0, sizeof(sfinfo_rw));
     if ((file = sf_open(filename, SFM_READ, &sfinfo_rw)) == NULL)
     {
-        printf("\n\nLine %d : sf_open SFM_RDWR failed : %s\n\n", __LINE__,
-               sf_strerror(NULL));
+        printf("\n\nLine %d : sf_open SFM_RDWR failed : %s\n\n", __LINE__, sf_strerror(NULL));
         exit(1);
     };
     check_log_buffer_or_die(file, __LINE__);
@@ -144,23 +143,20 @@ static void rw_test(const char *filename)
     /* Now compare the two. */
     if (sfinfo_rd.format != sfinfo_rw.format)
     {
-        printf("\n\nLine %d : format mismatch (0x%08X != 0x%08X).\n\n",
-               __LINE__, sfinfo_rd.format, sfinfo_rw.format);
+        printf("\n\nLine %d : format mismatch (0x%08X != 0x%08X).\n\n", __LINE__, sfinfo_rd.format, sfinfo_rw.format);
         exit(1);
     };
 
     if (sfinfo_rd.channels != sfinfo_rw.channels)
     {
-        printf("\n\nLine %d : channel count mismatch (%d != %d).\n\n", __LINE__,
-               sfinfo_rd.channels, sfinfo_rw.channels);
+        printf("\n\nLine %d : channel count mismatch (%d != %d).\n\n", __LINE__, sfinfo_rd.channels, sfinfo_rw.channels);
         exit(1);
     };
 
     if (sfinfo_rd.frames != sfinfo_rw.frames)
     {
-        printf("\n\nLine %d : frame count mismatch (rd %" PRId64
-               " != rw %" PRId64 ").\n\n",
-               __LINE__, sfinfo_rd.frames, sfinfo_rw.frames);
+        printf("\n\nLine %d : frame count mismatch (rd %" PRId64 " != rw %" PRId64 ").\n\n", __LINE__, sfinfo_rd.frames,
+               sfinfo_rw.frames);
         exit(1);
     };
 

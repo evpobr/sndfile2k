@@ -38,14 +38,10 @@
 #define BUFFER_LENGTH (10000)
 #define SAMPLE_RATE (44010)
 
-static void short_lrw_test(const char *filename, int filetype,
-                           const short *output, int out_len);
-static void int_lrw_test(const char *filename, int filetype, const int *output,
-                         int out_len);
-static void float_lrw_test(const char *filename, int filetype,
-                           const float *output, int out_len);
-static void double_lrw_test(const char *filename, int filetype,
-                            const double *output, int out_len);
+static void short_lrw_test(const char *filename, int filetype, const short *output, int out_len);
+static void int_lrw_test(const char *filename, int filetype, const int *output, int out_len);
+static void float_lrw_test(const char *filename, int filetype, const float *output, int out_len);
+static void double_lrw_test(const char *filename, int filetype, const double *output, int out_len);
 
 static short short_data[BUFFER_LENGTH];
 static int int_data[BUFFER_LENGTH];
@@ -79,21 +75,16 @@ int main(int argc, char *argv[])
 
     if (do_all || strcmp(argv[1], "alac") == 0)
     {
-        short_lrw_test("alac.caf", SF_FORMAT_CAF | SF_FORMAT_ALAC_16,
-                       short_data, ARRAY_LEN(short_data));
-        int_lrw_test("alac.caf", SF_FORMAT_CAF | SF_FORMAT_ALAC_32, int_data,
-                     ARRAY_LEN(int_data));
-        float_lrw_test("alac.caf", SF_FORMAT_CAF | SF_FORMAT_ALAC_32,
-                       float_data, ARRAY_LEN(float_data));
-        double_lrw_test("alac.caf", SF_FORMAT_CAF | SF_FORMAT_ALAC_32,
-                        double_data, ARRAY_LEN(double_data));
+        short_lrw_test("alac.caf", SF_FORMAT_CAF | SF_FORMAT_ALAC_16, short_data, ARRAY_LEN(short_data));
+        int_lrw_test("alac.caf", SF_FORMAT_CAF | SF_FORMAT_ALAC_32, int_data, ARRAY_LEN(int_data));
+        float_lrw_test("alac.caf", SF_FORMAT_CAF | SF_FORMAT_ALAC_32, float_data, ARRAY_LEN(float_data));
+        double_lrw_test("alac.caf", SF_FORMAT_CAF | SF_FORMAT_ALAC_32, double_data, ARRAY_LEN(double_data));
     };
 
     return 0;
 }
 
-static void short_lrw_test(const char *filename, int filetype,
-                           const short *output, int out_len)
+static void short_lrw_test(const char *filename, int filetype, const short *output, int out_len)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -102,16 +93,14 @@ static void short_lrw_test(const char *filename, int filetype,
 
     print_test_name("short_lrw_test", filename);
 
-    exit_if_true(BUFFER_LENGTH > out_len, "\n\nLine %d: Bad array length.\n",
-                 __LINE__);
+    exit_if_true(BUFFER_LENGTH > out_len, "\n\nLine %d: Bad array length.\n", __LINE__);
 
     sfinfo.samplerate = SAMPLE_RATE;
     sfinfo.frames = out_len;
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_short_or_die(file, 0, output, out_len, __LINE__);
 
@@ -119,20 +108,14 @@ static void short_lrw_test(const char *filename, int filetype,
 
     memset(input, 0, sizeof(input));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
-    exit_if_true(sfinfo.format != filetype,
-                 "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-                 __LINE__, filetype, sfinfo.format);
-    exit_if_true(
-        sfinfo.frames < out_len,
-        "\n\nLine %d: Incorrect number of frames in file (too short). (%" PRId64
-        " should be %d)\n",
-        __LINE__, sfinfo.frames, DFT_DATA_LENGTH);
-    exit_if_true(sfinfo.channels != 1,
-                 "\n\nLine %d: Incorrect number of channels in file.\n",
-                 __LINE__);
+    exit_if_true(sfinfo.format != filetype, "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype,
+                 sfinfo.format);
+    exit_if_true(sfinfo.frames < out_len,
+                 "\n\nLine %d: Incorrect number of frames in file (too short). (%" PRId64 " should be %d)\n", __LINE__,
+                 sfinfo.frames, DFT_DATA_LENGTH);
+    exit_if_true(sfinfo.channels != 1, "\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
 
     check_log_buffer_or_die(file, __LINE__);
 
@@ -141,9 +124,8 @@ static void short_lrw_test(const char *filename, int filetype,
     sf_close(file);
 
     for (k = 0; k < out_len; k++)
-        exit_if_true(input[k] != output[k],
-                     "\n\nLine: %d: Error on input %d, expected %d, got %d\n",
-                     __LINE__, k, output[k], input[k]);
+        exit_if_true(input[k] != output[k], "\n\nLine: %d: Error on input %d, expected %d, got %d\n", __LINE__, k, output[k],
+                     input[k]);
 
     puts("ok");
     unlink(filename);
@@ -151,8 +133,7 @@ static void short_lrw_test(const char *filename, int filetype,
     return;
 }
 
-static void int_lrw_test(const char *filename, int filetype, const int *output,
-                         int out_len)
+static void int_lrw_test(const char *filename, int filetype, const int *output, int out_len)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -161,16 +142,14 @@ static void int_lrw_test(const char *filename, int filetype, const int *output,
 
     print_test_name("int_lrw_test", filename);
 
-    exit_if_true(BUFFER_LENGTH > out_len, "\n\nLine %d: Bad array length.\n",
-                 __LINE__);
+    exit_if_true(BUFFER_LENGTH > out_len, "\n\nLine %d: Bad array length.\n", __LINE__);
 
     sfinfo.samplerate = SAMPLE_RATE;
     sfinfo.frames = out_len;
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_int_or_die(file, 0, output, out_len, __LINE__);
 
@@ -178,20 +157,13 @@ static void int_lrw_test(const char *filename, int filetype, const int *output,
 
     memset(input, 0, sizeof(input));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
-    exit_if_true(sfinfo.format != filetype,
-                 "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-                 __LINE__, filetype, sfinfo.format);
-    exit_if_true(
-        sfinfo.frames < out_len,
-        "\n\nLine %d: Incorrect number of frames in file (too int). (%" PRId64
-        " should be %d)\n",
-        __LINE__, sfinfo.frames, DFT_DATA_LENGTH);
-    exit_if_true(sfinfo.channels != 1,
-                 "\n\nLine %d: Incorrect number of channels in file.\n",
-                 __LINE__);
+    exit_if_true(sfinfo.format != filetype, "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype,
+                 sfinfo.format);
+    exit_if_true(sfinfo.frames < out_len, "\n\nLine %d: Incorrect number of frames in file (too int). (%" PRId64 " should be %d)\n",
+                 __LINE__, sfinfo.frames, DFT_DATA_LENGTH);
+    exit_if_true(sfinfo.channels != 1, "\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
 
     check_log_buffer_or_die(file, __LINE__);
 
@@ -200,9 +172,8 @@ static void int_lrw_test(const char *filename, int filetype, const int *output,
     sf_close(file);
 
     for (k = 0; k < out_len; k++)
-        exit_if_true(input[k] != output[k],
-                     "\n\nLine: %d: Error on input %d, expected %d, got %d\n",
-                     __LINE__, k, output[k], input[k]);
+        exit_if_true(input[k] != output[k], "\n\nLine: %d: Error on input %d, expected %d, got %d\n", __LINE__, k, output[k],
+                     input[k]);
 
     puts("ok");
     unlink(filename);
@@ -210,8 +181,7 @@ static void int_lrw_test(const char *filename, int filetype, const int *output,
     return;
 }
 
-static void float_lrw_test(const char *filename, int filetype,
-                           const float *output, int out_len)
+static void float_lrw_test(const char *filename, int filetype, const float *output, int out_len)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -220,16 +190,14 @@ static void float_lrw_test(const char *filename, int filetype,
 
     print_test_name("float_lrw_test", filename);
 
-    exit_if_true(BUFFER_LENGTH > out_len, "\n\nLine %d: Bad array length.\n",
-                 __LINE__);
+    exit_if_true(BUFFER_LENGTH > out_len, "\n\nLine %d: Bad array length.\n", __LINE__);
 
     sfinfo.samplerate = SAMPLE_RATE;
     sfinfo.frames = out_len;
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_float_or_die(file, 0, output, out_len, __LINE__);
 
@@ -237,20 +205,14 @@ static void float_lrw_test(const char *filename, int filetype,
 
     memset(input, 0, sizeof(input));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
-    exit_if_true(sfinfo.format != filetype,
-                 "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-                 __LINE__, filetype, sfinfo.format);
-    exit_if_true(
-        sfinfo.frames < out_len,
-        "\n\nLine %d: Incorrect number of frames in file (too float). (%" PRId64
-        " should be %d)\n",
-        __LINE__, sfinfo.frames, DFT_DATA_LENGTH);
-    exit_if_true(sfinfo.channels != 1,
-                 "\n\nLine %d: Incorrect number of channels in file.\n",
-                 __LINE__);
+    exit_if_true(sfinfo.format != filetype, "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype,
+                 sfinfo.format);
+    exit_if_true(sfinfo.frames < out_len,
+                 "\n\nLine %d: Incorrect number of frames in file (too float). (%" PRId64 " should be %d)\n", __LINE__,
+                 sfinfo.frames, DFT_DATA_LENGTH);
+    exit_if_true(sfinfo.channels != 1, "\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
 
     check_log_buffer_or_die(file, __LINE__);
 
@@ -259,9 +221,8 @@ static void float_lrw_test(const char *filename, int filetype,
     sf_close(file);
 
     for (k = 0; k < out_len; k++)
-        exit_if_true(fabs(input[k] - output[k]) > 0.00001,
-                     "\n\nLine: %d: Error on input %d, expected %f, got %f\n",
-                     __LINE__, k, output[k], input[k]);
+        exit_if_true(fabs(input[k] - output[k]) > 0.00001, "\n\nLine: %d: Error on input %d, expected %f, got %f\n", __LINE__, k,
+                     output[k], input[k]);
 
     puts("ok");
     unlink(filename);
@@ -269,8 +230,7 @@ static void float_lrw_test(const char *filename, int filetype,
     return;
 }
 
-static void double_lrw_test(const char *filename, int filetype,
-                            const double *output, int out_len)
+static void double_lrw_test(const char *filename, int filetype, const double *output, int out_len)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -279,16 +239,14 @@ static void double_lrw_test(const char *filename, int filetype,
 
     print_test_name("double_lrw_test", filename);
 
-    exit_if_true(BUFFER_LENGTH > out_len, "\n\nLine %d: Bad array length.\n",
-                 __LINE__);
+    exit_if_true(BUFFER_LENGTH > out_len, "\n\nLine %d: Bad array length.\n", __LINE__);
 
     sfinfo.samplerate = SAMPLE_RATE;
     sfinfo.frames = out_len;
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_double_or_die(file, 0, output, out_len, __LINE__);
 
@@ -296,19 +254,14 @@ static void double_lrw_test(const char *filename, int filetype,
 
     memset(input, 0, sizeof(input));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
-    exit_if_true(sfinfo.format != filetype,
-                 "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-                 __LINE__, filetype, sfinfo.format);
-    exit_if_true(sfinfo.frames < out_len, "\n\nLine %d: Incorrect number of "
-                                          "frames in file (too double). "
-                                          "(%" PRId64 " should be %d)\n",
+    exit_if_true(sfinfo.format != filetype, "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype,
+                 sfinfo.format);
+    exit_if_true(sfinfo.frames < out_len,
+                 "\n\nLine %d: Incorrect number of frames in file (too double). (%" PRId64 " should be %d)\n",
                  __LINE__, sfinfo.frames, DFT_DATA_LENGTH);
-    exit_if_true(sfinfo.channels != 1,
-                 "\n\nLine %d: Incorrect number of channels in file.\n",
-                 __LINE__);
+    exit_if_true(sfinfo.channels != 1, "\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
 
     check_log_buffer_or_die(file, __LINE__);
 
@@ -317,9 +270,8 @@ static void double_lrw_test(const char *filename, int filetype,
     sf_close(file);
 
     for (k = 0; k < out_len; k++)
-        exit_if_true(fabs(input[k] - output[k]) > 0.00001,
-                     "\n\nLine: %d: Error on input %d, expected %f, got %f\n",
-                     __LINE__, k, output[k], input[k]);
+        exit_if_true(fabs(input[k] - output[k]) > 0.00001, "\n\nLine: %d: Error on input %d, expected %f, got %f\n", __LINE__, k,
+                     output[k], input[k]);
 
     puts("ok");
     unlink(filename);

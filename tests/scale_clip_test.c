@@ -44,23 +44,15 @@
 #define SINE_AMP (1.1)
 #define MAX_ERROR (0.0202)
 
-static void flt_scale_clip_test_16(const char *filename, int filetype,
-                                   float maxval);
-static void flt_scale_clip_test_24(const char *filename, int filetype,
-                                   float maxval);
-static void flt_scale_clip_test_32(const char *filename, int filetype,
-                                   float maxval);
-static void flt_scale_clip_test_08(const char *filename, int filetype,
-                                   float maxval);
+static void flt_scale_clip_test_16(const char *filename, int filetype, float maxval);
+static void flt_scale_clip_test_24(const char *filename, int filetype, float maxval);
+static void flt_scale_clip_test_32(const char *filename, int filetype, float maxval);
+static void flt_scale_clip_test_08(const char *filename, int filetype, float maxval);
 
-static void dbl_scale_clip_test_16(const char *filename, int filetype,
-                                   float maxval);
-static void dbl_scale_clip_test_24(const char *filename, int filetype,
-                                   float maxval);
-static void dbl_scale_clip_test_32(const char *filename, int filetype,
-                                   float maxval);
-static void dbl_scale_clip_test_08(const char *filename, int filetype,
-                                   float maxval);
+static void dbl_scale_clip_test_16(const char *filename, int filetype, float maxval);
+static void dbl_scale_clip_test_24(const char *filename, int filetype, float maxval);
+static void dbl_scale_clip_test_32(const char *filename, int filetype, float maxval);
+static void dbl_scale_clip_test_08(const char *filename, int filetype, float maxval);
 
 static void flt_short_clip_read_test(const char *filename, int filetype);
 static void flt_int_clip_read_test(const char *filename, int filetype);
@@ -88,82 +80,45 @@ static BUFFER buffer_in;
 
 int main(void)
 {
-    flt_scale_clip_test_08("scale_clip_s8.au", SF_FORMAT_AU | SF_FORMAT_PCM_S8,
-                           1.0 * 0x80);
-    flt_scale_clip_test_08("scale_clip_u8.wav",
-                           SF_FORMAT_WAV | SF_FORMAT_PCM_U8, 1.0 * 0x80);
+    flt_scale_clip_test_08("scale_clip_s8.au", SF_FORMAT_AU | SF_FORMAT_PCM_S8, 1.0 * 0x80);
+    flt_scale_clip_test_08("scale_clip_u8.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_U8, 1.0 * 0x80);
 
-    dbl_scale_clip_test_08("scale_clip_s8.au", SF_FORMAT_AU | SF_FORMAT_PCM_S8,
-                           1.0 * 0x80);
-    dbl_scale_clip_test_08("scale_clip_u8.wav",
-                           SF_FORMAT_WAV | SF_FORMAT_PCM_U8, 1.0 * 0x80);
+    dbl_scale_clip_test_08("scale_clip_s8.au", SF_FORMAT_AU | SF_FORMAT_PCM_S8, 1.0 * 0x80);
+    dbl_scale_clip_test_08("scale_clip_u8.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_U8, 1.0 * 0x80);
 
     /*
 	 * Now use SF_FORMAT_AU where possible because it allows both
 	 * big and little endian files.
 	 */
 
-    flt_scale_clip_test_16("scale_clip_be16.au",
-                           SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_PCM_16,
-                           1.0 * 0x8000);
-    flt_scale_clip_test_16("scale_clip_le16.au",
-                           SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_PCM_16,
-                           1.0 * 0x8000);
-    flt_scale_clip_test_24("scale_clip_be24.au",
-                           SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_PCM_24,
-                           1.0 * 0x800000);
-    flt_scale_clip_test_24("scale_clip_le24.au",
-                           SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_PCM_24,
-                           1.0 * 0x800000);
-    flt_scale_clip_test_32("scale_clip_be32.au",
-                           SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_PCM_32,
-                           1.0 * 0x80000000);
-    flt_scale_clip_test_32("scale_clip_le32.au",
-                           SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_PCM_32,
-                           1.0 * 0x80000000);
+    flt_scale_clip_test_16("scale_clip_be16.au", SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_PCM_16, 1.0 * 0x8000);
+    flt_scale_clip_test_16("scale_clip_le16.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_PCM_16, 1.0 * 0x8000);
+    flt_scale_clip_test_24("scale_clip_be24.au", SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_PCM_24, 1.0 * 0x800000);
+    flt_scale_clip_test_24("scale_clip_le24.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_PCM_24, 1.0 * 0x800000);
+    flt_scale_clip_test_32("scale_clip_be32.au", SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_PCM_32, 1.0 * 0x80000000);
+    flt_scale_clip_test_32("scale_clip_le32.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_PCM_32, 1.0 * 0x80000000);
 
-    dbl_scale_clip_test_16("scale_clip_be16.au",
-                           SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_PCM_16,
-                           1.0 * 0x8000);
-    dbl_scale_clip_test_16("scale_clip_le16.au",
-                           SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_PCM_16,
-                           1.0 * 0x8000);
-    dbl_scale_clip_test_24("scale_clip_be24.au",
-                           SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_PCM_24,
-                           1.0 * 0x800000);
-    dbl_scale_clip_test_24("scale_clip_le24.au",
-                           SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_PCM_24,
-                           1.0 * 0x800000);
-    dbl_scale_clip_test_32("scale_clip_be32.au",
-                           SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_PCM_32,
-                           1.0 * 0x80000000);
-    dbl_scale_clip_test_32("scale_clip_le32.au",
-                           SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_PCM_32,
-                           1.0 * 0x80000000);
+    dbl_scale_clip_test_16("scale_clip_be16.au", SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_PCM_16, 1.0 * 0x8000);
+    dbl_scale_clip_test_16("scale_clip_le16.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_PCM_16, 1.0 * 0x8000);
+    dbl_scale_clip_test_24("scale_clip_be24.au", SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_PCM_24, 1.0 * 0x800000);
+    dbl_scale_clip_test_24("scale_clip_le24.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_PCM_24, 1.0 * 0x800000);
+    dbl_scale_clip_test_32("scale_clip_be32.au", SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_PCM_32, 1.0 * 0x80000000);
+    dbl_scale_clip_test_32("scale_clip_le32.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_PCM_32, 1.0 * 0x80000000);
 
-    flt_short_clip_read_test("flt_short.au",
-                             SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_FLOAT);
-    flt_int_clip_read_test("flt_int.au",
-                           SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_FLOAT);
-    dbl_short_clip_read_test("dbl_short.au",
-                             SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_DOUBLE);
-    dbl_int_clip_read_test("dbl_int.au",
-                           SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_DOUBLE);
+    flt_short_clip_read_test("flt_short.au", SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_FLOAT);
+    flt_int_clip_read_test("flt_int.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_FLOAT);
+    dbl_short_clip_read_test("dbl_short.au", SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_DOUBLE);
+    dbl_int_clip_read_test("dbl_int.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_DOUBLE);
 
-    short_flt_scale_write_test("short_flt.au",
-                               SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_FLOAT);
-    int_flt_scale_write_test("int_flt.au",
-                             SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_FLOAT);
-    short_dbl_scale_write_test("short_dbl.au",
-                               SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_DOUBLE);
-    int_dbl_scale_write_test(
-        "int_dbl.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_DOUBLE);
+    short_flt_scale_write_test("short_flt.au", SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_FLOAT);
+    int_flt_scale_write_test("int_flt.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_FLOAT);
+    short_dbl_scale_write_test("short_dbl.au", SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_DOUBLE);
+    int_dbl_scale_write_test("int_dbl.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_DOUBLE);
 
     return 0;
 }
 
-static void flt_scale_clip_test_16(const char *filename, int filetype,
-                                   float maxval)
+static void flt_scale_clip_test_16(const char *filename, int filetype, float maxval)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -183,8 +138,7 @@ static void flt_scale_clip_test_16(const char *filename, int filetype,
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
@@ -194,41 +148,34 @@ static void flt_scale_clip_test_16(const char *filename, int filetype,
 	 * un-normalized and clipped.
 	 */
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_SET_CLIPPING, NULL, SF_TRUE);
     test_write_float_or_die(file, 0, data_out, HALF_BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE);
-    test_write_float_or_die(file, 0, data_out + HALF_BUFFER_SIZE,
-                            HALF_BUFFER_SIZE, __LINE__);
+    test_write_float_or_die(file, 0, data_out + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     memset(&buffer_in, 0, sizeof(buffer_in));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
     if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != BUFFER_SIZE)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64
-               ").\n\n",
-               __LINE__, BUFFER_SIZE, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64 ").\n\n", __LINE__, BUFFER_SIZE, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n\n", __LINE__);
         exit(1);
     };
 
@@ -236,8 +183,7 @@ static void flt_scale_clip_test_16(const char *filename, int filetype,
 
     test_read_float_or_die(file, 0, data_in, HALF_BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE);
-    test_read_float_or_die(file, 0, data_in + HALF_BUFFER_SIZE,
-                           HALF_BUFFER_SIZE, __LINE__);
+    test_read_float_or_die(file, 0, data_in + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     /* Check normalized version. */
@@ -254,8 +200,7 @@ static void flt_scale_clip_test_16(const char *filename, int filetype,
 
         if (data_out[k] * data_in[k] < 0.0)
         {
-            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n",
-                   __LINE__, k, BUFFER_SIZE);
+            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n", __LINE__, k, BUFFER_SIZE);
             exit(1);
         };
 
@@ -269,17 +214,13 @@ static void flt_scale_clip_test_16(const char *filename, int filetype,
 
     if (clip_max_diff < 1e-20)
     {
-        printf(
-            "\n\nLine %d: Clipping difference (%e) too small (normalized).\n\n",
-            __LINE__, clip_max_diff);
+        printf("\n\nLine %d: Clipping difference (%e) too small (normalized).\n\n", __LINE__, clip_max_diff);
         exit(1);
     };
 
     if (clip_max_diff > 1.0 / 0x8000)
     {
-        printf(
-            "\n\nLine %d: Clipping difference (%e) too large (normalized).\n\n",
-            __LINE__, clip_max_diff);
+        printf("\n\nLine %d: Clipping difference (%e) too large (normalized).\n\n", __LINE__, clip_max_diff);
         exit(1);
     };
 
@@ -297,8 +238,7 @@ static void flt_scale_clip_test_16(const char *filename, int filetype,
 
         if (data_out[k] * data_in[k] < 0.0)
         {
-            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n",
-                   __LINE__, k, BUFFER_SIZE);
+            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n", __LINE__, k, BUFFER_SIZE);
             exit(1);
         };
 
@@ -330,8 +270,7 @@ static void flt_scale_clip_test_16(const char *filename, int filetype,
     unlink(filename);
 }
 
-static void flt_scale_clip_test_24(const char *filename, int filetype,
-                                   float maxval)
+static void flt_scale_clip_test_24(const char *filename, int filetype, float maxval)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -351,8 +290,7 @@ static void flt_scale_clip_test_24(const char *filename, int filetype,
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
@@ -362,41 +300,34 @@ static void flt_scale_clip_test_24(const char *filename, int filetype,
 	 * un-normalized and clipped.
 	 */
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_SET_CLIPPING, NULL, SF_TRUE);
     test_write_float_or_die(file, 0, data_out, HALF_BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE);
-    test_write_float_or_die(file, 0, data_out + HALF_BUFFER_SIZE,
-                            HALF_BUFFER_SIZE, __LINE__);
+    test_write_float_or_die(file, 0, data_out + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     memset(&buffer_in, 0, sizeof(buffer_in));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
     if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != BUFFER_SIZE)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64
-               ").\n\n",
-               __LINE__, BUFFER_SIZE, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64 ").\n\n", __LINE__, BUFFER_SIZE, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n\n", __LINE__);
         exit(1);
     };
 
@@ -404,8 +335,7 @@ static void flt_scale_clip_test_24(const char *filename, int filetype,
 
     test_read_float_or_die(file, 0, data_in, HALF_BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE);
-    test_read_float_or_die(file, 0, data_in + HALF_BUFFER_SIZE,
-                           HALF_BUFFER_SIZE, __LINE__);
+    test_read_float_or_die(file, 0, data_in + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     /* Check normalized version. */
@@ -422,8 +352,7 @@ static void flt_scale_clip_test_24(const char *filename, int filetype,
 
         if (data_out[k] * data_in[k] < 0.0)
         {
-            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n",
-                   __LINE__, k, BUFFER_SIZE);
+            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n", __LINE__, k, BUFFER_SIZE);
             exit(1);
         };
 
@@ -437,17 +366,13 @@ static void flt_scale_clip_test_24(const char *filename, int filetype,
 
     if (clip_max_diff < 1e-20)
     {
-        printf(
-            "\n\nLine %d: Clipping difference (%e) too small (normalized).\n\n",
-            __LINE__, clip_max_diff);
+        printf("\n\nLine %d: Clipping difference (%e) too small (normalized).\n\n", __LINE__, clip_max_diff);
         exit(1);
     };
 
     if (clip_max_diff > 1.0 / 0x800000)
     {
-        printf(
-            "\n\nLine %d: Clipping difference (%e) too large (normalized).\n\n",
-            __LINE__, clip_max_diff);
+        printf("\n\nLine %d: Clipping difference (%e) too large (normalized).\n\n", __LINE__, clip_max_diff);
         exit(1);
     };
 
@@ -465,8 +390,7 @@ static void flt_scale_clip_test_24(const char *filename, int filetype,
 
         if (data_out[k] * data_in[k] < 0.0)
         {
-            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n",
-                   __LINE__, k, BUFFER_SIZE);
+            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n", __LINE__, k, BUFFER_SIZE);
             exit(1);
         };
 
@@ -498,8 +422,7 @@ static void flt_scale_clip_test_24(const char *filename, int filetype,
     unlink(filename);
 }
 
-static void flt_scale_clip_test_32(const char *filename, int filetype,
-                                   float maxval)
+static void flt_scale_clip_test_32(const char *filename, int filetype, float maxval)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -519,8 +442,7 @@ static void flt_scale_clip_test_32(const char *filename, int filetype,
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
@@ -530,41 +452,34 @@ static void flt_scale_clip_test_32(const char *filename, int filetype,
 	 * un-normalized and clipped.
 	*/
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_SET_CLIPPING, NULL, SF_TRUE);
     test_write_float_or_die(file, 0, data_out, HALF_BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE);
-    test_write_float_or_die(file, 0, data_out + HALF_BUFFER_SIZE,
-                            HALF_BUFFER_SIZE, __LINE__);
+    test_write_float_or_die(file, 0, data_out + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     memset(&buffer_in, 0, sizeof(buffer_in));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
     if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != BUFFER_SIZE)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64
-               ").\n\n",
-               __LINE__, BUFFER_SIZE, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64 ").\n\n", __LINE__, BUFFER_SIZE, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n\n", __LINE__);
         exit(1);
     };
 
@@ -572,8 +487,7 @@ static void flt_scale_clip_test_32(const char *filename, int filetype,
 
     test_read_float_or_die(file, 0, data_in, HALF_BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE);
-    test_read_float_or_die(file, 0, data_in + HALF_BUFFER_SIZE,
-                           HALF_BUFFER_SIZE, __LINE__);
+    test_read_float_or_die(file, 0, data_in + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     /* Check normalized version. */
@@ -590,8 +504,7 @@ static void flt_scale_clip_test_32(const char *filename, int filetype,
 
         if (data_out[k] * data_in[k] < 0.0)
         {
-            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n",
-                   __LINE__, k, BUFFER_SIZE);
+            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n", __LINE__, k, BUFFER_SIZE);
             exit(1);
         };
 
@@ -605,17 +518,13 @@ static void flt_scale_clip_test_32(const char *filename, int filetype,
 
     if (clip_max_diff < 1e-20)
     {
-        printf(
-            "\n\nLine %d: Clipping difference (%e) too small (normalized).\n\n",
-            __LINE__, clip_max_diff);
+        printf("\n\nLine %d: Clipping difference (%e) too small (normalized).\n\n", __LINE__, clip_max_diff);
         exit(1);
     };
 
     if (clip_max_diff > 1.0 / 0x80000000)
     {
-        printf(
-            "\n\nLine %d: Clipping difference (%e) too large (normalized).\n\n",
-            __LINE__, clip_max_diff);
+        printf("\n\nLine %d: Clipping difference (%e) too large (normalized).\n\n", __LINE__, clip_max_diff);
         exit(1);
     };
 
@@ -633,8 +542,7 @@ static void flt_scale_clip_test_32(const char *filename, int filetype,
 
         if (data_out[k] * data_in[k] < 0.0)
         {
-            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n",
-                   __LINE__, k, BUFFER_SIZE);
+            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n", __LINE__, k, BUFFER_SIZE);
             exit(1);
         };
 
@@ -666,8 +574,7 @@ static void flt_scale_clip_test_32(const char *filename, int filetype,
     unlink(filename);
 }
 
-static void flt_scale_clip_test_08(const char *filename, int filetype,
-                                   float maxval)
+static void flt_scale_clip_test_08(const char *filename, int filetype, float maxval)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -687,8 +594,7 @@ static void flt_scale_clip_test_08(const char *filename, int filetype,
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
@@ -698,41 +604,34 @@ static void flt_scale_clip_test_08(const char *filename, int filetype,
 	 * un-normalized and clipped.
 	 */
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_SET_CLIPPING, NULL, SF_TRUE);
     test_write_float_or_die(file, 0, data_out, HALF_BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE);
-    test_write_float_or_die(file, 0, data_out + HALF_BUFFER_SIZE,
-                            HALF_BUFFER_SIZE, __LINE__);
+    test_write_float_or_die(file, 0, data_out + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     memset(&buffer_in, 0, sizeof(buffer_in));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
     if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != BUFFER_SIZE)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64
-               ").\n\n",
-               __LINE__, BUFFER_SIZE, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64 ").\n\n", __LINE__, BUFFER_SIZE, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n\n", __LINE__);
         exit(1);
     };
 
@@ -740,8 +639,7 @@ static void flt_scale_clip_test_08(const char *filename, int filetype,
 
     test_read_float_or_die(file, 0, data_in, HALF_BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE);
-    test_read_float_or_die(file, 0, data_in + HALF_BUFFER_SIZE,
-                           HALF_BUFFER_SIZE, __LINE__);
+    test_read_float_or_die(file, 0, data_in + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     /* Check normalized version. */
@@ -758,8 +656,7 @@ static void flt_scale_clip_test_08(const char *filename, int filetype,
 
         if (data_out[k] * data_in[k] < 0.0)
         {
-            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n",
-                   __LINE__, k, BUFFER_SIZE);
+            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n", __LINE__, k, BUFFER_SIZE);
             exit(1);
         };
 
@@ -773,17 +670,13 @@ static void flt_scale_clip_test_08(const char *filename, int filetype,
 
     if (clip_max_diff < 1e-20)
     {
-        printf(
-            "\n\nLine %d: Clipping difference (%e) too small (normalized).\n\n",
-            __LINE__, clip_max_diff);
+        printf("\n\nLine %d: Clipping difference (%e) too small (normalized).\n\n", __LINE__, clip_max_diff);
         exit(1);
     };
 
     if (clip_max_diff > 1.0 / 0x80)
     {
-        printf(
-            "\n\nLine %d: Clipping difference (%e) too large (normalized).\n\n",
-            __LINE__, clip_max_diff);
+        printf("\n\nLine %d: Clipping difference (%e) too large (normalized).\n\n", __LINE__, clip_max_diff);
         exit(1);
     };
 
@@ -801,8 +694,7 @@ static void flt_scale_clip_test_08(const char *filename, int filetype,
 
         if (data_out[k] * data_in[k] < 0.0)
         {
-            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n",
-                   __LINE__, k, BUFFER_SIZE);
+            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n", __LINE__, k, BUFFER_SIZE);
             exit(1);
         };
 
@@ -834,8 +726,7 @@ static void flt_scale_clip_test_08(const char *filename, int filetype,
     unlink(filename);
 }
 
-static void dbl_scale_clip_test_16(const char *filename, int filetype,
-                                   float maxval)
+static void dbl_scale_clip_test_16(const char *filename, int filetype, float maxval)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -855,8 +746,7 @@ static void dbl_scale_clip_test_16(const char *filename, int filetype,
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
@@ -866,41 +756,34 @@ static void dbl_scale_clip_test_16(const char *filename, int filetype,
 	 * un-normalized and clipped.
 	 */
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_SET_CLIPPING, NULL, SF_TRUE);
     test_write_double_or_die(file, 0, data_out, HALF_BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
-    test_write_double_or_die(file, 0, data_out + HALF_BUFFER_SIZE,
-                             HALF_BUFFER_SIZE, __LINE__);
+    test_write_double_or_die(file, 0, data_out + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     memset(&buffer_in, 0, sizeof(buffer_in));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
     if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != BUFFER_SIZE)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64
-               ").\n\n",
-               __LINE__, BUFFER_SIZE, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64 ").\n\n", __LINE__, BUFFER_SIZE, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n\n", __LINE__);
         exit(1);
     };
 
@@ -908,8 +791,7 @@ static void dbl_scale_clip_test_16(const char *filename, int filetype,
 
     test_read_double_or_die(file, 0, data_in, HALF_BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
-    test_read_double_or_die(file, 0, data_in + HALF_BUFFER_SIZE,
-                            HALF_BUFFER_SIZE, __LINE__);
+    test_read_double_or_die(file, 0, data_in + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     /* Check normalized version. */
@@ -926,8 +808,7 @@ static void dbl_scale_clip_test_16(const char *filename, int filetype,
 
         if (data_out[k] * data_in[k] < 0.0)
         {
-            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n",
-                   __LINE__, k, BUFFER_SIZE);
+            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n", __LINE__, k, BUFFER_SIZE);
             exit(1);
         };
 
@@ -941,17 +822,13 @@ static void dbl_scale_clip_test_16(const char *filename, int filetype,
 
     if (clip_max_diff < 1e-20)
     {
-        printf(
-            "\n\nLine %d: Clipping difference (%e) too small (normalized).\n\n",
-            __LINE__, clip_max_diff);
+        printf("\n\nLine %d: Clipping difference (%e) too small (normalized).\n\n", __LINE__, clip_max_diff);
         exit(1);
     };
 
     if (clip_max_diff > 1.0 / 0x8000)
     {
-        printf(
-            "\n\nLine %d: Clipping difference (%e) too large (normalized).\n\n",
-            __LINE__, clip_max_diff);
+        printf("\n\nLine %d: Clipping difference (%e) too large (normalized).\n\n", __LINE__, clip_max_diff);
         exit(1);
     };
 
@@ -969,8 +846,7 @@ static void dbl_scale_clip_test_16(const char *filename, int filetype,
 
         if (data_out[k] * data_in[k] < 0.0)
         {
-            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n",
-                   __LINE__, k, BUFFER_SIZE);
+            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n", __LINE__, k, BUFFER_SIZE);
             exit(1);
         };
 
@@ -1002,8 +878,7 @@ static void dbl_scale_clip_test_16(const char *filename, int filetype,
     unlink(filename);
 }
 
-static void dbl_scale_clip_test_24(const char *filename, int filetype,
-                                   float maxval)
+static void dbl_scale_clip_test_24(const char *filename, int filetype, float maxval)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -1023,8 +898,7 @@ static void dbl_scale_clip_test_24(const char *filename, int filetype,
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
@@ -1034,41 +908,34 @@ static void dbl_scale_clip_test_24(const char *filename, int filetype,
 	 * un-normalized and clipped.
 	 */
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_SET_CLIPPING, NULL, SF_TRUE);
     test_write_double_or_die(file, 0, data_out, HALF_BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
-    test_write_double_or_die(file, 0, data_out + HALF_BUFFER_SIZE,
-                             HALF_BUFFER_SIZE, __LINE__);
+    test_write_double_or_die(file, 0, data_out + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     memset(&buffer_in, 0, sizeof(buffer_in));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
     if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != BUFFER_SIZE)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64
-               ").\n\n",
-               __LINE__, BUFFER_SIZE, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64 ").\n\n", __LINE__, BUFFER_SIZE, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n\n", __LINE__);
         exit(1);
     };
 
@@ -1076,8 +943,7 @@ static void dbl_scale_clip_test_24(const char *filename, int filetype,
 
     test_read_double_or_die(file, 0, data_in, HALF_BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
-    test_read_double_or_die(file, 0, data_in + HALF_BUFFER_SIZE,
-                            HALF_BUFFER_SIZE, __LINE__);
+    test_read_double_or_die(file, 0, data_in + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     /* Check normalized version. */
@@ -1094,8 +960,7 @@ static void dbl_scale_clip_test_24(const char *filename, int filetype,
 
         if (data_out[k] * data_in[k] < 0.0)
         {
-            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n",
-                   __LINE__, k, BUFFER_SIZE);
+            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n", __LINE__, k, BUFFER_SIZE);
             exit(1);
         };
 
@@ -1109,17 +974,13 @@ static void dbl_scale_clip_test_24(const char *filename, int filetype,
 
     if (clip_max_diff < 1e-20)
     {
-        printf(
-            "\n\nLine %d: Clipping difference (%e) too small (normalized).\n\n",
-            __LINE__, clip_max_diff);
+        printf("\n\nLine %d: Clipping difference (%e) too small (normalized).\n\n", __LINE__, clip_max_diff);
         exit(1);
     };
 
     if (clip_max_diff > 1.0 / 0x800000)
     {
-        printf(
-            "\n\nLine %d: Clipping difference (%e) too large (normalized).\n\n",
-            __LINE__, clip_max_diff);
+        printf("\n\nLine %d: Clipping difference (%e) too large (normalized).\n\n", __LINE__, clip_max_diff);
         exit(1);
     };
 
@@ -1137,8 +998,7 @@ static void dbl_scale_clip_test_24(const char *filename, int filetype,
 
         if (data_out[k] * data_in[k] < 0.0)
         {
-            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n",
-                   __LINE__, k, BUFFER_SIZE);
+            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n", __LINE__, k, BUFFER_SIZE);
             exit(1);
         };
 
@@ -1170,8 +1030,7 @@ static void dbl_scale_clip_test_24(const char *filename, int filetype,
     unlink(filename);
 }
 
-static void dbl_scale_clip_test_32(const char *filename, int filetype,
-                                   float maxval)
+static void dbl_scale_clip_test_32(const char *filename, int filetype, float maxval)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -1191,8 +1050,7 @@ static void dbl_scale_clip_test_32(const char *filename, int filetype,
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
@@ -1202,41 +1060,34 @@ static void dbl_scale_clip_test_32(const char *filename, int filetype,
 	 * un-normalized and clipped.
 	 */
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_SET_CLIPPING, NULL, SF_TRUE);
     test_write_double_or_die(file, 0, data_out, HALF_BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
-    test_write_double_or_die(file, 0, data_out + HALF_BUFFER_SIZE,
-                             HALF_BUFFER_SIZE, __LINE__);
+    test_write_double_or_die(file, 0, data_out + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     memset(&buffer_in, 0, sizeof(buffer_in));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
     if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != BUFFER_SIZE)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64
-               ").\n\n",
-               __LINE__, BUFFER_SIZE, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64 ").\n\n", __LINE__, BUFFER_SIZE, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n\n", __LINE__);
         exit(1);
     };
 
@@ -1244,8 +1095,7 @@ static void dbl_scale_clip_test_32(const char *filename, int filetype,
 
     test_read_double_or_die(file, 0, data_in, HALF_BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
-    test_read_double_or_die(file, 0, data_in + HALF_BUFFER_SIZE,
-                            HALF_BUFFER_SIZE, __LINE__);
+    test_read_double_or_die(file, 0, data_in + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     /* Check normalized version. */
@@ -1262,8 +1112,7 @@ static void dbl_scale_clip_test_32(const char *filename, int filetype,
 
         if (data_out[k] * data_in[k] < 0.0)
         {
-            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n",
-                   __LINE__, k, BUFFER_SIZE);
+            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n", __LINE__, k, BUFFER_SIZE);
             exit(1);
         };
 
@@ -1277,17 +1126,13 @@ static void dbl_scale_clip_test_32(const char *filename, int filetype,
 
     if (clip_max_diff < 1e-20)
     {
-        printf(
-            "\n\nLine %d: Clipping difference (%e) too small (normalized).\n\n",
-            __LINE__, clip_max_diff);
+        printf("\n\nLine %d: Clipping difference (%e) too small (normalized).\n\n", __LINE__, clip_max_diff);
         exit(1);
     };
 
     if (clip_max_diff > 1.0 / 0x80000000)
     {
-        printf(
-            "\n\nLine %d: Clipping difference (%e) too large (normalized).\n\n",
-            __LINE__, clip_max_diff);
+        printf("\n\nLine %d: Clipping difference (%e) too large (normalized).\n\n", __LINE__, clip_max_diff);
         exit(1);
     };
 
@@ -1305,8 +1150,7 @@ static void dbl_scale_clip_test_32(const char *filename, int filetype,
 
         if (data_out[k] * data_in[k] < 0.0)
         {
-            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n",
-                   __LINE__, k, BUFFER_SIZE);
+            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n", __LINE__, k, BUFFER_SIZE);
             exit(1);
         };
 
@@ -1338,8 +1182,7 @@ static void dbl_scale_clip_test_32(const char *filename, int filetype,
     unlink(filename);
 }
 
-static void dbl_scale_clip_test_08(const char *filename, int filetype,
-                                   float maxval)
+static void dbl_scale_clip_test_08(const char *filename, int filetype, float maxval)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -1359,8 +1202,7 @@ static void dbl_scale_clip_test_08(const char *filename, int filetype,
     };
 
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
@@ -1370,41 +1212,34 @@ static void dbl_scale_clip_test_08(const char *filename, int filetype,
 	 * un-normalized and clipped.
 	 */
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_SET_CLIPPING, NULL, SF_TRUE);
     test_write_double_or_die(file, 0, data_out, HALF_BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
-    test_write_double_or_die(file, 0, data_out + HALF_BUFFER_SIZE,
-                             HALF_BUFFER_SIZE, __LINE__);
+    test_write_double_or_die(file, 0, data_out + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     memset(&buffer_in, 0, sizeof(buffer_in));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
     if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != BUFFER_SIZE)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64
-               ").\n\n",
-               __LINE__, BUFFER_SIZE, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64 ").\n\n", __LINE__, BUFFER_SIZE, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n\n", __LINE__);
         exit(1);
     };
 
@@ -1412,8 +1247,7 @@ static void dbl_scale_clip_test_08(const char *filename, int filetype,
 
     test_read_double_or_die(file, 0, data_in, HALF_BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
-    test_read_double_or_die(file, 0, data_in + HALF_BUFFER_SIZE,
-                            HALF_BUFFER_SIZE, __LINE__);
+    test_read_double_or_die(file, 0, data_in + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     /* Check normalized version. */
@@ -1430,8 +1264,7 @@ static void dbl_scale_clip_test_08(const char *filename, int filetype,
 
         if (data_out[k] * data_in[k] < 0.0)
         {
-            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n",
-                   __LINE__, k, BUFFER_SIZE);
+            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n", __LINE__, k, BUFFER_SIZE);
             exit(1);
         };
 
@@ -1445,17 +1278,13 @@ static void dbl_scale_clip_test_08(const char *filename, int filetype,
 
     if (clip_max_diff < 1e-20)
     {
-        printf(
-            "\n\nLine %d: Clipping difference (%e) too small (normalized).\n\n",
-            __LINE__, clip_max_diff);
+        printf("\n\nLine %d: Clipping difference (%e) too small (normalized).\n\n", __LINE__, clip_max_diff);
         exit(1);
     };
 
     if (clip_max_diff > 1.0 / 0x80)
     {
-        printf(
-            "\n\nLine %d: Clipping difference (%e) too large (normalized).\n\n",
-            __LINE__, clip_max_diff);
+        printf("\n\nLine %d: Clipping difference (%e) too large (normalized).\n\n", __LINE__, clip_max_diff);
         exit(1);
     };
 
@@ -1473,8 +1302,7 @@ static void dbl_scale_clip_test_08(const char *filename, int filetype,
 
         if (data_out[k] * data_in[k] < 0.0)
         {
-            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n",
-                   __LINE__, k, BUFFER_SIZE);
+            printf("\n\nLine %d: Data wrap around at index %d/%d.\n\n", __LINE__, k, BUFFER_SIZE);
             exit(1);
         };
 
@@ -1528,44 +1356,37 @@ static void flt_short_clip_read_test(const char *filename, int filetype)
 
     memset(&sfinfo, 0, sizeof(sfinfo));
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
     /* Save unclipped data to the file. */
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     test_write_float_or_die(file, 0, data_out, BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE);
 
     sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
     if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != BUFFER_SIZE)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64
-               ").\n\n",
-               __LINE__, BUFFER_SIZE, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64 ").\n\n", __LINE__, BUFFER_SIZE, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n\n", __LINE__);
         exit(1);
     };
 
@@ -1581,12 +1402,10 @@ static void flt_short_clip_read_test(const char *filename, int filetype)
     for (k = 0; k < sfinfo.frames; k++)
     {
         /* Check if data_out has different sign from data_in. */
-        if ((data_out[k] < 0.0 && data_in[k] > 0) ||
-            (data_out[k] > 0.0 && data_in[k] < 0))
+        if ((data_out[k] < 0.0 && data_in[k] > 0) || (data_out[k] > 0.0 && data_in[k] < 0))
         {
-            printf(
-                "\n\nLine %d: Data wrap around at index %d/%d  (%f -> %d).\n\n",
-                __LINE__, k, BUFFER_SIZE, data_out[k], data_in[k]);
+            printf("\n\nLine %d: Data wrap around at index %d/%d  (%f -> %d).\n\n", __LINE__, k, BUFFER_SIZE, data_out[k],
+                   data_in[k]);
             exit(1);
         };
         max_value = (max_value > abs(data_in[k])) ? max_value : abs(data_in[k]);
@@ -1618,44 +1437,37 @@ static void flt_int_clip_read_test(const char *filename, int filetype)
 
     memset(&sfinfo, 0, sizeof(sfinfo));
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
     /* Save unclipped data to the file. */
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     test_write_float_or_die(file, 0, data_out, BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE);
 
     sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
     if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != BUFFER_SIZE)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64
-               ").\n\n",
-               __LINE__, BUFFER_SIZE, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64 ").\n\n", __LINE__, BUFFER_SIZE, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n\n", __LINE__);
         exit(1);
     };
 
@@ -1671,12 +1483,10 @@ static void flt_int_clip_read_test(const char *filename, int filetype)
     for (k = 0; k < sfinfo.frames; k++)
     {
         /* Check if data_out has different sign from data_in. */
-        if ((data_out[k] < 0.0 && data_in[k] > 0) ||
-            (data_out[k] > 0.0 && data_in[k] < 0))
+        if ((data_out[k] < 0.0 && data_in[k] > 0) || (data_out[k] > 0.0 && data_in[k] < 0))
         {
-            printf(
-                "\n\nLine %d: Data wrap around at index %d/%d  (%f -> %d).\n\n",
-                __LINE__, k, BUFFER_SIZE, data_out[k], data_in[k]);
+            printf("\n\nLine %d: Data wrap around at index %d/%d  (%f -> %d).\n\n", __LINE__, k, BUFFER_SIZE, data_out[k],
+                   data_in[k]);
             exit(1);
         };
         max_value = (max_value > abs(data_in[k])) ? max_value : abs(data_in[k]);
@@ -1708,44 +1518,37 @@ static void dbl_short_clip_read_test(const char *filename, int filetype)
 
     memset(&sfinfo, 0, sizeof(sfinfo));
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
     /* Save unclipped data to the file. */
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     test_write_double_or_die(file, 0, data_out, BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE);
 
     sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
     if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != BUFFER_SIZE)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64
-               ").\n\n",
-               __LINE__, BUFFER_SIZE, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64 ").\n\n", __LINE__, BUFFER_SIZE, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n\n", __LINE__);
         exit(1);
     };
 
@@ -1761,12 +1564,10 @@ static void dbl_short_clip_read_test(const char *filename, int filetype)
     for (k = 0; k < sfinfo.frames; k++)
     {
         /* Check if data_out has different sign from data_in. */
-        if ((data_out[k] < 0.0 && data_in[k] > 0) ||
-            (data_out[k] > 0.0 && data_in[k] < 0))
+        if ((data_out[k] < 0.0 && data_in[k] > 0) || (data_out[k] > 0.0 && data_in[k] < 0))
         {
-            printf(
-                "\n\nLine %d: Data wrap around at index %d/%d  (%f -> %d).\n\n",
-                __LINE__, k, BUFFER_SIZE, data_out[k], data_in[k]);
+            printf("\n\nLine %d: Data wrap around at index %d/%d  (%f -> %d).\n\n", __LINE__, k, BUFFER_SIZE, data_out[k],
+                   data_in[k]);
             exit(1);
         };
         max_value = (max_value > abs(data_in[k])) ? max_value : abs(data_in[k]);
@@ -1798,44 +1599,37 @@ static void dbl_int_clip_read_test(const char *filename, int filetype)
 
     memset(&sfinfo, 0, sizeof(sfinfo));
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
     /* Save unclipped data to the file. */
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     test_write_double_or_die(file, 0, data_out, BUFFER_SIZE, __LINE__);
     sf_close(file);
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
     sf_command(file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE);
 
     sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
     if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != BUFFER_SIZE)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64
-               ").\n\n",
-               __LINE__, BUFFER_SIZE, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64 ").\n\n", __LINE__, BUFFER_SIZE, sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n\n", __LINE__);
         exit(1);
     };
 
@@ -1851,12 +1645,10 @@ static void dbl_int_clip_read_test(const char *filename, int filetype)
     for (k = 0; k < sfinfo.frames; k++)
     {
         /* Check if data_out has different sign from data_in. */
-        if ((data_out[k] < 0.0 && data_in[k] > 0) ||
-            (data_out[k] > 0.0 && data_in[k] < 0))
+        if ((data_out[k] < 0.0 && data_in[k] > 0) || (data_out[k] > 0.0 && data_in[k] < 0))
         {
-            printf(
-                "\n\nLine %d: Data wrap around at index %d/%d  (%f -> %d).\n\n",
-                __LINE__, k, BUFFER_SIZE, data_out[k], data_in[k]);
+            printf("\n\nLine %d: Data wrap around at index %d/%d  (%f -> %d).\n\n", __LINE__, k, BUFFER_SIZE, data_out[k],
+                   data_in[k]);
             exit(1);
         };
         max_value = (max_value > abs(data_in[k])) ? max_value : abs(data_in[k]);
@@ -1884,13 +1676,11 @@ static void short_flt_scale_write_test(const char *filename, int filetype)
 
     memset(&sfinfo, 0, sizeof(sfinfo));
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     test_write_short_or_die(file, 0, data_out, BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_SCALE_INT_FLOAT_WRITE, NULL, SF_TRUE);
     test_write_short_or_die(file, 0, data_out, BUFFER_SIZE, __LINE__);
@@ -1900,30 +1690,26 @@ static void short_flt_scale_write_test(const char *filename, int filetype)
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
     if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != 3 * BUFFER_SIZE)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64
-               ").\n\n",
-               __LINE__, 3 * BUFFER_SIZE, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64 ").\n\n", __LINE__, 3 * BUFFER_SIZE,
+               sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n\n", __LINE__);
         exit(1);
     };
 
@@ -1934,13 +1720,11 @@ static void short_flt_scale_write_test(const char *filename, int filetype)
 
     max_value = 0.0;
     for (k = 0; k < BUFFER_SIZE; k++)
-        max_value =
-            (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
+        max_value = (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
 
     if (max_value < 1000.0)
     {
-        printf("\n\nLine %d: Max value (%f) < 1000.0.\n\n", __LINE__,
-               max_value);
+        printf("\n\nLine %d: Max value (%f) < 1000.0.\n\n", __LINE__, max_value);
         exit(1);
     };
 
@@ -1949,8 +1733,7 @@ static void short_flt_scale_write_test(const char *filename, int filetype)
 
     max_value = 0.0;
     for (k = 0; k < BUFFER_SIZE; k++)
-        max_value =
-            (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
+        max_value = (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
 
     if (max_value > 1.0)
     {
@@ -1963,13 +1746,11 @@ static void short_flt_scale_write_test(const char *filename, int filetype)
 
     max_value = 0.0;
     for (k = 0; k < BUFFER_SIZE; k++)
-        max_value =
-            (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
+        max_value = (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
 
     if (max_value < 1000.0)
     {
-        printf("\n\nLine %d: Max value (%f) < 1000.0.\n\n", __LINE__,
-               max_value);
+        printf("\n\nLine %d: Max value (%f) < 1000.0.\n\n", __LINE__, max_value);
         exit(1);
     };
 
@@ -1997,13 +1778,11 @@ static void short_dbl_scale_write_test(const char *filename, int filetype)
 
     memset(&sfinfo, 0, sizeof(sfinfo));
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     test_write_short_or_die(file, 0, data_out, BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_SCALE_INT_FLOAT_WRITE, NULL, SF_TRUE);
     test_write_short_or_die(file, 0, data_out, BUFFER_SIZE, __LINE__);
@@ -2013,30 +1792,26 @@ static void short_dbl_scale_write_test(const char *filename, int filetype)
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
     if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != 3 * BUFFER_SIZE)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64
-               ").\n\n",
-               __LINE__, 3 * BUFFER_SIZE, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64 ").\n\n", __LINE__, 3 * BUFFER_SIZE,
+               sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n\n", __LINE__);
         exit(1);
     };
 
@@ -2047,13 +1822,11 @@ static void short_dbl_scale_write_test(const char *filename, int filetype)
 
     max_value = 0.0;
     for (k = 0; k < BUFFER_SIZE; k++)
-        max_value =
-            (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
+        max_value = (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
 
     if (max_value < 1000.0)
     {
-        printf("\n\nLine %d: Max value (%f) < 1000.0.\n\n", __LINE__,
-               max_value);
+        printf("\n\nLine %d: Max value (%f) < 1000.0.\n\n", __LINE__, max_value);
         exit(1);
     };
 
@@ -2062,8 +1835,7 @@ static void short_dbl_scale_write_test(const char *filename, int filetype)
 
     max_value = 0.0;
     for (k = 0; k < BUFFER_SIZE; k++)
-        max_value =
-            (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
+        max_value = (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
 
     if (max_value > 1.0)
     {
@@ -2076,13 +1848,11 @@ static void short_dbl_scale_write_test(const char *filename, int filetype)
 
     max_value = 0.0;
     for (k = 0; k < BUFFER_SIZE; k++)
-        max_value =
-            (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
+        max_value = (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
 
     if (max_value < 1000.0)
     {
-        printf("\n\nLine %d: Max value (%f) < 1000.0.\n\n", __LINE__,
-               max_value);
+        printf("\n\nLine %d: Max value (%f) < 1000.0.\n\n", __LINE__, max_value);
         exit(1);
     };
 
@@ -2106,18 +1876,15 @@ static void int_flt_scale_write_test(const char *filename, int filetype)
     data_in = buffer_in.flt;
 
     for (k = 0; k < BUFFER_SIZE; k++)
-        data_out[k] =
-            lrintf(0x7FFFFFFF * 0.995 * sin(4 * M_PI * k / BUFFER_SIZE));
+        data_out[k] = lrintf(0x7FFFFFFF * 0.995 * sin(4 * M_PI * k / BUFFER_SIZE));
 
     memset(&sfinfo, 0, sizeof(sfinfo));
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     test_write_int_or_die(file, 0, data_out, BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_SCALE_INT_FLOAT_WRITE, NULL, SF_TRUE);
     test_write_int_or_die(file, 0, data_out, BUFFER_SIZE, __LINE__);
@@ -2127,30 +1894,26 @@ static void int_flt_scale_write_test(const char *filename, int filetype)
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
     if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != 3 * BUFFER_SIZE)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64
-               ").\n\n",
-               __LINE__, 3 * BUFFER_SIZE, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64 ").\n\n", __LINE__, 3 * BUFFER_SIZE,
+               sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n\n", __LINE__);
         exit(1);
     };
 
@@ -2161,13 +1924,11 @@ static void int_flt_scale_write_test(const char *filename, int filetype)
 
     max_value = 0.0;
     for (k = 0; k < BUFFER_SIZE; k++)
-        max_value =
-            (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
+        max_value = (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
 
     if (max_value < 1000.0)
     {
-        printf("\n\nLine %d: Max value (%f) < 1000.0.\n\n", __LINE__,
-               max_value);
+        printf("\n\nLine %d: Max value (%f) < 1000.0.\n\n", __LINE__, max_value);
         exit(1);
     };
 
@@ -2176,8 +1937,7 @@ static void int_flt_scale_write_test(const char *filename, int filetype)
 
     max_value = 0.0;
     for (k = 0; k < BUFFER_SIZE; k++)
-        max_value =
-            (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
+        max_value = (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
 
     if (max_value > 1.0)
     {
@@ -2190,13 +1950,11 @@ static void int_flt_scale_write_test(const char *filename, int filetype)
 
     max_value = 0.0;
     for (k = 0; k < BUFFER_SIZE; k++)
-        max_value =
-            (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
+        max_value = (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
 
     if (max_value < 1000.0)
     {
-        printf("\n\nLine %d: Max value (%f) < 1000.0.\n\n", __LINE__,
-               max_value);
+        printf("\n\nLine %d: Max value (%f) < 1000.0.\n\n", __LINE__, max_value);
         exit(1);
     };
 
@@ -2220,18 +1978,15 @@ static void int_dbl_scale_write_test(const char *filename, int filetype)
     data_in = buffer_in.dbl;
 
     for (k = 0; k < BUFFER_SIZE; k++)
-        data_out[k] =
-            lrint(0x7FFFFFFF * 0.995 * sin(4 * M_PI * k / BUFFER_SIZE));
+        data_out[k] = lrint(0x7FFFFFFF * 0.995 * sin(4 * M_PI * k / BUFFER_SIZE));
 
     memset(&sfinfo, 0, sizeof(sfinfo));
     sfinfo.samplerate = 44100;
-    sfinfo.frames =
-        123456789; /* Wrong length. Library should correct this on sf_close. */
+    sfinfo.frames = 123456789; /* Wrong length. Library should correct this on sf_close. */
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     test_write_int_or_die(file, 0, data_out, BUFFER_SIZE, __LINE__);
     sf_command(file, SFC_SET_SCALE_INT_FLOAT_WRITE, NULL, SF_TRUE);
     test_write_int_or_die(file, 0, data_out, BUFFER_SIZE, __LINE__);
@@ -2241,30 +1996,26 @@ static void int_dbl_scale_write_test(const char *filename, int filetype)
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK);
 
     if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != 3 * BUFFER_SIZE)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64
-               ").\n\n",
-               __LINE__, 3 * BUFFER_SIZE, sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file (%d => %" PRId64 ").\n\n", __LINE__, 3 * BUFFER_SIZE,
+               sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n\n", __LINE__);
         exit(1);
     };
 
@@ -2275,13 +2026,11 @@ static void int_dbl_scale_write_test(const char *filename, int filetype)
 
     max_value = 0.0;
     for (k = 0; k < BUFFER_SIZE; k++)
-        max_value =
-            (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
+        max_value = (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
 
     if (max_value < 1000.0)
     {
-        printf("\n\nLine %d: Max value (%f) < 1000.0.\n\n", __LINE__,
-               max_value);
+        printf("\n\nLine %d: Max value (%f) < 1000.0.\n\n", __LINE__, max_value);
         exit(1);
     };
 
@@ -2290,8 +2039,7 @@ static void int_dbl_scale_write_test(const char *filename, int filetype)
 
     max_value = 0.0;
     for (k = 0; k < BUFFER_SIZE; k++)
-        max_value =
-            (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
+        max_value = (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
 
     if (max_value > 1.0)
     {
@@ -2304,13 +2052,11 @@ static void int_dbl_scale_write_test(const char *filename, int filetype)
 
     max_value = 0.0;
     for (k = 0; k < BUFFER_SIZE; k++)
-        max_value =
-            (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
+        max_value = (max_value > fabs(data_in[k])) ? max_value : fabs(data_in[k]);
 
     if (max_value < 1000.0)
     {
-        printf("\n\nLine %d: Max value (%f) < 1000.0.\n\n", __LINE__,
-               max_value);
+        printf("\n\nLine %d: Max value (%f) < 1000.0.\n\n", __LINE__, max_value);
         exit(1);
     };
 

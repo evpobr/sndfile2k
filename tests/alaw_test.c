@@ -94,8 +94,7 @@ int main(void)
     for (k = 0; k < 0x10000; k++)
         if (alaw_encode(short_buffer[k]) != alaw_buffer[k])
         {
-            printf("Encoder error : sample #%d (0x%02X should be 0x%02X)\n", k,
-                   alaw_buffer[k], alaw_encode(short_buffer[k]));
+            printf("Encoder error : sample #%d (0x%02X should be 0x%02X)\n", k, alaw_buffer[k], alaw_encode(short_buffer[k]));
             exit(1);
         };
 
@@ -144,8 +143,7 @@ int main(void)
     for (k = 0; k < 256; k++)
         if (short_buffer[k] != alaw_decode(alaw_buffer[k]))
         {
-            printf("Decoder error : sample #%d (0x%02X should be 0x%02X)\n", k,
-                   short_buffer[k], alaw_decode(alaw_buffer[k]));
+            printf("Decoder error : sample #%d (0x%02X should be 0x%02X)\n", k, short_buffer[k], alaw_decode(alaw_buffer[k]));
             exit(1);
         };
 
@@ -158,7 +156,7 @@ int main(void)
     return 0;
 }
 
-/*=================================================================================
+/*===============================================================================
 **	The following routines came from the sox-12.15 (Sound eXcahcnge) distribution.
 **
 **	This code is not compiled into libsndfile. It is only used to test the
@@ -180,13 +178,10 @@ int main(void)
 
 static unsigned char alaw_encode(int sample)
 {
-    static int exp_lut[128] = {
-        1, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5,
-        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-        6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7,
-        7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-        7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-        7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7};
+    static int exp_lut[128] = {1, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+                               6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+                               7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+                               7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7};
 
     int sign, exponent, mantissa;
     unsigned char Alawbyte;

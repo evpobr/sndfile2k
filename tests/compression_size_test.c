@@ -76,11 +76,9 @@ static void vorbis_test(void)
         const char *errstr;
 
         errstr = sf_strerror(NULL);
-        if (strstr(errstr, "Sample rate chosen is known to trigger a Vorbis") ==
-            NULL)
+        if (strstr(errstr, "Sample rate chosen is known to trigger a Vorbis") == NULL)
         {
-            printf("Line %d: sf_open (SFM_WRITE) failed : %s\n", __LINE__,
-                   errstr);
+            printf("Line %d: sf_open (SFM_WRITE) failed : %s\n", __LINE__, errstr);
             dump_log_buffer(NULL);
             exit(1);
         };
@@ -88,30 +86,24 @@ static void vorbis_test(void)
         printf("\n                                  Sample rate -> 32kHz    ");
         sfinfo.samplerate = 32000;
 
-        file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE,
-                                     __LINE__);
+        file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     };
 
-    test_write_float_or_die(file, 0, float_data, ARRAY_LEN(float_data),
-                            __LINE__);
+    test_write_float_or_die(file, 0, float_data, ARRAY_LEN(float_data), __LINE__);
     sf_close(file);
 
     memset(float_data, 0, sizeof(float_data));
 
     /* Read the file back in again. */
     memset(&sfinfo, 0, sizeof(sfinfo));
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
-    test_read_float_or_die(file, 0, float_data, ARRAY_LEN(float_data),
-                           __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    test_read_float_or_die(file, 0, float_data, ARRAY_LEN(float_data), __LINE__);
     sf_close(file);
 
     for (k = 0; k < ARRAY_LEN(float_data); k++)
         max_abs = max_float(max_abs, fabs(float_data[k]));
 
-    exit_if_true(max_abs > 1.023,
-                 "\n\nLine %d : max_abs %f should be < 1.023.\n\n", __LINE__,
-                 max_abs);
+    exit_if_true(max_abs > 1.023, "\n\nLine %d : max_abs %f should be < 1.023.\n\n", __LINE__, max_abs);
 
     puts("ok");
     unlink(filename);
@@ -147,25 +139,19 @@ static void compression_size_test(int format, const char *filename)
     sfinfo.samplerate = SAMPLE_RATE;
 
     /* Write the output file. */
-    q3_file =
-        test_open_file_or_die(q3_fname, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
-    q6_file =
-        test_open_file_or_die(q6_fname, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
+    q3_file = test_open_file_or_die(q3_fname, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
+    q6_file = test_open_file_or_die(q6_fname, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
 
     quality = 0.3;
-    sf_command(q3_file, SFC_SET_VBR_ENCODING_QUALITY, &quality,
-               sizeof(quality));
+    sf_command(q3_file, SFC_SET_VBR_ENCODING_QUALITY, &quality, sizeof(quality));
     quality = 0.6;
-    sf_command(q6_file, SFC_SET_VBR_ENCODING_QUALITY, &quality,
-               sizeof(quality));
+    sf_command(q6_file, SFC_SET_VBR_ENCODING_QUALITY, &quality, sizeof(quality));
 
     for (k = 0; k < 5; k++)
     {
         gen_lowpass_signal_float(data_out, ARRAY_LEN(data_out));
-        test_write_float_or_die(q3_file, 0, data_out, ARRAY_LEN(data_out),
-                                __LINE__);
-        test_write_float_or_die(q6_file, 0, data_out, ARRAY_LEN(data_out),
-                                __LINE__);
+        test_write_float_or_die(q3_file, 0, data_out, ARRAY_LEN(data_out), __LINE__);
+        test_write_float_or_die(q6_file, 0, data_out, ARRAY_LEN(data_out), __LINE__);
     };
 
     sf_close(q3_file);
@@ -174,9 +160,7 @@ static void compression_size_test(int format, const char *filename)
     q3_size = file_length(q3_fname);
     q6_size = file_length(q6_fname);
 
-    exit_if_true(q3_size >= q6_size,
-                 "\n\nLine %d : q3 size (%d) >= q6 size (%d)\n\n", __LINE__,
-                 q3_size, q6_size);
+    exit_if_true(q3_size >= q6_size, "\n\nLine %d : q3 size (%d) >= q6 size (%d)\n\n", __LINE__, q3_size, q6_size);
 
     puts("ok");
     unlink(q3_fname);
@@ -199,8 +183,7 @@ int main(int argc, char *argv[])
     };
 
 #if !defined(HAVE_XIPH_CODECS)
-    puts("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled "
-         "in.");
+    puts("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.");
     return 0;
 #endif
 

@@ -47,8 +47,7 @@
 #define LOG_BUFFER_SIZE (1024)
 
 static void update_header_test(const char *filename, int typemajor);
-static void update_header_before_write_test(const char *filename,
-                                            int typemajor);
+static void update_header_before_write_test(const char *filename, int typemajor);
 
 static void update_seek_short_test(const char *filename, int filetype);
 static void update_seek_int_test(const char *filename, int filetype);
@@ -267,8 +266,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-static void update_header_sub(const char *filename, int typemajor,
-                              int write_mode)
+static void update_header_sub(const char *filename, int typemajor, int write_mode)
 {
     SNDFILE *outfile, *infile;
     SF_INFO sfinfo;
@@ -279,8 +277,7 @@ static void update_header_sub(const char *filename, int typemajor,
     sfinfo.format = (typemajor | SF_FORMAT_PCM_16);
     sfinfo.channels = 1;
 
-    outfile =
-        test_open_file_or_die(filename, write_mode, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, write_mode, &sfinfo, SF_TRUE, __LINE__);
 
     for (k = 0; k < BUFFER_LEN; k++)
         data_out[k] = k + 1;
@@ -289,8 +286,7 @@ static void update_header_sub(const char *filename, int typemajor,
     if (typemajor != SF_FORMAT_HTK)
     {
         /* The HTK header is not correct when the file is first written. */
-        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE,
-                                       __LINE__);
+        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
         sf_close(infile);
     };
 
@@ -300,15 +296,12 @@ static void update_header_sub(const char *filename, int typemajor,
 	** Open file and check log buffer for an error. If header update failed
 	** the the log buffer will contain errors.
 	*/
-    infile =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
     check_log_buffer_or_die(infile, __LINE__);
 
     if (sfinfo.frames < BUFFER_LEN || sfinfo.frames > BUFFER_LEN + 50)
     {
-        printf("\n\nLine %d : Incorrect sample count (%" PRId64
-               " should be %d)\n",
-               __LINE__, sfinfo.frames, BUFFER_LEN);
+        printf("\n\nLine %d : Incorrect sample count (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, BUFFER_LEN);
         dump_log_buffer(infile);
         exit(1);
     };
@@ -329,15 +322,12 @@ static void update_header_sub(const char *filename, int typemajor,
     test_write_int_or_die(outfile, 0, data_out, BUFFER_LEN, __LINE__);
 
     /* Open file again and make sure no errors in log buffer. */
-    infile =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
     check_log_buffer_or_die(infile, __LINE__);
 
     if (sfinfo.frames < 2 * BUFFER_LEN || sfinfo.frames > 2 * BUFFER_LEN + 50)
     {
-        printf("\n\nLine %d : Incorrect sample count (%" PRId64
-               " should be %d)\n",
-               __LINE__, sfinfo.frames, 2 * BUFFER_LEN);
+        printf("\n\nLine %d : Incorrect sample count (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, 2 * BUFFER_LEN);
         dump_log_buffer(infile);
         exit(1);
     };
@@ -373,8 +363,7 @@ static void update_header_before_write_test(const char *filename, int typemajor)
     sfinfo.format = (typemajor | SF_FORMAT_PCM_16);
     sfinfo.channels = 1;
 
-    outfile =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     /* FLAC can only write the header once; if the first call to sf_write() will
 	** also attempt to write the header, it fails. FLAC-specific regression
@@ -411,13 +400,11 @@ static void update_seek_short_test(const char *filename, int filetype)
     if (sf_format_check(&sfinfo) == SF_FALSE)
         sfinfo.channels = 1;
 
-    outfile =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     sf_close(outfile);
 
     /* Open again for read/write. */
-    outfile =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
 
     /*
 	** In auto header update mode, seeking to the end of the file with
@@ -437,29 +424,24 @@ static void update_seek_short_test(const char *filename, int filetype)
 
     for (k = 0; k < 6; k++)
     {
-        test_seek_or_die(outfile, k * frames, SEEK_SET, k * frames,
-                         sfinfo.channels, __LINE__);
-        test_seek_or_die(outfile, 0, SEEK_END, k * frames, sfinfo.channels,
-                         __LINE__);
+        test_seek_or_die(outfile, k * frames, SEEK_SET, k * frames, sfinfo.channels, __LINE__);
+        test_seek_or_die(outfile, 0, SEEK_END, k * frames, sfinfo.channels, __LINE__);
 
         /* Open file again and make sure no errors in log buffer. */
-        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE,
-                                       __LINE__);
+        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
         check_log_buffer_or_die(infile, __LINE__);
         sf_close(infile);
 
         if (sfinfo.frames != k * frames)
         {
-            printf("\n\nLine %d : Incorrect sample count (%" PRId64
-                   " should be %" PRId64 ")\n",
-                   __LINE__, sfinfo.frames, k + frames);
+            printf("\n\nLine %d : Incorrect sample count (%" PRId64 " should be %" PRId64 ")\n", __LINE__, sfinfo.frames,
+                   k + frames);
             dump_log_buffer(infile);
             exit(1);
         };
 
         if ((k & 1) == 0)
-            test_write_short_or_die(outfile, k, buffer,
-                                    sfinfo.channels * frames, __LINE__);
+            test_write_short_or_die(outfile, k, buffer, sfinfo.channels * frames, __LINE__);
         else
             test_writef_short_or_die(outfile, k, buffer, frames, __LINE__);
     };
@@ -492,13 +474,11 @@ static void update_seek_int_test(const char *filename, int filetype)
     if (sf_format_check(&sfinfo) == SF_FALSE)
         sfinfo.channels = 1;
 
-    outfile =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     sf_close(outfile);
 
     /* Open again for read/write. */
-    outfile =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
 
     /*
 	** In auto header update mode, seeking to the end of the file with
@@ -518,29 +498,24 @@ static void update_seek_int_test(const char *filename, int filetype)
 
     for (k = 0; k < 6; k++)
     {
-        test_seek_or_die(outfile, k * frames, SEEK_SET, k * frames,
-                         sfinfo.channels, __LINE__);
-        test_seek_or_die(outfile, 0, SEEK_END, k * frames, sfinfo.channels,
-                         __LINE__);
+        test_seek_or_die(outfile, k * frames, SEEK_SET, k * frames, sfinfo.channels, __LINE__);
+        test_seek_or_die(outfile, 0, SEEK_END, k * frames, sfinfo.channels, __LINE__);
 
         /* Open file again and make sure no errors in log buffer. */
-        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE,
-                                       __LINE__);
+        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
         check_log_buffer_or_die(infile, __LINE__);
         sf_close(infile);
 
         if (sfinfo.frames != k * frames)
         {
-            printf("\n\nLine %d : Incorrect sample count (%" PRId64
-                   " should be %" PRId64 ")\n",
-                   __LINE__, sfinfo.frames, k + frames);
+            printf("\n\nLine %d : Incorrect sample count (%" PRId64 " should be %" PRId64 ")\n", __LINE__, sfinfo.frames,
+                   k + frames);
             dump_log_buffer(infile);
             exit(1);
         };
 
         if ((k & 1) == 0)
-            test_write_int_or_die(outfile, k, buffer, sfinfo.channels * frames,
-                                  __LINE__);
+            test_write_int_or_die(outfile, k, buffer, sfinfo.channels * frames, __LINE__);
         else
             test_writef_int_or_die(outfile, k, buffer, frames, __LINE__);
     };
@@ -573,13 +548,11 @@ static void update_seek_float_test(const char *filename, int filetype)
     if (sf_format_check(&sfinfo) == SF_FALSE)
         sfinfo.channels = 1;
 
-    outfile =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     sf_close(outfile);
 
     /* Open again for read/write. */
-    outfile =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
 
     /*
 	** In auto header update mode, seeking to the end of the file with
@@ -599,29 +572,24 @@ static void update_seek_float_test(const char *filename, int filetype)
 
     for (k = 0; k < 6; k++)
     {
-        test_seek_or_die(outfile, k * frames, SEEK_SET, k * frames,
-                         sfinfo.channels, __LINE__);
-        test_seek_or_die(outfile, 0, SEEK_END, k * frames, sfinfo.channels,
-                         __LINE__);
+        test_seek_or_die(outfile, k * frames, SEEK_SET, k * frames, sfinfo.channels, __LINE__);
+        test_seek_or_die(outfile, 0, SEEK_END, k * frames, sfinfo.channels, __LINE__);
 
         /* Open file again and make sure no errors in log buffer. */
-        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE,
-                                       __LINE__);
+        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
         check_log_buffer_or_die(infile, __LINE__);
         sf_close(infile);
 
         if (sfinfo.frames != k * frames)
         {
-            printf("\n\nLine %d : Incorrect sample count (%" PRId64
-                   " should be %" PRId64 ")\n",
-                   __LINE__, sfinfo.frames, k + frames);
+            printf("\n\nLine %d : Incorrect sample count (%" PRId64 " should be %" PRId64 ")\n", __LINE__, sfinfo.frames,
+                   k + frames);
             dump_log_buffer(infile);
             exit(1);
         };
 
         if ((k & 1) == 0)
-            test_write_float_or_die(outfile, k, buffer,
-                                    sfinfo.channels * frames, __LINE__);
+            test_write_float_or_die(outfile, k, buffer, sfinfo.channels * frames, __LINE__);
         else
             test_writef_float_or_die(outfile, k, buffer, frames, __LINE__);
     };
@@ -654,13 +622,11 @@ static void update_seek_double_test(const char *filename, int filetype)
     if (sf_format_check(&sfinfo) == SF_FALSE)
         sfinfo.channels = 1;
 
-    outfile =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     sf_close(outfile);
 
     /* Open again for read/write. */
-    outfile =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
 
     /*
 	** In auto header update mode, seeking to the end of the file with
@@ -680,29 +646,24 @@ static void update_seek_double_test(const char *filename, int filetype)
 
     for (k = 0; k < 6; k++)
     {
-        test_seek_or_die(outfile, k * frames, SEEK_SET, k * frames,
-                         sfinfo.channels, __LINE__);
-        test_seek_or_die(outfile, 0, SEEK_END, k * frames, sfinfo.channels,
-                         __LINE__);
+        test_seek_or_die(outfile, k * frames, SEEK_SET, k * frames, sfinfo.channels, __LINE__);
+        test_seek_or_die(outfile, 0, SEEK_END, k * frames, sfinfo.channels, __LINE__);
 
         /* Open file again and make sure no errors in log buffer. */
-        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE,
-                                       __LINE__);
+        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
         check_log_buffer_or_die(infile, __LINE__);
         sf_close(infile);
 
         if (sfinfo.frames != k * frames)
         {
-            printf("\n\nLine %d : Incorrect sample count (%" PRId64
-                   " should be %" PRId64 ")\n",
-                   __LINE__, sfinfo.frames, k + frames);
+            printf("\n\nLine %d : Incorrect sample count (%" PRId64 " should be %" PRId64 ")\n", __LINE__, sfinfo.frames,
+                   k + frames);
             dump_log_buffer(infile);
             exit(1);
         };
 
         if ((k & 1) == 0)
-            test_write_double_or_die(outfile, k, buffer,
-                                     sfinfo.channels * frames, __LINE__);
+            test_write_double_or_die(outfile, k, buffer, sfinfo.channels * frames, __LINE__);
         else
             test_writef_double_or_die(outfile, k, buffer, frames, __LINE__);
     };
@@ -734,8 +695,7 @@ static void header_shrink_test(const char *filename, int filetype)
     frames = ARRAY_LEN(buffer) / sfinfo.channels;
 
     /* Test the file with extra header data. */
-    outfile =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
 
     sf_command(outfile, SFC_SET_ADD_PEAK_CHUNK, NULL, SF_TRUE);
     sf_command(outfile, SFC_UPDATE_HEADER_NOW, NULL, SF_FALSE);
@@ -745,8 +705,7 @@ static void header_shrink_test(const char *filename, int filetype)
     sf_close(outfile);
 
     /* Open again for read. */
-    infile =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
 
     test_readf_float_or_die(infile, 0, bufferin, frames, __LINE__);
     sf_close(infile);
@@ -833,10 +792,8 @@ static void extra_header_test(const char *filename, int filetype)
         printf("\n*** pass %d\n", k);
         memset(buffer, 0xA0 + k, sizeof(buffer));
 
-        test_seek_or_die(outfile, k * frames, SEEK_SET, k * frames,
-                         sfinfo.channels, 553);
-        test_seek_or_die(outfile, 0, SEEK_END, k * frames, sfinfo.channels,
-                         554);
+        test_seek_or_die(outfile, k * frames, SEEK_SET, k * frames, sfinfo.channels, 553);
+        test_seek_or_die(outfile, 0, SEEK_END, k * frames, sfinfo.channels, 554);
 
         /* Open file again and make sure no errors in log buffer. */
         if (0)
@@ -848,16 +805,13 @@ static void extra_header_test(const char *filename, int filetype)
 
         if (sfinfo.frames != k * frames)
         {
-            printf("\n\nLine %d : Incorrect sample count (%" PRId64
-                   " should be %" PRId64 ")\n",
-                   564, sfinfo.frames, k + frames);
+            printf("\n\nLine %d : Incorrect sample count (%" PRId64 " should be %" PRId64 ")\n", 564, sfinfo.frames, k + frames);
             dump_log_buffer(infile);
             exit(1);
         };
 
         if ((k & 1) == 0)
-            test_write_short_or_die(outfile, k, buffer,
-                                    sfinfo.channels * frames, 570);
+            test_write_short_or_die(outfile, k, buffer, sfinfo.channels * frames, 570);
         else
             test_writef_short_or_die(outfile, k, buffer, frames, 572);
         hexdump_file(filename, 0, 100000);

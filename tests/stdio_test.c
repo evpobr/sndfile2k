@@ -63,9 +63,8 @@ int main(void)
 static size_t file_length(const char *filename);
 static void stdio_test(const char *filetype);
 
-static const char *filetypes[] = {"raw",  "wav",  "aiff",  "au",  "paf",
-                                  "svx",  "nist", "ircam", "voc", "w64",
-                                  "mat4", "mat5", "pvf",   NULL};
+static const char *filetypes[] = {"raw",   "wav", "aiff", "au",   "paf",  "svx", "nist",
+                                  "ircam", "voc", "w64",  "mat4", "mat5", "pvf", NULL};
 
 int main(void)
 {
@@ -85,8 +84,7 @@ static void stdio_test(const char *filetype)
 
     print_test_name("stdio_test", filetype);
 
-    snprintf(buffer, sizeof(buffer), "./tests/stdout_test %s > stdio.%s",
-             filetype, filetype);
+    snprintf(buffer, sizeof(buffer), "./tests/stdout_test %s > stdio.%s", filetype, filetype);
     if ((retval = system(buffer)))
     {
         retval = WIFEXITED(retval) ? WEXITSTATUS(retval) : 1;
@@ -97,13 +95,11 @@ static void stdio_test(const char *filetype)
     snprintf(buffer, sizeof(buffer), "stdio.%s", filetype);
     if ((file_size = file_length(buffer)) < PIPE_TEST_LEN)
     {
-        printf("\n    Error : test file '%s' too small (%d).\n\n", buffer,
-               file_size);
+        printf("\n    Error : test file '%s' too small (%d).\n\n", buffer, file_size);
         exit(1);
     };
 
-    snprintf(buffer, sizeof(buffer), "./tests/stdin_test %s < stdio.%s",
-             filetype, filetype);
+    snprintf(buffer, sizeof(buffer), "./tests/stdin_test %s < stdio.%s", filetype, filetype);
     if ((retval = system(buffer)))
     {
         retval = WIFEXITED(retval) ? WEXITSTATUS(retval) : 1;

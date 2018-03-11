@@ -26,8 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if (defined(_WIN32) || defined(__OS2__) || !defined(HAVE_PIPE) || \
-     !defined(HAVE_WAITPID))
+#if (defined(_WIN32) || defined(__OS2__) || !defined(HAVE_PIPE) || !defined(HAVE_WAITPID))
 
 int main(void)
 {
@@ -124,13 +123,11 @@ static void pipe_read_test(int filetype, const char *ext)
     for (k = 0; k < PIPE_TEST_LEN; k++)
         data[k] = PIPE_INDEX(k);
 
-    outfile =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
     test_writef_short_or_die(outfile, 0, data, PIPE_TEST_LEN, __LINE__);
     sf_close(outfile);
 
-    snprintf(buffer, sizeof(buffer), "cat %s | ./tests/stdin_test %s ",
-             filename, ext);
+    snprintf(buffer, sizeof(buffer), "cat %s | ./tests/stdin_test %s ", filename, ext);
     if ((retval = system(buffer)) != 0)
     {
         retval = WEXITSTATUS(retval);
@@ -154,14 +151,11 @@ static void pipe_write_test(const char *ext)
 
     print_test_name("pipe_write_test", ext);
 
-    snprintf(buffer, sizeof(buffer),
-             "./tests/stdout_test %s | ./tests/stdin_test %s ", ext, ext);
+    snprintf(buffer, sizeof(buffer), "./tests/stdout_test %s | ./tests/stdin_test %s ", ext, ext);
     if ((retval = system(buffer)))
     {
         retval = WEXITSTATUS(retval);
-        printf(
-            "\n\n     Line %d : pipe test returned error file type \"%s\".\n\n",
-            __LINE__, ext);
+        printf("\n\n     Line %d : pipe test returned error file type \"%s\".\n\n", __LINE__, ext);
         exit(retval);
     };
 
@@ -170,8 +164,7 @@ static void pipe_write_test(const char *ext)
     return;
 }
 
-static void useek_pipe_rw_short(const char *ext, SF_INFO *psfinfo_write,
-                                SF_INFO *psfinfo_read)
+static void useek_pipe_rw_short(const char *ext, SF_INFO *psfinfo_write, SF_INFO *psfinfo_read)
 {
     static short buffer[PIPE_TEST_LEN];
     static short data[PIPE_TEST_LEN];
@@ -188,14 +181,12 @@ static void useek_pipe_rw_short(const char *ext, SF_INFO *psfinfo_write,
     /*
 	 * Create the pipe.
 	 */
-    exit_if_true(pipe(pipefd) != 0, "\n\n%s %d : pipe failed : %s\n", __func__,
-                 __LINE__, strerror(errno));
+    exit_if_true(pipe(pipefd) != 0, "\n\n%s %d : pipe failed : %s\n", __func__, __LINE__, strerror(errno));
 
     /*
 	 * Attach the write end of the pipe to be written to.
 	 */
-    if ((outfile = sf_open_fd(pipefd[1], SFM_WRITE, psfinfo_write, SF_TRUE)) ==
-        NULL)
+    if ((outfile = sf_open_fd(pipefd[1], SFM_WRITE, psfinfo_write, SF_TRUE)) == NULL)
     {
         printf("\n\n%s %d : unable to create unseekable pipe for write type "
                "\"%s\".\n",
@@ -215,8 +206,7 @@ static void useek_pipe_rw_short(const char *ext, SF_INFO *psfinfo_write,
     /*
 	 * Attach the read end of the pipe to be read from.
 	 */
-    if ((infile_piped =
-             sf_open_fd(pipefd[0], SFM_READ, psfinfo_read, SF_TRUE)) == NULL)
+    if ((infile_piped = sf_open_fd(pipefd[0], SFM_READ, psfinfo_read, SF_TRUE)) == NULL)
     {
         printf("\n\n%s %d : unable to create unseekable pipe for read type. "
                "\"%s\".\n\n",
@@ -246,9 +236,7 @@ static void useek_pipe_rw_short(const char *ext, SF_INFO *psfinfo_write,
     test_readf_short_or_die(infile_piped, 0, buffer, PIPE_TEST_LEN, __LINE__);
     if (memcmp(buffer, data, sizeof(buffer)) != 0)
     {
-        printf(
-            "\n\n%s %d : unseekable pipe test failed for file type \"%s\".\n\n",
-            __func__, __LINE__, ext);
+        printf("\n\n%s %d : unseekable pipe test failed for file type \"%s\".\n\n", __func__, __LINE__, ext);
         exit(1);
     };
 
@@ -260,17 +248,14 @@ static void useek_pipe_rw_short(const char *ext, SF_INFO *psfinfo_write,
 
     if (status != 0)
     {
-        printf(
-            "\n\n%s %d : status of child process is %d for file type %s.\n\n",
-            __func__, __LINE__, status, ext);
+        printf("\n\n%s %d : status of child process is %d for file type %s.\n\n", __func__, __LINE__, status, ext);
         exit(1);
     };
 
     return;
 }
 
-static void useek_pipe_rw_float(const char *ext, SF_INFO *psfinfo_write,
-                                SF_INFO *psfinfo_read)
+static void useek_pipe_rw_float(const char *ext, SF_INFO *psfinfo_write, SF_INFO *psfinfo_read)
 {
     static float buffer[PIPE_TEST_LEN];
     static float data[PIPE_TEST_LEN];
@@ -287,14 +272,12 @@ static void useek_pipe_rw_float(const char *ext, SF_INFO *psfinfo_write,
     /*
 	** Create the pipe.
 	*/
-    exit_if_true(pipe(pipefd) != 0, "\n\n%s %d : pipe failed : %s\n", __func__,
-                 __LINE__, strerror(errno));
+    exit_if_true(pipe(pipefd) != 0, "\n\n%s %d : pipe failed : %s\n", __func__, __LINE__, strerror(errno));
 
     /*
 	 * Attach the write end of the pipe to be written to.
 	 */
-    if ((outfile = sf_open_fd(pipefd[1], SFM_WRITE, psfinfo_write, SF_TRUE)) ==
-        NULL)
+    if ((outfile = sf_open_fd(pipefd[1], SFM_WRITE, psfinfo_write, SF_TRUE)) == NULL)
     {
         printf("\n\n%s %d : unable to create unseekable pipe for write type "
                "\"%s\".\n",
@@ -314,8 +297,7 @@ static void useek_pipe_rw_float(const char *ext, SF_INFO *psfinfo_write,
     /*
 	 * Attach the read end of the pipe to be read from.
 	 */
-    if ((infile_piped =
-             sf_open_fd(pipefd[0], SFM_READ, psfinfo_read, SF_TRUE)) == NULL)
+    if ((infile_piped = sf_open_fd(pipefd[0], SFM_READ, psfinfo_read, SF_TRUE)) == NULL)
     {
         printf("\n\n%s %d : unable to create unseekable pipe for read type. "
                "\"%s\".\n\n",
@@ -345,9 +327,7 @@ static void useek_pipe_rw_float(const char *ext, SF_INFO *psfinfo_write,
     test_readf_float_or_die(infile_piped, 0, buffer, PIPE_TEST_LEN, __LINE__);
     if (memcmp(buffer, data, sizeof(buffer)) != 0)
     {
-        printf(
-            "\n\n%s %d : unseekable pipe test failed for file type \"%s\".\n\n",
-            __func__, __LINE__, ext);
+        printf("\n\n%s %d : unseekable pipe test failed for file type \"%s\".\n\n", __func__, __LINE__, ext);
         exit(1);
     };
 
@@ -359,17 +339,14 @@ static void useek_pipe_rw_float(const char *ext, SF_INFO *psfinfo_write,
 
     if (status != 0)
     {
-        printf(
-            "\n\n%s %d : status of child process is %d for file type %s.\n\n",
-            __func__, __LINE__, status, ext);
+        printf("\n\n%s %d : status of child process is %d for file type %s.\n\n", __func__, __LINE__, status, ext);
         exit(1);
     };
 
     return;
 }
 
-static void useek_pipe_rw_double(const char *ext, SF_INFO *psfinfo_write,
-                                 SF_INFO *psfinfo_read)
+static void useek_pipe_rw_double(const char *ext, SF_INFO *psfinfo_write, SF_INFO *psfinfo_read)
 {
     static double buffer[PIPE_TEST_LEN];
     static double data[PIPE_TEST_LEN];
@@ -386,14 +363,12 @@ static void useek_pipe_rw_double(const char *ext, SF_INFO *psfinfo_write,
     /*
 	 * Create the pipe.
 	 */
-    exit_if_true(pipe(pipefd) != 0, "\n\n%s %d : pipe failed : %s\n", __func__,
-                 __LINE__, strerror(errno));
+    exit_if_true(pipe(pipefd) != 0, "\n\n%s %d : pipe failed : %s\n", __func__, __LINE__, strerror(errno));
 
     /*
 	 * Attach the write end of the pipe to be written to.
 	 */
-    if ((outfile = sf_open_fd(pipefd[1], SFM_WRITE, psfinfo_write, SF_TRUE)) ==
-        NULL)
+    if ((outfile = sf_open_fd(pipefd[1], SFM_WRITE, psfinfo_write, SF_TRUE)) == NULL)
     {
         printf("\n\n%s %d : unable to create unseekable pipe for write type "
                "\"%s\".\n",
@@ -413,8 +388,7 @@ static void useek_pipe_rw_double(const char *ext, SF_INFO *psfinfo_write,
     /*
 	 * Attach the read end of the pipe to be read from.
 	 */
-    if ((infile_piped =
-             sf_open_fd(pipefd[0], SFM_READ, psfinfo_read, SF_TRUE)) == NULL)
+    if ((infile_piped = sf_open_fd(pipefd[0], SFM_READ, psfinfo_read, SF_TRUE)) == NULL)
     {
         printf("\n\n%s %d : unable to create unseekable pipe for read type. "
                "\"%s\".\n\n",
@@ -444,9 +418,7 @@ static void useek_pipe_rw_double(const char *ext, SF_INFO *psfinfo_write,
     test_readf_double_or_die(infile_piped, 0, buffer, PIPE_TEST_LEN, __LINE__);
     if (memcmp(buffer, data, sizeof(buffer)) != 0)
     {
-        printf(
-            "\n\n%s %d : unseekable pipe test failed for file type \"%s\".\n\n",
-            __func__, __LINE__, ext);
+        printf("\n\n%s %d : unseekable pipe test failed for file type \"%s\".\n\n", __func__, __LINE__, ext);
         exit(1);
     };
 
@@ -458,9 +430,7 @@ static void useek_pipe_rw_double(const char *ext, SF_INFO *psfinfo_write,
 
     if (status != 0)
     {
-        printf(
-            "\n\n%s %d : status of child process is %d for file type %s.\n\n",
-            __func__, __LINE__, status, ext);
+        printf("\n\n%s %d : status of child process is %d for file type %s.\n\n", __func__, __LINE__, status, ext);
         exit(1);
     };
 
@@ -548,14 +518,11 @@ static void pipe_test_others(FILETYPE *list1, FILETYPE *list2)
             sfinfo.channels = 1;
             sfinfo.samplerate = 44100;
 
-            outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo,
-                                            SF_TRUE, __LINE__);
+            outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
             test_writef_short_or_die(outfile, 0, data, PIPE_TEST_LEN, __LINE__);
             sf_close(outfile);
 
-            snprintf(buffer, sizeof(buffer),
-                     "cat %s | ./tests/stdin_test %s %d ", filename,
-                     info.extension, PIPE_TEST_LEN);
+            snprintf(buffer, sizeof(buffer), "cat %s | ./tests/stdin_test %s %d ", filename, info.extension, PIPE_TEST_LEN);
             if ((retval = system(buffer)) == 0)
             {
                 retval = WEXITSTATUS(retval);

@@ -44,27 +44,24 @@
 
 static void write_file_at_end(int fd, int filetype, int channels, int file_num);
 
-static void multi_file_test(const char *filename, int *formats,
-                            int format_count);
+static void multi_file_test(const char *filename, int *formats, int format_count);
 
 static short data[DATA_LENGTH];
 
 static int wav_formats[] = {
-    SF_FORMAT_WAV | SF_FORMAT_PCM_16, SF_FORMAT_WAV | SF_FORMAT_PCM_24,
-    SF_FORMAT_WAV | SF_FORMAT_ULAW, SF_FORMAT_WAV | SF_FORMAT_ALAW,
+    SF_FORMAT_WAV | SF_FORMAT_PCM_16, SF_FORMAT_WAV | SF_FORMAT_PCM_24, SF_FORMAT_WAV | SF_FORMAT_ULAW,
+    SF_FORMAT_WAV | SF_FORMAT_ALAW,
     /* Lite remove start */
     SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, SF_FORMAT_WAV | SF_FORMAT_MS_ADPCM,
     /* Lite remove end */
     /*-SF_FORMAT_WAV | SF_FORMAT_GSM610 Doesn't work yet. -*/
 };
 
-static int aiff_formats[] = {
-    SF_FORMAT_AIFF | SF_FORMAT_PCM_16, SF_FORMAT_AIFF | SF_FORMAT_PCM_24,
-    SF_FORMAT_AIFF | SF_FORMAT_ULAW, SF_FORMAT_AIFF | SF_FORMAT_ALAW};
+static int aiff_formats[] = {SF_FORMAT_AIFF | SF_FORMAT_PCM_16, SF_FORMAT_AIFF | SF_FORMAT_PCM_24, SF_FORMAT_AIFF | SF_FORMAT_ULAW,
+                             SF_FORMAT_AIFF | SF_FORMAT_ALAW};
 
-static int au_formats[] = {
-    SF_FORMAT_AU | SF_FORMAT_PCM_16, SF_FORMAT_AU | SF_FORMAT_PCM_24,
-    SF_FORMAT_AU | SF_FORMAT_ULAW, SF_FORMAT_AU | SF_FORMAT_ALAW};
+static int au_formats[] = {SF_FORMAT_AU | SF_FORMAT_PCM_16, SF_FORMAT_AU | SF_FORMAT_PCM_24, SF_FORMAT_AU | SF_FORMAT_ULAW,
+                           SF_FORMAT_AU | SF_FORMAT_ALAW};
 
 static int verbose = SF_FALSE;
 
@@ -107,8 +104,7 @@ int main(int argc, char **argv)
 
     if (do_all || !strcmp(argv[1], "aiff"))
     {
-        multi_file_test("multi_aiff.dat", aiff_formats,
-                        ARRAY_LEN(aiff_formats));
+        multi_file_test("multi_aiff.dat", aiff_formats, ARRAY_LEN(aiff_formats));
         test_count++;
     };
 
@@ -121,8 +117,7 @@ int main(int argc, char **argv)
     return 0;
 }
 
-static void multi_file_test(const char *filename, int *formats,
-                            int format_count)
+static void multi_file_test(const char *filename, int *formats, int format_count)
 {
     SNDFILE *sndfile;
     SF_INFO sfinfo;
@@ -150,20 +145,17 @@ static void multi_file_test(const char *filename, int *formats,
     embed_info.offset = 4;
     embed_info.length = 0;
 
-    for (file_count = 1; embed_info.offset + embed_info.length < filelen;
-         file_count++)
+    for (file_count = 1; embed_info.offset + embed_info.length < filelen; file_count++)
     {
         if (verbose)
         {
             puts("\n------------------------------------");
-            printf("This offset : %" PRId64 "\n",
-                   embed_info.offset + embed_info.length);
+            printf("This offset : %" PRId64 "\n", embed_info.offset + embed_info.length);
         };
 
         if (lseek(fd, embed_info.offset + embed_info.length, SEEK_SET) < 0)
         {
-            printf("\n\nLine %d: lseek failed : %s\n", __LINE__,
-                   strerror(errno));
+            printf("\n\nLine %d: lseek failed : %s\n", __LINE__, strerror(errno));
             exit(1);
         };
 
@@ -171,29 +163,25 @@ static void multi_file_test(const char *filename, int *formats,
         if ((sndfile = sf_open_fd(fd, SFM_READ, &sfinfo, SF_FALSE)) == NULL)
         {
             printf("\n\nLine %d: sf_open_fd failed\n", __LINE__);
-            printf("Embedded file number : %d   offset : %" PRId64 "\n",
-                   file_count, embed_info.offset);
+            printf("Embedded file number : %d   offset : %" PRId64 "\n", file_count, embed_info.offset);
             puts(sf_strerror(sndfile));
             dump_log_buffer(sndfile);
             exit(1);
         };
 
-        sf_command(sndfile, SFC_GET_EMBED_FILE_INFO, &embed_info,
-                   sizeof(embed_info));
+        sf_command(sndfile, SFC_GET_EMBED_FILE_INFO, &embed_info, sizeof(embed_info));
 
         sf_close(sndfile);
 
         if (verbose)
-            printf("\nNext offset : %" PRId64 "\nNext length : %" PRId64 "\n",
-                   embed_info.offset, embed_info.length);
+            printf("\nNext offset : %" PRId64 "\nNext length : %" PRId64 "\n", embed_info.offset, embed_info.length);
     };
 
     file_count--;
 
     if (file_count != format_count)
     {
-        printf("\n\nLine %d: file count (%d) not equal to %d.\n\n", __LINE__,
-               file_count, format_count);
+        printf("\n\nLine %d: file count (%d) not equal to %d.\n\n", __LINE__, file_count, format_count);
         printf("Embedded file number : %d\n", file_count);
         exit(1);
     };

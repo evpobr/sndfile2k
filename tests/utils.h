@@ -43,16 +43,13 @@ void gen_windowed_sine_double(double *data, int len, double maximum);
 
 void create_short_sndfile(const char *filename, int format, int channels);
 
-void check_file_hash_or_die(const char *filename, uint64_t target_hash,
-                            int line_num);
+void check_file_hash_or_die(const char *filename, uint64_t target_hash, int line_num);
 
 void print_test_name(const char *test, const char *filename);
 
-void dump_data_to_file(const char *filename, const void *data,
-                       unsigned int datalen);
+void dump_data_to_file(const char *filename, const void *data, unsigned int datalen);
 
-void write_mono_file(const char *filename, int format, int srate, float *output,
-                     int len);
+void write_mono_file(const char *filename, int format, int srate, float *output, int len);
 
 #ifdef __GNUC__
 static inline void exit_if_true(int test, const char *format, ...)
@@ -105,8 +102,7 @@ static inline void sf_info_clear(SF_INFO *info)
     memset(info, 0, sizeof(SF_INFO));
 }
 
-static inline void sf_info_setup(SF_INFO *info, int format, int samplerate,
-                                 int channels)
+static inline void sf_info_setup(SF_INFO *info, int format, int samplerate, int channels)
 {
     sf_info_clear(info);
 
@@ -122,65 +118,40 @@ void hexdump_file(const char *filename, sf_count_t offset, sf_count_t length);
 
 void test_sf_format_or_die(const SF_INFO *info, int line_num);
 
-SNDFILE *test_open_file_or_die(const char *filename, int mode, SF_INFO *sfinfo,
-                               int allow_fd, int line_num);
+SNDFILE *test_open_file_or_die(const char *filename, int mode, SF_INFO *sfinfo, int allow_fd, int line_num);
 
-void test_read_write_position_or_die(SNDFILE *file, int line_num, int pass,
-                                     sf_count_t read_pos, sf_count_t write_pos);
+void test_read_write_position_or_die(SNDFILE *file, int line_num, int pass, sf_count_t read_pos, sf_count_t write_pos);
 
-void test_seek_or_die(SNDFILE *file, sf_count_t offset, int whence,
-                      sf_count_t new_pos, int channels, int line_num);
+void test_seek_or_die(SNDFILE *file, sf_count_t offset, int whence, sf_count_t new_pos, int channels, int line_num);
 
-void test_read_short_or_die(SNDFILE *file, int pass, short *test,
-                            sf_count_t items, int line_num);
-void test_read_int_or_die(SNDFILE *file, int pass, int *test, sf_count_t items,
-                          int line_num);
-void test_read_float_or_die(SNDFILE *file, int pass, float *test,
-                            sf_count_t items, int line_num);
-void test_read_double_or_die(SNDFILE *file, int pass, double *test,
-                             sf_count_t items, int line_num);
+void test_read_short_or_die(SNDFILE *file, int pass, short *test, sf_count_t items, int line_num);
+void test_read_int_or_die(SNDFILE *file, int pass, int *test, sf_count_t items, int line_num);
+void test_read_float_or_die(SNDFILE *file, int pass, float *test, sf_count_t items, int line_num);
+void test_read_double_or_die(SNDFILE *file, int pass, double *test, sf_count_t items, int line_num);
 
-void test_readf_short_or_die(SNDFILE *file, int pass, short *test,
-                             sf_count_t frames, int line_num);
-void test_readf_int_or_die(SNDFILE *file, int pass, int *test,
-                           sf_count_t frames, int line_num);
-void test_readf_float_or_die(SNDFILE *file, int pass, float *test,
-                             sf_count_t frames, int line_num);
-void test_readf_double_or_die(SNDFILE *file, int pass, double *test,
-                              sf_count_t frames, int line_num);
+void test_readf_short_or_die(SNDFILE *file, int pass, short *test, sf_count_t frames, int line_num);
+void test_readf_int_or_die(SNDFILE *file, int pass, int *test, sf_count_t frames, int line_num);
+void test_readf_float_or_die(SNDFILE *file, int pass, float *test, sf_count_t frames, int line_num);
+void test_readf_double_or_die(SNDFILE *file, int pass, double *test, sf_count_t frames, int line_num);
 
-void test_read_raw_or_die(SNDFILE *file, int pass, void *test, sf_count_t items,
-                          int line_num);
+void test_read_raw_or_die(SNDFILE *file, int pass, void *test, sf_count_t items, int line_num);
 
-void test_write_short_or_die(SNDFILE *file, int pass, const short *test,
-                             sf_count_t items, int line_num);
-void test_write_int_or_die(SNDFILE *file, int pass, const int *test,
-                           sf_count_t items, int line_num);
-void test_write_float_or_die(SNDFILE *file, int pass, const float *test,
-                             sf_count_t items, int line_num);
-void test_write_double_or_die(SNDFILE *file, int pass, const double *test,
-                              sf_count_t items, int line_num);
+void test_write_short_or_die(SNDFILE *file, int pass, const short *test, sf_count_t items, int line_num);
+void test_write_int_or_die(SNDFILE *file, int pass, const int *test, sf_count_t items, int line_num);
+void test_write_float_or_die(SNDFILE *file, int pass, const float *test, sf_count_t items, int line_num);
+void test_write_double_or_die(SNDFILE *file, int pass, const double *test, sf_count_t items, int line_num);
 
-void test_writef_short_or_die(SNDFILE *file, int pass, const short *test,
-                              sf_count_t frames, int line_num);
-void test_writef_int_or_die(SNDFILE *file, int pass, const int *test,
-                            sf_count_t frames, int line_num);
-void test_writef_float_or_die(SNDFILE *file, int pass, const float *test,
-                              sf_count_t frames, int line_num);
-void test_writef_double_or_die(SNDFILE *file, int pass, const double *test,
-                               sf_count_t frames, int line_num);
+void test_writef_short_or_die(SNDFILE *file, int pass, const short *test, sf_count_t frames, int line_num);
+void test_writef_int_or_die(SNDFILE *file, int pass, const int *test, sf_count_t frames, int line_num);
+void test_writef_float_or_die(SNDFILE *file, int pass, const float *test, sf_count_t frames, int line_num);
+void test_writef_double_or_die(SNDFILE *file, int pass, const double *test, sf_count_t frames, int line_num);
 
-void test_write_raw_or_die(SNDFILE *file, int pass, const void *test,
-                           sf_count_t items, int line_num);
+void test_write_raw_or_die(SNDFILE *file, int pass, const void *test, sf_count_t items, int line_num);
 
-void compare_short_or_die(const short *expected, const short *actual,
-                          unsigned count, int line_num);
-void compare_int_or_die(const int *expected, const int *actual, unsigned count,
-                        int line_num);
-void compare_float_or_die(const float *expected, const float *actual,
-                          unsigned count, int line_num);
-void compare_double_or_die(const double *expected, const double *actual,
-                           unsigned count, int line_num);
+void compare_short_or_die(const short *expected, const short *actual, unsigned count, int line_num);
+void compare_int_or_die(const int *expected, const int *actual, unsigned count, int line_num);
+void compare_float_or_die(const float *expected, const float *actual, unsigned count, int line_num);
+void compare_double_or_die(const double *expected, const double *actual, unsigned count, int line_num);
 
 void gen_lowpass_signal_float(float *data, int len);
 

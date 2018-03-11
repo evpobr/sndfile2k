@@ -57,21 +57,15 @@ static void format_error_test(void)
 
     info.format = SF_FORMAT_WAV;
     file = sf_open(filename, SFM_WRITE, &info);
-    exit_if_true(file != NULL, "\n\nLine %d : Format should not be valid.\n\n",
-                 __LINE__);
-    exit_if_true(
-        strstr(sf_strerror(NULL), "minor format") == NULL,
-        "\n\nLine %d : Error string should reference bad 'minor format'.\n\n",
-        __LINE__);
+    exit_if_true(file != NULL, "\n\nLine %d : Format should not be valid.\n\n", __LINE__);
+    exit_if_true(strstr(sf_strerror(NULL), "minor format") == NULL,
+                 "\n\nLine %d : Error string should reference bad 'minor format'.\n\n", __LINE__);
 
     info.format = SF_FORMAT_PCM_16;
     file = sf_open(filename, SFM_WRITE, &info);
-    exit_if_true(file != NULL, "\n\nLine %d : Format should not be valid.\n\n",
-                 __LINE__);
-    exit_if_true(
-        strstr(sf_strerror(NULL), "major format") == NULL,
-        "\n\nLine %d : Error string should reference bad 'major format'.\n\n",
-        __LINE__);
+    exit_if_true(file != NULL, "\n\nLine %d : Format should not be valid.\n\n", __LINE__);
+    exit_if_true(strstr(sf_strerror(NULL), "major format") == NULL,
+                 "\n\nLine %d : Error string should reference bad 'major format'.\n\n", __LINE__);
 
     unlink(filename);
     puts("ok");
@@ -83,10 +77,8 @@ static void format_combo_test(void)
 
     print_test_name(__func__, NULL);
 
-    sf_command(NULL, SFC_GET_FORMAT_MAJOR_COUNT, &container_max,
-               sizeof(container_max));
-    sf_command(NULL, SFC_GET_FORMAT_SUBTYPE_COUNT, &codec_max,
-               sizeof(codec_max));
+    sf_command(NULL, SFC_GET_FORMAT_MAJOR_COUNT, &container_max, sizeof(container_max));
+    sf_command(NULL, SFC_GET_FORMAT_SUBTYPE_COUNT, &codec_max, sizeof(codec_max));
 
     for (cont = 0; cont < container_max + 10; cont++)
     {
@@ -94,8 +86,7 @@ static void format_combo_test(void)
 
         memset(&major_fmt_info, 0, sizeof(major_fmt_info));
         major_fmt_info.format = cont;
-        (void)sf_command(NULL, SFC_GET_FORMAT_MAJOR, &major_fmt_info,
-                         sizeof(major_fmt_info));
+        (void)sf_command(NULL, SFC_GET_FORMAT_MAJOR, &major_fmt_info, sizeof(major_fmt_info));
 
         for (codec = 0; codec < codec_max + 10; codec++)
         {
@@ -108,49 +99,38 @@ static void format_combo_test(void)
             memset(&info, 0, sizeof(info));
             memset(&subtype_fmt_info, 0, sizeof(subtype_fmt_info));
             subtype_fmt_info.format = codec;
-            subtype_is_valid =
-                sf_command(NULL, SFC_GET_FORMAT_SUBTYPE, &subtype_fmt_info,
-                           sizeof(subtype_fmt_info)) == 0;
+            subtype_is_valid = sf_command(NULL, SFC_GET_FORMAT_SUBTYPE, &subtype_fmt_info, sizeof(subtype_fmt_info)) == 0;
 
-            sf_info_setup(&info,
-                          major_fmt_info.format | subtype_fmt_info.format,
-                          22050, 1);
+            sf_info_setup(&info, major_fmt_info.format | subtype_fmt_info.format, 22050, 1);
 
             check_is_valid = sf_format_check(&info);
 
-            exit_if_true(!subtype_is_valid && check_is_valid,
-                         "\n\nLine %d : Subtype is not valid but checks ok.\n",
-                         __LINE__);
+            exit_if_true(!subtype_is_valid && check_is_valid, "\n\nLine %d : Subtype is not valid but checks ok.\n", __LINE__);
 
-            snprintf(filename, sizeof(filename), "format-check.%s",
-                     major_fmt_info.extension);
+            snprintf(filename, sizeof(filename), "format-check.%s", major_fmt_info.extension);
 
             sndfile = sf_open(filename, SFM_WRITE, &info);
 
             sf_close(sndfile);
             unlink(filename);
 
-            if (major_fmt_info.extension != NULL &&
-                strcmp(major_fmt_info.extension, "sd2") == 0)
+            if (major_fmt_info.extension != NULL && strcmp(major_fmt_info.extension, "sd2") == 0)
             {
-                snprintf(filename, sizeof(filename), "._format-check.%s",
-                         major_fmt_info.extension);
+                snprintf(filename, sizeof(filename), "._format-check.%s", major_fmt_info.extension);
                 unlink(filename);
             };
 
-            exit_if_true(
-                sndfile && !(check_is_valid),
-                "\n\nError : Format was not valid but file opened correctly.\n"
-                "    Container : %s\n"
-                "    Codec     : %s\n\n",
-                major_fmt_info.name, subtype_fmt_info.name);
+            exit_if_true(sndfile && !(check_is_valid),
+                         "\n\nError : Format was not valid but file opened correctly.\n"
+                         "    Container : %s\n"
+                         "    Codec     : %s\n\n",
+                         major_fmt_info.name, subtype_fmt_info.name);
 
-            exit_if_true(
-                !sndfile && check_is_valid,
-                "\n\nError : Format was valid but file failed to open.\n"
-                "    Container : %s\n"
-                "    Codec     : %s\n\n",
-                major_fmt_info.name, subtype_fmt_info.name);
+            exit_if_true(!sndfile && check_is_valid,
+                         "\n\nError : Format was valid but file failed to open.\n"
+                         "    Container : %s\n"
+                         "    Codec     : %s\n\n",
+                         major_fmt_info.name, subtype_fmt_info.name);
         };
     };
 

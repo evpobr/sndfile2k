@@ -71,12 +71,10 @@ int main(int argc, char *argv[])
     {
         test_float_peak("peak_float.wav", SF_FORMAT_WAV | SF_FORMAT_FLOAT);
         test_float_peak("peak_float.wavex", SF_FORMAT_WAVEX | SF_FORMAT_FLOAT);
-        test_float_peak("peak_float.rifx",
-                        SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_FLOAT);
+        test_float_peak("peak_float.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_FLOAT);
 
         read_write_peak_test("rw_peak.wav", SF_FORMAT_WAV | SF_FORMAT_FLOAT);
-        read_write_peak_test("rw_peak.wavex",
-                             SF_FORMAT_WAVEX | SF_FORMAT_FLOAT);
+        read_write_peak_test("rw_peak.wavex", SF_FORMAT_WAVEX | SF_FORMAT_FLOAT);
         test_count++;
     };
 
@@ -154,8 +152,7 @@ static void test_float_peak(const char *filename, int filetype)
 	 * be written in the different calls to sf_write_double ().
 	 */
     for (count = 0; count < 4; count++)
-        test_write_double_or_die(file, 0, data + count * BUFFER_LEN / 4,
-                                 BUFFER_LEN / 4, BUFFER_LEN / 4);
+        test_write_double_or_die(file, 0, data + count * BUFFER_LEN / 4, BUFFER_LEN / 4, BUFFER_LEN / 4);
 
     sf_close(file);
 
@@ -163,30 +160,26 @@ static void test_float_peak(const char *filename, int filetype)
 
     if (sfinfo.format != filetype)
     {
-        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n",
-               __LINE__, filetype, sfinfo.format);
+        printf("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format);
         exit(1);
     };
 
     if (sfinfo.frames != frames)
     {
-        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %ld)\n",
-               __LINE__, frames, (long)sfinfo.frames);
+        printf("\n\nLine %d: Incorrect number of frames in file. (%d => %ld)\n", __LINE__, frames, (long)sfinfo.frames);
         exit(1);
     };
 
     if (sfinfo.channels != 4)
     {
-        printf("\n\nLine %d: Incorrect number of channels in file.\n",
-               __LINE__);
+        printf("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
         exit(1);
     };
 
     /* Check these two commands. */
     if (sf_command(file, SFC_GET_SIGNAL_MAX, data, sizeof(double)) == SF_FALSE)
     {
-        printf("\n\nLine %d: Command should have returned SF_TRUE.\n",
-               __LINE__);
+        printf("\n\nLine %d: Command should have returned SF_TRUE.\n", __LINE__);
         exit(1);
     };
 
@@ -198,11 +191,9 @@ static void test_float_peak(const char *filename, int filetype)
         exit(1);
     };
 
-    if (sf_command(file, SFC_GET_MAX_ALL_CHANNELS, data,
-                   sizeof(double) * sfinfo.channels) == SF_FALSE)
+    if (sf_command(file, SFC_GET_MAX_ALL_CHANNELS, data, sizeof(double) * sfinfo.channels) == SF_FALSE)
     {
-        printf("\n\nLine %d: Command should have returned SF_TRUE.\n",
-               __LINE__);
+        printf("\n\nLine %d: Command should have returned SF_TRUE.\n", __LINE__);
         exit(1);
     };
 
@@ -241,8 +232,7 @@ static void test_float_peak(const char *filename, int filetype)
 	 * be written in the different calls to sf_write_double ().
 	 */
     for (count = 0; count < 4; count++)
-        test_write_double_or_die(file, 0, data + count * BUFFER_LEN / 4,
-                                 BUFFER_LEN / 4, BUFFER_LEN / 4);
+        test_write_double_or_die(file, 0, data + count * BUFFER_LEN / 4, BUFFER_LEN / 4, BUFFER_LEN / 4);
 
     sf_close(file);
 
@@ -251,16 +241,13 @@ static void test_float_peak(const char *filename, int filetype)
     /* Check these two commands. */
     if (sf_command(file, SFC_GET_SIGNAL_MAX, data, sizeof(double)))
     {
-        printf("\n\nLine %d: Command should have returned SF_FALSE.\n",
-               __LINE__);
+        printf("\n\nLine %d: Command should have returned SF_FALSE.\n", __LINE__);
         exit(1);
     };
 
-    if (sf_command(file, SFC_GET_MAX_ALL_CHANNELS, data,
-                   sizeof(double) * sfinfo.channels))
+    if (sf_command(file, SFC_GET_MAX_ALL_CHANNELS, data, sizeof(double) * sfinfo.channels))
     {
-        printf("\n\nLine %d: Command should have returned SF_FALSE.\n",
-               __LINE__);
+        printf("\n\nLine %d: Command should have returned SF_FALSE.\n", __LINE__);
         exit(1);
     };
 
@@ -276,8 +263,7 @@ static void test_float_peak(const char *filename, int filetype)
 
     if (strstr(log_buffer, "PEAK :") != NULL)
     {
-        printf("\n\nLine %d: Should not have a PEAK chunk in this file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d: Should not have a PEAK chunk in this file.\n\n", __LINE__);
         puts(log_buffer);
         exit(1);
     };
@@ -315,8 +301,7 @@ static void check_logged_peaks(char *buffer)
 
     if (channel_count != 4)
     {
-        printf("\n\nLine %d: Wrong channel count (4 ->%d).\n", __LINE__,
-               channel_count);
+        printf("\n\nLine %d: Wrong channel count (4 ->%d).\n", __LINE__, channel_count);
         exit(1);
     };
 
@@ -350,8 +335,7 @@ static void check_logged_peaks(char *buffer)
         {
             printf("\n\nLine %d: Error : peak value incorrect!\n", __LINE__);
             printf("%s", buffer);
-            printf("\n\nLine %d: %d %f %f\n", __LINE__, chan, position * 0.01,
-                   value);
+            printf("\n\nLine %d: %d %f %f\n", __LINE__, chan, position * 0.01, value);
             exit(1);
         };
         cptr++; /* Move past current newline. */
@@ -377,49 +361,39 @@ static void read_write_peak_test(const char *filename, int filetype)
     sfinfo.frames = 0;
 
     /* Open the file, add peak chunk and write samples with value 0.1. */
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
 
     sf_command(file, SFC_SET_ADD_PEAK_CHUNK, NULL, SF_TRUE);
 
-    test_write_double_or_die(file, 0, small_data, ARRAY_LEN(small_data),
-                             __LINE__);
+    test_write_double_or_die(file, 0, small_data, ARRAY_LEN(small_data), __LINE__);
 
     sf_close(file);
 
     /* Open the fiel RDWR, write sample valied 1.25. */
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__);
 
     for (k = 0; k < ARRAY_LEN(small_data); k++)
         small_data[k] = 1.0;
 
-    test_write_double_or_die(file, 0, small_data, ARRAY_LEN(small_data),
-                             __LINE__);
+    test_write_double_or_die(file, 0, small_data, ARRAY_LEN(small_data), __LINE__);
 
     sf_command(file, SFC_GET_SIGNAL_MAX, &max_peak, sizeof(max_peak));
 
     sf_close(file);
 
-    exit_if_true(max_peak < 0.1,
-                 "\n\nLine %d : max peak (%5.3f) should not be 0.1.\n\n",
-                 __LINE__, max_peak);
+    exit_if_true(max_peak < 0.1, "\n\nLine %d : max peak (%5.3f) should not be 0.1.\n\n", __LINE__, max_peak);
 
     /* Open the file and test the values written to the PEAK chunk. */
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
 
     exit_if_true(sfinfo.channels * sfinfo.frames != 2 * ARRAY_LEN(small_data),
-                 "Line %d : frame count is %" PRId64 ", should be %zd\n",
-                 __LINE__, sfinfo.frames, 2 * ARRAY_LEN(small_data));
+                 "Line %d : frame count is %" PRId64 ", should be %zd\n", __LINE__, sfinfo.frames, 2 * ARRAY_LEN(small_data));
 
     sf_command(file, SFC_GET_SIGNAL_MAX, &max_peak, sizeof(double));
 
     sf_close(file);
 
-    exit_if_true(max_peak < 1.0,
-                 "\n\nLine %d : max peak (%5.3f) should be 1.0.\n\n", __LINE__,
-                 max_peak);
+    exit_if_true(max_peak < 1.0, "\n\nLine %d : max peak (%5.3f) should be 1.0.\n\n", __LINE__, max_peak);
 
     unlink(filename);
     puts("ok");

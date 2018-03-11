@@ -140,8 +140,7 @@ static void g723_test(double margin)
     {
         if (error_function(data[k], orig[k], margin))
         {
-            printf("Line %d: Incorrect sample A (#%ld : %d should be %d).\n",
-                   __LINE__, k, data[k], orig[k]);
+            printf("Line %d: Incorrect sample A (#%ld : %d should be %d).\n", __LINE__, k, data[k], orig[k]);
             oct_save_short(orig, data, BUFFER_SIZE);
             exit(1);
         };
@@ -169,10 +168,8 @@ static void gen_signal_double(double *gendata, double scale, int gendatalen)
         else if (k > gendatalen - ramplen)
             amp = scale * (gendatalen - k) / ((double)ramplen);
 
-        gendata[k] = amp * (0.4 * sin(33.3 * 2.0 * M_PI * ((double)(k + 1)) /
-                                      ((double)SAMPLE_RATE)) +
-                            0.3 * cos(201.1 * 2.0 * M_PI * ((double)(k + 1)) /
-                                      ((double)SAMPLE_RATE)));
+        gendata[k] = amp * (0.4 * sin(33.3 * 2.0 * M_PI * ((double)(k + 1)) / ((double)SAMPLE_RATE)) +
+                            0.3 * cos(201.1 * 2.0 * M_PI * ((double)(k + 1)) / ((double)SAMPLE_RATE)));
     };
 
     return;

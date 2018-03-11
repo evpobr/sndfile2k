@@ -180,8 +180,7 @@ static void stdin_test(int typemajor, int count)
     err = sf_error(file);
     if (err != SF_ERR_NO_ERROR)
     {
-        printf("Line %d : unexpected error : %s\n", __LINE__,
-               sf_error_number(err));
+        printf("Line %d : unexpected error : %s\n", __LINE__, sf_error_number(err));
         exit(1);
     };
 
@@ -193,22 +192,19 @@ static void stdin_test(int typemajor, int count)
 
     if (sfinfo.samplerate != 44100)
     {
-        fprintf(stderr, "\n\nError : Sample rate (%d) should be 44100\n",
-                sfinfo.samplerate);
+        fprintf(stderr, "\n\nError : Sample rate (%d) should be 44100\n", sfinfo.samplerate);
         exit(1);
     };
 
     if (sfinfo.channels != 1)
     {
-        fprintf(stderr, "\n\nError : Channels (%d) should be 1\n",
-                sfinfo.channels);
+        fprintf(stderr, "\n\nError : Channels (%d) should be 1\n", sfinfo.channels);
         exit(1);
     };
 
     if (sfinfo.frames < count)
     {
-        fprintf(stderr, "\n\nError : Sample count (%ld) should be %d\n",
-                (long)sfinfo.frames, count);
+        fprintf(stderr, "\n\nError : Sample count (%ld) should be %d\n", (long)sfinfo.frames, count);
         exit(1);
     };
 
@@ -218,16 +214,14 @@ static void stdin_test(int typemajor, int count)
 
     if (total != count)
     {
-        fprintf(stderr, "\n\nError : Expected %d frames, read %d.\n", count,
-                total);
+        fprintf(stderr, "\n\nError : Expected %d frames, read %d.\n", count, total);
         exit(1);
     };
 
     for (k = 0; k < total; k++)
         if (data[k] != PIPE_INDEX(k))
         {
-            printf("\n\nError : data [%d] == %d, should have been %d.\n\n", k,
-                   data[k], k);
+            printf("\n\nError : data [%d] == %d, should have been %d.\n\n", k, data[k], k);
             exit(1);
         };
 

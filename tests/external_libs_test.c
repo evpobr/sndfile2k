@@ -72,20 +72,13 @@ static void major_format_test(void)
 
 #ifdef HAVE_XIPH_CODECS
     {
-        exit_if_true(have_flac == 0,
-                     "\n\nLine %d : FLAC should be available.\n\n", __LINE__);
-        exit_if_true(have_ogg == 0,
-                     "\n\nLine %d : Ogg/Vorbis should be available.\n\n",
-                     __LINE__);
+        exit_if_true(have_flac == 0, "\n\nLine %d : FLAC should be available.\n\n", __LINE__);
+        exit_if_true(have_ogg == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__);
     }
 #else
     {
-        exit_if_true(have_flac,
-                     "\n\nLine %d : FLAC should not be available.\n\n",
-                     __LINE__);
-        exit_if_true(have_ogg,
-                     "\n\nLine %d : Ogg/Vorbis should not be available.\n\n",
-                     __LINE__);
+        exit_if_true(have_flac, "\n\nLine %d : FLAC should not be available.\n\n", __LINE__);
+        exit_if_true(have_ogg, "\n\nLine %d : Ogg/Vorbis should not be available.\n\n", __LINE__);
     };
 #endif
 
@@ -111,12 +104,9 @@ static void subtype_format_test(void)
     };
 
 #ifdef HAVE_XIPH_CODECS
-    exit_if_true(have_vorbis == 0,
-                 "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__);
+    exit_if_true(have_vorbis == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__);
 #else
-    exit_if_true(have_vorbis,
-                 "\n\nLine %d : Ogg/Vorbis should not be available.\n\n",
-                 __LINE__);
+    exit_if_true(have_vorbis, "\n\nLine %d : Ogg/Vorbis should not be available.\n\n", __LINE__);
 #endif
     puts("ok");
 }
@@ -163,26 +153,15 @@ static void simple_format_test(void)
 
 #ifdef HAVE_XIPH_CODECS
     {
-        exit_if_true(have_flac == 0,
-                     "\n\nLine %d : FLAC should be available.\n\n", __LINE__);
-        exit_if_true(have_ogg == 0,
-                     "\n\nLine %d : Ogg/Vorbis should be available.\n\n",
-                     __LINE__);
-        exit_if_true(have_vorbis == 0,
-                     "\n\nLine %d : Ogg/Vorbis should be available.\n\n",
-                     __LINE__);
+        exit_if_true(have_flac == 0, "\n\nLine %d : FLAC should be available.\n\n", __LINE__);
+        exit_if_true(have_ogg == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__);
+        exit_if_true(have_vorbis == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__);
     }
 #else
     {
-        exit_if_true(have_flac,
-                     "\n\nLine %d : FLAC should not be available.\n\n",
-                     __LINE__);
-        exit_if_true(have_ogg,
-                     "\n\nLine %d : Ogg/Vorbis should not be available.\n\n",
-                     __LINE__);
-        exit_if_true(have_vorbis,
-                     "\n\nLine %d : Ogg/Vorbis should not be available.\n\n",
-                     __LINE__);
+        exit_if_true(have_flac, "\n\nLine %d : FLAC should not be available.\n\n", __LINE__);
+        exit_if_true(have_ogg, "\n\nLine %d : Ogg/Vorbis should not be available.\n\n", __LINE__);
+        exit_if_true(have_vorbis, "\n\nLine %d : Ogg/Vorbis should not be available.\n\n", __LINE__);
     };
 #endif
 
@@ -213,12 +192,10 @@ static void flac_subset_test(void)
         sfinfo.frames = 0;
         sfinfo.format = SF_FORMAT_FLAC | SF_FORMAT_PCM_16;
 
-        file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE,
-                                     __LINE__);
+        file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
         rc = sf_write_float(file, whatever, ARRAY_LEN(whatever));
         unlink(filename);
-        exit_if_true(rc != 0, "\n\nLine %d : return code (%d) should be 0.\n\n",
-                     __LINE__, (int)rc);
+        exit_if_true(rc != 0, "\n\nLine %d : return code (%d) should be 0.\n\n", __LINE__, (int)rc);
 
         sf_close(file);
     };

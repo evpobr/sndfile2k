@@ -116,8 +116,7 @@ void create_short_sndfile(const char *filename, int format, int channels)
 
     if ((file = sf_open(filename, SFM_WRITE, &sfinfo)) == NULL)
     {
-        printf("Error (%s, %d) : sf_open failed : %s\n", __FILE__, __LINE__,
-               sf_strerror(file));
+        printf("Error (%s, %d) : sf_open failed : %s\n", __FILE__, __LINE__, sf_strerror(file));
         exit(1);
     };
 
@@ -126,8 +125,7 @@ void create_short_sndfile(const char *filename, int format, int channels)
     sf_close(file);
 }
 
-void check_file_hash_or_die(const char *filename, uint64_t target_hash,
-                            int line_num)
+void check_file_hash_or_die(const char *filename, uint64_t target_hash, int line_num)
 {
     static unsigned char buf[4096];
     uint64_t cksum;
@@ -159,9 +157,7 @@ void check_file_hash_or_die(const char *filename, uint64_t target_hash,
 
     if (cksum != target_hash)
     {
-        printf("\n\nLine %d: incorrect hash value 0x%" PRIx64
-               " should be 0x%" PRIx64 ".\n\n",
-               line_num, cksum, target_hash);
+        printf("\n\nLine %d: incorrect hash value 0x%" PRIx64 " should be 0x%" PRIx64 ".\n\n", line_num, cksum, target_hash);
         exit(1);
     };
 
@@ -196,15 +192,13 @@ void print_test_name(const char *test, const char *filename)
     fflush(stdout);
 }
 
-void dump_data_to_file(const char *filename, const void *data,
-                       unsigned int datalen)
+void dump_data_to_file(const char *filename, const void *data, unsigned int datalen)
 {
     FILE *file;
 
     if ((file = fopen(filename, "wb")) == NULL)
     {
-        printf("\n\nLine %d : could not open file : %s\n\n", __LINE__,
-               filename);
+        printf("\n\nLine %d : could not open file : %s\n\n", __LINE__, filename);
         exit(1);
     };
 
@@ -235,19 +229,14 @@ int oct_save_short(const short *a, const short *b, int len)
     fprintf(file, "# columns: 1\n");
 
     for (k = 0; k < len; k++)
-        fprintf(file, "% d"
-                      "\n",
-                a[k]);
-
+        fprintf(file, "% d\n", a[k]);
     fprintf(file, "# name: b\n");
     fprintf(file, "# type: matrix\n");
     fprintf(file, "# rows: %d\n", len);
     fprintf(file, "# columns: 1\n");
 
     for (k = 0; k < len; k++)
-        fprintf(file, "% d"
-                      "\n",
-                b[k]);
+        fprintf(file, "% d\n", b[k]);
 
     fclose(file);
     return 0;
@@ -269,9 +258,7 @@ int oct_save_int(const int *a, const int *b, int len)
     fprintf(file, "# columns: 1\n");
 
     for (k = 0; k < len; k++)
-        fprintf(file, "% d"
-                      "\n",
-                a[k]);
+        fprintf(file, "% d\n", a[k]);
 
     fprintf(file, "# name: b\n");
     fprintf(file, "# type: matrix\n");
@@ -279,9 +266,7 @@ int oct_save_int(const int *a, const int *b, int len)
     fprintf(file, "# columns: 1\n");
 
     for (k = 0; k < len; k++)
-        fprintf(file, "% d"
-                      "\n",
-                b[k]);
+        fprintf(file, "% d\n", b[k]);
 
     fclose(file);
     return 0;
@@ -303,9 +288,7 @@ int oct_save_float(const float *a, const float *b, int len)
     fprintf(file, "# columns: 1\n");
 
     for (k = 0; k < len; k++)
-        fprintf(file, "% g"
-                      "\n",
-                a[k]);
+        fprintf(file, "% g\n", a[k]);
 
     fprintf(file, "# name: b\n");
     fprintf(file, "# type: matrix\n");
@@ -313,9 +296,7 @@ int oct_save_float(const float *a, const float *b, int len)
     fprintf(file, "# columns: 1\n");
 
     for (k = 0; k < len; k++)
-        fprintf(file, "% g"
-                      "\n",
-                b[k]);
+        fprintf(file, "% g\n", b[k]);
 
     fclose(file);
     return 0;
@@ -337,9 +318,7 @@ int oct_save_double(const double *a, const double *b, int len)
     fprintf(file, "# columns: 1\n");
 
     for (k = 0; k < len; k++)
-        fprintf(file, "% g"
-                      "\n",
-                a[k]);
+        fprintf(file, "% g\n", a[k]);
 
     fprintf(file, "# name: b\n");
     fprintf(file, "# type: matrix\n");
@@ -347,9 +326,7 @@ int oct_save_double(const double *a, const double *b, int len)
     fprintf(file, "# columns: 1\n");
 
     for (k = 0; k < len; k++)
-        fprintf(file, "% g"
-                      "\n",
-                b[k]);
+        fprintf(file, "% g\n", b[k]);
 
     fclose(file);
     return 0;
@@ -374,8 +351,7 @@ void check_log_buffer_or_die(SNDFILE *file, int line_num)
     /* Look for "Should" */
     if (strstr(buffer, "ould"))
     {
-        printf("\n\nLine %d : Log buffer contains `ould'. Dumping.\n",
-               line_num);
+        printf("\n\nLine %d : Log buffer contains `ould'. Dumping.\n", line_num);
         puts(buffer);
         exit(1);
     };
@@ -391,8 +367,7 @@ void check_log_buffer_or_die(SNDFILE *file, int line_num)
     /* Look for "Should" */
     if (strstr(buffer, "nknown marker"))
     {
-        printf("\n\nLine %d : Log buffer contains `nknown marker'. Dumping.\n",
-               line_num);
+        printf("\n\nLine %d : Log buffer contains `nknown marker'. Dumping.\n", line_num);
         puts(buffer);
         exit(1);
     };
@@ -434,16 +409,13 @@ void hexdump_file(const char *filename, sf_count_t offset, sf_count_t length)
 
     if ((file = fopen(filename, "r")) == NULL)
     {
-        printf(
-            "\n\nError : hexdump_file (%s) could not open file for read.\n\n",
-            filename);
+        printf("\n\nError : hexdump_file (%s) could not open file for read.\n\n", filename);
         exit(1);
     };
 
     if (fseek(file, offset, SEEK_SET) != 0)
     {
-        printf("\n\nError : fseek(file, %" PRId64 ", SEEK_SET) failed : %s\n\n",
-               offset, strerror(errno));
+        printf("\n\nError : fseek(file, %" PRId64 ", SEEK_SET) failed : %s\n\n", offset, strerror(errno));
         exit(1);
     };
 
@@ -502,16 +474,14 @@ void test_sf_format_or_die(const SF_INFO *info, int line_num)
 
     if ((res = sf_format_check(info)) != 1)
     {
-        printf("\n\nLine %d : sf_format_check returned error (%d)\n\n",
-               line_num, res);
+        printf("\n\nLine %d : sf_format_check returned error (%d)\n\n", line_num, res);
         exit(1);
     };
 
     return;
 }
 
-SNDFILE *test_open_file_or_die(const char *filename, int mode, SF_INFO *sfinfo,
-                               int allow_fd, int line_num)
+SNDFILE *test_open_file_or_die(const char *filename, int mode, SF_INFO *sfinfo, int allow_fd, int line_num)
 {
     static int count = 0;
 
@@ -560,8 +530,7 @@ SNDFILE *test_open_file_or_die(const char *filename, int mode, SF_INFO *sfinfo,
         int fd;
 
         /* Only use the three argument open() function if omode != 0. */
-        fd = (omode == 0) ? open(filename, oflags)
-                          : open(filename, oflags, omode);
+        fd = (omode == 0) ? open(filename, oflags) : open(filename, oflags, omode);
 
         if (fd < 0)
         {
@@ -580,8 +549,7 @@ SNDFILE *test_open_file_or_die(const char *filename, int mode, SF_INFO *sfinfo,
 
     if (file == NULL)
     {
-        printf("\n\nLine %d: %s (%s) failed : %s\n\n", line_num, func_name,
-               modestr, sf_strerror(NULL));
+        printf("\n\nLine %d: %s (%s) failed : %s\n\n", line_num, func_name, modestr, sf_strerror(NULL));
         dump_log_buffer(file);
         exit(1);
     };
@@ -589,8 +557,7 @@ SNDFILE *test_open_file_or_die(const char *filename, int mode, SF_INFO *sfinfo,
     err = sf_error(file);
     if (err != SF_ERR_NO_ERROR)
     {
-        printf("\n\nLine %d : sf_error : %s\n\n", line_num,
-               sf_error_number(err));
+        printf("\n\nLine %d : sf_error : %s\n\n", line_num, sf_error_number(err));
         dump_log_buffer(file);
         exit(1);
     };
@@ -598,40 +565,34 @@ SNDFILE *test_open_file_or_die(const char *filename, int mode, SF_INFO *sfinfo,
     return file;
 }
 
-void test_read_write_position_or_die(SNDFILE *file, int line_num, int pass,
-                                     sf_count_t read_pos, sf_count_t write_pos)
+void test_read_write_position_or_die(SNDFILE *file, int line_num, int pass, sf_count_t read_pos, sf_count_t write_pos)
 {
     sf_count_t pos;
 
     /* Check the current read position. */
-    if (read_pos >= 0 &&
-        (pos = sf_seek(file, 0, SEEK_CUR | SFM_READ)) != read_pos)
+    if (read_pos >= 0 && (pos = sf_seek(file, 0, SEEK_CUR | SFM_READ)) != read_pos)
     {
         printf("\n\nLine %d ", line_num);
         if (pass > 0)
             printf("(pass %d): ", pass);
-        printf("Read position (%" PRId64 ") should be %" PRId64 ".\n", pos,
-               read_pos);
+        printf("Read position (%" PRId64 ") should be %" PRId64 ".\n", pos, read_pos);
         exit(1);
     };
 
     /* Check the current write position. */
-    if (write_pos >= 0 &&
-        (pos = sf_seek(file, 0, SEEK_CUR | SFM_WRITE)) != write_pos)
+    if (write_pos >= 0 && (pos = sf_seek(file, 0, SEEK_CUR | SFM_WRITE)) != write_pos)
     {
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : Write position (%" PRId64 ") should be %" PRId64 ".\n", pos,
-               write_pos);
+        printf(" : Write position (%" PRId64 ") should be %" PRId64 ".\n", pos, write_pos);
         exit(1);
     };
 
     return;
 }
 
-void test_seek_or_die(SNDFILE *file, sf_count_t offset, int whence,
-                      sf_count_t new_pos, int channels, int line_num)
+void test_seek_or_die(SNDFILE *file, sf_count_t offset, int whence, sf_count_t new_pos, int channels, int line_num)
 {
     sf_count_t position;
     const char *channel_name, *whence_name;
@@ -679,15 +640,13 @@ void test_seek_or_die(SNDFILE *file, sf_count_t offset, int whence,
 
     if ((position = sf_seek(file, offset, whence)) != new_pos)
     {
-        printf("\n\nLine %d : %s : sf_seek (file, %" PRId64
-               ", %s) returned %" PRId64 " (should be %" PRId64 ").\n\n",
-               line_num, channel_name, offset, whence_name, position, new_pos);
+        printf("\n\nLine %d : %s : sf_seek (file, %" PRId64 ", %s) returned %" PRId64 " (should be %" PRId64 ").\n\n", line_num,
+               channel_name, offset, whence_name, position, new_pos);
         exit(1);
     };
 }
 
-void test_read_short_or_die(SNDFILE *file, int pass, short *test,
-                            sf_count_t items, int line_num)
+void test_read_short_or_die(SNDFILE *file, int pass, short *test, sf_count_t items, int line_num)
 {
     sf_count_t count;
 
@@ -696,9 +655,7 @@ void test_read_short_or_die(SNDFILE *file, int pass, short *test,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_read_short failed with short read (%" PRId64
-               " => %" PRId64 ").\n",
-               items, count);
+        printf(" : sf_read_short failed with short read (%" PRId64 " => %" PRId64 ").\n", items, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -707,8 +664,7 @@ void test_read_short_or_die(SNDFILE *file, int pass, short *test,
     return;
 }
 
-void test_read_int_or_die(SNDFILE *file, int pass, int *test, sf_count_t items,
-                          int line_num)
+void test_read_int_or_die(SNDFILE *file, int pass, int *test, sf_count_t items, int line_num)
 {
     sf_count_t count;
 
@@ -717,9 +673,7 @@ void test_read_int_or_die(SNDFILE *file, int pass, int *test, sf_count_t items,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_read_int failed with short read (%" PRId64 " => %" PRId64
-               ").\n",
-               items, count);
+        printf(" : sf_read_int failed with short read (%" PRId64 " => %" PRId64 ").\n", items, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -728,8 +682,7 @@ void test_read_int_or_die(SNDFILE *file, int pass, int *test, sf_count_t items,
     return;
 }
 
-void test_read_float_or_die(SNDFILE *file, int pass, float *test,
-                            sf_count_t items, int line_num)
+void test_read_float_or_die(SNDFILE *file, int pass, float *test, sf_count_t items, int line_num)
 {
     sf_count_t count;
 
@@ -738,9 +691,7 @@ void test_read_float_or_die(SNDFILE *file, int pass, float *test,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_read_float failed with short read (%" PRId64
-               " => %" PRId64 ").\n",
-               items, count);
+        printf(" : sf_read_float failed with short read (%" PRId64 " => %" PRId64 ").\n", items, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -749,8 +700,7 @@ void test_read_float_or_die(SNDFILE *file, int pass, float *test,
     return;
 }
 
-void test_read_double_or_die(SNDFILE *file, int pass, double *test,
-                             sf_count_t items, int line_num)
+void test_read_double_or_die(SNDFILE *file, int pass, double *test, sf_count_t items, int line_num)
 {
     sf_count_t count;
 
@@ -759,9 +709,7 @@ void test_read_double_or_die(SNDFILE *file, int pass, double *test,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_read_double failed with short read (%" PRId64
-               " => %" PRId64 ").\n",
-               items, count);
+        printf(" : sf_read_double failed with short read (%" PRId64 " => %" PRId64 ").\n", items, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -770,8 +718,7 @@ void test_read_double_or_die(SNDFILE *file, int pass, double *test,
     return;
 }
 
-void test_readf_short_or_die(SNDFILE *file, int pass, short *test,
-                             sf_count_t frames, int line_num)
+void test_readf_short_or_die(SNDFILE *file, int pass, short *test, sf_count_t frames, int line_num)
 {
     sf_count_t count;
 
@@ -780,9 +727,7 @@ void test_readf_short_or_die(SNDFILE *file, int pass, short *test,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_readf_short failed with short readf (%" PRId64
-               " => %" PRId64 ").\n",
-               frames, count);
+        printf(" : sf_readf_short failed with short readf (%" PRId64 " => %" PRId64 ").\n", frames, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -791,8 +736,7 @@ void test_readf_short_or_die(SNDFILE *file, int pass, short *test,
     return;
 }
 
-void test_readf_int_or_die(SNDFILE *file, int pass, int *test,
-                           sf_count_t frames, int line_num)
+void test_readf_int_or_die(SNDFILE *file, int pass, int *test, sf_count_t frames, int line_num)
 {
     sf_count_t count;
 
@@ -801,9 +745,7 @@ void test_readf_int_or_die(SNDFILE *file, int pass, int *test,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_readf_int failed with short readf (%" PRId64
-               " => %" PRId64 ").\n",
-               frames, count);
+        printf(" : sf_readf_int failed with short readf (%" PRId64 " => %" PRId64 ").\n", frames, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -812,8 +754,7 @@ void test_readf_int_or_die(SNDFILE *file, int pass, int *test,
     return;
 }
 
-void test_readf_float_or_die(SNDFILE *file, int pass, float *test,
-                             sf_count_t frames, int line_num)
+void test_readf_float_or_die(SNDFILE *file, int pass, float *test, sf_count_t frames, int line_num)
 {
     sf_count_t count;
 
@@ -822,9 +763,7 @@ void test_readf_float_or_die(SNDFILE *file, int pass, float *test,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_readf_float failed with short readf (%" PRId64
-               " => %" PRId64 ").\n",
-               frames, count);
+        printf(" : sf_readf_float failed with short readf (%" PRId64 " => %" PRId64 ").\n", frames, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -833,8 +772,7 @@ void test_readf_float_or_die(SNDFILE *file, int pass, float *test,
     return;
 }
 
-void test_readf_double_or_die(SNDFILE *file, int pass, double *test,
-                              sf_count_t frames, int line_num)
+void test_readf_double_or_die(SNDFILE *file, int pass, double *test, sf_count_t frames, int line_num)
 {
     sf_count_t count;
 
@@ -843,9 +781,7 @@ void test_readf_double_or_die(SNDFILE *file, int pass, double *test,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_readf_double failed with short readf (%" PRId64
-               " => %" PRId64 ").\n",
-               frames, count);
+        printf(" : sf_readf_double failed with short readf (%" PRId64 " => %" PRId64 ").\n", frames, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -854,8 +790,7 @@ void test_readf_double_or_die(SNDFILE *file, int pass, double *test,
     return;
 }
 
-void test_read_raw_or_die(SNDFILE *file, int pass, void *test, sf_count_t items,
-                          int line_num)
+void test_read_raw_or_die(SNDFILE *file, int pass, void *test, sf_count_t items, int line_num)
 {
     sf_count_t count;
 
@@ -864,9 +799,7 @@ void test_read_raw_or_die(SNDFILE *file, int pass, void *test, sf_count_t items,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_read_raw failed with short read (%" PRId64 " => %" PRId64
-               ").\n",
-               items, count);
+        printf(" : sf_read_raw failed with short read (%" PRId64 " => %" PRId64 ").\n", items, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -875,8 +808,7 @@ void test_read_raw_or_die(SNDFILE *file, int pass, void *test, sf_count_t items,
     return;
 } /* test_read_raw_or_die */
 
-void test_write_short_or_die(SNDFILE *file, int pass, const short *test,
-                             sf_count_t items, int line_num)
+void test_write_short_or_die(SNDFILE *file, int pass, const short *test, sf_count_t items, int line_num)
 {
     sf_count_t count;
 
@@ -885,9 +817,7 @@ void test_write_short_or_die(SNDFILE *file, int pass, const short *test,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_write_short failed with short write (%" PRId64
-               " => %" PRId64 ").\n",
-               items, count);
+        printf(" : sf_write_short failed with short write (%" PRId64 " => %" PRId64 ").\n", items, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -896,8 +826,7 @@ void test_write_short_or_die(SNDFILE *file, int pass, const short *test,
     return;
 }
 
-void test_write_int_or_die(SNDFILE *file, int pass, const int *test,
-                           sf_count_t items, int line_num)
+void test_write_int_or_die(SNDFILE *file, int pass, const int *test, sf_count_t items, int line_num)
 {
     sf_count_t count;
 
@@ -906,9 +835,7 @@ void test_write_int_or_die(SNDFILE *file, int pass, const int *test,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_write_int failed with short write (%" PRId64
-               " => %" PRId64 ").\n",
-               items, count);
+        printf(" : sf_write_int failed with short write (%" PRId64 " => %" PRId64 ").\n", items, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -917,8 +844,7 @@ void test_write_int_or_die(SNDFILE *file, int pass, const int *test,
     return;
 }
 
-void test_write_float_or_die(SNDFILE *file, int pass, const float *test,
-                             sf_count_t items, int line_num)
+void test_write_float_or_die(SNDFILE *file, int pass, const float *test, sf_count_t items, int line_num)
 {
     sf_count_t count;
 
@@ -927,9 +853,7 @@ void test_write_float_or_die(SNDFILE *file, int pass, const float *test,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_write_float failed with short write (%" PRId64
-               " => %" PRId64 ").\n",
-               items, count);
+        printf(" : sf_write_float failed with short write (%" PRId64 " => %" PRId64 ").\n", items, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -938,8 +862,7 @@ void test_write_float_or_die(SNDFILE *file, int pass, const float *test,
     return;
 }
 
-void test_write_double_or_die(SNDFILE *file, int pass, const double *test,
-                              sf_count_t items, int line_num)
+void test_write_double_or_die(SNDFILE *file, int pass, const double *test, sf_count_t items, int line_num)
 {
     sf_count_t count;
 
@@ -948,9 +871,7 @@ void test_write_double_or_die(SNDFILE *file, int pass, const double *test,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_write_double failed with short write (%" PRId64
-               " => %" PRId64 ").\n",
-               items, count);
+        printf(" : sf_write_double failed with short write (%" PRId64 " => %" PRId64 ").\n", items, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -959,8 +880,7 @@ void test_write_double_or_die(SNDFILE *file, int pass, const double *test,
     return;
 }
 
-void test_writef_short_or_die(SNDFILE *file, int pass, const short *test,
-                              sf_count_t frames, int line_num)
+void test_writef_short_or_die(SNDFILE *file, int pass, const short *test, sf_count_t frames, int line_num)
 {
     sf_count_t count;
 
@@ -969,9 +889,7 @@ void test_writef_short_or_die(SNDFILE *file, int pass, const short *test,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_writef_short failed with short writef (%" PRId64
-               " => %" PRId64 ").\n",
-               frames, count);
+        printf(" : sf_writef_short failed with short writef (%" PRId64 " => %" PRId64 ").\n", frames, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -980,8 +898,7 @@ void test_writef_short_or_die(SNDFILE *file, int pass, const short *test,
     return;
 }
 
-void test_writef_int_or_die(SNDFILE *file, int pass, const int *test,
-                            sf_count_t frames, int line_num)
+void test_writef_int_or_die(SNDFILE *file, int pass, const int *test, sf_count_t frames, int line_num)
 {
     sf_count_t count;
 
@@ -990,9 +907,7 @@ void test_writef_int_or_die(SNDFILE *file, int pass, const int *test,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_writef_int failed with short writef (%" PRId64
-               " => %" PRId64 ").\n",
-               frames, count);
+        printf(" : sf_writef_int failed with short writef (%" PRId64 " => %" PRId64 ").\n", frames, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -1001,8 +916,7 @@ void test_writef_int_or_die(SNDFILE *file, int pass, const int *test,
     return;
 }
 
-void test_writef_float_or_die(SNDFILE *file, int pass, const float *test,
-                              sf_count_t frames, int line_num)
+void test_writef_float_or_die(SNDFILE *file, int pass, const float *test, sf_count_t frames, int line_num)
 {
     sf_count_t count;
 
@@ -1011,9 +925,7 @@ void test_writef_float_or_die(SNDFILE *file, int pass, const float *test,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_writef_float failed with short writef (%" PRId64
-               " => %" PRId64 ").\n",
-               frames, count);
+        printf(" : sf_writef_float failed with short writef (%" PRId64 " => %" PRId64 ").\n", frames, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -1022,8 +934,7 @@ void test_writef_float_or_die(SNDFILE *file, int pass, const float *test,
     return;
 }
 
-void test_writef_double_or_die(SNDFILE *file, int pass, const double *test,
-                               sf_count_t frames, int line_num)
+void test_writef_double_or_die(SNDFILE *file, int pass, const double *test, sf_count_t frames, int line_num)
 {
     sf_count_t count;
 
@@ -1032,9 +943,7 @@ void test_writef_double_or_die(SNDFILE *file, int pass, const double *test,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_writef_double failed with short writef (%" PRId64
-               " => %" PRId64 ").\n",
-               frames, count);
+        printf(" : sf_writef_double failed with short writef (%" PRId64 " => %" PRId64 ").\n", frames, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -1043,8 +952,7 @@ void test_writef_double_or_die(SNDFILE *file, int pass, const double *test,
     return;
 }
 
-void test_write_raw_or_die(SNDFILE *file, int pass, const void *test,
-                           sf_count_t items, int line_num)
+void test_write_raw_or_die(SNDFILE *file, int pass, const void *test, sf_count_t items, int line_num)
 {
     sf_count_t count;
 
@@ -1053,9 +961,7 @@ void test_write_raw_or_die(SNDFILE *file, int pass, const void *test,
         printf("\n\nLine %d", line_num);
         if (pass > 0)
             printf(" (pass %d)", pass);
-        printf(" : sf_write_raw failed with short write (%" PRId64
-               " => %" PRId64 ").\n",
-               items, count);
+        printf(" : sf_write_raw failed with short write (%" PRId64 " => %" PRId64 ").\n", items, count);
         fflush(stdout);
         puts(sf_strerror(file));
         exit(1);
@@ -1064,80 +970,56 @@ void test_write_raw_or_die(SNDFILE *file, int pass, const void *test,
     return;
 }
 
-void compare_short_or_die(const short *expected, const short *actual,
-                          unsigned count, int line_num)
+void compare_short_or_die(const short *expected, const short *actual, unsigned count, int line_num)
 {
     unsigned k;
 
     for (k = 0; k < count; k++)
         if (expected[k] != actual[k])
         {
-            printf("\n\nLine %d : Error at index %d, got "
-                   "% d"
-                   ", should be "
-                   "% d"
-                   ".\n\n",
-                   line_num, k, actual[k], expected[k]);
+            printf("\n\nLine %d : Error at index %d, got % d, should be % d.\n\n", line_num, k, actual[k], expected[k]);
             exit(1);
         };
 
     return;
 }
 
-void compare_int_or_die(const int *expected, const int *actual, unsigned count,
-                        int line_num)
+void compare_int_or_die(const int *expected, const int *actual, unsigned count, int line_num)
 {
     unsigned k;
 
     for (k = 0; k < count; k++)
         if (expected[k] != actual[k])
         {
-            printf("\n\nLine %d : Error at index %d, got "
-                   "% d"
-                   ", should be "
-                   "% d"
-                   ".\n\n",
-                   line_num, k, actual[k], expected[k]);
+            printf("\n\nLine %d : Error at index %d, got % d, should be % d.\n\n", line_num, k, actual[k], expected[k]);
             exit(1);
         };
 
     return;
 }
 
-void compare_float_or_die(const float *expected, const float *actual,
-                          unsigned count, int line_num)
+void compare_float_or_die(const float *expected, const float *actual, unsigned count, int line_num)
 {
     unsigned k;
 
     for (k = 0; k < count; k++)
         if (expected[k] != actual[k])
         {
-            printf("\n\nLine %d : Error at index %d, got "
-                   "% g"
-                   ", should be "
-                   "% g"
-                   ".\n\n",
-                   line_num, k, actual[k], expected[k]);
+            printf("\n\nLine %d : Error at index %d, got % g, should be % g.\n\n", line_num, k, actual[k], expected[k]);
             exit(1);
         };
 
     return;
 }
 
-void compare_double_or_die(const double *expected, const double *actual,
-                           unsigned count, int line_num)
+void compare_double_or_die(const double *expected, const double *actual, unsigned count, int line_num)
 {
     unsigned k;
 
     for (k = 0; k < count; k++)
         if (expected[k] != actual[k])
         {
-            printf("\n\nLine %d : Error at index %d, got "
-                   "% g"
-                   ", should be "
-                   "% g"
-                   ".\n\n",
-                   line_num, k, actual[k], expected[k]);
+            printf("\n\nLine %d : Error at index %d, got % g, should be % g.\n\n", line_num, k, actual[k], expected[k]);
             exit(1);
         };
 
@@ -1228,15 +1110,13 @@ void check_open_file_count_or_die(int lineno)
 
     if (count > allowed_open_files)
     {
-        printf("\nLine %d : number of open files (%d) > allowed (%d).\n\n",
-               lineno, count, allowed_open_files);
+        printf("\nLine %d : number of open files (%d) > allowed (%d).\n\n", lineno, count, allowed_open_files);
         exit(1);
     };
 #endif
 }
 
-void write_mono_file(const char *filename, int format, int srate, float *output,
-                     int len)
+void write_mono_file(const char *filename, int format, int srate, float *output, int len)
 {
     SNDFILE *file;
     SF_INFO sfinfo;

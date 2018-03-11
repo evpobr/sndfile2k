@@ -64,15 +64,13 @@ static void wchar_test(void)
     info.samplerate = 44100;
 
     file = sf_wchar_open(filename, SFM_WRITE, &info);
-    exit_if_true(file == NULL, "\n\nLine %d : sf_wchar_open failed : %s\n\n",
-                 __LINE__, sf_strerror(NULL));
+    exit_if_true(file == NULL, "\n\nLine %d : sf_wchar_open failed : %s\n\n", __LINE__, sf_strerror(NULL));
     sf_close(file);
 
     /*	This should check that the file did in fact get created with a
 	**	wchar_t * filename.
 	*/
-    exit_if_true(GetFileAttributesW(filename) == INVALID_FILE_ATTRIBUTES,
-                 "\n\nLine %d : GetFileAttributes failed.\n\n", __LINE__);
+    exit_if_true(GetFileAttributesW(filename) == INVALID_FILE_ATTRIBUTES, "\n\nLine %d : GetFileAttributes failed.\n\n", __LINE__);
 
     /* Use this because the file was created with CreateFileW. */
     DeleteFileW(filename);
@@ -93,21 +91,20 @@ static void locale_test(const LOCALE_DATA *locdata);
 
 static void utf8_test(void)
 {
-    LOCALE_DATA ldata[] = {
-        {"de_DE", 1, "F\303\274\303\237e.au", 7},
-        {"en_AU", 1, "kangaroo.au", 11},
-        {"POSIX", 0, "posix.au", 8},
-        {"pt_PT", 1, "concei\303\247\303\243o.au", 12},
+    LOCALE_DATA ldata[] = {{"de_DE", 1, "F\303\274\303\237e.au", 7},
+                           {"en_AU", 1, "kangaroo.au", 11},
+                           {"POSIX", 0, "posix.au", 8},
+                           {"pt_PT", 1, "concei\303\247\303\243o.au", 12},
 
 #ifndef _WIN32
-        {"ja_JP", 1, "\343\201\212\343\201\257\343\202\210\343\201\206\343\201"
-                     "\224\343\201\226\343\201\204\343\201\276\343\201\231.au",
-         21},
+                           {"ja_JP", 1,
+                            "\343\201\212\343\201\257\343\202\210\343\201\206\343\201"
+                            "\224\343\201\226\343\201\204\343\201\276\343\201\231.au",
+                            21},
 #endif
 
-        {"vi_VN", 1, "qu\341\273\221c ng\341\273\257.au", 11},
-        {NULL, 0, NULL, 0}
-    };
+                           {"vi_VN", 1, "qu\341\273\221c ng\341\273\257.au", 11},
+                           {NULL, 0, NULL, 0}};
     int k;
 
     for (k = 0; ldata[k].locale != NULL; k++)
@@ -128,28 +125,24 @@ static void locale_test(const LOCALE_DATA *ldata)
     SNDFILE *file;
     SF_INFO sfinfo;
 
-    snprintf(utf8_locname, sizeof(utf8_locname), "%s%s", ldata->locale,
-             ldata->utf8 ? ".UTF-8" : "");
+    snprintf(utf8_locname, sizeof(utf8_locname), "%s%s", ldata->locale, ldata->utf8 ? ".UTF-8" : "");
 
     /* Change the locale saving the old one. */
     if ((old_locale = setlocale(LC_CTYPE, utf8_locname)) == NULL)
         return;
 
-    printf("    locale_test           %-8s : %s %*c ", ldata->locale,
-           ldata->filename, 24 - ldata->width, ' ');
+    printf("    locale_test           %-8s : %s %*c ", ldata->locale, ldata->filename, 24 - ldata->width, ' ');
     fflush(stdout);
 
     sfinfo.format = SF_FORMAT_AU | SF_FORMAT_PCM_16;
     sfinfo.channels = 1;
     sfinfo.samplerate = 44100;
 
-    file =
-        test_open_file_or_die(ldata->filename, SFM_WRITE, &sfinfo, 0, __LINE__);
+    file = test_open_file_or_die(ldata->filename, SFM_WRITE, &sfinfo, 0, __LINE__);
     test_write_short_or_die(file, 0, wdata, ARRAY_LEN(wdata), __LINE__);
     sf_close(file);
 
-    file =
-        test_open_file_or_die(ldata->filename, SFM_READ, &sfinfo, 0, __LINE__);
+    file = test_open_file_or_die(ldata->filename, SFM_READ, &sfinfo, 0, __LINE__);
     test_read_short_or_die(file, 0, rdata, ARRAY_LEN(rdata), __LINE__);
     sf_close(file);
 

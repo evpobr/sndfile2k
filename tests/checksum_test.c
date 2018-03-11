@@ -41,14 +41,10 @@ typedef struct
 } CHECKSUM;
 
 static CHECKSUM checksum_orig[] = {
-    {SF_FORMAT_RAW | SF_FORMAT_ULAW, "checksum.ulaw", "cksum_ulaw.pcm16",
-     0xbd99d34ccbe2fLL, 0xda82168ed82e9LL},
-    {SF_FORMAT_RAW | SF_FORMAT_ALAW, "checksum.alaw", "cksum_alaw.pcm16",
-     0x0004afddc0fcf4bdLL, 0x2e7320230b88LL},
-    {SF_FORMAT_RAW | SF_FORMAT_GSM610, "checksum.gsm", "cksum_gsm.pcm16",
-     0xa06a3faaaf684LL, 0x2d7ff668efeb9LL},
-    {SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM, "checksum.vox", "cksum_vox.pcm16",
-     0x7c9d7afdb96a1LL, 0xe540df74a4b14LL},
+    {SF_FORMAT_RAW | SF_FORMAT_ULAW, "checksum.ulaw", "cksum_ulaw.pcm16", 0xbd99d34ccbe2fLL, 0xda82168ed82e9LL},
+    {SF_FORMAT_RAW | SF_FORMAT_ALAW, "checksum.alaw", "cksum_alaw.pcm16", 0x0004afddc0fcf4bdLL, 0x2e7320230b88LL},
+    {SF_FORMAT_RAW | SF_FORMAT_GSM610, "checksum.gsm", "cksum_gsm.pcm16", 0xa06a3faaaf684LL, 0x2d7ff668efeb9LL},
+    {SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM, "checksum.vox", "cksum_vox.pcm16", 0x7c9d7afdb96a1LL, 0xe540df74a4b14LL},
 };
 
 static void checksum_test(const CHECKSUM *cksum);
@@ -80,8 +76,7 @@ static void checksum_test(const CHECKSUM *cksum)
     info.channels = 1;
     info.samplerate = SAMPLE_RATE;
 
-    file =
-        test_open_file_or_die(cksum->enc_name, SFM_WRITE, &info, 0, __LINE__);
+    file = test_open_file_or_die(cksum->enc_name, SFM_WRITE, &info, 0, __LINE__);
     test_write_float_or_die(file, 0, orig, ARRAY_LEN(orig), __LINE__);
     sf_close(file);
 
@@ -104,8 +99,7 @@ static void checksum_test(const CHECKSUM *cksum)
     info.channels = 1;
     info.samplerate = SAMPLE_RATE;
 
-    file =
-        test_open_file_or_die(cksum->dec_name, SFM_WRITE, &info, 0, __LINE__);
+    file = test_open_file_or_die(cksum->dec_name, SFM_WRITE, &info, 0, __LINE__);
     test_write_short_or_die(file, 0, data, ARRAY_LEN(data), __LINE__);
     sf_close(file);
 

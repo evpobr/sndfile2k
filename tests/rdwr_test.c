@@ -80,8 +80,7 @@ static void rdwr_short_test(const char *filename)
     frames = ARRAY_LEN(buffer);
 
     /* Open again for read/write. */
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_short_or_die(file, 0, buffer, frames, __LINE__);
 
@@ -115,8 +114,7 @@ static void rdwr_int_test(const char *filename)
     frames = ARRAY_LEN(buffer);
 
     /* Open again for read/write. */
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_int_or_die(file, 0, buffer, frames, __LINE__);
 
@@ -150,8 +148,7 @@ static void rdwr_float_test(const char *filename)
     frames = ARRAY_LEN(buffer);
 
     /* Open again for read/write. */
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_float_or_die(file, 0, buffer, frames, __LINE__);
 
@@ -185,8 +182,7 @@ static void rdwr_double_test(const char *filename)
     frames = ARRAY_LEN(buffer);
 
     /* Open again for read/write. */
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_double_or_die(file, 0, buffer, frames, __LINE__);
 
@@ -220,8 +216,7 @@ static void rdwr_raw_test(const char *filename)
     frames = ARRAY_LEN(buffer);
 
     /* Open again for read/write. */
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
 
     test_write_raw_or_die(file, 0, buffer, frames, __LINE__);
 

@@ -86,15 +86,13 @@ static void error_value_test(void)
     file = sf_open(filename, SFM_READ, &sfinfo);
     if (file != NULL)
     {
-        printf("\n\nLine %d : Should not have been able to open this file.\n\n",
-               __LINE__);
+        printf("\n\nLine %d : Should not have been able to open this file.\n\n", __LINE__);
         exit(1);
     };
 
     if ((error_num = sf_error(NULL)) <= 1 || error_num > 300)
     {
-        printf("\n\nLine %d : Should not have had an error number of %d.\n\n",
-               __LINE__, error_num);
+        printf("\n\nLine %d : Should not have had an error number of %d.\n\n", __LINE__, error_num);
         exit(1);
     };
 
@@ -115,10 +113,7 @@ static void no_file_test(const char *filename)
     memset(&sfinfo, 0, sizeof(sfinfo));
     sndfile = sf_open(filename, SFM_READ, &sfinfo);
 
-    exit_if_true(
-        sndfile != NULL,
-        "\n\nLine %d : should not have received a valid SNDFILE* pointer.\n",
-        __LINE__);
+    exit_if_true(sndfile != NULL, "\n\nLine %d : should not have received a valid SNDFILE* pointer.\n", __LINE__);
 
     unlink(filename);
     puts("ok");
@@ -134,22 +129,16 @@ static void zero_length_test(const char *filename)
 
     /* Create a zero length file. */
     file = fopen(filename, "w");
-    exit_if_true(file == NULL, "\n\nLine %d : fopen ('%s') failed.\n", __LINE__,
-                 filename);
+    exit_if_true(file == NULL, "\n\nLine %d : fopen ('%s') failed.\n", __LINE__, filename);
     fclose(file);
 
     memset(&sfinfo, 0, sizeof(sfinfo));
     sndfile = sf_open(filename, SFM_READ, &sfinfo);
 
-    exit_if_true(
-        sndfile != NULL,
-        "\n\nLine %d : should not have received a valid SNDFILE* pointer.\n",
-        __LINE__);
+    exit_if_true(sndfile != NULL, "\n\nLine %d : should not have received a valid SNDFILE* pointer.\n", __LINE__);
 
-    exit_if_true(0 && sf_error(NULL) != SF_ERR_UNRECOGNISED_FORMAT,
-                 "\n\nLine %3d : Error : %s\n       should be : %s\n", __LINE__,
-                 sf_strerror(NULL),
-                 sf_error_number(SF_ERR_UNRECOGNISED_FORMAT));
+    exit_if_true(0 && sf_error(NULL) != SF_ERR_UNRECOGNISED_FORMAT, "\n\nLine %3d : Error : %s\n       should be : %s\n", __LINE__,
+                 sf_strerror(NULL), sf_error_number(SF_ERR_UNRECOGNISED_FORMAT));
 
     unlink(filename);
     puts("ok");
@@ -171,8 +160,7 @@ static void bad_wav_test(const char *filename)
         exit(1);
     };
 
-    exit_if_true(fwrite(data, sizeof(data), 1, file) != 1,
-                 "\n\nLine %d : fwrite failed.\n", __LINE__);
+    exit_if_true(fwrite(data, sizeof(data), 1, file) != 1, "\n\nLine %d : fwrite failed.\n", __LINE__);
     fclose(file);
 
     memset(&sfinfo, 0, sizeof(sfinfo));
@@ -216,8 +204,7 @@ static void error_close_test(void)
     sndfile = sf_open_fd(fileno(file), SFM_WRITE, &sfinfo, SF_TRUE);
     if (sndfile == NULL)
     {
-        printf("\n\nLine %d : sf_open_fd failed : %s\n", __LINE__,
-               sf_strerror(NULL));
+        printf("\n\nLine %d : sf_open_fd failed : %s\n", __LINE__, sf_strerror(NULL));
         exit(1);
     };
 
@@ -230,13 +217,10 @@ static void error_close_test(void)
     {
 #ifdef _WIN32
 
-            printf("\n\nLine %d : sf_close should not have returned zero.\n",
-                   __LINE__);
-            printf("\nHowever, this is a known bug of windows "
-                   "so we'll ignore it.\n\n");
+        printf("\n\nLine %d : sf_close should not have returned zero.\n", __LINE__);
+        printf("\nHowever, this is a known bug of windows so we'll ignore it.\n\n");
 #else
-        printf("\n\nLine %d : sf_close should not have returned zero.\n",
-               __LINE__);
+        printf("\n\nLine %d : sf_close should not have returned zero.\n", __LINE__);
         exit(1);
 #endif
     };

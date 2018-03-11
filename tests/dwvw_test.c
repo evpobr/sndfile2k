@@ -69,8 +69,7 @@ static void dwvw_test(const char *filename, int format, int bit_width)
 
     sf_info_setup(&sfinfo, format, 44100, 1);
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
 
     /* Generate random.frames. */
     for (k = 0; k < BUFFER_SIZE / 2; k++)
@@ -80,19 +79,16 @@ static void dwvw_test(const char *filename, int format, int bit_width)
     };
 
     for (; k < BUFFER_SIZE; k++)
-        write_buf[k] =
-            bit_mask & (arith_shift_left(rand(), 11) ^ (rand() >> 11));
+        write_buf[k] = bit_mask & (arith_shift_left(rand(), 11) ^ (rand() >> 11));
 
     sf_write_int(file, write_buf, BUFFER_SIZE);
     sf_close(file);
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
     if ((k = sf_read_int(file, read_buf, BUFFER_SIZE)) != BUFFER_SIZE)
     {
-        printf("Error (line %d) : Only read %d/%d.frames.\n", __LINE__, k,
-               BUFFER_SIZE);
+        printf("Error (line %d) : Only read %d/%d.frames.\n", __LINE__, k, BUFFER_SIZE);
         exit(1);
     }
 
@@ -100,8 +96,7 @@ static void dwvw_test(const char *filename, int format, int bit_width)
     {
         if (read_buf[k] != write_buf[k])
         {
-            printf("Error (line %d) : %d != %d at position %d/%d\n", __LINE__,
-                   write_buf[k] >> (32 - bit_width),
+            printf("Error (line %d) : %d != %d at position %d/%d\n", __LINE__, write_buf[k] >> (32 - bit_width),
                    read_buf[k] >> (32 - bit_width), k, BUFFER_SIZE);
             oct_save_int(write_buf, read_buf, BUFFER_SIZE);
             exit(1);
