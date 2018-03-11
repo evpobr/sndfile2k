@@ -75,7 +75,7 @@ static void read_file(const string &fname)
     /* RAII takes care of destroying SndfileHandle object. */
 }
 
-void main(void)
+int main(void)
 {
     const string fname("test.wav");
 
@@ -90,4 +90,6 @@ void main(void)
 	remove(fname.c_str());
 
     cout << "Done" << endl << endl;
+
+	return 0;
 }
