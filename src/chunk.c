@@ -39,7 +39,7 @@ static int64_t hash_of_str(const char *str)
 
 SF_CHUNK_ITERATOR *psf_get_chunk_iterator(SF_PRIVATE *psf, const char *marker_str)
 {
-    const READ_CHUNKS *pchk = &psf->rchunks;
+    const struct READ_CHUNKS *pchk = &psf->rchunks;
     int idx;
 
     if (marker_str)
@@ -87,7 +87,7 @@ SF_CHUNK_ITERATOR *psf_get_chunk_iterator(SF_PRIVATE *psf, const char *marker_st
     return psf->iterator;
 }
 
-SF_CHUNK_ITERATOR *psf_next_chunk_iterator(const READ_CHUNKS *pchk, SF_CHUNK_ITERATOR *iterator)
+SF_CHUNK_ITERATOR *psf_next_chunk_iterator(const struct READ_CHUNKS *pchk, SF_CHUNK_ITERATOR *iterator)
 {
     uint64_t hash = iterator->hash;
     uint32_t k;
@@ -111,22 +111,22 @@ SF_CHUNK_ITERATOR *psf_next_chunk_iterator(const READ_CHUNKS *pchk, SF_CHUNK_ITE
     return NULL;
 }
 
-static int psf_store_read_chunk(READ_CHUNKS *pchk, const READ_CHUNK *rchunk)
+static int psf_store_read_chunk(struct READ_CHUNKS *pchk, const struct READ_CHUNK *rchunk)
 {
     if (pchk->count == 0)
     {
         pchk->used = 0;
         pchk->count = 20;
-        pchk->chunks = calloc(pchk->count, sizeof(READ_CHUNK));
+        pchk->chunks = calloc(pchk->count, sizeof(struct READ_CHUNK));
     }
     else if (pchk->used > pchk->count)
         return SFE_INTERNAL;
     else if (pchk->used == pchk->count)
     {
-        READ_CHUNK *old_ptr = pchk->chunks;
+		struct READ_CHUNK *old_ptr = pchk->chunks;
         int new_count = 3 * (pchk->count + 1) / 2;
 
-        pchk->chunks = realloc(old_ptr, new_count * sizeof(READ_CHUNK));
+        pchk->chunks = realloc(old_ptr, new_count * sizeof(struct READ_CHUNK));
         if (pchk->chunks == NULL)
         {
             pchk->chunks = old_ptr;
@@ -142,9 +142,9 @@ static int psf_store_read_chunk(READ_CHUNKS *pchk, const READ_CHUNK *rchunk)
     return SFE_NO_ERROR;
 }
 
-int psf_store_read_chunk_u32(READ_CHUNKS *pchk, uint32_t marker, sf_count_t offset, uint32_t len)
+int psf_store_read_chunk_u32(struct READ_CHUNKS *pchk, uint32_t marker, sf_count_t offset, uint32_t len)
 {
-    READ_CHUNK rchunk;
+	struct READ_CHUNK rchunk;
 
     memset(&rchunk, 0, sizeof(rchunk));
 
@@ -159,7 +159,7 @@ int psf_store_read_chunk_u32(READ_CHUNKS *pchk, uint32_t marker, sf_count_t offs
     return psf_store_read_chunk(pchk, &rchunk);
 }
 
-int psf_find_read_chunk_str(const READ_CHUNKS *pchk, const char *marker_str)
+int psf_find_read_chunk_str(const struct READ_CHUNKS *pchk, const char *marker_str)
 {
     uint64_t hash;
     uint32_t k;
@@ -180,7 +180,7 @@ int psf_find_read_chunk_str(const READ_CHUNKS *pchk, const char *marker_str)
     return -1;
 }
 
-int psf_find_read_chunk_m32(const READ_CHUNKS *pchk, uint32_t marker)
+int psf_find_read_chunk_m32(const struct READ_CHUNKS *pchk, uint32_t marker)
 {
     uint32_t k;
 
@@ -191,7 +191,7 @@ int psf_find_read_chunk_m32(const READ_CHUNKS *pchk, uint32_t marker)
     return -1;
 }
 
-int psf_find_read_chunk_iterator(const READ_CHUNKS *pchk, const SF_CHUNK_ITERATOR *marker)
+int psf_find_read_chunk_iterator(const struct READ_CHUNKS *pchk, const SF_CHUNK_ITERATOR *marker)
 {
     if (marker->current < pchk->used)
         return marker->current;
@@ -199,10 +199,10 @@ int psf_find_read_chunk_iterator(const READ_CHUNKS *pchk, const SF_CHUNK_ITERATO
     return -1;
 }
 
-int psf_store_read_chunk_str(READ_CHUNKS *pchk, const char *marker_str, sf_count_t offset,
+int psf_store_read_chunk_str(struct READ_CHUNKS *pchk, const char *marker_str, sf_count_t offset,
                              uint32_t len)
 {
-    READ_CHUNK rchunk;
+	struct READ_CHUNK rchunk;
     union
     {
         uint32_t marker;
@@ -226,7 +226,7 @@ int psf_store_read_chunk_str(READ_CHUNKS *pchk, const char *marker_str, sf_count
     return psf_store_read_chunk(pchk, &rchunk);
 }
 
-int psf_save_write_chunk(WRITE_CHUNKS *pchk, const SF_CHUNK_INFO *chunk_info)
+int psf_save_write_chunk(struct WRITE_CHUNKS *pchk, const SF_CHUNK_INFO *chunk_info)
 {
     union
     {
@@ -239,14 +239,14 @@ int psf_save_write_chunk(WRITE_CHUNKS *pchk, const SF_CHUNK_INFO *chunk_info)
     {
         pchk->used = 0;
         pchk->count = 20;
-        pchk->chunks = calloc(pchk->count, sizeof(WRITE_CHUNK));
+        pchk->chunks = calloc(pchk->count, sizeof(struct WRITE_CHUNK));
     }
     else if (pchk->used >= pchk->count)
     {
-        WRITE_CHUNK *old_ptr = pchk->chunks;
+		struct WRITE_CHUNK *old_ptr = pchk->chunks;
         int new_count = 3 * (pchk->count + 1) / 2;
 
-        pchk->chunks = realloc(old_ptr, new_count * sizeof(WRITE_CHUNK));
+        pchk->chunks = realloc(old_ptr, new_count * sizeof(struct WRITE_CHUNK));
         if (pchk->chunks == NULL)
         {
             pchk->chunks = old_ptr;

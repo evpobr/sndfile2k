@@ -133,25 +133,26 @@
 /*------------------------------------------------------------------------------
 */
 
-enum
+/* PEAK chunk location. */
+enum SF_PEAK_POSITION
 {
-    /* PEAK chunk location. */
-    SF_PEAK_START = 42,
-    SF_PEAK_END = 43,
+	SF_PEAK_START = 42,
+	SF_PEAK_END = 43
+};
 
-    /* PEAK chunk location. */
-    SF_SCALE_MAX = 52,
-    SF_SCALE_MIN = 53,
+enum SF_SCALE_VALUE
+{
+	SF_SCALE_MAX = 52,
+	SF_SCALE_MIN = 53,
+};
 
-    /* str_flags values. */
-    SF_STR_ALLOW_START = 0x0100,
-    SF_STR_ALLOW_END = 0x0200,
-
-    /* Location of strings. */
+/* str_flags values. */
+enum SF_STR_FLAGS
+{
+	SF_STR_ALLOW_START = 0x0100,
+	SF_STR_ALLOW_END = 0x0200,
     SF_STR_LOCATE_START = 0x0400,
     SF_STR_LOCATE_END = 0x0800,
-
-    SFD_TYPEMASK = 0x0FFFFFFF
 };
 
 #define SFM_MASK (SFM_READ | SFM_WRITE | SFM_RDWR)
@@ -162,7 +163,7 @@ enum
 ** When support is finalised, these values move to src/sndfile.h.
 */
 
-enum
+enum _SF_FORMAT
 {
     /* Work in progress. */
     SF_FORMAT_SPEEX = 0x5000000,
@@ -189,7 +190,7 @@ enum
 /*---------------------------------------------------------------------------------------
 */
 
-typedef struct
+struct ALAC_DECODER_INFO
 {
     unsigned kuki_offset;
     unsigned pakt_offset;
@@ -201,23 +202,23 @@ typedef struct
     int64_t valid_frames;
     int32_t priming_frames;
     int32_t remainder_frames;
-} ALAC_DECODER_INFO;
+};
 
 /*---------------------------------------------------------------------------------------
 **	PEAK_CHUNK - This chunk type is common to both AIFF and WAVE files although their
 **	endian encodings are different.
 */
 
-typedef struct
+struct PEAK_POS
 {
     double value; /* signed value of peak */
     sf_count_t position; /* the sample frame for the peak */
-} PEAK_POS;
+};
 
-typedef struct
+struct PEAK_INFO
 {
     /* libsndfile internal : write a PEAK chunk at the start or end of the file? */
-    int peak_loc;
+    enum SF_PEAK_POSITION peak_loc;
 
     /* WAV/AIFF */
     unsigned int version; /* version of the PEAK chunk */
@@ -227,22 +228,22 @@ typedef struct
     unsigned int edit_number;
 
     /* the per channel peak info */
-    PEAK_POS peaks[];
-} PEAK_INFO;
+    struct PEAK_POS peaks[];
+};
 
-static inline PEAK_INFO *peak_info_calloc(int channels)
+static inline struct PEAK_INFO *peak_info_calloc(int channels)
 {
-    return calloc(1, sizeof(PEAK_INFO) + channels * sizeof(PEAK_POS));
+    return calloc(1, sizeof(struct PEAK_INFO) + channels * sizeof(struct PEAK_POS));
 } /* peak_info_calloc */
 
-typedef struct
+struct STR_DATA
 {
     int type;
     int flags;
     size_t offset;
-} STR_DATA;
+};
 
-typedef struct
+struct READ_CHUNK
 {
     uint64_t hash;
     char id[64];
@@ -250,28 +251,28 @@ typedef struct
     uint32_t mark32;
     sf_count_t offset;
     uint32_t len;
-} READ_CHUNK;
+};
 
-typedef struct
+struct WRITE_CHUNK
 {
     uint64_t hash;
     uint32_t mark32;
     uint32_t len;
     void *data;
-} WRITE_CHUNK;
+};
 
-typedef struct
+struct READ_CHUNKS
 {
     uint32_t count;
     uint32_t used;
-    READ_CHUNK *chunks;
-} READ_CHUNKS;
-typedef struct
+    struct READ_CHUNK *chunks;
+};
+struct WRITE_CHUNKS
 {
     uint32_t count;
     uint32_t used;
-    WRITE_CHUNK *chunks;
-} WRITE_CHUNKS;
+    struct WRITE_CHUNK *chunks;
+};
 
 struct SF_CHUNK_ITERATOR
 {
@@ -376,12 +377,12 @@ typedef union
 typedef struct sf_private_tag
 {
     /* Canary in a coal mine. */
-    union
+    union canary
     {
         /* Place a double here to encourage double alignment. */
         double d[2];
         char c[16];
-    } canary;
+    } _canary;
 
     PSF_FILE file, rsrc;
 
@@ -390,13 +391,13 @@ typedef struct sf_private_tag
     /* parselog and indx should only be changed within the logging functions
 	** of common.c
 	*/
-    struct
+    struct parselog_buffer
     {
         char buf[SF_PARSELOG_LEN];
         int indx;
     } parselog;
 
-    struct
+    struct header_storage
     {
         unsigned char *ptr;
         sf_count_t indx, end, len;
@@ -407,9 +408,9 @@ typedef struct sf_private_tag
     /* Storage and housekeeping data for adding/reading strings from
 	** sound files.
 	*/
-    struct
+    struct strings_storage
     {
-        STR_DATA data[SF_MAX_STRINGS];
+        struct STR_DATA data[SF_MAX_STRINGS];
         char *storage;
         size_t storage_len;
         size_t storage_used;
@@ -445,7 +446,7 @@ typedef struct sf_private_tag
     SF_INFO sf;
 
     int have_written; /* Has a single write been done to the file? */
-    PEAK_INFO *peak_info;
+    struct PEAK_INFO *peak_info;
 
     /* Cue Marker Info */
     SF_CUES *cues;
@@ -535,8 +536,8 @@ typedef struct sf_private_tag
     /* Chunk get/set. */
     SF_CHUNK_ITERATOR *iterator;
 
-    READ_CHUNKS rchunks;
-    WRITE_CHUNKS wchunks;
+    struct READ_CHUNKS rchunks;
+	struct WRITE_CHUNKS wchunks;
 
     int (*set_chunk)(struct sf_private_tag *, const SF_CHUNK_INFO *chunk_info);
     SF_CHUNK_ITERATOR *(*next_chunk_iterator)(struct sf_private_tag *, SF_CHUNK_ITERATOR *iterator);
@@ -933,7 +934,7 @@ int nms_adpcm_init(SF_PRIVATE *psf);
 int vox_adpcm_init(SF_PRIVATE *psf);
 int flac_init(SF_PRIVATE *psf);
 int g72x_init(SF_PRIVATE *psf);
-int alac_init(SF_PRIVATE *psf, const ALAC_DECODER_INFO *info);
+int alac_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *info);
 
 int dither_init(SF_PRIVATE *psf, int mode);
 
@@ -949,16 +950,16 @@ int interleave_init(SF_PRIVATE *psf);
 */
 
 SF_CHUNK_ITERATOR *psf_get_chunk_iterator(SF_PRIVATE *psf, const char *marker_str);
-SF_CHUNK_ITERATOR *psf_next_chunk_iterator(const READ_CHUNKS *pchk, SF_CHUNK_ITERATOR *iterator);
-int psf_store_read_chunk_u32(READ_CHUNKS *pchk, uint32_t marker, sf_count_t offset, uint32_t len);
-int psf_store_read_chunk_str(READ_CHUNKS *pchk, const char *marker, sf_count_t offset,
+SF_CHUNK_ITERATOR *psf_next_chunk_iterator(const struct READ_CHUNKS *pchk, SF_CHUNK_ITERATOR *iterator);
+int psf_store_read_chunk_u32(struct READ_CHUNKS *pchk, uint32_t marker, sf_count_t offset, uint32_t len);
+int psf_store_read_chunk_str(struct READ_CHUNKS *pchk, const char *marker, sf_count_t offset,
                              uint32_t len);
-int psf_save_write_chunk(WRITE_CHUNKS *pchk, const SF_CHUNK_INFO *chunk_info);
-int psf_find_read_chunk_str(const READ_CHUNKS *pchk, const char *marker);
-int psf_find_read_chunk_m32(const READ_CHUNKS *pchk, uint32_t marker);
-int psf_find_read_chunk_iterator(const READ_CHUNKS *pchk, const SF_CHUNK_ITERATOR *marker);
+int psf_save_write_chunk(struct WRITE_CHUNKS *pchk, const SF_CHUNK_INFO *chunk_info);
+int psf_find_read_chunk_str(const struct READ_CHUNKS *pchk, const char *marker);
+int psf_find_read_chunk_m32(const struct READ_CHUNKS *pchk, uint32_t marker);
+int psf_find_read_chunk_iterator(const struct READ_CHUNKS *pchk, const SF_CHUNK_ITERATOR *marker);
 
-int psf_find_write_chunk(WRITE_CHUNKS *pchk, const char *marker);
+int psf_find_write_chunk(struct WRITE_CHUNKS *pchk, const char *marker);
 
 static inline int fourcc_to_marker(const SF_CHUNK_INFO *chunk_info)
 {
@@ -1020,13 +1021,13 @@ SF_CART_INFO_16K *cart_var_alloc(void);
 int cart_var_set(SF_PRIVATE *psf, const SF_CART_INFO *date, size_t datasize);
 int cart_var_get(SF_PRIVATE *psf, SF_CART_INFO *data, size_t datasize);
 
-typedef struct
+struct AUDIO_DETECT
 {
     int channels;
     int endianness;
-} AUDIO_DETECT;
+};
 
-int audio_detect(SF_PRIVATE *psf, AUDIO_DETECT *ad, const unsigned char *data, int datalen);
+int audio_detect(SF_PRIVATE *psf, struct AUDIO_DETECT *ad, const unsigned char *data, int datalen);
 int id3_skip(SF_PRIVATE *psf);
 
 void alac_get_desc_chunk_items(int subformat, uint32_t *fmt_flags, uint32_t *frames_per_packet);
@@ -1048,7 +1049,7 @@ const char *str_of_endianness(int end);
 ** Extra commands for sf_command(). Not for public use yet.
 */
 
-enum
+enum _SFC_COMMAND
 {
     SFC_TEST_AIFF_ADD_INST_CHUNK = 0x2000,
     SFC_TEST_WAV_ADD_INFO_CHUNK = 0x2010

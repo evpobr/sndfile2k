@@ -70,11 +70,7 @@
 #define SFE_CAF_NO_DESC (667)
 #define SFE_CAF_BAD_PEAK (668)
 
-/*
- * Typedefs.
- */
-
-typedef struct
+struct DESC_CHUNK
 {
     uint8_t srate[8];
     uint32_t fmt_id;
@@ -83,14 +79,14 @@ typedef struct
     uint32_t frames_per_packet;
     uint32_t channels_per_frame;
     uint32_t bits_per_chan;
-} DESC_CHUNK;
+};
 
-typedef struct
+struct CAF_PRIVATE
 {
     int chanmap_tag;
 
-    ALAC_DECODER_INFO alac;
-} CAF_PRIVATE;
+	struct ALAC_DECODER_INFO alac;
+};
 
 /*
  * Private static functions.
@@ -114,10 +110,10 @@ static int caf_get_chunk_data(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator
 
 int caf_open(SF_PRIVATE *psf)
 {
-    CAF_PRIVATE *pcaf;
+    struct CAF_PRIVATE *pcaf;
     int subformat, format, error = 0;
 
-    if ((psf->container_data = calloc(1, sizeof(CAF_PRIVATE))) == NULL)
+    if ((psf->container_data = calloc(1, sizeof(struct CAF_PRIVATE))) == NULL)
         return SFE_MALLOC_FAILED;
 
     pcaf = psf->container_data;
@@ -233,7 +229,7 @@ static int caf_close(SF_PRIVATE *psf)
 
 static size_t caf_command(SF_PRIVATE *psf, int command, void *UNUSED(data), size_t UNUSED(datasize))
 {
-    CAF_PRIVATE *pcaf;
+	struct CAF_PRIVATE *pcaf;
 
     if ((pcaf = psf->container_data) == NULL)
         return SFE_INTERNAL;
@@ -251,7 +247,7 @@ static size_t caf_command(SF_PRIVATE *psf, int command, void *UNUSED(data), size
     return 0;
 }
 
-static int decode_desc_chunk(SF_PRIVATE *psf, const DESC_CHUNK *desc)
+static int decode_desc_chunk(SF_PRIVATE *psf, const struct DESC_CHUNK *desc)
 {
     int format = SF_FORMAT_CAF;
 
@@ -259,7 +255,7 @@ static int decode_desc_chunk(SF_PRIVATE *psf, const DESC_CHUNK *desc)
 
     if (desc->fmt_id == alac_MARKER)
     {
-        CAF_PRIVATE *pcaf;
+		struct CAF_PRIVATE *pcaf;
 
         if ((pcaf = psf->container_data) != NULL)
         {
@@ -352,9 +348,9 @@ static int decode_desc_chunk(SF_PRIVATE *psf, const DESC_CHUNK *desc)
 
 static int caf_read_header(SF_PRIVATE *psf)
 {
-    CAF_PRIVATE *pcaf;
+	struct CAF_PRIVATE *pcaf;
     BUF_UNION ubuf;
-    DESC_CHUNK desc;
+	struct DESC_CHUNK desc;
     sf_count_t chunk_size;
     double srate;
     short version, flags;
@@ -379,7 +375,7 @@ static int caf_read_header(SF_PRIVATE *psf)
     if (marker != desc_MARKER)
         return SFE_CAF_NO_DESC;
 
-    if (chunk_size < SIGNED_SIZEOF(DESC_CHUNK))
+    if (chunk_size < SIGNED_SIZEOF(struct DESC_CHUNK))
     {
         psf_log_printf(psf, "**** Chunk size too small. Should be > 32 bytes.\n");
         return SFE_MALFORMED_FILE;
@@ -402,8 +398,8 @@ static int caf_read_header(SF_PRIVATE *psf)
         return SFE_MALFORMED_FILE;
     };
 
-	if (chunk_size > SIGNED_SIZEOF(DESC_CHUNK))
-		psf_binheader_seekf(psf, chunk_size - sizeof(DESC_CHUNK), SF_SEEK_CUR);
+	if (chunk_size > SIGNED_SIZEOF(struct DESC_CHUNK))
+		psf_binheader_seekf(psf, chunk_size - sizeof(struct DESC_CHUNK), SF_SEEK_CUR);
 
     psf->sf.channels = desc.channels_per_frame;
 
@@ -613,8 +609,8 @@ static int caf_read_header(SF_PRIVATE *psf)
 static int caf_write_header(SF_PRIVATE *psf, int calc_length)
 {
     BUF_UNION ubuf;
-    CAF_PRIVATE *pcaf;
-    DESC_CHUNK desc;
+	struct CAF_PRIVATE *pcaf;
+	struct DESC_CHUNK desc;
     sf_count_t current;
     uint32_t uk;
     int subformat, append_free_block = SF_TRUE;
@@ -648,7 +644,7 @@ static int caf_write_header(SF_PRIVATE *psf, int calc_length)
     psf_binheader_writef(psf, "Em22", BHWm(caff_MARKER), BHW2(1), BHW2(0));
 
     /* 'desc' marker and chunk size. */
-    psf_binheader_writef(psf, "Em8", BHWm(desc_MARKER), BHW8((sf_count_t)(sizeof(DESC_CHUNK))));
+    psf_binheader_writef(psf, "Em8", BHWm(desc_MARKER), BHW8((sf_count_t)(sizeof(struct DESC_CHUNK))));
 
     double64_be_write(1.0 * psf->sf.samplerate, ubuf.ucbuf);
     psf_binheader_writef(psf, "b", BHWv(ubuf.ucbuf), BHWz(8));

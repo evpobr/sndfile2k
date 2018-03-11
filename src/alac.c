@@ -70,7 +70,7 @@ typedef struct
 
 } ALAC_PRIVATE;
 
-static int alac_reader_init(SF_PRIVATE *psf, const ALAC_DECODER_INFO *info);
+static int alac_reader_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *info);
 static int alac_writer_init(SF_PRIVATE *psf);
 
 static sf_count_t alac_reader_calc_frames(SF_PRIVATE *psf, ALAC_PRIVATE *plac);
@@ -108,7 +108,7 @@ static const char *alac_error_string(int error);
  * ALAC Reader initialisation function.
  */
 
-int alac_init(SF_PRIVATE *psf, const ALAC_DECODER_INFO *info)
+int alac_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *info)
 {
     int error;
 
@@ -241,7 +241,7 @@ static int alac_byterate(SF_PRIVATE *psf)
  * ALAC initialisation Functions.
  */
 
-static int alac_reader_init(SF_PRIVATE *psf, const ALAC_DECODER_INFO *info)
+static int alac_reader_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *info)
 {
     ALAC_PRIVATE *plac;
     uint32_t kuki_size;

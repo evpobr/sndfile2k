@@ -559,7 +559,7 @@ int wavlike_gen_channel_mask(const int *chan_map, int channels)
 void wavlike_analyze(SF_PRIVATE *psf)
 {
     unsigned char buffer[4096];
-    AUDIO_DETECT ad;
+	struct AUDIO_DETECT ad;
     int format = 0;
 
     if (psf->is_pipe)
