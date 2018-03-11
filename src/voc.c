@@ -153,7 +153,8 @@ static int voc_read_header(SF_PRIVATE *psf)
     int offset;
 
     /* Set position to start of file to begin reading header. */
-    offset = psf_binheader_readf(psf, "pb", 0, creative, SIGNED_SIZEOF(creative));
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+    offset = psf_binheader_readf(psf, "b", creative, SIGNED_SIZEOF(creative));
 
     if (creative[sizeof(creative) - 1] != 0x1A)
         return SFE_VOC_NO_CREATIVE;
@@ -215,7 +216,8 @@ static int voc_read_header(SF_PRIVATE *psf)
                 continue;
             }
 
-            offset += psf_binheader_readf(psf, "j", size);
+			psf_binheader_seekf(psf, size, SF_SEEK_CUR);
+            offset += size;
             continue;
 
         case VOC_REPEAT:

@@ -432,7 +432,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
     paiff->ssnd_offset = 0;
 
     /* Set position to start of file to begin reading header. */
-    psf_binheader_readf(psf, "p", 0);
+    psf_binheader_seekf(psf, 0, SF_SEEK_SET);
 
     memset(comm_fmt, 0, sizeof(struct COMM_CHUNK));
 
@@ -449,7 +449,8 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
         size_t jump = chunk_size & 1;
         unsigned marker = chunk_size = 0;
 
-        psf_binheader_readf(psf, "Ejm4", jump, &marker, &chunk_size);
+		psf_binheader_seekf(psf, (sf_count_t)jump, SF_SEEK_CUR);
+        psf_binheader_readf(psf, "Em4", &marker, &chunk_size);
         if (marker == 0)
         {
             sf_count_t pos = psf_ftell(psf);
@@ -522,7 +523,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
             psf_log_printf(psf, "%M : %d\n", marker, chunk_size);
             if (chunk_size != AIFF_PEAK_CHUNK_SIZE(psf->sf.channels))
             {
-                psf_binheader_readf(psf, "j", chunk_size);
+				psf_binheader_seekf(psf, (sf_count_t)chunk_size, SF_SEEK_CUR);
                 psf_log_printf(psf, "*** File PEAK chunk too big.\n");
                 return SFE_WAV_BAD_PEAK;
             };
@@ -678,8 +679,8 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
                 psf_log_printf(psf, "   string : %s\n", cptr);
             };
 
-            if (bytes > 0)
-                psf_binheader_readf(psf, "j", bytes);
+			if (bytes > 0)
+				psf_binheader_seekf(psf, (sf_count_t)bytes, SF_SEEK_CUR);
         };
         break;
 
@@ -692,14 +693,14 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
             if (chunk_size >= SIGNED_SIZEOF(ubuf.scbuf) - 1)
             {
                 psf_log_printf(psf, " %M : %u (too big, skipping)\n", marker, chunk_size);
-                psf_binheader_readf(psf, "j", chunk_size + (chunk_size & 1));
+				psf_binheader_seekf(psf, (sf_count_t)(chunk_size + (chunk_size & 1)), SF_SEEK_CUR);
                 break;
             };
 
             if (chunk_size < 4)
             {
                 psf_log_printf(psf, " %M : %d (too small, skipping)\n", marker, chunk_size);
-                psf_binheader_readf(psf, "j", chunk_size + (chunk_size & 1));
+				psf_binheader_seekf(psf, (sf_count_t)(chunk_size + (chunk_size & 1)), SF_SEEK_CUR);
                 break;
             };
 
@@ -760,7 +761,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
             {
                 psf_log_printf(psf, " %M : %d (should be %d)\n", marker, chunk_size,
                                SIZEOF_INST_CHUNK);
-                psf_binheader_readf(psf, "j", chunk_size);
+				psf_binheader_seekf(psf, (sf_count_t)chunk_size, SF_SEEK_CUR);
                 break;
             };
             psf_log_printf(psf, " %M : %d\n", marker, chunk_size);
@@ -864,7 +865,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
                 if (mark_count > 1000)
                 {
                     psf_log_printf(psf, "  More than 1000 markers, skipping!\n");
-                    psf_binheader_readf(psf, "j", chunk_size - bytesread);
+					psf_binheader_seekf(psf, chunk_size - bytesread, SF_SEEK_CUR);
                     break;
                 };
 
@@ -898,8 +899,9 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
                     else
                     {
                         uint32_t read_len = pstr_len - (sizeof(ubuf.scbuf) - 1);
-                        bytesread += psf_binheader_readf(psf, "bj", ubuf.scbuf, read_len,
-                                                         pstr_len - read_len);
+                        bytesread += psf_binheader_readf(psf, "b", ubuf.scbuf, read_len);
+						psf_binheader_seekf(psf, pstr_len - read_len, SF_SEEK_CUR);
+						bytesread += pstr_len - read_len;
                         ubuf.scbuf[sizeof(ubuf.scbuf) - 1] = 0;
                     }
 
@@ -920,7 +922,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
                 };
             };
             mark_found++;
-            psf_binheader_readf(psf, "j", chunk_size - bytesread);
+			psf_binheader_seekf(psf, chunk_size - bytesread, SF_SEEK_CUR);
             break;
 
         case FVER_MARKER:
@@ -929,21 +931,21 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
 
         case SFX_MARKER:
             psf_log_printf(psf, " %M : %d\n", marker, chunk_size);
-            psf_binheader_readf(psf, "j", chunk_size);
+			psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
             break;
 
         case NONE_MARKER:
             /* Fix for broken AIFC files with incorrect COMM chunk length. */
             chunk_size = (chunk_size >> 24) - 3;
             psf_log_printf(psf, " %M : %d\n", marker, chunk_size);
-            psf_binheader_readf(psf, "j", make_size_t(chunk_size));
+			psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
             break;
 
         case CHAN_MARKER:
             if (chunk_size < 12)
             {
                 psf_log_printf(psf, " %M : %d (should be >= 12)\n", marker, chunk_size);
-                psf_binheader_readf(psf, "j", chunk_size);
+				psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
                 break;
             }
 
@@ -969,7 +971,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
             {
                 psf_log_printf(psf, " %M : %u (unknown marker)\n", marker, chunk_size);
 
-                psf_binheader_readf(psf, "j", chunk_size);
+				psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
                 break;
             };
 
@@ -977,7 +979,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
             {
                 psf_log_printf(psf, "  Unknown chunk marker at position %D. Resynching.\n",
                                psf_ftell(psf) - 8);
-                psf_binheader_readf(psf, "j", -3);
+				psf_binheader_seekf(psf, -3, SF_SEEK_CUR);
                 break;
             };
             psf_log_printf(psf, "*** Unknown chunk marker %X at position %D. Exiting parser.\n",
@@ -1838,7 +1840,9 @@ static int aiff_read_basc_chunk(SF_PRIVATE *psf, int datasize)
 
     count = psf_binheader_readf(psf, "E442", &bc.version, &bc.numBeats, &bc.rootNote);
     count += psf_binheader_readf(psf, "E222", &bc.scaleType, &bc.sigNumerator, &bc.sigDenominator);
-    count += psf_binheader_readf(psf, "E2j", &bc.loopType, datasize - sizeof(bc));
+    count += psf_binheader_readf(psf, "E2", &bc.loopType, datasize - sizeof(bc));
+	psf_binheader_seekf(psf, datasize - sizeof(bc), SF_SEEK_CUR);
+	count += datasize - sizeof(bc);
 
     psf_log_printf(psf, "  Version ? : %u\n  Num Beats : %u\n  Root Note : 0x%x\n", bc.version,
                    bc.numBeats, bc.rootNote);
@@ -1893,8 +1897,8 @@ static int aiff_read_basc_chunk(SF_PRIVATE *psf, int datasize)
                                   ((bc.numBeats * 4.0) / bc.sigDenominator) * 60.0);
     psf->loop_info->root_key = bc.rootNote;
 
-    if (count < datasize)
-        psf_binheader_readf(psf, "j", datasize - count);
+	if (count < datasize)
+		psf_binheader_seekf(psf, datasize - count, SF_SEEK_CUR);
 
     return 0;
 }
@@ -1914,8 +1918,8 @@ static int aiff_read_chanmap(SF_PRIVATE *psf, unsigned dword)
     if (map_info)
         psf_log_printf(psf, "  Layout : %s\n", map_info->name);
 
-    if (bytesread < dword)
-        psf_binheader_readf(psf, "j", dword - bytesread);
+	if (bytesread < dword)
+		psf_binheader_seekf(psf, dword - bytesread, SF_SEEK_CUR);
 
     if (map_info->channel_map != NULL)
     {

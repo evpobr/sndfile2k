@@ -124,7 +124,9 @@ static int pvf_read_header(SF_PRIVATE *psf)
     char buffer[32];
     int marker, channels, samplerate, bitwidth;
 
-    psf_binheader_readf(psf, "pmj", 0, &marker, 1);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+    psf_binheader_readf(psf, "m", &marker);
+	psf_binheader_seekf(psf, 1, SF_SEEK_CUR);
     psf_log_printf(psf, "%M\n", marker);
 
     if (marker != PVF1_MARKER)

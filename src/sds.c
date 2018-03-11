@@ -209,7 +209,8 @@ static int sds_read_header(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     int bytesread, blockcount;
 
     /* Set position to start of file to begin reading header. */
-    bytesread = psf_binheader_readf(psf, "pE211", 0, &marker, &channel, &byte);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+    bytesread = psf_binheader_readf(psf, "E211", &marker, &channel, &byte);
 
     if (marker != 0xF07E || byte != 0x01)
         return SFE_SDS_NOT_SDS;

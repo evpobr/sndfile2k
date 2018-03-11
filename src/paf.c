@@ -147,7 +147,8 @@ static int paf_read_header(SF_PRIVATE *psf)
         return SFE_PAF_SHORT_HEADER;
 
     memset(&paf_fmt, 0, sizeof(paf_fmt));
-    psf_binheader_readf(psf, "pm", 0, &marker);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+    psf_binheader_readf(psf, "m", &marker);
 
     psf_log_printf(psf, "Signature   : '%M'\n", marker);
 
@@ -194,7 +195,7 @@ static int paf_read_header(SF_PRIVATE *psf)
 
     psf->datalength = psf->filelength - psf->dataoffset;
 
-    psf_binheader_readf(psf, "p", (int)psf->dataoffset);
+	psf_binheader_seekf(psf, psf->dataoffset, SF_SEEK_SET);
 
     psf->sf.samplerate = paf_fmt.samplerate;
     psf->sf.channels = paf_fmt.channels;

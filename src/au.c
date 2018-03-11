@@ -336,7 +336,8 @@ static int au_read_header(SF_PRIVATE *psf)
     int marker, dword;
 
     memset(&au_fmt, 0, sizeof(au_fmt));
-    psf_binheader_readf(psf, "pm", 0, &marker);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+    psf_binheader_readf(psf, "m", &marker);
     psf_log_printf(psf, "%M\n", marker);
 
     if (marker == DOTSND_MARKER)
@@ -385,8 +386,8 @@ static int au_read_header(SF_PRIVATE *psf)
     psf->dataoffset = au_fmt.dataoffset;
     psf->datalength = psf->filelength - psf->dataoffset;
 
-    if (psf_ftell(psf) < psf->dataoffset)
-        psf_binheader_readf(psf, "j", psf->dataoffset - psf_ftell(psf));
+	if (psf_ftell(psf) < psf->dataoffset)
+		psf_binheader_seekf(psf, psf->dataoffset - psf_ftell(psf), SF_SEEK_CUR);
 
     psf->sf.samplerate = au_fmt.samplerate;
     psf->sf.channels = au_fmt.channels;

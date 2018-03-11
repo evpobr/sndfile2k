@@ -235,13 +235,13 @@ static int w64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
     wav_fmt = &wpriv->wav_fmt;
 
     /* Set position to start of file to begin reading header. */
-    psf_binheader_readf(psf, "p", 0);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
 
     while (!done)
     {
         /* Each new chunk must start on an 8 byte boundary, so jump if needed. */
         if (psf->header.indx & 0x7)
-            psf_binheader_readf(psf, "j", 8 - (psf->header.indx & 0x7));
+			psf_binheader_seekf(psf, 8 - (psf->header.indx & 0x7), SF_SEEK_CUR);
 
         /* Generate hash of 16 byte marker. */
         marker = chunk_size = 0;
@@ -288,8 +288,8 @@ static int w64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
             if ((error = wavlike_read_fmt_chunk(psf, (int)chunk_size)))
                 return error;
 
-            if (chunk_size % 8)
-                psf_binheader_readf(psf, "j", 8 - (chunk_size % 8));
+			if (chunk_size % 8)
+				psf_binheader_seekf(psf, 8 - (chunk_size % 8), SF_SEEK_CUR);
 
             format = wav_fmt->format;
             parsestage |= HAVE_fmt;
@@ -384,7 +384,7 @@ static int w64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
         if (chunk_size > 0 && chunk_size < 0xffff0000)
         {
             dword = chunk_size;
-            psf_binheader_readf(psf, "j", dword - 24);
+			psf_binheader_seekf(psf, dword - 24, SF_SEEK_CUR);
         };
     };
 

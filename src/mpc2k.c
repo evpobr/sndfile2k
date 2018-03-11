@@ -154,7 +154,8 @@ static int mpc2k_read_header(SF_PRIVATE *psf)
     uint32_t sample_start, loop_end, sample_frames, loop_length;
     uint16_t sample_rate;
 
-    psf_binheader_readf(psf, "pebb", 0, bytes, 2, sample_name, make_size_t(HEADER_NAME_LEN));
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+    psf_binheader_readf(psf, "ebb", bytes, 2, sample_name, make_size_t(HEADER_NAME_LEN));
 
     if (bytes[0] != 1 || bytes[1] != 4)
         return SFE_MPC_NO_MARKER;

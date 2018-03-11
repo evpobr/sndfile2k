@@ -123,7 +123,8 @@ static int ircam_read_header(SF_PRIVATE *psf)
     float samplerate;
     int error = SFE_NO_ERROR;
 
-    psf_binheader_readf(psf, "epmf44", 0, &marker, &samplerate, &(psf->sf.channels), &encoding);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+    psf_binheader_readf(psf, "emf44", &marker, &samplerate, &(psf->sf.channels), &encoding);
 
     if (((marker & IRCAM_BE_MASK) != IRCAM_BE_MARKER) &&
         ((marker & IRCAM_LE_MASK) != IRCAM_LE_MARKER))
@@ -136,7 +137,8 @@ static int ircam_read_header(SF_PRIVATE *psf)
 
     if (psf->sf.channels > SF_MAX_CHANNELS)
     {
-        psf_binheader_readf(psf, "Epmf44", 0, &marker, &samplerate, &(psf->sf.channels), &encoding);
+		psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+        psf_binheader_readf(psf, "Emf44", &marker, &samplerate, &(psf->sf.channels), &encoding);
 
         /* Sanity checking for endian-ness detection. */
         if (psf->sf.channels > SF_MAX_CHANNELS)
@@ -216,7 +218,7 @@ static int ircam_read_header(SF_PRIVATE *psf)
 
     psf_log_printf(psf, "  Samples     : %d\n", psf->sf.frames);
 
-    psf_binheader_readf(psf, "p", IRCAM_DATA_OFFSET);
+	psf_binheader_seekf(psf, IRCAM_DATA_OFFSET, SF_SEEK_SET);
 
     return 0;
 }

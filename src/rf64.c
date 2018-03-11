@@ -184,7 +184,8 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperbloc
     wav_fmt = &wpriv->wav_fmt;
 
     /* Set position to start of file to begin reading header. */
-    psf_binheader_readf(psf, "pmmm", 0, &marker, marks, marks + 1);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+    psf_binheader_readf(psf, "mmm", &marker, marks, marks + 1);
     if (marker != RF64_MARKER || marks[1] != WAVE_MARKER)
         return SFE_RF64_NOT_RF64;
 
@@ -226,7 +227,8 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperbloc
                 /* Read table length. */
                 bytesread += psf_binheader_readf(psf, "4", &table_len);
                 /* Skip table for now. (this was "table_len + 4", why?) */
-                bytesread += psf_binheader_readf(psf, "j", table_len);
+				psf_binheader_seekf(psf, table_len, SF_SEEK_CUR);
+                bytesread += table_len;
 
                 if (chunk_size == bytesread)
                 {
@@ -240,12 +242,12 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperbloc
                     {
                         psf_log_printf(psf, "%M : %u (should be %u)\n", marker, chunk_size,
                                        bytesread);
-                        psf_binheader_readf(psf, "j", -4);
+						psf_binheader_seekf(psf, -4, SF_SEEK_CUR);
                     }
                     else
                     {
                         psf_log_printf(psf, "%M : %u\n", marker, chunk_size);
-                        psf_binheader_readf(psf, "j", chunk_size - bytesread - 4);
+						psf_binheader_seekf(psf, chunk_size - bytesread - 4, SF_SEEK_CUR);
                     };
                 };
 
@@ -361,7 +363,7 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperbloc
         case JUNK_MARKER:
         case PAD_MARKER:
             psf_log_printf(psf, "%M : %d\n", marker, chunk_size);
-            psf_binheader_readf(psf, "j", chunk_size);
+			psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
             break;
 
         default:
@@ -379,14 +381,14 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperbloc
                 isprint((marker >> 8) & 0xFF) && isprint(marker & 0xFF))
             {
                 psf_log_printf(psf, "*** %M : %d (unknown marker)\n", marker, chunk_size);
-                psf_binheader_readf(psf, "j", chunk_size);
+				psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
                 break;
             };
             if (psf_ftell(psf) & 0x03)
             {
                 psf_log_printf(psf, "  Unknown chunk marker at position 0x%x. Resynching.\n",
                                chunk_size - 4);
-                psf_binheader_readf(psf, "j", -3);
+				psf_binheader_seekf(psf, -3, SF_SEEK_CUR);
                 break;
             };
             psf_log_printf(psf,

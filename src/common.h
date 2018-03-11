@@ -798,6 +798,7 @@ void psf_asciiheader_printf(SF_PRIVATE *psf, const char *format, ...);
 
 /* Functions used when reading file headers. */
 
+void psf_binheader_seekf(SF_PRIVATE *psf, sf_count_t position, SF_SEEK_MODE whence);
 int psf_binheader_readf(SF_PRIVATE *psf, char const *format, ...);
 
 /* Functions used in the write function for updating the peak chunk. */

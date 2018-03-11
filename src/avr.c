@@ -130,7 +130,8 @@ static int avr_read_header(SF_PRIVATE *psf)
 
     memset(&hdr, 0, sizeof(hdr));
 
-    psf_binheader_readf(psf, "pmb", 0, &hdr.marker, &hdr.name, sizeof(hdr.name));
+	psf_binheader_seekf(psf, 0, SEEK_SET);
+    psf_binheader_readf(psf, "mb", &hdr.marker, &hdr.name, sizeof(hdr.name));
     psf_log_printf(psf, "%M\n", hdr.marker);
 
     if (hdr.marker != TWOBIT_MARKER)
@@ -188,8 +189,8 @@ static int avr_read_header(SF_PRIVATE *psf)
     if (psf->fileoffset > 0)
         psf->filelength = AVR_HDR_SIZE + psf->datalength;
 
-    if (psf_ftell(psf) != psf->dataoffset)
-        psf_binheader_readf(psf, "j", psf->dataoffset - psf_ftell(psf));
+	if (psf_ftell(psf) != psf->dataoffset)
+		psf_binheader_seekf(psf, psf->dataoffset - psf_ftell(psf), SF_SEEK_CUR);
 
     psf->blockwidth = psf->sf.channels * psf->bytewidth;
 

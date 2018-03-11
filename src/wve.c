@@ -79,7 +79,8 @@ static int wve_read_header(SF_PRIVATE *psf)
 {
     /* Set position to start of file to begin reading header. */
     uint32_t marker;
-    psf_binheader_readf(psf, "pm", 0, &marker);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+    psf_binheader_readf(psf, "m", &marker);
     if (marker != ALAW_MARKER)
     {
         psf_log_printf(psf, "Could not find '%M'\n", ALAW_MARKER);

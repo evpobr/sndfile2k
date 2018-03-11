@@ -204,7 +204,8 @@ static int mat4_read_header(SF_PRIVATE *psf)
     const char *marker_str;
     char name[64];
 
-    psf_binheader_readf(psf, "pm", 0, &marker);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+    psf_binheader_readf(psf, "m", &marker);
 
     /* MAT4 file must start with a double for the samplerate. */
     if (marker == MAT4_BE_DOUBLE)

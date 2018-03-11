@@ -131,7 +131,7 @@ static int svx_read_header(SF_PRIVATE *psf)
         psf_log_printf(psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n");
 
     memset(&vhdr, 0, sizeof(vhdr));
-    psf_binheader_readf(psf, "p", 0);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
 
     /* Set default number of channels. Modify later if necessary */
     psf->sf.channels = 1;
@@ -253,7 +253,7 @@ static int svx_read_header(SF_PRIVATE *psf)
                 psf->file.name.c[chunk_size] = 0;
             }
             else
-                psf_binheader_readf(psf, "j", chunk_size);
+				psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
             break;
 
         case ANNO_MARKER:
@@ -262,7 +262,7 @@ static int svx_read_header(SF_PRIVATE *psf)
 
             psf_log_printf(psf, " %M : %u\n", marker, chunk_size);
 
-            psf_binheader_readf(psf, "j", chunk_size);
+			psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
             break;
 
         case CHAN_MARKER:
@@ -283,7 +283,7 @@ static int svx_read_header(SF_PRIVATE *psf)
             else
                 psf_log_printf(psf, "  Channels : %d *** assuming mono\n", channels);
 
-            psf_binheader_readf(psf, "j", chunk_size - bytecount);
+			psf_binheader_seekf(psf, chunk_size - bytecount, SF_SEEK_CUR);
             break;
 
         case AUTH_MARKER:
@@ -293,7 +293,7 @@ static int svx_read_header(SF_PRIVATE *psf)
 
             psf_log_printf(psf, " %M : %u\n", marker, chunk_size);
 
-            psf_binheader_readf(psf, "j", chunk_size);
+			psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
             break;
 
         default:
@@ -311,7 +311,7 @@ static int svx_read_header(SF_PRIVATE *psf)
                 psf_isprint((marker >> 8) & 0xFF) && psf_isprint(marker & 0xFF))
             {
                 psf_log_printf(psf, "%M : %u (unknown marker)\n", marker, chunk_size);
-                psf_binheader_readf(psf, "j", chunk_size);
+				psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
                 break;
             };
             if ((chunk_size = psf_ftell(psf)) & 0x03)
@@ -319,7 +319,7 @@ static int svx_read_header(SF_PRIVATE *psf)
                 psf_log_printf(psf, "  Unknown chunk marker at position %d. Resynching.\n",
                                chunk_size - 4);
 
-                psf_binheader_readf(psf, "j", -3);
+				psf_binheader_seekf(psf, -3, SF_SEEK_CUR);
                 break;
             };
             psf_log_printf(psf,

@@ -262,7 +262,8 @@ static int mat5_read_header(SF_PRIVATE *psf)
     unsigned size;
     int have_samplerate = 1;
 
-    psf_binheader_readf(psf, "pb", 0, buffer, 124);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+    psf_binheader_readf(psf, "b", buffer, 124);
 
     buffer[125] = 0;
 
@@ -339,8 +340,9 @@ static int mat5_read_header(SF_PRIVATE *psf)
             return SFE_MAT5_NO_BLOCK;
         };
 
-        psf_binheader_readf(psf, "bj", name, size, (8 - (size % 8)) % 8);
-        name[size] = 0;
+        psf_binheader_readf(psf, "b", name, size);
+		name[size] = 0;
+		psf_binheader_seekf(psf, (8 - (size % 8)) % 8, SF_SEEK_CUR);
     }
     else if ((type & 0xFFFF) == MAT5_TYPE_SCHAR)
     {
@@ -385,7 +387,9 @@ static int mat5_read_header(SF_PRIVATE *psf)
     {
         unsigned short samplerate;
 
-        psf_binheader_readf(psf, "j2j", -4, &samplerate, 2);
+		psf_binheader_seekf(psf, -4, SF_SEEK_CUR);
+        psf_binheader_readf(psf, "2", &samplerate);
+		psf_binheader_seekf(psf, 2, SF_SEEK_CUR);
         psf_log_printf(psf, "    Val  : %u\n", samplerate);
         psf->sf.samplerate = samplerate;
     }
@@ -439,7 +443,8 @@ static int mat5_read_header(SF_PRIVATE *psf)
             return SFE_MAT5_NO_BLOCK;
         };
 
-        psf_binheader_readf(psf, "bj", name, size, (8 - (size % 8)) % 8);
+        psf_binheader_readf(psf, "b", name, size);
+		psf_binheader_seekf(psf, (8 - (size % 8)) % 8, SF_SEEK_CUR);
         name[size] = 0;
     }
     else if ((type & 0xFFFF) == MAT5_TYPE_SCHAR)

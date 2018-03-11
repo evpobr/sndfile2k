@@ -912,66 +912,6 @@ static size_t header_read(SF_PRIVATE *psf, void *ptr, size_t bytes)
     return bytes;
 }
 
-static void header_seek(SF_PRIVATE *psf, sf_count_t position, int whence)
-{
-    switch (whence)
-    {
-    case SEEK_SET:
-        if (psf->header.indx + position >= psf->header.len)
-            psf_bump_header_allocation(psf, position);
-        if (position > psf->header.len)
-        {
-            /* Too much header to cache so just seek instead. */
-            psf_fseek(psf, position, whence);
-            return;
-        };
-        if (position > psf->header.end)
-            psf->header.end +=
-                psf_fread(psf->header.ptr + psf->header.end, 1, position - psf->header.end, psf);
-        psf->header.indx = position;
-        break;
-
-    case SEEK_CUR:
-        if (psf->header.indx + position >= psf->header.len)
-            psf_bump_header_allocation(psf, position);
-
-        if (psf->header.indx + position < 0)
-            break;
-
-        if (psf->header.indx >= psf->header.len)
-        {
-            psf_fseek(psf, position, whence);
-            return;
-        };
-
-        if (psf->header.indx + position <= psf->header.end)
-        {
-            psf->header.indx += position;
-            break;
-        };
-
-        if (psf->header.indx + position > psf->header.len)
-        {
-            /* Need to jump this without caching it. */
-            psf->header.indx = psf->header.end;
-            psf_fseek(psf, position, SEEK_CUR);
-            break;
-        };
-
-        psf->header.end += psf_fread(psf->header.ptr + psf->header.end, 1,
-                                     position - (psf->header.end - psf->header.indx), psf);
-        psf->header.indx = psf->header.end;
-        break;
-
-    case SEEK_END:
-    default:
-        psf_log_printf(psf, "Bad whence param in header_seek().\n");
-        break;
-    };
-
-    return;
-}
-
 static int header_gets(SF_PRIVATE *psf, char *ptr, int bufsize)
 {
     int k;
@@ -1000,6 +940,66 @@ static int header_gets(SF_PRIVATE *psf, char *ptr, int bufsize)
     ptr[k] = 0;
 
     return k;
+}
+
+void psf_binheader_seekf(SF_PRIVATE * psf, sf_count_t position, SF_SEEK_MODE whence)
+{
+	switch (whence)
+	{
+	case SEEK_SET:
+		if (psf->header.indx + position >= psf->header.len)
+			psf_bump_header_allocation(psf, position);
+		if (position > psf->header.len)
+		{
+			/* Too much header to cache so just seek instead. */
+			psf_fseek(psf, position, whence);
+			return;
+		};
+		if (position > psf->header.end)
+			psf->header.end +=
+			psf_fread(psf->header.ptr + psf->header.end, 1, position - psf->header.end, psf);
+		psf->header.indx = position;
+		break;
+
+	case SEEK_CUR:
+		if (psf->header.indx + position >= psf->header.len)
+			psf_bump_header_allocation(psf, position);
+
+		if (psf->header.indx + position < 0)
+			break;
+
+		if (psf->header.indx >= psf->header.len)
+		{
+			psf_fseek(psf, position, whence);
+			return;
+		};
+
+		if (psf->header.indx + position <= psf->header.end)
+		{
+			psf->header.indx += position;
+			break;
+		};
+
+		if (psf->header.indx + position > psf->header.len)
+		{
+			/* Need to jump this without caching it. */
+			psf->header.indx = psf->header.end;
+			psf_fseek(psf, position, SEEK_CUR);
+			break;
+		};
+
+		psf->header.end += psf_fread(psf->header.ptr + psf->header.end, 1,
+									 position - (psf->header.end - psf->header.indx), psf);
+		psf->header.indx = psf->header.end;
+		break;
+
+	case SEEK_END:
+	default:
+		psf_log_printf(psf, "Bad whence param in header_seek().\n");
+		break;
+	};
+
+	return;
 }
 
 int psf_binheader_readf(SF_PRIVATE *psf, char const *format, ...)
@@ -1168,18 +1168,6 @@ int psf_binheader_readf(SF_PRIVATE *psf, char const *format, ...)
 				size -- ;
 				} ;
 			*/
-            break;
-
-        case 'p': /* Seek to position from start. */
-            count = va_arg(argptr, size_t);
-            header_seek(psf, count, SEEK_SET);
-            byte_count = count;
-            break;
-
-        case 'j': /* Seek to position from current position. */
-            count = va_arg(argptr, size_t);
-            header_seek(psf, count, SEEK_CUR);
-            byte_count += count;
             break;
 
         default:

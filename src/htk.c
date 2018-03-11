@@ -174,7 +174,8 @@ static int htk_read_header(SF_PRIVATE *psf)
 {
     int sample_count, sample_period, marker;
 
-    psf_binheader_readf(psf, "pE444", 0, &sample_count, &sample_period, &marker);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+    psf_binheader_readf(psf, "E444", &sample_count, &sample_period, &marker);
 
     if (2 * sample_count + 12 != psf->filelength)
         return SFE_HTK_BAD_FILE_LEN;

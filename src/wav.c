@@ -287,7 +287,9 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
     wav_fmt = &wpriv->wav_fmt;
 
     /* Set position to start of file to begin reading header. */
-    psf_binheader_readf(psf, "pmj", 0, &marker, -4);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+    psf_binheader_readf(psf, "m", &marker);
+	psf_binheader_seekf(psf, -4, SF_SEEK_CUR);
     psf->header.indx = 0;
 
     /*
@@ -302,7 +304,8 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
         size_t jump = chunk_size & 1;
 
         marker = chunk_size = 0;
-        psf_binheader_readf(psf, "jm4", jump, &marker, &chunk_size);
+		psf_binheader_seekf(psf, jump, SF_SEEK_CUR);
+        psf_binheader_readf(psf, "m4", &marker, &chunk_size);
         if (marker == 0)
         {
             sf_count_t pos = psf_ftell(psf);
@@ -442,7 +445,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
             psf_binheader_readf(psf, "4", &(fact_chunk.frames));
 
             if (chunk_size > SIGNED_SIZEOF(fact_chunk))
-                psf_binheader_readf(psf, "j", (int)(chunk_size - SIGNED_SIZEOF(fact_chunk)));
+				psf_binheader_seekf(psf, chunk_size - sizeof(fact_chunk), SF_SEEK_CUR);
 
             if (chunk_size)
                 psf_log_printf(psf, "%M : %u\n", marker, chunk_size);
@@ -479,7 +482,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
                 if (cue_count > 1000)
                 {
                     psf_log_printf(psf, "  Count : %u (skipping)\n", cue_count);
-                    psf_binheader_readf(psf, "j", (cue_count > 20 ? 20 : cue_count) * 24);
+					psf_binheader_seekf(psf, (cue_count > 20 ? 20 : cue_count) * 24, SF_SEEK_CUR);
                     break;
                 };
 
@@ -518,7 +521,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
                 {
                     psf_log_printf(psf, "**** Chunk size weirdness (%d != %d)\n", chunk_size,
                                    bytesread);
-                    psf_binheader_readf(psf, "j", chunk_size - bytesread);
+					psf_binheader_seekf(psf, chunk_size - bytesread, SF_SEEK_CUR);
                 };
             };
             break;
@@ -564,7 +567,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
 			 * parsestage |= HAVE_other ;
 			 */
             psf_log_printf(psf, "%M : %u\n", marker, chunk_size);
-            psf_binheader_readf(psf, "j", chunk_size);
+			psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
             break;
 
         case cart_MARKER:
@@ -594,7 +597,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
         case MEXT_MARKER:
         case FLLR_MARKER:
             psf_log_printf(psf, "%M : %u\n", marker, chunk_size);
-            psf_binheader_readf(psf, "j", chunk_size);
+			psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
             break;
 
         default:
@@ -612,14 +615,14 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
                 psf_isprint((marker >> 8) & 0xFF) && psf_isprint(marker & 0xFF))
             {
                 psf_log_printf(psf, "*** %M : %u (unknown marker)\n", marker, chunk_size);
-                psf_binheader_readf(psf, "j", chunk_size);
+				psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
                 break;
             };
             if (psf_ftell(psf) & 0x03)
             {
                 psf_log_printf(psf, "  Unknown chunk marker at position %D. Resynching.\n",
                                psf_ftell(psf) - 8);
-                psf_binheader_readf(psf, "j", -3);
+				psf_binheader_seekf(psf, -3, SF_SEEK_CUR);
                 /* File is too messed up so we prevent editing in RDWR mode here. */
                 parsestage |= HAVE_other;
                 break;
@@ -1558,7 +1561,7 @@ static int wav_read_acid_chunk(SF_PRIVATE *psf, uint32_t chunklen)
     psf_log_printf(psf, "  Beats     : %d\n  Meter     : %d/%d\n  Tempo     : %s\n", beats,
                    meter_numer, meter_denom, buffer);
 
-    psf_binheader_readf(psf, "j", chunklen - bytesread);
+	psf_binheader_seekf(psf, chunklen - bytesread, SF_SEEK_CUR);
 
     if ((psf->loop_info = calloc(1, sizeof(SF_LOOP_INFO))) == NULL)
         return SFE_MALLOC_FAILED;

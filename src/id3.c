@@ -32,7 +32,8 @@ int id3_skip(SF_PRIVATE *psf)
     unsigned char buf[10];
 
     memset(buf, 0, sizeof(buf));
-    psf_binheader_readf(psf, "pb", 0, buf, 10);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+    psf_binheader_readf(psf, "b", buf, 10);
 
     if (buf[0] == 'I' && buf[1] == 'D' && buf[2] == '3')
     {
@@ -52,7 +53,7 @@ int id3_skip(SF_PRIVATE *psf)
 
         if (psf->fileoffset < psf->filelength)
         {
-            psf_binheader_readf(psf, "p", psf->fileoffset);
+			psf_binheader_seekf(psf, psf->fileoffset, SF_SEEK_SET);
             return 1;
         };
     };

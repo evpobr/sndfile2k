@@ -341,7 +341,8 @@ static int xi_read_header(SF_PRIVATE *psf)
     int k, loop_begin, loop_end;
     int sample_sizes[MAX_XI_SAMPLES];
 
-    psf_binheader_readf(psf, "pb", 0, buffer, 21);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+    psf_binheader_readf(psf, "b", buffer, 21);
 
     memset(sample_sizes, 0, sizeof(sample_sizes));
 
@@ -375,7 +376,7 @@ static int xi_read_header(SF_PRIVATE *psf)
 	 * Jump note numbers (96), volume envelope (48), pan envelope (48),
 	 * volume points (1), pan points (1)
 	 */
-    psf_binheader_readf(psf, "j", 96 + 48 + 48 + 1 + 1);
+	psf_binheader_seekf(psf, 96 + 48 + 48 + 1 + 1, SF_SEEK_CUR);
 
     psf_binheader_readf(psf, "b", buffer, 12);
     psf_log_printf(psf, "Volume Loop\n  sustain : %u\n  begin   : %u\n  end     : %u\n", buffer[0],
@@ -394,7 +395,9 @@ static int xi_read_header(SF_PRIVATE *psf)
 	 * Read fade_out then jump reserved (2 bytes) and ???? (20 bytes) and
 	 * sample_count.
 	 */
-    psf_binheader_readf(psf, "e2j2", &fade_out, 2 + 20, &sample_count);
+    psf_binheader_readf(psf, "e2", &fade_out);
+	psf_binheader_seekf(psf, 2 + 20, SF_SEEK_CUR);
+	psf_binheader_readf(psf, "e2", &sample_count);
     psf_log_printf(psf, "Fade out  : %d\n", fade_out);
 
     /* XI file can contain up to 16 samples. */

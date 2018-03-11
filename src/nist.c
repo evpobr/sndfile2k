@@ -113,7 +113,8 @@ static int nist_read_header(SF_PRIVATE *psf)
     long samples;
 
     /* Go to start of file and read in the whole header. */
-    psf_binheader_readf(psf, "pb", 0, psf_header, NIST_HEADER_LENGTH);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+    psf_binheader_readf(psf, "b", psf_header, NIST_HEADER_LENGTH);
 
     /* Header is a string, so make sure it is null terminated. */
     psf_header[NIST_HEADER_LENGTH] = 0;
