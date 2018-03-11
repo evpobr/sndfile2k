@@ -16,30 +16,36 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include <cstdio>
-#include <cstring>
-
 #include "sndfile2k/sndfile2k.hpp"
+
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+#include <cstdio>
 
 #define BUFFER_LEN (1024)
 
-static void create_file(const char *fname, int format)
+static void create_file(const string &fname, int format)
 {
-    static short buffer[BUFFER_LEN];
+    vector<short> buffer;
 
     SndfileHandle file;
     int channels = 2;
     int srate = 48000;
 
-    printf("Creating file named '%s'\n", fname);
+	cout << endl;
+	cout << "Creating file named '" << fname << '\'' << endl;
 
     file = SndfileHandle(fname, SFM_WRITE, format, channels, srate);
 
-    memset(buffer, 0, sizeof(buffer));
+	buffer.resize(BUFFER_LEN);
 
-    file.write(buffer, BUFFER_LEN);
+    file.write(buffer.data(), BUFFER_LEN);
 
-    puts("");
+	cout << endl;
     /*
 	 * The SndfileHandle object will automatically close the file and
 	 * release all allocated memory when the object goes out of scope.
@@ -48,35 +54,40 @@ static void create_file(const char *fname, int format)
 	 */
 }
 
-static void read_file(const char *fname)
+static void read_file(const string &fname)
 {
-    static short buffer[BUFFER_LEN];
+    vector<short> buffer;
 
     SndfileHandle file;
 
     file = SndfileHandle(fname);
 
-    printf("Opened file '%s'\n", fname);
-    printf("    Sample rate : %d\n", file.samplerate());
-    printf("    Channels    : %d\n", file.channels());
+	cout << "Opened file '" << fname << "'" << endl;
+	cout << "    Sample rate : " << file.samplerate() << endl;
+	cout << "    Channels    : " << file.channels() << endl;
 
-    file.read(buffer, BUFFER_LEN);
+	buffer.resize(BUFFER_LEN);
 
-    puts("");
+    file.read(buffer.data(), BUFFER_LEN);
+
+	cout << endl;
 
     /* RAII takes care of destroying SndfileHandle object. */
 }
 
-int main(void)
+void main(void)
 {
-    const char *fname = "test.wav";
+    const string fname("test.wav");
 
-    puts("\nSimple example showing usage of the C++ SndfileHandle object.\n");
+	cout << endl;
+    cout << "Simple example showing usage of the C++ SndfileHandle object.";
+	cout << endl;
 
     create_file(fname, SF_FORMAT_WAV | SF_FORMAT_PCM_16);
 
     read_file(fname);
 
-    puts("Done.\n");
-    return 0;
+	remove(fname.c_str());
+
+    cout << "Done" << endl << endl;
 }
