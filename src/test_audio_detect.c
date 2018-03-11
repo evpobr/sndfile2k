@@ -70,7 +70,7 @@ static unsigned char int24_32_le_stereo[] = {
 void test_audio_detect(void)
 {
     SF_PRIVATE psf;
-    AUDIO_DETECT ad;
+    struct AUDIO_DETECT ad;
     int errors = 0;
 
     print_test_name("Testing audio detect");
