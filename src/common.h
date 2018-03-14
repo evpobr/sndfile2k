@@ -64,12 +64,6 @@
 
 #define BITWIDTH2BYTES(x) (((x) + 7) / 8)
 
-/*	For some reason sizeof returns an unsigned  value which causes
-**	a warning when that value is added or subtracted from a signed
-**	value. Use SIGNED_SIZEOF instead.
-*/
-#define SIGNED_SIZEOF(x) ((int)sizeof(x))
-
 #define ARRAY_LEN(x) ((sizeof(x) / sizeof((x)[0])))
 
 #if COMPILER_IS_GCC
@@ -394,13 +388,13 @@ typedef struct sf_private_tag
     struct parselog_buffer
     {
         char buf[SF_PARSELOG_LEN];
-        int indx;
+        size_t indx;
     } parselog;
 
     struct header_storage
     {
         unsigned char *ptr;
-        sf_count_t indx, end, len;
+        size_t indx, end, len;
     } header;
 
     int rwf_endian; /* Header endian-ness flag. */

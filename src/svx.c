@@ -332,7 +332,7 @@ static int svx_read_header(SF_PRIVATE *psf)
         if (!psf->sf.seekable && (parsestage & HAVE_BODY))
             break;
 
-        if (psf_ftell(psf) >= psf->filelength - SIGNED_SIZEOF(chunk_size))
+        if (psf_ftell(psf) >= psf->filelength - (sf_count_t)sizeof(chunk_size))
             break;
     }; /* while (1) */
 

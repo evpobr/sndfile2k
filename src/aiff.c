@@ -489,7 +489,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
                 psf->filelength = FORMsize + 8;
                 psf_log_printf(psf, "FORM : %u\n %M\n", FORMsize, marker);
             }
-            else if (FORMsize != psf->filelength - 2 * SIGNED_SIZEOF(chunk_size))
+            else if (FORMsize != psf->filelength - 2 * (sf_count_t)sizeof(chunk_size))
             {
                 chunk_size = (uint32_t)(psf->filelength - 2 * sizeof(chunk_size));
                 psf_log_printf(psf, "FORM : %u (should be %u)\n %M\n", FORMsize, chunk_size,
@@ -616,7 +616,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
         case c_MARKER:
             if (chunk_size == 0)
                 break;
-            if (chunk_size >= SIGNED_SIZEOF(ubuf.scbuf))
+            if (chunk_size >= (uint32_t)sizeof(ubuf.scbuf))
             {
                 psf_log_printf(psf, " %M : %d (too big)\n", marker, chunk_size);
                 return SFE_INTERNAL;
@@ -636,7 +636,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
         case AUTH_MARKER:
             if (chunk_size == 0)
                 break;
-            if (chunk_size >= SIGNED_SIZEOF(ubuf.scbuf) - 1)
+            if (chunk_size >= (uint32_t)sizeof(ubuf.scbuf) - 1)
             {
                 psf_log_printf(psf, " %M : %d (too big)\n", marker, chunk_size);
                 return SFE_INTERNAL;
@@ -667,7 +667,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
                 psf_log_printf(psf, "   time   : 0x%x\n   marker : %x\n   length : %d\n", timestamp,
                                id, len);
 
-                if (len + 1 > SIGNED_SIZEOF(ubuf.scbuf))
+                if (len + 1 > (uint16_t)sizeof(ubuf.scbuf))
                 {
                     psf_log_printf(psf, "\nError : string length (%d) too big.\n", len);
                     return SFE_INTERNAL;
@@ -690,7 +690,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
 
             if (chunk_size == 0)
                 break;
-            if (chunk_size >= SIGNED_SIZEOF(ubuf.scbuf) - 1)
+            if (chunk_size >= (uint32_t)sizeof(ubuf.scbuf) - 1)
             {
                 psf_log_printf(psf, " %M : %u (too big, skipping)\n", marker, chunk_size);
 				psf_binheader_seekf(psf, (sf_count_t)(chunk_size + (chunk_size & 1)), SF_SEEK_CUR);
@@ -725,7 +725,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
         case NAME_MARKER:
             if (chunk_size == 0)
                 break;
-            if (chunk_size >= SIGNED_SIZEOF(ubuf.scbuf) - 2)
+            if (chunk_size >= (uint32_t)sizeof(ubuf.scbuf) - 2)
             {
                 psf_log_printf(psf, " %M : %d (too big)\n", marker, chunk_size);
                 return SFE_INTERNAL;
@@ -742,7 +742,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
         case ANNO_MARKER:
             if (chunk_size == 0)
                 break;
-            if (chunk_size >= SIGNED_SIZEOF(ubuf.scbuf) - 2)
+            if (chunk_size >= (uint32_t)sizeof(ubuf.scbuf) - 2)
             {
                 psf_log_printf(psf, " %M : %d (too big)\n", marker, chunk_size);
                 return SFE_INTERNAL;
@@ -998,7 +998,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
         if ((!psf->sf.seekable) && (found_chunk & HAVE_SSND))
             break;
 
-        if (psf_ftell(psf) >= psf->filelength - (2 * SIGNED_SIZEOF(int32_t)))
+        if (psf_ftell(psf) >= psf->filelength - (2 * (sf_count_t)sizeof(int32_t)))
             break;
     };
 
@@ -1102,7 +1102,7 @@ static int aiff_read_comm_chunk(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
 
     psf_binheader_readf(psf, "E242b", &(comm_fmt->numChannels), &(comm_fmt->numSampleFrames),
                         &(comm_fmt->sampleSize), &(comm_fmt->sampleRate),
-                        SIGNED_SIZEOF(comm_fmt->sampleRate));
+                        (int)sizeof(comm_fmt->sampleRate));
 
     if (comm_fmt->size > 0x10000 && (comm_fmt->size & 0xffff) == 0)
     {

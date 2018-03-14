@@ -95,7 +95,7 @@ static int psf_bump_header_allocation(SF_PRIVATE *psf, sf_count_t needed)
 
 static inline void log_putchar(SF_PRIVATE *psf, char ch)
 {
-    if (psf->parselog.indx < SIGNED_SIZEOF(psf->parselog.buf) - 1)
+    if (psf->parselog.indx < sizeof(psf->parselog.buf) - 1)
     {
         psf->parselog.buf[psf->parselog.indx++] = ch;
         psf->parselog.buf[psf->parselog.indx] = 0;

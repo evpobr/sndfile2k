@@ -375,7 +375,7 @@ static int caf_read_header(SF_PRIVATE *psf)
     if (marker != desc_MARKER)
         return SFE_CAF_NO_DESC;
 
-    if (chunk_size < SIGNED_SIZEOF(struct DESC_CHUNK))
+    if (chunk_size < (sf_count_t)sizeof(struct DESC_CHUNK))
     {
         psf_log_printf(psf, "**** Chunk size too small. Should be > 32 bytes.\n");
         return SFE_MALFORMED_FILE;
@@ -398,7 +398,7 @@ static int caf_read_header(SF_PRIVATE *psf)
         return SFE_MALFORMED_FILE;
     };
 
-	if (chunk_size > SIGNED_SIZEOF(struct DESC_CHUNK))
+	if (chunk_size > (sf_count_t)sizeof(struct DESC_CHUNK))
 		psf_binheader_seekf(psf, chunk_size - sizeof(struct DESC_CHUNK), SF_SEEK_CUR);
 
     psf->sf.channels = desc.channels_per_frame;
@@ -580,7 +580,7 @@ static int caf_read_header(SF_PRIVATE *psf)
         if (!psf->sf.seekable && have_data)
             break;
 
-        if (psf_ftell(psf) >= psf->filelength - SIGNED_SIZEOF(chunk_size))
+        if (psf_ftell(psf) >= psf->filelength - (sf_count_t)sizeof(chunk_size))
         {
             psf_log_printf(psf, "End\n");
             break;

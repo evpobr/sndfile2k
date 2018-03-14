@@ -87,9 +87,8 @@ int interleave_init(SF_PRIVATE *psf)
 static size_t interleave_read_short(SF_PRIVATE *psf, short *ptr, size_t len)
 {
     INTERLEAVE_DATA *pdata;
-    sf_count_t offset, templen;
+    sf_count_t offset;
     int chan;
-    size_t count, k;
     short *inptr, *outptr;
 
     if (!(pdata = psf->interleave))
@@ -109,14 +108,15 @@ static size_t interleave_read_short(SF_PRIVATE *psf, short *ptr, size_t len)
             return 0;
         };
 
-        templen = len / psf->sf.channels;
+        size_t templen = len / (size_t)psf->sf.channels;
+		size_t count;
 
         while (templen > 0)
         {
-            if (templen > SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(short))
-                count = SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(short);
+            if (templen > sizeof(pdata->buffer) / sizeof(short))
+                count = sizeof(pdata->buffer) / sizeof(short);
             else
-                count = (int)templen;
+                count = templen;
 
             if (pdata->read_short(psf, inptr, count) != count)
             {
@@ -124,7 +124,7 @@ static size_t interleave_read_short(SF_PRIVATE *psf, short *ptr, size_t len)
                 return 0;
             };
 
-            for (k = 0; k < count; k++)
+            for (size_t k = 0; k < count; k++)
             {
                 *outptr = inptr[k];
                 outptr += psf->sf.channels;
@@ -140,9 +140,8 @@ static size_t interleave_read_short(SF_PRIVATE *psf, short *ptr, size_t len)
 static size_t interleave_read_int(SF_PRIVATE *psf, int *ptr, size_t len)
 {
     INTERLEAVE_DATA *pdata;
-    sf_count_t offset, templen;
+    sf_count_t offset;
     int chan;
-    size_t count, k;
     int *inptr, *outptr;
 
     if (!(pdata = psf->interleave))
@@ -162,7 +161,8 @@ static size_t interleave_read_int(SF_PRIVATE *psf, int *ptr, size_t len)
             return 0;
         };
 
-        templen = len / psf->sf.channels;
+        size_t templen = len / (size_t)psf->sf.channels;
+		size_t count;
 
         while (templen > 0)
         {
@@ -177,7 +177,7 @@ static size_t interleave_read_int(SF_PRIVATE *psf, int *ptr, size_t len)
                 return 0;
             };
 
-            for (k = 0; k < count; k++)
+            for (size_t k = 0; k < count; k++)
             {
                 *outptr = inptr[k];
                 outptr += psf->sf.channels;
@@ -193,9 +193,8 @@ static size_t interleave_read_int(SF_PRIVATE *psf, int *ptr, size_t len)
 static size_t interleave_read_float(SF_PRIVATE *psf, float *ptr, size_t len)
 {
     INTERLEAVE_DATA *pdata;
-    sf_count_t offset, templen;
+    sf_count_t offset;
     int chan;
-    size_t count, k;
     float *inptr, *outptr;
 
     if (!(pdata = psf->interleave))
@@ -218,14 +217,15 @@ static size_t interleave_read_float(SF_PRIVATE *psf, float *ptr, size_t len)
             return 0;
         };
 
-        templen = len / psf->sf.channels;
+        size_t templen = len / (size_t)psf->sf.channels;
+		size_t count;
 
         while (templen > 0)
         {
-            if (templen > SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(float))
-                count = SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(float);
+            if (templen > sizeof(pdata->buffer) / sizeof(float))
+                count = sizeof(pdata->buffer) / sizeof(float);
             else
-                count = (int)templen;
+                count = templen;
 
             if (pdata->read_float(psf, inptr, count) != count)
             {
@@ -234,7 +234,7 @@ static size_t interleave_read_float(SF_PRIVATE *psf, float *ptr, size_t len)
                 return 0;
             };
 
-            for (k = 0; k < count; k++)
+            for (size_t k = 0; k < count; k++)
             {
                 *outptr = inptr[k];
                 outptr += psf->sf.channels;
@@ -250,9 +250,8 @@ static size_t interleave_read_float(SF_PRIVATE *psf, float *ptr, size_t len)
 static size_t interleave_read_double(SF_PRIVATE *psf, double *ptr, size_t len)
 {
     INTERLEAVE_DATA *pdata;
-    sf_count_t offset, templen;
+    sf_count_t offset;
     int chan;
-    size_t count, k;
     double *inptr, *outptr;
 
     if (!(pdata = psf->interleave))
@@ -272,14 +271,15 @@ static size_t interleave_read_double(SF_PRIVATE *psf, double *ptr, size_t len)
             return 0;
         };
 
-        templen = len / psf->sf.channels;
+        size_t templen = len / psf->sf.channels;
+		size_t count;
 
         while (templen > 0)
         {
-            if (templen > SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(double))
-                count = SIGNED_SIZEOF(pdata->buffer) / SIGNED_SIZEOF(double);
+            if (templen > sizeof(pdata->buffer) / sizeof(double))
+                count = sizeof(pdata->buffer) / sizeof(double);
             else
-                count = (int)templen;
+                count = templen;
 
             if (pdata->read_double(psf, inptr, count) != count)
             {
@@ -287,7 +287,7 @@ static size_t interleave_read_double(SF_PRIVATE *psf, double *ptr, size_t len)
                 return 0;
             };
 
-            for (k = 0; k < count; k++)
+            for (size_t k = 0; k < count; k++)
             {
                 *outptr = inptr[k];
                 outptr += psf->sf.channels;

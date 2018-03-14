@@ -453,7 +453,7 @@ static void dwvw_encode_store_bits(SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int dat
         pdwvw->b.index++;
     };
 
-    if (pdwvw->b.index > SIGNED_SIZEOF(pdwvw->b.buffer) - 4)
+    if (pdwvw->b.index > sizeof(pdwvw->b.buffer) - 4)
     {
         psf_fwrite(pdwvw->b.buffer, 1, pdwvw->b.index, psf);
         pdwvw->b.index = 0;

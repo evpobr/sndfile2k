@@ -410,7 +410,7 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperbloc
             break;
         };
 
-        if (psf_ftell(psf) >= psf->filelength - SIGNED_SIZEOF(marker))
+        if (psf_ftell(psf) >= psf->filelength - (sf_count_t)sizeof(marker))
         {
             psf_log_printf(psf, "End\n");
             break;

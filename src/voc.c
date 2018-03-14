@@ -154,7 +154,7 @@ static int voc_read_header(SF_PRIVATE *psf)
 
     /* Set position to start of file to begin reading header. */
 	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-    offset = psf_binheader_readf(psf, "b", creative, SIGNED_SIZEOF(creative));
+    offset = psf_binheader_readf(psf, "b", creative, (int)sizeof(creative));
 
     if (creative[sizeof(creative) - 1] != 0x1A)
         return SFE_VOC_NO_CREATIVE;
