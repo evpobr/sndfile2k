@@ -335,16 +335,16 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
                 else
                     psf_log_printf(psf, "RIFX : %u\n", RIFFsize);
             }
-            else if (psf->filelength < (sf_count_t)(RIFFsize + 2 * sizeof(marker)))
+            else if (psf->filelength < RIFFsize + 2 * SIGNED_SIZEOF(marker))
             {
                 if (marker == RIFF_MARKER)
                     psf_log_printf(psf, "RIFF : %u (should be %D)\n", RIFFsize,
-                                   psf->filelength - 2 * (sf_count_t)sizeof(marker));
+                                   psf->filelength - 2 * SIGNED_SIZEOF(marker));
                 else
                     psf_log_printf(psf, "RIFX : %u (should be %D)\n", RIFFsize,
-                                   psf->filelength - 2 * (sf_count_t)sizeof(marker));
+                                   psf->filelength - 2 * SIGNED_SIZEOF(marker));
 
-                RIFFsize = psf->filelength - 2 * (sf_count_t)sizeof(RIFFsize);
+                RIFFsize = psf->filelength - 2 * SIGNED_SIZEOF(RIFFsize);
             }
             else
             {
@@ -444,7 +444,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
 
             psf_binheader_readf(psf, "4", &(fact_chunk.frames));
 
-            if (chunk_size > (uint32_t)sizeof(fact_chunk))
+            if (chunk_size > SIGNED_SIZEOF(fact_chunk))
 				psf_binheader_seekf(psf, chunk_size - sizeof(fact_chunk), SF_SEEK_CUR);
 
             if (chunk_size)
@@ -645,7 +645,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
         if (!psf->sf.seekable && (parsestage & HAVE_data))
             break;
 
-        if (psf_ftell(psf) >= psf->filelength - (sf_count_t)sizeof(chunk_size))
+        if (psf_ftell(psf) >= psf->filelength - SIGNED_SIZEOF(chunk_size))
         {
             psf_log_printf(psf, "End\n");
             break;

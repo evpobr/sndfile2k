@@ -378,7 +378,7 @@ static int w64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
         if (psf->sf.seekable == 0 && (parsestage & HAVE_data))
             break;
 
-        if (psf_ftell(psf) >= (psf->filelength - (2 * (sf_count_t)sizeof(dword))))
+        if (psf_ftell(psf) >= (psf->filelength - (2 * SIGNED_SIZEOF(dword))))
             break;
 
         if (chunk_size > 0 && chunk_size < 0xffff0000)

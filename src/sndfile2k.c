@@ -946,40 +946,40 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         return strlen(data);
 
     case SFC_GET_SIMPLE_FORMAT_COUNT:
-        if (data == NULL || datasize != SIZEOF_INT)
+        if (data == NULL || datasize != SIGNED_SIZEOF(int))
             return (sf_errno = SFE_BAD_COMMAND_PARAM);
         *((int *)data) = psf_get_format_simple_count();
         return 0;
 
     case SFC_GET_SIMPLE_FORMAT:
-        if (data == NULL || datasize != (int)sizeof(SF_FORMAT_INFO))
+        if (data == NULL || datasize != SIGNED_SIZEOF(SF_FORMAT_INFO))
             return (sf_errno = SFE_BAD_COMMAND_PARAM);
         return psf_get_format_simple(data);
 
     case SFC_GET_FORMAT_MAJOR_COUNT:
-        if (data == NULL || datasize != SIZEOF_INT)
+        if (data == NULL || datasize != SIGNED_SIZEOF(int))
             return (sf_errno = SFE_BAD_COMMAND_PARAM);
         *((int *)data) = psf_get_format_major_count();
         return 0;
 
     case SFC_GET_FORMAT_MAJOR:
-        if (data == NULL || datasize != (int)sizeof(SF_FORMAT_INFO))
+        if (data == NULL || datasize != SIGNED_SIZEOF(SF_FORMAT_INFO))
             return (sf_errno = SFE_BAD_COMMAND_PARAM);
         return psf_get_format_major(data);
 
     case SFC_GET_FORMAT_SUBTYPE_COUNT:
-        if (data == NULL || datasize != SIZEOF_INT)
+        if (data == NULL || datasize != SIGNED_SIZEOF(int))
             return (sf_errno = SFE_BAD_COMMAND_PARAM);
         *((int *)data) = psf_get_format_subtype_count();
         return 0;
 
     case SFC_GET_FORMAT_SUBTYPE:
-        if (data == NULL || datasize != (int)sizeof(SF_FORMAT_INFO))
+        if (data == NULL || datasize != SIGNED_SIZEOF(SF_FORMAT_INFO))
             return (sf_errno = SFE_BAD_COMMAND_PARAM);
         return psf_get_format_subtype(data);
 
     case SFC_GET_FORMAT_INFO:
-        if (data == NULL || datasize != (int)sizeof(SF_FORMAT_INFO))
+        if (data == NULL || datasize != SIGNED_SIZEOF(SF_FORMAT_INFO))
             return (sf_errno = SFE_BAD_COMMAND_PARAM);
         return psf_get_format_info(data);
     };
@@ -1002,7 +1002,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         return old_value;
 
     case SFC_GET_CURRENT_SF_INFO:
-        if (data == NULL || datasize != (int)sizeof(SF_INFO))
+        if (data == NULL || datasize != SIGNED_SIZEOF(SF_INFO))
             return (sf_errno = SFE_BAD_COMMAND_PARAM);
         memcpy(data, &psf->sf, sizeof(SF_INFO));
         break;
@@ -1104,12 +1104,12 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         break;
 
     case SFC_CALC_MAX_ALL_CHANNELS:
-        if (data == NULL || datasize != (int)sizeof(double) * psf->sf.channels)
+        if (data == NULL || datasize != SIGNED_SIZEOF(double) * psf->sf.channels)
             return (psf->error = SFE_BAD_COMMAND_PARAM);
         return psf_calc_max_all_channels(psf, (double *)data, SF_FALSE);
 
     case SFC_CALC_NORM_MAX_ALL_CHANNELS:
-        if (data == NULL || datasize != (int)sizeof(double) * psf->sf.channels)
+        if (data == NULL || datasize != SIGNED_SIZEOF(double) * psf->sf.channels)
             return (psf->error = SFE_BAD_COMMAND_PARAM);
         return psf_calc_max_all_channels(psf, (double *)data, SF_TRUE);
 
@@ -1122,7 +1122,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         return psf_get_signal_max(psf, (double *)data);
 
     case SFC_GET_MAX_ALL_CHANNELS:
-        if (data == NULL || datasize != (int)sizeof(double) * psf->sf.channels)
+        if (data == NULL || datasize != SIGNED_SIZEOF(double) * psf->sf.channels)
         {
             psf->error = SFE_BAD_COMMAND_PARAM;
             return SF_FALSE;
@@ -1149,7 +1149,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         break;
 
     case SFC_SET_DITHER_ON_WRITE:
-        if (data == NULL || datasize != (int)sizeof(SF_DITHER_INFO))
+        if (data == NULL || datasize != SIGNED_SIZEOF(SF_DITHER_INFO))
             return (psf->error = SFE_BAD_COMMAND_PARAM);
         memcpy(&psf->write_dither, data, sizeof(psf->write_dither));
         if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
@@ -1157,7 +1157,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         break;
 
     case SFC_SET_DITHER_ON_READ:
-        if (data == NULL || datasize != (int)sizeof(SF_DITHER_INFO))
+        if (data == NULL || datasize != SIGNED_SIZEOF(SF_DITHER_INFO))
             return (psf->error = SFE_BAD_COMMAND_PARAM);
         memcpy(&psf->read_dither, data, sizeof(psf->read_dither));
         if (psf->file.mode == SFM_READ || psf->file.mode == SFM_RDWR)
@@ -1387,7 +1387,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         if (psf->channel_map == NULL)
             return SF_FALSE;
 
-        if (data == NULL || datasize != (int)sizeof(psf->channel_map[0]) * psf->sf.channels)
+        if (data == NULL || datasize != SIGNED_SIZEOF(psf->channel_map[0]) * psf->sf.channels)
         {
             psf->error = SFE_BAD_COMMAND_PARAM;
             return SF_FALSE;
@@ -1402,7 +1402,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
             psf->error = SFE_CMD_HAS_DATA;
             return SF_FALSE;
         };
-        if (data == NULL || datasize != (int)sizeof(psf->channel_map[0]) * psf->sf.channels)
+        if (data == NULL || datasize != SIGNED_SIZEOF(psf->channel_map[0]) * psf->sf.channels)
         {
             psf->error = SFE_BAD_COMMAND_PARAM;
             return SF_FALSE;
@@ -2805,7 +2805,7 @@ static int guess_file_type(SF_PRIVATE *psf)
 {
     uint32_t buffer[3], format;
 
-    if (psf_binheader_readf(psf, "b", &buffer, (int)sizeof(buffer)) != (int)sizeof(buffer))
+    if (psf_binheader_readf(psf, "b", &buffer, SIGNED_SIZEOF(buffer)) != SIGNED_SIZEOF(buffer))
     {
         psf->error = SFE_BAD_FILE_READ;
         return 0;

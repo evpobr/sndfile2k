@@ -334,7 +334,7 @@ static int mat5_read_header(SF_PRIVATE *psf)
     {
         psf_binheader_readf(psf, "4", &size);
         psf_log_printf(psf, "    Type : %X    Size : %d\n", type, size);
-        if (size > sizeof(name) - 1)
+        if (size > SIGNED_SIZEOF(name) - 1)
         {
             psf_log_printf(psf, "Error : Bad name length.\n");
             return SFE_MAT5_NO_BLOCK;
@@ -437,7 +437,7 @@ static int mat5_read_header(SF_PRIVATE *psf)
     {
         psf_binheader_readf(psf, "4", &size);
         psf_log_printf(psf, "    Type : %X    Size : %d\n", type, size);
-        if (size > sizeof(name) - 1)
+        if (size > SIGNED_SIZEOF(name) - 1)
         {
             psf_log_printf(psf, "Error : Bad name length.\n");
             return SFE_MAT5_NO_BLOCK;

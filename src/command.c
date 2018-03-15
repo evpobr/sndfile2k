@@ -71,11 +71,12 @@ int psf_get_format_simple(SF_FORMAT_INFO *data)
 {
     int indx;
 
-    if (data->format < 0 || data->format >= (int)(sizeof(simple_formats) / sizeof(SF_FORMAT_INFO)))
+    if (data->format < 0 ||
+        data->format >= (SIGNED_SIZEOF(simple_formats) / SIGNED_SIZEOF(SF_FORMAT_INFO)))
         return SFE_BAD_COMMAND_PARAM;
 
     indx = data->format;
-    memcpy(data, &(simple_formats[indx]), sizeof(SF_FORMAT_INFO));
+    memcpy(data, &(simple_formats[indx]), SIGNED_SIZEOF(SF_FORMAT_INFO));
 
     return 0;
 }
@@ -127,11 +128,11 @@ int psf_get_format_major(SF_FORMAT_INFO *data)
     int indx;
 
     if (data->format < 0 ||
-        data->format >= (int)(sizeof(major_formats) / sizeof(SF_FORMAT_INFO)))
+        data->format >= (SIGNED_SIZEOF(major_formats) / SIGNED_SIZEOF(SF_FORMAT_INFO)))
         return SFE_BAD_COMMAND_PARAM;
 
     indx = data->format;
-    memcpy(data, &(major_formats[indx]), sizeof(SF_FORMAT_INFO));
+    memcpy(data, &(major_formats[indx]), SIGNED_SIZEOF(SF_FORMAT_INFO));
 
     return 0;
 }
@@ -193,7 +194,8 @@ int psf_get_format_subtype(SF_FORMAT_INFO *data)
 {
     int indx;
 
-    if (data->format < 0 || data->format >= (int)(sizeof(subtype_formats) / sizeof(SF_FORMAT_INFO)))
+    if (data->format < 0 ||
+        data->format >= (SIGNED_SIZEOF(subtype_formats) / SIGNED_SIZEOF(SF_FORMAT_INFO)))
     {
         data->format = 0;
         return SFE_BAD_COMMAND_PARAM;
@@ -207,13 +209,13 @@ int psf_get_format_subtype(SF_FORMAT_INFO *data)
 
 int psf_get_format_info(SF_FORMAT_INFO *data)
 {
-    int format;
+    int k, format;
 
     if (SF_CONTAINER(data->format))
     {
         format = SF_CONTAINER(data->format);
 
-        for (size_t k = 0; k < (sizeof(major_formats) / sizeof(SF_FORMAT_INFO)); k++)
+        for (k = 0; k < (SIGNED_SIZEOF(major_formats) / SIGNED_SIZEOF(SF_FORMAT_INFO)); k++)
         {
             if (format == major_formats[k].format)
             {
@@ -226,7 +228,7 @@ int psf_get_format_info(SF_FORMAT_INFO *data)
     {
         format = SF_CODEC(data->format);
 
-        for (size_t k = 0; k < (sizeof(subtype_formats) / sizeof(SF_FORMAT_INFO)); k++)
+        for (k = 0; k < (SIGNED_SIZEOF(subtype_formats) / SIGNED_SIZEOF(SF_FORMAT_INFO)); k++)
         {
             if (format == subtype_formats[k].format)
             {

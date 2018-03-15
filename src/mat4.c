@@ -232,7 +232,7 @@ static int mat4_read_header(SF_PRIVATE *psf)
 
     psf_binheader_readf(psf, "4", &namesize);
 
-    if (namesize >= sizeof(name))
+    if (namesize >= SIGNED_SIZEOF(name))
         return SFE_MAT4_BAD_NAME;
 
     psf_binheader_readf(psf, "b", name, namesize);
@@ -263,7 +263,7 @@ static int mat4_read_header(SF_PRIVATE *psf)
 
     psf_binheader_readf(psf, "4", &namesize);
 
-    if (namesize >= sizeof(name))
+    if (namesize >= SIGNED_SIZEOF(name))
         return SFE_MAT4_BAD_NAME;
 
     psf_binheader_readf(psf, "b", name, namesize);

@@ -191,10 +191,10 @@ static void file_read_write_test(const char *filename)
     test_open_or_die(psf, __LINE__);
 
     test_seek_or_die(psf, 0, SEEK_SET, 0, __LINE__);
-    test_seek_or_die(psf, 0, SEEK_END, 2 * (sf_count_t)sizeof(data_out), __LINE__);
-    test_seek_or_die(psf, -1 * (sf_count_t)sizeof(data_out), SEEK_CUR, (sf_count_t)sizeof(data_out), __LINE__);
+    test_seek_or_die(psf, 0, SEEK_END, 2 * SIGNED_SIZEOF(data_out), __LINE__);
+    test_seek_or_die(psf, -1 * SIGNED_SIZEOF(data_out), SEEK_CUR, (sf_count_t)sizeof(data_out), __LINE__);
 
-    test_seek_or_die(psf, (sf_count_t)sizeof(data_out), SEEK_CUR, 2 * (sf_count_t)sizeof(data_out), __LINE__);
+    test_seek_or_die(psf, SIGNED_SIZEOF(data_out), SEEK_CUR, 2 * SIGNED_SIZEOF(data_out), __LINE__);
     make_data(data_out, ARRAY_LEN(data_out), 3);
     test_write_or_die(psf, data_out, sizeof(data_out[0]), ARRAY_LEN(data_out), 3 * sizeof(data_out), __LINE__);
 
@@ -203,12 +203,12 @@ static void file_read_write_test(const char *filename)
     test_read_or_die(psf, data_in, 1, sizeof(data_in), sizeof(data_in), __LINE__);
     test_equal_or_die(data_out, data_in, ARRAY_LEN(data_out), __LINE__);
 
-    test_seek_or_die(psf, 2 * (sf_count_t)sizeof(data_out), SEEK_SET, 2 * (sf_count_t)sizeof(data_out), __LINE__);
+    test_seek_or_die(psf, 2 * SIGNED_SIZEOF(data_out), SEEK_SET, 2 * SIGNED_SIZEOF(data_out), __LINE__);
     make_data(data_out, ARRAY_LEN(data_out), 3);
     test_read_or_die(psf, data_in, 1, sizeof(data_in), 3 * sizeof(data_in), __LINE__);
     test_equal_or_die(data_out, data_in, ARRAY_LEN(data_out), __LINE__);
 
-    test_seek_or_die(psf, (sf_count_t)sizeof(data_out), SEEK_SET, (sf_count_t)sizeof(data_out), __LINE__);
+    test_seek_or_die(psf, SIGNED_SIZEOF(data_out), SEEK_SET, SIGNED_SIZEOF(data_out), __LINE__);
     make_data(data_out, ARRAY_LEN(data_out), 2);
     test_read_or_die(psf, data_in, 1, sizeof(data_in), 2 * sizeof(data_in), __LINE__);
     test_equal_or_die(data_out, data_in, ARRAY_LEN(data_out), __LINE__);
@@ -236,7 +236,7 @@ static void file_read_write_test(const char *filename)
         exit(1);
     };
 
-    test_seek_or_die(psf, (sf_count_t)sizeof(data_out), SEEK_SET, (sf_count_t)sizeof(data_out), __LINE__);
+    test_seek_or_die(psf, SIGNED_SIZEOF(data_out), SEEK_SET, SIGNED_SIZEOF(data_out), __LINE__);
     make_data(data_out, ARRAY_LEN(data_out), 5);
     test_write_or_die(psf, data_out, sizeof(data_out[0]), ARRAY_LEN(data_out), 2 * sizeof(data_out), __LINE__);
     test_close_or_die(psf, __LINE__);
@@ -275,6 +275,7 @@ static void file_truncate_test(const char *filename)
 {
     SF_PRIVATE sf_data, *psf;
     unsigned char buffer[256];
+    int k;
 
     /*
 	 * Open a new file and write two blocks of data to the file. After each
@@ -305,17 +306,17 @@ static void file_truncate_test(const char *filename)
     test_read_or_die(psf, buffer, sizeof(buffer), 1, sizeof(buffer), __LINE__);
     test_close_or_die(psf, __LINE__);
 
-    for (size_t k = 0; k < sizeof(buffer) / 2; k++)
+    for (k = 0; k < SIGNED_SIZEOF(buffer) / 2; k++)
         if (buffer[k] != 0xEE)
         {
-            printf("\n\nLine %d : buffer [%zu] = %d (should be 0xEE)\n\n", __LINE__, k, buffer[k]);
+            printf("\n\nLine %d : buffer [%d] = %d (should be 0xEE)\n\n", __LINE__, k, buffer[k]);
             exit(1);
         };
 
-    for (size_t k = sizeof(buffer) / 2; k < sizeof(buffer); k++)
+    for (k = SIGNED_SIZEOF(buffer) / 2; k < SIGNED_SIZEOF(buffer); k++)
         if (buffer[k] != 0)
         {
-            printf("\n\nLine %d : buffer [%zu] = %d (should be 0)\n\n", __LINE__, k, buffer[k]);
+            printf("\n\nLine %d : buffer [%d] = %d (should be 0)\n\n", __LINE__, k, buffer[k]);
             exit(1);
         };
 
@@ -328,7 +329,7 @@ static void file_truncate_test(const char *filename)
     /* Check the file length. */
     psf->file.mode = SFM_READ;
     test_open_or_die(psf, __LINE__);
-    test_seek_or_die(psf, 0, SEEK_END, (sf_count_t)(sizeof(buffer) / 4), __LINE__);
+    test_seek_or_die(psf, 0, SEEK_END, SIGNED_SIZEOF(buffer) / 4, __LINE__);
     test_close_or_die(psf, __LINE__);
 
     puts("ok");
