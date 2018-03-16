@@ -129,7 +129,6 @@ static int au_read_header(SF_PRIVATE *psf);
 
 int au_open(SF_PRIVATE *psf)
 {
-    int subformat;
     int error = 0;
 
     if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
@@ -141,18 +140,24 @@ int au_open(SF_PRIVATE *psf)
     if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_AU)
         return SFE_BAD_OPEN_FORMAT;
 
-    subformat = SF_CODEC(psf->sf.format);
+    int subformat = SF_CODEC(psf->sf.format);
 
     if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
     {
         psf->endian = SF_ENDIAN(psf->sf.format);
         if (CPU_IS_LITTLE_ENDIAN && psf->endian == SF_ENDIAN_CPU)
+        {
             psf->endian = SF_ENDIAN_LITTLE;
+        }
         else if (psf->endian != SF_ENDIAN_LITTLE)
+        {
             psf->endian = SF_ENDIAN_BIG;
+        }
 
         if (au_write_header(psf, SF_FALSE))
+        {
             return psf->error;
+        }
 
         psf->write_header = au_write_header;
     };
@@ -221,13 +226,10 @@ static int au_close(SF_PRIVATE *psf)
 
 static int au_write_header(SF_PRIVATE *psf, int calc_length)
 {
-    sf_count_t current;
-    int encoding, datalength;
-
     if (psf->pipeoffset > 0)
         return 0;
 
-    current = psf_ftell(psf);
+    sf_count_t current = psf_ftell(psf);
 
     if (calc_length)
     {
@@ -235,10 +237,12 @@ static int au_write_header(SF_PRIVATE *psf, int calc_length)
 
         psf->datalength = psf->filelength - psf->dataoffset;
         if (psf->dataend)
+        {
             psf->datalength -= psf->filelength - psf->dataend;
+        }
     };
 
-    encoding = au_format_to_encoding(SF_CODEC(psf->sf.format));
+    int encoding = au_format_to_encoding(SF_CODEC(psf->sf.format));
     if (!encoding)
         return (psf->error = SFE_BAD_OPEN_FORMAT);
 
@@ -258,6 +262,9 @@ static int au_write_header(SF_PRIVATE *psf, int calc_length)
      * is not know at the time the header is written.
      * Also use this value of -1 if the datalength > 2 gigabytes.
      */
+    
+    int datalength;
+
     if (psf->datalength < 0 || psf->datalength > 0x7FFFFFFF)
         datalength = -1;
     else
@@ -333,7 +340,7 @@ static int au_format_to_encoding(int format)
 static int au_read_header(SF_PRIVATE *psf)
 {
     AU_FMT au_fmt;
-    int marker, dword;
+    int marker;
 
     memset(&au_fmt, 0, sizeof(au_fmt));
 	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
@@ -354,7 +361,9 @@ static int au_read_header(SF_PRIVATE *psf)
                             &(au_fmt.encoding), &(au_fmt.samplerate), &(au_fmt.channels));
     }
     else
+    {
         return SFE_AU_NO_DOTSND;
+    }
 
     psf_log_printf(psf, "  Data Offset : %d\n", au_fmt.dataoffset);
 
@@ -370,7 +379,9 @@ static int au_read_header(SF_PRIVATE *psf)
         psf_log_printf(psf, "  Data Size   : %d\n", au_fmt.datasize);
     }
     else if (au_fmt.datasize == -1 || au_fmt.dataoffset + au_fmt.datasize == psf->filelength)
+    {
         psf_log_printf(psf, "  Data Size   : %d\n", au_fmt.datasize);
+    }
     else if (au_fmt.dataoffset + au_fmt.datasize < psf->filelength)
     {
         psf->filelength = au_fmt.dataoffset + au_fmt.datasize;
@@ -378,7 +389,7 @@ static int au_read_header(SF_PRIVATE *psf)
     }
     else
     {
-        dword = psf->filelength - au_fmt.dataoffset;
+        int dword = psf->filelength - au_fmt.dataoffset;
         psf_log_printf(psf, "  Data Size   : %d (should be %d)\n", au_fmt.datasize, dword);
         au_fmt.datasize = dword;
     };
@@ -491,8 +502,7 @@ static int au_read_header(SF_PRIVATE *psf)
     }
     else if (au_fmt.channels > SF_MAX_CHANNELS)
     {
-        psf_log_printf(psf, "  Channels    : %d  **** should be <= %d\n", au_fmt.channels,
-                       SF_MAX_CHANNELS);
+        psf_log_printf(psf, "  Channels    : %d  **** should be <= %d\n", au_fmt.channels, SF_MAX_CHANNELS);
         return SFE_CHANNEL_COUNT;
     };
 
