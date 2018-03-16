@@ -1059,7 +1059,7 @@ int wavlike_subchunk_parse(SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
             psf_log_printf(psf, "    *** Found weird-ass zero marker. Jumping "
                                 "to end of chunk.\n");
             if (bytesread < chunk_length)
-                psf_binheader_seekf(psf, chunk_length - bytesread + 4, SF_SEEK_CUR);
+                psf_binheader_seekf(psf, chunk_length - bytesread, SF_SEEK_CUR);
             psf_log_printf(psf, "    *** Offset is now : 0x%X\n", psf_fseek(psf, 0, SEEK_CUR));
             return 0;
 
