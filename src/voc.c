@@ -429,7 +429,7 @@ static int voc_read_header(SF_PRIVATE *psf)
             break;
 
         default: /* Unknown */
-            return SFE_UNKNOWN_FORMAT;
+            return SFE_VOC_BAD_FORMAT;
             break;
         };
     };

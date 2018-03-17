@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -80,7 +80,6 @@ static ErrorStruct SndfileErrors[] = {
     {SFE_UNIMPLEMENTED, "File contains data in an unimplemented format."},
     {SFE_BAD_READ_ALIGN, "Attempt to read a non-integer number of channels."},
     {SFE_BAD_WRITE_ALIGN, "Attempt to write a non-integer number of channels."},
-    {SFE_UNKNOWN_FORMAT, "File contains data in an unknown format."},
     {SFE_NOT_READMODE, "Read attempted on file currently open for write."},
     {SFE_NOT_WRITEMODE, "Write attempted on file currently open for read."},
     {SFE_BAD_MODE_RW, "Error : This file format does not support read/write mode."},
@@ -3351,7 +3350,7 @@ SNDFILE *psf_open_file(SF_PRIVATE *psf, SF_INFO *sfinfo)
         /* Lite remove end */
 
     default:
-        error = SFE_UNKNOWN_FORMAT;
+        error = SF_ERR_UNRECOGNISED_FORMAT;
     };
 
     if (error)
