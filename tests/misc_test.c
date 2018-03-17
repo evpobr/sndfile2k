@@ -489,9 +489,8 @@ static void rf64_downgrade_test(const char *filename)
 
     exit_if_true(sfinfo.format != (SF_FORMAT_WAVEX | SF_FORMAT_PCM_16), "\n\nLine %d: RF64 to WAV downgrade failed.\n", __LINE__);
     exit_if_true(sfinfo.frames != ARRAY_LEN(output),
-                 "\n\nLine %d: Incorrect number of frames in file (too short). "
-                 "(%d should be %d)\n",
-                 __LINE__, (int)sfinfo.frames, (int)ARRAY_LEN(output));
+                 "\n\nLine %d: Incorrect number of frames in file (too short). (%" PRId64 " should be %zu)\n",
+                 __LINE__, sfinfo.frames, ARRAY_LEN(output));
     exit_if_true(sfinfo.channels != 1, "\n\nLine %d: Incorrect number of channels in file.\n", __LINE__);
 
     check_log_buffer_or_die(file, __LINE__);
