@@ -62,7 +62,6 @@ compile_commands.json
 CTestTestfile.cmake
 CMakeSettings.json
 
-CmakeBuild*/
-cmake-build*/
+*[Bb]uild*/
 
 .vs/
