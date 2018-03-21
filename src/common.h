@@ -845,6 +845,10 @@ int macos_guess_file_type(SF_PRIVATE *psf, const char *filename);
 **	some 32 bit OSes. Implementation in file_io.c.
 */
 
+#define SENSIBLE_SIZE (0x40000000)
+
+static void psf_log_syserr(SF_PRIVATE *psf, int error);
+
 int psf_fopen(SF_PRIVATE *psf);
 int psf_set_stdio(SF_PRIVATE *psf);
 int psf_file_valid(SF_PRIVATE *psf);

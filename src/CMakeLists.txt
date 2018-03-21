@@ -21,7 +21,6 @@ set(noinst_HEADERS
 # Common sources
 set(COMMON
   common.c
-  file_io.c
   command.c
   pcm.c
   ulaw.c
@@ -49,6 +48,12 @@ set(COMMON
 if(WIN32 OR CYGWIN)
   list(APPEND COMMON windows.c)
 endif()
+
+# I/O sources
+set(FILE_IO_SOURCES
+  file_io/posix_io.c
+  file_io/win32_io.c
+)
 
 # File specific sources
 set(FILESPECIFIC
@@ -142,7 +147,7 @@ set(libalac_SOURCES
 source_group("ALAC" FILES ${libalac_SOURCES})
 
 # Headers to be installed on target machine
-set(libsndfile2k_SOURCES ${COMMON} ${FILESPECIFIC} ${noinst_HEADERS} 
+set(libsndfile2k_SOURCES ${COMMON} ${FILE_IO_SOURCES} ${FILESPECIFIC} ${noinst_HEADERS} 
   ${libgsm_SOURCES} ${libg72x_SOURCES} ${libalac_SOURCES}
   ${libsndfile2k_PUBLIC_HEADERS})
 
