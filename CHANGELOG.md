@@ -1,4 +1,5 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
@@ -6,11 +7,30 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.2.0] - 2018-03-25
+
+### Fixed
+
+- Skipping of erroneous subchunks
+- Always return SF_ERR_UNRECOGNISED_FORMAT on unrecognised format
+- Avoid unnessesary seeks when opening Ogg files
+
 ### Changed
 
 - Coding style rules: bump column width limit of C source files to 132 chars.
   We have too long lines, so i choose 132 for readability. It is another
   historical limit. More explained [here](https://lkml.org/lkml/2009/12/17/229).
+- New Posix based internal file IO. Now IO is unform across all platforms.
+- `sf_open_virtual()` function deprecated, use `sf_open_virtual_ex` instead.
+- `sf_open_fd()` function deprecated, use `sf_open_virtual_ex` instead.
+- Broadcast info support deprecated and will be removed in next release.
+- CART info support deprecated and will be removed in next release.
+
+### Added
+
+- New members os `SF_VIRTUAL_IO` struct: `flush`, `set_filelen`, `is_pipe`, `ref`
+  and `unref`. Now you can implement fully functional IO with SF_VIRTUAL_IO.
+- New `sf_open_virtual_ex()` function to use all the features of `SF_VIRTUAL_IO`.
 
 ## [1.1.1] - 2018-03-10
 
@@ -132,9 +152,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [1.0.0-alpha1] - 2017-11-07 [YANKED]
 
 ### Added
+
 - Tests sources which were generated are now in source tree. No `autogen` stuff requred, faster configuration and compilation.
 
 ### Changed
+
 - Version numbering restarted from `1`.
 - Project renamed to SndFile2K. Library name is `sndfile2k`. Utilities are renamed in the same way.
 - Main public header renamed to sndfile2k to avoid conflicts with installed `libsndfile`.
@@ -146,6 +168,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Using reStructuredTest for documentation.
   
 ### Removed
+
 - Autootools build system in favour of CMake build system.
 - Documentation - will be rewritten in ReStructuredText and added later.
 - Python based style checking script and git hook - coding style was changed.
@@ -153,7 +176,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `Win32` directory. Test file inside was useless, since Windows is supported now.
 - Travis CI MacOS GCC test removed
 
-[Unreleased]: https://github.com/evpobr/sndfile2k/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/evpobr/sndfile2k/compare/v1.2.0...HEAD
 [1.0.0-beta1]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-alpha1...v1.0.0-beta1
 [1.0.0-beta2]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta1...v1.0.0-beta2
 [1.0.0-beta3]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-beta2...v1.0.0-beta3
@@ -163,3 +186,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 [1.0.0]: https://github.com/evpobr/sndfile2k/compare/v1.0.0-rc.2...v1.0.0
 [1.1.0]: https://github.com/evpobr/sndfile2k/compare/v1.0.0...v1.1.0
 [1.1.1]: https://github.com/evpobr/sndfile2k/compare/v1.1.0...v1.1.1
+[1.2.0]: https://github.com/evpobr/sndfile2k/compare/v1.1.1...v1.2.0
