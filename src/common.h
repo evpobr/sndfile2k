@@ -319,8 +319,15 @@ static inline int psf_isprint(int ch)
 **	contents.
 */
 
-typedef struct
+typedef struct PSF_FILE
 {
+    /* Virtual I/O functions. */
+    SF_VIRTUAL_IO vio;
+    int virtual_io;
+    void *vio_user_data;
+    unsigned long vio_ref_counter;
+    SF_BOOL use_new_vio;
+
     union
     {
         char c[SF_FILENAME_LEN];
@@ -339,23 +346,25 @@ typedef struct
         sfwchar_t wc[SF_FILENAME_LEN / 4];
     } name;
 
-#if USE_WINDOWS_API
     /*
 	**	These fields can only be used in src/file_io.c.
 	**	They are basically the same as a windows file HANDLE.
 	*/
     void *handle, *hsaved;
-#else
     /* These fields can only be used in src/file_io.c. */
     int filedes, savedes;
-#endif
 
 #if (defined(_WIN32) || defined(__CYGWIN__))
-    int use_wchar;
+    SF_BOOL use_wchar;
 #endif
 
-    int do_not_close_descriptor;
-    int mode; /* Open mode : SFM_READ, SFM_WRITE or SFM_RDWR. */
+    SF_BOOL do_not_close_descriptor;
+    SF_FILEMODE mode; /* Open mode : SFM_READ, SFM_WRITE or SFM_RDWR. */
+
+    /* Vairables for handling pipes. */
+    SF_BOOL is_pipe; /* True if file is a pipe. */
+    sf_count_t pipeoffset; /* Number of bytes read from a pipe. */
+
 } PSF_FILE;
 
 typedef union
@@ -435,10 +444,6 @@ typedef struct sf_private_tag
     float float_max;
 
     int scale_int_float;
-
-    /* Vairables for handling pipes. */
-    int is_pipe; /* True if file is a pipe. */
-    sf_count_t pipeoffset; /* Number of bytes read from a pipe. */
 
     /* True if clipping must be performed on float->int conversions. */
     int add_clipping;
@@ -527,11 +532,6 @@ typedef struct sf_private_tag
     int (*container_close)(struct sf_private_tag *);
 
     char *format_desc;
-
-    /* Virtual I/O functions. */
-    int virtual_io;
-    SF_VIRTUAL_IO vio;
-    void *vio_user_data;
 
     /* Chunk get/set. */
     SF_CHUNK_ITERATOR *iterator;
@@ -848,6 +848,8 @@ int macos_guess_file_type(SF_PRIVATE *psf, const char *filename);
 #define SENSIBLE_SIZE (0x40000000)
 
 static void psf_log_syserr(SF_PRIVATE *psf, int error);
+
+SF_VIRTUAL_IO *psf_get_vio();
 
 int psf_fopen(SF_PRIVATE *psf);
 int psf_set_stdio(SF_PRIVATE *psf);

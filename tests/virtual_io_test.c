@@ -130,6 +130,13 @@ static sf_count_t vftell(void *user_data)
     return vf->offset;
 } /* vftell */
 
+int flush_done = 0;
+
+static void vflush(void *user_data)
+{
+    flush_done = 1;
+}
+
 /*==============================================================================
 */
 
@@ -174,6 +181,7 @@ static void vio_test(const char *fname, int format)
     vio.read = vfread;
     vio.write = vfwrite;
     vio.tell = vftell;
+    vio.flush = vflush;
 
     /* Set virtual file offset and length to zero. */
     vio_data.offset = 0;
@@ -208,7 +216,12 @@ static void vio_test(const char *fname, int format)
     gen_short_data(data, ARRAY_LEN(data), 2);
     sf_write_short(file, data, ARRAY_LEN(data));
 
+    /* Test flush */
+    sf_write_sync(file);
     sf_close(file);
+    if (!flush_done)
+        printf("\n\nLine %d : sf_write_sync failed.", __LINE__);
+
 
     /* Now test read. */
     memset(&sfinfo, 0, sizeof(sfinfo));

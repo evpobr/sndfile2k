@@ -109,7 +109,7 @@ int rf64_open(SF_PRIVATE *psf)
 
     if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
     {
-        if (psf->is_pipe)
+        if (psf->file.is_pipe)
             return SFE_NO_PIPE_WRITE;
 
         psf->blockwidth = psf->bytewidth * psf->sf.channels;
@@ -431,7 +431,7 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperbloc
 
     psf_fseek(psf, psf->dataoffset, SEEK_SET);
 
-    if (psf->is_pipe == 0)
+    if (psf->file.is_pipe == 0)
     {
         /*
 		 * Check for 'wvpk' at the start of the DATA section. Not able to

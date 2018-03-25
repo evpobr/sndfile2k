@@ -94,7 +94,7 @@ int voc_open(SF_PRIVATE *psf)
 {
     int subformat, error = 0;
 
-    if (psf->is_pipe)
+    if (psf->file.is_pipe)
         return SFE_VOC_NO_PIPE;
 
     if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))

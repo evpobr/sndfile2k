@@ -52,7 +52,7 @@ int nist_open(SF_PRIVATE *psf)
 
     if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
     {
-        if (psf->is_pipe)
+        if (psf->file.is_pipe)
             return SFE_NO_PIPE_WRITE;
 
         if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_NIST)

@@ -163,7 +163,7 @@ int wav_open(SF_PRIVATE *psf)
 
     if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
     {
-        if (psf->is_pipe)
+        if (psf->file.is_pipe)
             return SFE_NO_PIPE_WRITE;
 
         wpriv->wavex_ambisonic = SF_AMBISONIC_NONE;
@@ -279,7 +279,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
     uint32_t marker, chunk_size = 0, RIFFsize = 0, done = 0;
     int parsestage = 0, error, format = 0;
 
-    if (psf->is_pipe == 0 && psf->filelength > INT64_C(0xffffffff))
+    if (psf->file.is_pipe == 0 && psf->filelength > INT64_C(0xffffffff))
         psf_log_printf(psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n");
 
     if ((wpriv = psf->container_data) == NULL)
@@ -669,7 +669,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
 
     psf_fseek(psf, psf->dataoffset, SEEK_SET);
 
-    if (psf->is_pipe == 0)
+    if (psf->file.is_pipe == SF_FALSE)
     {
         /*
 		 * Check for 'wvpk' at the start of the DATA section. Not able to

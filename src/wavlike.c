@@ -562,7 +562,7 @@ void wavlike_analyze(SF_PRIVATE *psf)
 	struct AUDIO_DETECT ad;
     int format = 0;
 
-    if (psf->is_pipe)
+    if (psf->file.is_pipe)
     {
         psf_log_printf(psf, "*** Error : Reading from a pipe. Can't analyze "
                             "data section to figure out real data format.\n\n");
