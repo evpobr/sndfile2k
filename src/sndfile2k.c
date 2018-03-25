@@ -312,7 +312,7 @@ static inline _Bool VALIDATE_SNDFILE_AND_ASSIGN_PSF(SNDFILE *sndfile, _Bool clea
         sf_errno = SFE_BAD_SNDFILE_PTR;
         return false;
     };
-    if (sndfile->virtual_io == SF_FALSE && psf_file_valid(sndfile) == 0)
+    if (sndfile->file.virtual_io == SF_FALSE && psf_file_valid(sndfile) == 0)
     {
         sndfile->error = SFE_BAD_FILE_PTR;
         return false;
@@ -362,6 +362,15 @@ SNDFILE *sf_open(const char *path, int mode, SF_INFO *sfinfo)
     else
         psf->error = psf_fopen(psf);
 
+	if (psf->error == 0)
+	{
+		psf->file.virtual_io = SF_TRUE;
+		psf->file.vio = *psf_get_vio();
+		psf->file.vio_user_data = psf;
+		psf->file.use_new_vio = SF_TRUE;
+	}
+	psf->file.use_new_vio = SF_TRUE;
+
     return psf_open_file(psf, sfinfo);
 } /* sf_open */
 
@@ -386,7 +395,16 @@ SNDFILE *sf_open_fd(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 
     psf->file.mode = mode;
     psf_set_file(psf, fd);
-    psf->is_pipe = psf_is_pipe(psf);
+
+	psf->file.virtual_io = SF_TRUE;
+	psf->file.vio = *psf_get_vio();
+	psf->file.vio_user_data = psf;
+	psf->file.use_new_vio = SF_TRUE;
+    psf->file.vio.ref(psf);
+    if (!close_desc)
+        psf->file.vio.ref(psf);
+
+    psf->file.is_pipe = psf_is_pipe(psf);
     psf->fileoffset = psf_ftell(psf);
 
     if (!close_desc)
@@ -432,9 +450,21 @@ SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, vo
 
     psf_init_files(psf);
 
-    psf->virtual_io = SF_TRUE;
-    psf->vio = *sfvirtual;
-    psf->vio_user_data = user_data;
+	psf->file.virtual_io = SF_TRUE;
+
+	psf->file.vio.get_filelen = sfvirtual->get_filelen;
+    psf->file.vio.set_filelen = NULL;
+	psf->file.vio.read = sfvirtual->read;
+	psf->file.vio.write = sfvirtual->write;
+	psf->file.vio.seek = sfvirtual->seek;
+	psf->file.vio.tell = sfvirtual->tell;
+	psf->file.vio.flush = NULL;
+    psf->file.vio.is_pipe = NULL;
+    psf->file.vio.ref = NULL;
+    psf->file.vio.unref = NULL;
+
+    psf->file.vio_user_data = user_data;
+	psf->file.use_new_vio = SF_FALSE;
 
     psf->file.mode = mode;
 
@@ -456,7 +486,17 @@ void sf_write_sync(SNDFILE *sndfile)
     if ((psf = (SF_PRIVATE *)sndfile) == NULL)
         return;
 
-    psf_fsync(psf);
+    if (psf->file.virtual_io)
+    {
+        if (psf->file.use_new_vio || psf->file.vio.flush)
+        {
+            psf->file.vio.flush(psf->file.vio_user_data);
+        }
+    }
+    else
+    {
+        psf_fsync(psf);
+    }
 
     return;
 } /* sf_write_sync */
@@ -3121,9 +3161,9 @@ SNDFILE *psf_open_file(SF_PRIVATE *psf, SF_INFO *sfinfo)
 
     psf->sf.sections = 1;
 
-    psf->is_pipe = psf_is_pipe(psf);
+    psf->file.is_pipe = psf_is_pipe(psf);
 
-    if (psf->is_pipe)
+    if (psf->file.is_pipe)
     {
         psf->sf.seekable = SF_FALSE;
         psf->filelength = SF_COUNT_MAX;

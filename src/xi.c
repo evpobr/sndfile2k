@@ -57,7 +57,7 @@ int xi_open(SF_PRIVATE *psf)
     XI_PRIVATE *pxi;
     int subformat, error = 0;
 
-    if (psf->is_pipe)
+    if (psf->file.is_pipe)
         return SFE_XI_NO_PIPE;
 
     if (psf->codec_data)

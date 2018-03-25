@@ -226,7 +226,7 @@ static int au_close(SF_PRIVATE *psf)
 
 static int au_write_header(SF_PRIVATE *psf, int calc_length)
 {
-    if (psf->pipeoffset > 0)
+    if (psf->file.pipeoffset > 0)
         return 0;
 
     sf_count_t current = psf_ftell(psf);
@@ -254,7 +254,7 @@ static int au_write_header(SF_PRIVATE *psf, int calc_length)
      * Only attempt to seek if we are not writng to a pipe. If we are
      * writing to a pipe we shouldn't be here anyway.
      */
-    if (psf->is_pipe == SF_FALSE)
+    if (psf->file.is_pipe == SF_FALSE)
         psf_fseek(psf, 0, SEEK_SET);
 
     /*

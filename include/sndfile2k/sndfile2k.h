@@ -1301,6 +1301,9 @@ typedef struct SF_CART_TIMER
 
 typedef SF_CART_INFO_VAR(256) SF_CART_INFO;
 
+typedef unsigned long (*sf_ref_callback)(void *user_data);
+typedef void (*sf_unref_callback)(void *user_data);
+
 /** Type of user defined function that returns file size
  *
  * @ingroup file-virt
@@ -1358,6 +1361,35 @@ typedef sf_count_t (*sf_vio_write)(const void *ptr, sf_count_t count, void *user
 * @return File offset on success, @c -1 otherwise.
 */
 typedef sf_count_t (*sf_vio_tell)(void *user_data);
+/** Type of user defined function that forces the writing of data to disk.
+*
+* @ingroup file - base
+*
+* @param[in] user_data User defined value.
+*
+* @return File offset on success, @c - 1 otherwise.
+*/
+typedef void (*sf_vio_flush)(void *user_data);
+/** Type of user defined function truncates stream size.
+*
+* @ingroup file - base
+*
+* @param[in] user_data User defined value.
+* @param[in] len New size of stream.
+*
+* @return New file size on success, @c - 1 otherwise.
+*/
+typedef int (*sf_vio_set_filelen)(void *user_data, sf_count_t len);
+
+/** Type of user defined function indicates pipe mode.
+*
+* @ingroup file - base
+*
+* @param[in] user_data User defined value.
+*
+* @return SF_TRUE on success, @c - 1 otherwise.
+*/
+typedef SF_BOOL (*sf_vio_is_pipe)(void *user_data);
 
 /** Defines virtual file I/O context
  *
@@ -1383,6 +1415,15 @@ typedef struct SF_VIRTUAL_IO
     sf_vio_write write;
     //! Pointer to a user defined function that returns file position
     sf_vio_tell tell;
+    //! Pointer to a user defined function that forces the writing of data to disk
+    sf_vio_flush flush;
+	//! Pointer to a user defined function that truncates stream
+	sf_vio_set_filelen set_filelen;
+	//! Pointer to a user defined function that indicates pipe mode.
+	sf_vio_is_pipe is_pipe;
+
+	sf_ref_callback ref;
+	sf_unref_callback unref;
 } SF_VIRTUAL_IO;
 
 #include "sndfile2k_export.h"

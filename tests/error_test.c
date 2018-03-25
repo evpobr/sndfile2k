@@ -181,6 +181,7 @@ static void bad_wav_test(const char *filename)
 
 static void error_close_test(void)
 {
+#ifndef _WIN32
     static short buffer[SHORT_BUFFER];
     const char *filename = "error_close.wav";
     SNDFILE *sndfile;
@@ -216,17 +217,15 @@ static void error_close_test(void)
 
     if (sf_close(sndfile) == 0)
     {
-#ifdef _WIN32
-
-        printf("\n\nLine %d : sf_close should not have returned zero.\n", __LINE__);
-        printf("\nHowever, this is a known bug of windows so we'll ignore it.\n\n");
-#else
         printf("\n\nLine %d : sf_close should not have returned zero.\n", __LINE__);
         exit(1);
-#endif
     };
 
     unlink(filename);
+#else
+	printf("\nerror_close_test disabled under Win32.\n\n");
+#endif
+
     puts("ok");
 }
 

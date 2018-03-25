@@ -30,8 +30,7 @@ if(BUILD_SHARED_LIBS)
       ../src/common.c
       ../src/float32.c
       ../src/double64.c
-      ../src/file_io/posix_io.c
-      ../src/file_io/win32_io.c
+      ../src/file_io.c
       ../src/audio_detect.c
       ../src/broadcast.c
       ../src/cart.c)

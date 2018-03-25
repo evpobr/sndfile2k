@@ -88,7 +88,7 @@ static int pvf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
 {
     sf_count_t current;
 
-    if (psf->pipeoffset > 0)
+    if (psf->file.pipeoffset > 0)
         return 0;
 
     current = psf_ftell(psf);
@@ -97,7 +97,7 @@ static int pvf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     psf->header.ptr[0] = 0;
     psf->header.indx = 0;
 
-    if (psf->is_pipe == SF_FALSE)
+    if (psf->file.is_pipe == SF_FALSE)
         psf_fseek(psf, 0, SEEK_SET);
 
     snprintf((char *)psf->header.ptr, psf->header.len, "PVF1\n%d %d %d\n", psf->sf.channels,
