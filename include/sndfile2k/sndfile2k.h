@@ -737,6 +737,8 @@ typedef enum SF_COMMAND
      *
      * @return ::SF_TRUE if the file contained a Broadcast Extension chunk or
      * ::SF_FALSE otherwise.
+     *
+     * @deprecated This command is deprecated and will be removed in next major release.
      */
     SFC_GET_BROADCAST_INFO = 0x10F0,
     /** Sets the Broadcast Chunk info
@@ -747,6 +749,8 @@ typedef enum SF_COMMAND
      *
      * @return ::SF_TRUE if setting the Broadcast Extension chunk was successful
      * and ::SF_FALSE otherwise.
+     *
+     * @deprecated This command is deprecated and will be removed in next major release.
      */
     SFC_SET_BROADCAST_INFO = 0x10F1,
 
@@ -880,6 +884,8 @@ typedef enum SF_COMMAND
      *
      * @return ::SF_TRUE if the file contains a Cart chunk or ::SF_FALSE
      * otherwise.
+     *
+     * @deprecated This command is deprecated and will be removed in next major release.
      */
     SFC_SET_CART_INFO = 0x1400,
     /** Gets the Cart Chunk info
@@ -893,6 +899,8 @@ typedef enum SF_COMMAND
      *
      * @return ::SF_TRUE if the file contains a Cart chunk or ::SF_FALSE
      * otherwise.
+     *
+     * @deprecated This command is deprecated and will be removed in next major release.
      */
     SFC_GET_CART_INFO = 0x1401,
 
