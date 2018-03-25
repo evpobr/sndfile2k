@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">sndfile2k
-   &#160;<span id="projectnumber">1.1.1</span>
+   &#160;<span id="projectnumber">1.2.0</span>
    </div>
   </td>
  </tr>
@@ -93,13 +93,33 @@ Data Fields</h2></td></tr>
 <a class="el" href="group__file-base.html#ga457595d4cdaf505525ff421aebe6eb5d">sf_vio_tell</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html#ac40bf7a24e909f0ebec62fab7c0321b2">tell</a></td></tr>
 <tr class="memdesc:ac40bf7a24e909f0ebec62fab7c0321b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to a user defined function that returns file position. <br /></td></tr>
 <tr class="separator:ac40bf7a24e909f0ebec62fab7c0321b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc6b115dd56ee075a53097f03620032a"><td class="memItemLeft" align="right" valign="top"><a id="adc6b115dd56ee075a53097f03620032a"></a>
+<a class="el" href="sndfile2k_8h.html#ab8830576515f953df9f3b881479da76f">sf_vio_flush</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html#adc6b115dd56ee075a53097f03620032a">flush</a></td></tr>
+<tr class="memdesc:adc6b115dd56ee075a53097f03620032a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to a user defined function that forces the writing of data to disk. <br /></td></tr>
+<tr class="separator:adc6b115dd56ee075a53097f03620032a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a849d190d6f18b7e4d73e1f5c215dbd71"><td class="memItemLeft" align="right" valign="top"><a id="a849d190d6f18b7e4d73e1f5c215dbd71"></a>
+<a class="el" href="sndfile2k_8h.html#ac50419ebeaba01e6ffa107dd128ba4b1">sf_vio_set_filelen</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html#a849d190d6f18b7e4d73e1f5c215dbd71">set_filelen</a></td></tr>
+<tr class="memdesc:a849d190d6f18b7e4d73e1f5c215dbd71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to a user defined function that truncates stream. <br /></td></tr>
+<tr class="separator:a849d190d6f18b7e4d73e1f5c215dbd71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21facb1beae7168544c60c4285c93cea"><td class="memItemLeft" align="right" valign="top"><a id="a21facb1beae7168544c60c4285c93cea"></a>
+<a class="el" href="sndfile2k_8h.html#af20b6e82de794847b459fd79ca2ae965">sf_vio_is_pipe</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html#a21facb1beae7168544c60c4285c93cea">is_pipe</a></td></tr>
+<tr class="memdesc:a21facb1beae7168544c60c4285c93cea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to a user defined function that indicates pipe mode. <br /></td></tr>
+<tr class="separator:a21facb1beae7168544c60c4285c93cea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afef0b941ac0324a42aba42a3ef9c472b"><td class="memItemLeft" align="right" valign="top"><a id="afef0b941ac0324a42aba42a3ef9c472b"></a>
+<a class="el" href="sndfile2k_8h.html#a92383612fc7c80c666de7dd6f805968f">sf_ref_callback</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html#afef0b941ac0324a42aba42a3ef9c472b">ref</a></td></tr>
+<tr class="memdesc:afef0b941ac0324a42aba42a3ef9c472b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to a user defined function that increases reference count. <br /></td></tr>
+<tr class="separator:afef0b941ac0324a42aba42a3ef9c472b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf093762f7cc0387b44fa9280b7fb30b"><td class="memItemLeft" align="right" valign="top"><a id="adf093762f7cc0387b44fa9280b7fb30b"></a>
+<a class="el" href="sndfile2k_8h.html#a6694feee692dc2f00e7de0d258a17706">sf_unref_callback</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html#adf093762f7cc0387b44fa9280b7fb30b">unref</a></td></tr>
+<tr class="memdesc:adf093762f7cc0387b44fa9280b7fb30b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to a user defined function that decreases reference count. <br /></td></tr>
+<tr class="separator:adf093762f7cc0387b44fa9280b7fb30b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Defines virtual file I/O context. </p>
 <p><code><a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html" title="Defines virtual file I/O context. ">SF_VIRTUAL_IO</a></code> contains pointers to user-defined functions used in Virtual I/O.</p>
 <p><code>get_filelen</code>, <code>seek</code> and <code>tell</code> fields must always be set; <code>read</code> field is required for read and read/write mode; <code>write</code> field should be set for write mode. </p>
 </div><hr/>The documentation for this struct was generated from the following file:<ul>
-<li>C:/Users/evpob/Source/Repos/sndfile2k/include/sndfile2k/<a class="el" href="sndfile2k_8h_source.html">sndfile2k.h</a></li>
+<li>sndfile2k/<a class="el" href="sndfile2k_8h_source.html">sndfile2k.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -6,5 +6,6 @@ var searchData=
   ['read_2fwrite_20items',['Read/Write items',['../group__read-write-items.html',1,'']]],
   ['readf',['readf',['../class_sndfile_handle.html#aea11dfe64ff49f514068969cd8f8ed38',1,'SndfileHandle::readf(short *ptr, sf_count_t frames)'],['../class_sndfile_handle.html#a3484df57698b0fc6f8835c864e48c8e0',1,'SndfileHandle::readf(int *ptr, sf_count_t frames)'],['../class_sndfile_handle.html#af8214c9c6501fb05bc64df83ba85fb6e',1,'SndfileHandle::readf(float *ptr, sf_count_t frames)'],['../class_sndfile_handle.html#a00da31b8ed6ac1da69330c27adb9297c',1,'SndfileHandle::readf(double *ptr, sf_count_t frames)']]],
   ['readraw',['readRaw',['../class_sndfile_handle.html#a5dfeda9653d5c9c70552fb67f60d52c4',1,'SndfileHandle']]],
+  ['ref',['ref',['../struct_s_f___v_i_r_t_u_a_l___i_o.html#afef0b941ac0324a42aba42a3ef9c472b',1,'SF_VIRTUAL_IO']]],
   ['refcount',['refCount',['../class_sndfile_handle.html#a6b56dc2dbe66af6b1fe44adf0f4f371a',1,'SndfileHandle']]]
 ];

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>sndfile2k: C:/Users/evpob/Source/Repos/sndfile2k/include/sndfile2k/sndfile2k.h File Reference</title>
+<title>sndfile2k: sndfile2k/sndfile2k.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">sndfile2k
-   &#160;<span id="projectnumber">1.1.1</span>
+   &#160;<span id="projectnumber">1.2.0</span>
    </div>
   </td>
  </tr>
@@ -59,7 +59,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_1d7f3f8004dd7c8b1921a0aa18b7b613.html">sndfile2k</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_05a45e9a086cfe3c6ff86a73dd30bae9.html">sndfile2k</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -141,7 +141,8 @@ Macros</h2></td></tr>
 <tr class="separator:a01418c0b27e026aee7b718533bb4f7f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac029684516383fab298a406c625a7d8d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><b>SF_BROADCAST_INFO_VAR</b>(coding_hist_size)</td></tr>
 <tr class="separator:ac029684516383fab298a406c625a7d8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a502df5fca6cdcd9f5b076c2b989bc125"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><b>SF_CART_INFO_VAR</b>(p_tag_text_size)</td></tr>
+<tr class="memitem:a502df5fca6cdcd9f5b076c2b989bc125"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sndfile2k_8h.html#a502df5fca6cdcd9f5b076c2b989bc125">SF_CART_INFO_VAR</a>(p_tag_text_size)</td></tr>
+<tr class="memdesc:a502df5fca6cdcd9f5b076c2b989bc125"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines CART timer struct with <code>tag_text</code> of desired size.  <a href="#a502df5fca6cdcd9f5b076c2b989bc125">More...</a><br /></td></tr>
 <tr class="separator:a502df5fca6cdcd9f5b076c2b989bc125"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
@@ -152,6 +153,12 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a398121a5f562230ea7f772528fff5f84"><td class="memItemLeft" align="right" valign="top">typedef int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sndfile2k_8h.html#a398121a5f562230ea7f772528fff5f84">sf_count_t</a></td></tr>
 <tr class="memdesc:a398121a5f562230ea7f772528fff5f84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents file offset type.  <a href="#a398121a5f562230ea7f772528fff5f84">More...</a><br /></td></tr>
 <tr class="separator:a398121a5f562230ea7f772528fff5f84"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92383612fc7c80c666de7dd6f805968f"><td class="memItemLeft" align="right" valign="top">typedef unsigned long(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sndfile2k_8h.html#a92383612fc7c80c666de7dd6f805968f">sf_ref_callback</a>) (void *user_data)</td></tr>
+<tr class="memdesc:a92383612fc7c80c666de7dd6f805968f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of user defined function that increases reference count.  <a href="#a92383612fc7c80c666de7dd6f805968f">More...</a><br /></td></tr>
+<tr class="separator:a92383612fc7c80c666de7dd6f805968f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6694feee692dc2f00e7de0d258a17706"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sndfile2k_8h.html#a6694feee692dc2f00e7de0d258a17706">sf_unref_callback</a>) (void *user_data)</td></tr>
+<tr class="memdesc:a6694feee692dc2f00e7de0d258a17706"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of user defined function that decreases reference count.  <a href="#a6694feee692dc2f00e7de0d258a17706">More...</a><br /></td></tr>
+<tr class="separator:a6694feee692dc2f00e7de0d258a17706"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga2166198457fe4e852ef10804b2c1e8a1"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="sndfile2k_8h.html#a398121a5f562230ea7f772528fff5f84">sf_count_t</a>(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__file-virt.html#ga2166198457fe4e852ef10804b2c1e8a1">sf_vio_get_filelen</a>) (void *user_data)</td></tr>
 <tr class="memdesc:ga2166198457fe4e852ef10804b2c1e8a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of user defined function that returns file size.  <a href="group__file-virt.html#ga2166198457fe4e852ef10804b2c1e8a1">More...</a><br /></td></tr>
 <tr class="separator:ga2166198457fe4e852ef10804b2c1e8a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -167,6 +174,15 @@ Typedefs</h2></td></tr>
 <tr class="memitem:ga457595d4cdaf505525ff421aebe6eb5d"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="sndfile2k_8h.html#a398121a5f562230ea7f772528fff5f84">sf_count_t</a>(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__file-base.html#ga457595d4cdaf505525ff421aebe6eb5d">sf_vio_tell</a>) (void *user_data)</td></tr>
 <tr class="memdesc:ga457595d4cdaf505525ff421aebe6eb5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of user defined function that returns current position in file.  <a href="group__file-base.html#ga457595d4cdaf505525ff421aebe6eb5d">More...</a><br /></td></tr>
 <tr class="separator:ga457595d4cdaf505525ff421aebe6eb5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8830576515f953df9f3b881479da76f"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sndfile2k_8h.html#ab8830576515f953df9f3b881479da76f">sf_vio_flush</a>) (void *user_data)</td></tr>
+<tr class="memdesc:ab8830576515f953df9f3b881479da76f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of user defined function that forces the writing of data to disk.  <a href="#ab8830576515f953df9f3b881479da76f">More...</a><br /></td></tr>
+<tr class="separator:ab8830576515f953df9f3b881479da76f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac50419ebeaba01e6ffa107dd128ba4b1"><td class="memItemLeft" align="right" valign="top">typedef int(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sndfile2k_8h.html#ac50419ebeaba01e6ffa107dd128ba4b1">sf_vio_set_filelen</a>) (void *user_data, <a class="el" href="sndfile2k_8h.html#a398121a5f562230ea7f772528fff5f84">sf_count_t</a> len)</td></tr>
+<tr class="memdesc:ac50419ebeaba01e6ffa107dd128ba4b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of user defined function truncates stream size.  <a href="#ac50419ebeaba01e6ffa107dd128ba4b1">More...</a><br /></td></tr>
+<tr class="separator:ac50419ebeaba01e6ffa107dd128ba4b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af20b6e82de794847b459fd79ca2ae965"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="sndfile2k_8h.html#a8bef0a7559a7d0f9f3b3c1c3f0ccafcb">SF_BOOL</a>(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sndfile2k_8h.html#af20b6e82de794847b459fd79ca2ae965">sf_vio_is_pipe</a>) (void *user_data)</td></tr>
+<tr class="memdesc:af20b6e82de794847b459fd79ca2ae965"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of user defined function indicates pipe mode.  <a href="#af20b6e82de794847b459fd79ca2ae965">More...</a><br /></td></tr>
+<tr class="separator:af20b6e82de794847b459fd79ca2ae965"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaae1e1793d9401e031b6e8c75a266a2a6"><td class="memItemLeft" align="right" valign="top">
 typedef struct <a class="el" href="group__chunks.html#gaae1e1793d9401e031b6e8c75a266a2a6">SF_CHUNK_ITERATOR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__chunks.html#gaae1e1793d9401e031b6e8c75a266a2a6">SF_CHUNK_ITERATOR</a></td></tr>
 <tr class="memdesc:gaae1e1793d9401e031b6e8c75a266a2a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">An opaque structure to an iterator over the all chunks of a given id. <br /></td></tr>
@@ -444,12 +460,11 @@ Functions</h2></td></tr>
 typedef&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sndfile2k_8h.html#a36936578c6066276291e0c8fd3c4bf76">SF_CUES_VAR</a> (100) SF_CUES</td></tr>
 <tr class="memdesc:a36936578c6066276291e0c8fd3c4bf76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents CUE markers struct containing maximum of <code>100</code> CUE markers. <br /></td></tr>
 <tr class="separator:a36936578c6066276291e0c8fd3c4bf76"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a681b92a0003d2990ce7f0868e50d2483"><td class="memItemLeft" align="right" valign="top"><a id="a681b92a0003d2990ce7f0868e50d2483"></a>
-typedef&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sndfile2k_8h.html#a681b92a0003d2990ce7f0868e50d2483">SF_BROADCAST_INFO_VAR</a> (256) SF_BROADCAST_INFO</td></tr>
-<tr class="memdesc:a681b92a0003d2990ce7f0868e50d2483"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines Broadcast struct with <code>coding_history</code> field of 256 bytes. <br /></td></tr>
+<tr class="memitem:a681b92a0003d2990ce7f0868e50d2483"><td class="memItemLeft" align="right" valign="top">typedef&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sndfile2k_8h.html#a681b92a0003d2990ce7f0868e50d2483">SF_BROADCAST_INFO_VAR</a> (256) SF_BROADCAST_INFO</td></tr>
+<tr class="memdesc:a681b92a0003d2990ce7f0868e50d2483"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines Broadcast struct with <code>coding_history</code> field of 256 bytes.  <a href="#a681b92a0003d2990ce7f0868e50d2483">More...</a><br /></td></tr>
 <tr class="separator:a681b92a0003d2990ce7f0868e50d2483"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a6a27e0f6039f0a0b85b8925fe1b723"><td class="memItemLeft" align="right" valign="top"><a id="a3a6a27e0f6039f0a0b85b8925fe1b723"></a>
-typedef&#160;</td><td class="memItemRight" valign="bottom"><b>SF_CART_INFO_VAR</b> (256) SF_CART_INFO</td></tr>
+<tr class="memitem:a3a6a27e0f6039f0a0b85b8925fe1b723"><td class="memItemLeft" align="right" valign="top">typedef&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sndfile2k_8h.html#a3a6a27e0f6039f0a0b85b8925fe1b723">SF_CART_INFO_VAR</a> (256) SF_CART_INFO</td></tr>
+<tr class="memdesc:a3a6a27e0f6039f0a0b85b8925fe1b723"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declares CART timer struct with <code>tag_text</code> of 256 elements.  <a href="#a3a6a27e0f6039f0a0b85b8925fe1b723">More...</a><br /></td></tr>
 <tr class="separator:a3a6a27e0f6039f0a0b85b8925fe1b723"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa45351ce25bafc72c211045e6e9d8fb2"><td class="memItemLeft" align="right" valign="top">SNDFILE2K_EXPORT <a class="el" href="group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc">SNDFILE</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__file-base.html#gaa45351ce25bafc72c211045e6e9d8fb2">sf_open</a> (const char *path, int mode, <a class="el" href="struct_s_f___i_n_f_o.html">SF_INFO</a> *sfinfo)</td></tr>
 <tr class="memdesc:gaa45351ce25bafc72c211045e6e9d8fb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens the specified sound file using path.  <a href="group__file-base.html#gaa45351ce25bafc72c211045e6e9d8fb2">More...</a><br /></td></tr>
@@ -460,6 +475,9 @@ typedef&#160;</td><td class="memItemRight" valign="bottom"><b>SF_CART_INFO_VAR</
 <tr class="memitem:ga09d282e248951a83f66bc7e6c8dc7fc8"><td class="memItemLeft" align="right" valign="top">SNDFILE2K_EXPORT <a class="el" href="group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc">SNDFILE</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__file-virt.html#ga09d282e248951a83f66bc7e6c8dc7fc8">sf_open_virtual</a> (<a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html">SF_VIRTUAL_IO</a> *sfvirtual, int mode, <a class="el" href="struct_s_f___i_n_f_o.html">SF_INFO</a> *sfinfo, void *user_data)</td></tr>
 <tr class="memdesc:ga09d282e248951a83f66bc7e6c8dc7fc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens sound file using Virtual I/O context.  <a href="group__file-virt.html#ga09d282e248951a83f66bc7e6c8dc7fc8">More...</a><br /></td></tr>
 <tr class="separator:ga09d282e248951a83f66bc7e6c8dc7fc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8a73a72234d17776134fc5fe1419ed60"><td class="memItemLeft" align="right" valign="top">SNDFILE2K_EXPORT <a class="el" href="group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc">SNDFILE</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__file-virt.html#ga8a73a72234d17776134fc5fe1419ed60">sf_open_virtual_ex</a> (<a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html">SF_VIRTUAL_IO</a> *sfvirtual, int mode, <a class="el" href="struct_s_f___i_n_f_o.html">SF_INFO</a> *sfinfo, void *user_data)</td></tr>
+<tr class="memdesc:ga8a73a72234d17776134fc5fe1419ed60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens sound file using Virtual I/O context.  <a href="group__file-virt.html#ga8a73a72234d17776134fc5fe1419ed60">More...</a><br /></td></tr>
+<tr class="separator:ga8a73a72234d17776134fc5fe1419ed60"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac595827dc4dfe5869cd58754af90291f"><td class="memItemLeft" align="right" valign="top">SNDFILE2K_EXPORT int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__error.html#gac595827dc4dfe5869cd58754af90291f">sf_error</a> (<a class="el" href="group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc">SNDFILE</a> *sndfile)</td></tr>
 <tr class="memdesc:gac595827dc4dfe5869cd58754af90291f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current error code for the given <a class="el" href="group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc" title="Represents opened sound file. ">SNDFILE</a>.  <a href="group__error.html#gac595827dc4dfe5869cd58754af90291f">More...</a><br /></td></tr>
 <tr class="separator:gac595827dc4dfe5869cd58754af90291f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -609,6 +627,9 @@ typedef&#160;</td><td class="memItemRight" valign="bottom"><b>SF_CART_INFO_VAR</
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><span class="keyword">struct                                </span>\</div><div class="line">    {                                     \</div><div class="line">        char version[4];                  \</div><div class="line">        char title[64];                   \</div><div class="line">        char artist[64];                  \</div><div class="line">        char cut_id[64];                  \</div><div class="line">        char client_id[64];               \</div><div class="line">        char category[64];                \</div><div class="line">        char classification[64];          \</div><div class="line">        char out_cue[64];                 \</div><div class="line">        char start_date[10];              \</div><div class="line">        char start_time[8];               \</div><div class="line">        char end_date[10];                \</div><div class="line">        char end_time[8];                 \</div><div class="line">        char producer_app_id[64];         \</div><div class="line">        char producer_app_version[64];    \</div><div class="line">        char user_def[64];                \</div><div class="line">        int32_t level_reference;          \</div><div class="line">        SF_CART_TIMER post_timers[8];     \</div><div class="line">        char reserved[276];               \</div><div class="line">        char url[1024];                   \</div><div class="line">        uint32_t tag_text_size;           \</div><div class="line">        char tag_text[p_tag_text_size];   \</div><div class="line">    }</div></div><!-- fragment -->
+<p>Defines CART timer struct with <code>tag_text</code> of desired size. </p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000003">Deprecated:</a></b></dt><dd>This feature and will be removed in next major release. </dd></dl>
+
 </div>
 </div>
 <a id="a01418c0b27e026aee7b718533bb4f7f9"></a>
@@ -652,6 +673,130 @@ typedef&#160;</td><td class="memItemRight" valign="bottom"><b>SF_CART_INFO_VAR</
 
 <p>Represents file offset type. </p>
 <p>This type is always 64-bit unsigned integer. </p>
+
+</div>
+</div>
+<a id="a92383612fc7c80c666de7dd6f805968f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92383612fc7c80c666de7dd6f805968f">&#9670;&nbsp;</a></span>sf_ref_callback</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef unsigned long(* sf_ref_callback) (void *user_data)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Type of user defined function that increases reference count. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">user_data</td><td>User defined value.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Reference count. </dd></dl>
+
+</div>
+</div>
+<a id="a6694feee692dc2f00e7de0d258a17706"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6694feee692dc2f00e7de0d258a17706">&#9670;&nbsp;</a></span>sf_unref_callback</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(* sf_unref_callback) (void *user_data)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Type of user defined function that decreases reference count. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">user_data</td><td>User defined value. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab8830576515f953df9f3b881479da76f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8830576515f953df9f3b881479da76f">&#9670;&nbsp;</a></span>sf_vio_flush</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(* sf_vio_flush) (void *user_data)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Type of user defined function that forces the writing of data to disk. </p>
+<ul>
+<li></li>
+</ul>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">user_data</td><td>User defined value.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>File offset on success, <code>-</code> 1 otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="af20b6e82de794847b459fd79ca2ae965"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af20b6e82de794847b459fd79ca2ae965">&#9670;&nbsp;</a></span>sf_vio_is_pipe</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="sndfile2k_8h.html#a8bef0a7559a7d0f9f3b3c1c3f0ccafcb">SF_BOOL</a>(* sf_vio_is_pipe) (void *user_data)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Type of user defined function indicates pipe mode. </p>
+<ul>
+<li></li>
+</ul>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">user_data</td><td>User defined value.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>SF_TRUE on success, <code>-</code> 1 otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="ac50419ebeaba01e6ffa107dd128ba4b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac50419ebeaba01e6ffa107dd128ba4b1">&#9670;&nbsp;</a></span>sf_vio_set_filelen</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef int(* sf_vio_set_filelen) (void *user_data, <a class="el" href="sndfile2k_8h.html#a398121a5f562230ea7f772528fff5f84">sf_count_t</a> len)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Type of user defined function truncates stream size. </p>
+<ul>
+<li></li>
+</ul>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">user_data</td><td>User defined value. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">len</td><td>New size of stream.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>New file size on success, <code>-</code> 1 otherwise. </dd></dl>
 
 </div>
 </div>
@@ -905,6 +1050,48 @@ typedef&#160;</td><td class="memItemRight" valign="bottom"><b>SF_CART_INFO_VAR</
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a681b92a0003d2990ce7f0868e50d2483"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a681b92a0003d2990ce7f0868e50d2483">&#9670;&nbsp;</a></span>SF_BROADCAST_INFO_VAR()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef SF_BROADCAST_INFO_VAR </td>
+          <td>(</td>
+          <td class="paramtype">256&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Defines Broadcast struct with <code>coding_history</code> field of 256 bytes. </p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated:</a></b></dt><dd>This feature and will be removed in next major release. </dd></dl>
+
+</div>
+</div>
+<a id="a3a6a27e0f6039f0a0b85b8925fe1b723"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a6a27e0f6039f0a0b85b8925fe1b723">&#9670;&nbsp;</a></span>SF_CART_INFO_VAR()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef SF_CART_INFO_VAR </td>
+          <td>(</td>
+          <td class="paramtype">256&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Declares CART timer struct with <code>tag_text</code> of 256 elements. </p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000004">Deprecated:</a></b></dt><dd>This feature and will be removed in next major release. </dd></dl>
+
+</div>
+</div>
 <a id="a654c4c7efbf9db9017e7e4c5a2d9538c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a654c4c7efbf9db9017e7e4c5a2d9538c">&#9670;&nbsp;</a></span>sf_close()</h2>
 

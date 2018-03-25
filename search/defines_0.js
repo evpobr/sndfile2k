@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['sf_5fcart_5finfo_5fvar',['SF_CART_INFO_VAR',['../sndfile2k_8h.html#a502df5fca6cdcd9f5b076c2b989bc125',1,'sndfile2k.h']]],
   ['sf_5fcount_5fmax',['SF_COUNT_MAX',['../sndfile2k_8h.html#a2a594c90b41e9b0140f28724f80b763a',1,'sndfile2k.h']]],
   ['sf_5fcues_5fvar',['SF_CUES_VAR',['../sndfile2k_8h.html#a01418c0b27e026aee7b718533bb4f7f9',1,'sndfile2k.h']]],
   ['sf_5fstr_5ffirst',['SF_STR_FIRST',['../sndfile2k_8h.html#a4e4fb6e7419fa77d21641397c5afd702',1,'sndfile2k.h']]],

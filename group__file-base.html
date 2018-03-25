@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">sndfile2k
-   &#160;<span id="projectnumber">1.1.1</span>
+   &#160;<span id="projectnumber">1.2.0</span>
    </div>
   </td>
  </tr>
@@ -323,6 +323,7 @@ Functions</h2></td></tr>
 <p>When <a class="el" href="sndfile2k_8h.html#a654c4c7efbf9db9017e7e4c5a2d9538c" title="Closes the SNDFILE object. ">sf_close()</a> is called, the file descriptor is only closed if the <code>close_desc</code> parameter was <a class="el" href="sndfile2k_8h.html#a8bef0a7559a7d0f9f3b3c1c3f0ccafcba74a076892285b06bce678d01893ac6f7" title="True. ">SF_TRUE</a> when the <a class="el" href="group__file-base.html#gad6635d6c4c00e16a48e14542a27efd91" title="Opens sound file using POSIX file descriptor. ">sf_open_fd()</a> function was called.</p>
 <dl class="section note"><dt>Note</dt><dd>On Microsoft Windows, this function does not work if the application and the sndfile2k DLL are linked to different versions of the Microsoft C runtime DLL.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid pointer to a <a class="el" href="group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc" title="Represents opened sound file. ">SNDFILE</a> object on success, <code>NULL</code> otherwise.</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000005">Deprecated:</a></b></dt><dd>This function and will be removed in next major release. Use <a class="el" href="group__file-virt.html#ga8a73a72234d17776134fc5fe1419ed60" title="Opens sound file using Virtual I/O context. ">sf_open_virtual_ex()</a> function instead.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__file-base.html#gaa45351ce25bafc72c211045e6e9d8fb2" title="Opens the specified sound file using path. ">sf_open()</a>, sf_wchar_open(), <a class="el" href="group__file-virt.html#ga09d282e248951a83f66bc7e6c8dc7fc8" title="Opens sound file using Virtual I/O context. ">sf_open_virtual()</a> </dd>
 <dd>
 <a class="el" href="sndfile2k_8h.html#a654c4c7efbf9db9017e7e4c5a2d9538c" title="Closes the SNDFILE object. ">sf_close()</a> </dd></dl>

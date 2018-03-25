@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">sndfile2k
-   &#160;<span id="projectnumber">1.1.1</span>
+   &#160;<span id="projectnumber">1.2.0</span>
    </div>
   </td>
  </tr>
@@ -97,6 +97,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga09d282e248951a83f66bc7e6c8dc7fc8"><td class="memItemLeft" align="right" valign="top">SNDFILE2K_EXPORT <a class="el" href="group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc">SNDFILE</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__file-virt.html#ga09d282e248951a83f66bc7e6c8dc7fc8">sf_open_virtual</a> (<a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html">SF_VIRTUAL_IO</a> *sfvirtual, int mode, <a class="el" href="struct_s_f___i_n_f_o.html">SF_INFO</a> *sfinfo, void *user_data)</td></tr>
 <tr class="memdesc:ga09d282e248951a83f66bc7e6c8dc7fc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens sound file using Virtual I/O context.  <a href="#ga09d282e248951a83f66bc7e6c8dc7fc8">More...</a><br /></td></tr>
 <tr class="separator:ga09d282e248951a83f66bc7e6c8dc7fc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8a73a72234d17776134fc5fe1419ed60"><td class="memItemLeft" align="right" valign="top">SNDFILE2K_EXPORT <a class="el" href="group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc">SNDFILE</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__file-virt.html#ga8a73a72234d17776134fc5fe1419ed60">sf_open_virtual_ex</a> (<a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html">SF_VIRTUAL_IO</a> *sfvirtual, int mode, <a class="el" href="struct_s_f___i_n_f_o.html">SF_INFO</a> *sfinfo, void *user_data)</td></tr>
+<tr class="memdesc:ga8a73a72234d17776134fc5fe1419ed60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens sound file using Virtual I/O context.  <a href="#ga8a73a72234d17776134fc5fe1419ed60">More...</a><br /></td></tr>
+<tr class="separator:ga8a73a72234d17776134fc5fe1419ed60"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>SndFile2K calls the callbacks provided by the <a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html" title="Defines virtual file I/O context. ">SF_VIRTUAL_IO</a> structure when opening, reading and writing to the virtual file context. </p>
@@ -252,7 +255,72 @@ Functions</h2></td></tr>
 <p><a class="el" href="group__file-base.html#gad6635d6c4c00e16a48e14542a27efd91" title="Opens sound file using POSIX file descriptor. ">sf_open_fd()</a> is similar to <a class="el" href="group__file-base.html#gaa45351ce25bafc72c211045e6e9d8fb2" title="Opens the specified sound file using path. ">sf_open()</a>, but takes Virtual I/O context of already opened file instead of path.</p>
 <p>Care should be taken to ensure that the mode of the file represented by the descriptor matches the <code>mode</code> argument.</p>
 <dl class="section return"><dt>Returns</dt><dd>A valid pointer to a <a class="el" href="group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc" title="Represents opened sound file. ">SNDFILE</a> object on success, <code>NULL</code> otherwise.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__file-base.html#gaa45351ce25bafc72c211045e6e9d8fb2" title="Opens the specified sound file using path. ">sf_open()</a>, sf_wchar_open(), <a class="el" href="group__file-base.html#gad6635d6c4c00e16a48e14542a27efd91" title="Opens sound file using POSIX file descriptor. ">sf_open_fd()</a> </dd>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000006">Deprecated:</a></b></dt><dd>This function is deprecated and will be removed in next major release. Use <a class="el" href="group__file-virt.html#ga8a73a72234d17776134fc5fe1419ed60" title="Opens sound file using Virtual I/O context. ">sf_open_virtual_ex()</a> instead.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__file-base.html#gaa45351ce25bafc72c211045e6e9d8fb2" title="Opens the specified sound file using path. ">sf_open()</a>, sf_wchar_open(), <a class="el" href="group__file-base.html#gad6635d6c4c00e16a48e14542a27efd91" title="Opens sound file using POSIX file descriptor. ">sf_open_fd()</a>, <a class="el" href="group__file-virt.html#ga8a73a72234d17776134fc5fe1419ed60" title="Opens sound file using Virtual I/O context. ">sf_open_virtual_ex()</a> </dd>
+<dd>
+<a class="el" href="sndfile2k_8h.html#a654c4c7efbf9db9017e7e4c5a2d9538c" title="Closes the SNDFILE object. ">sf_close()</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga8a73a72234d17776134fc5fe1419ed60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8a73a72234d17776134fc5fe1419ed60">&#9670;&nbsp;</a></span>sf_open_virtual_ex()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SNDFILE2K_EXPORT <a class="el" href="group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc">SNDFILE</a>* sf_open_virtual_ex </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html">SF_VIRTUAL_IO</a> *&#160;</td>
+          <td class="paramname"><em>sfvirtual</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>mode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="struct_s_f___i_n_f_o.html">SF_INFO</a> *&#160;</td>
+          <td class="paramname"><em>sfinfo</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>user_data</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Opens sound file using Virtual I/O context. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">sfvirtual</td><td>Virtual I/O context </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>File open mode </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">sfinfo</td><td>Format information </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">user_data</td><td>User data</td></tr>
+  </table>
+  </dd>
+</dl>
+<p><a class="el" href="group__file-virt.html#ga8a73a72234d17776134fc5fe1419ed60" title="Opens sound file using Virtual I/O context. ">sf_open_virtual_ex()</a> is similar to <a class="el" href="group__file-base.html#gaa45351ce25bafc72c211045e6e9d8fb2" title="Opens the specified sound file using path. ">sf_open()</a>, but takes Virtual I/O context of already opened file instead of path.</p>
+<p><a class="el" href="group__file-virt.html#ga8a73a72234d17776134fc5fe1419ed60" title="Opens sound file using Virtual I/O context. ">sf_open_virtual_ex()</a> uses new <a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html" title="Defines virtual file I/O context. ">SF_VIRTUAL_IO</a> members: <a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html#adc6b115dd56ee075a53097f03620032a" title="Pointer to a user defined function that forces the writing of data to disk. ">SF_VIRTUAL_IO::flush</a>, <a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html#a849d190d6f18b7e4d73e1f5c215dbd71" title="Pointer to a user defined function that truncates stream. ">SF_VIRTUAL_IO::set_filelen</a>, <a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html#a21facb1beae7168544c60c4285c93cea" title="Pointer to a user defined function that indicates pipe mode. ">SF_VIRTUAL_IO::is_pipe</a>, <a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html#afef0b941ac0324a42aba42a3ef9c472b" title="Pointer to a user defined function that increases reference count. ">SF_VIRTUAL_IO::ref</a> and <a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html#adf093762f7cc0387b44fa9280b7fb30b" title="Pointer to a user defined function that decreases reference count. ">SF_VIRTUAL_IO::unref</a>. Anyway, all this callbaks are not required and could be set to <code>NULL</code>.</p>
+<ul>
+<li><a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html#adc6b115dd56ee075a53097f03620032a" title="Pointer to a user defined function that forces the writing of data to disk. ">SF_VIRTUAL_IO::flush</a> is helpful in write mode, performing flashing cache data to disk.</li>
+<li><a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html#a849d190d6f18b7e4d73e1f5c215dbd71" title="Pointer to a user defined function that truncates stream. ">SF_VIRTUAL_IO::set_filelen</a> truncates file to desired size by the library.</li>
+<li><a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html#a21facb1beae7168544c60c4285c93cea" title="Pointer to a user defined function that indicates pipe mode. ">SF_VIRTUAL_IO::is_pipe</a> indicates that stream is pipe, activating internal pipe support.</li>
+<li><a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html#afef0b941ac0324a42aba42a3ef9c472b" title="Pointer to a user defined function that increases reference count. ">SF_VIRTUAL_IO::ref</a> and <a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html#adf093762f7cc0387b44fa9280b7fb30b" title="Pointer to a user defined function that decreases reference count. ">SF_VIRTUAL_IO::unref</a> could be implemented to control stream life time. When these members are implemented, library will call <code>ref</code> when file is opened, and call <code>unref</code> before closing file. You can pass as <code>user_data</code> pointer to struct with some counter member, your implementation of <code>ref</code> must increase this value, and  must decrease it and when it reaches zero close stream and free resources. Now, when initial value is zero, library will call and set counter to <code>1</code>, holding reference. In <a class="el" href="sndfile2k_8h.html#a654c4c7efbf9db9017e7e4c5a2d9538c" title="Closes the SNDFILE object. ">sf_close()</a> <code>unref</code> will be called, setting counter to <code>0</code> and calls yours cleanup code.</li>
+</ul>
+<p>Care should be taken to ensure that the mode of the file represented by the descriptor matches the <code>mode</code> argument.</p>
+<dl class="section return"><dt>Returns</dt><dd>A valid pointer to a <a class="el" href="group__file-base.html#gafcfd725939fab9b8a6e7891f80a8dafc" title="Represents opened sound file. ">SNDFILE</a> object on success, <code>NULL</code> otherwise.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__file-base.html#gaa45351ce25bafc72c211045e6e9d8fb2" title="Opens the specified sound file using path. ">sf_open()</a>, sf_wchar_open(), <a class="el" href="group__file-base.html#gad6635d6c4c00e16a48e14542a27efd91" title="Opens sound file using POSIX file descriptor. ">sf_open_fd()</a>, <a class="el" href="group__file-virt.html#ga09d282e248951a83f66bc7e6c8dc7fc8" title="Opens sound file using Virtual I/O context. ">sf_open_virtual()</a> </dd>
 <dd>
 <a class="el" href="sndfile2k_8h.html#a654c4c7efbf9db9017e7e4c5a2d9538c" title="Closes the SNDFILE object. ">sf_close()</a> </dd></dl>
 

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">sndfile2k
-   &#160;<span id="projectnumber">1.1.1</span>
+   &#160;<span id="projectnumber">1.2.0</span>
    </div>
   </td>
  </tr>
@@ -64,14 +64,34 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><dl class="reflist">
-<dt><a class="anchor" id="_deprecated000002"></a>Global <a class="el" href="group__error.html#ga54be9a815e6dcb347a816b3f237f1c20">sf_error_str</a>  (SNDFILE *sndfile, char *str, size_t len)</dt>
+<dt><a class="anchor" id="_deprecated000001"></a>Global <a class="el" href="sndfile2k_8h.html#a681b92a0003d2990ce7f0868e50d2483">SF_BROADCAST_INFO_VAR</a>  (256) SF_BROADCAST_INFO</dt>
+<dd>This feature and will be removed in next major release.  </dd>
+<dt><a class="anchor" id="_deprecated000004"></a>Global <a class="el" href="sndfile2k_8h.html#a3a6a27e0f6039f0a0b85b8925fe1b723">SF_CART_INFO_VAR</a>  (256) SF_CART_INFO</dt>
+<dd>This feature and will be removed in next major release.  </dd>
+<dt><a class="anchor" id="_deprecated000003"></a>Global <a class="el" href="sndfile2k_8h.html#a502df5fca6cdcd9f5b076c2b989bc125">SF_CART_INFO_VAR</a>  (p_tag_text_size)</dt>
+<dd>This feature and will be removed in next major release.  </dd>
+<dt><a class="anchor" id="_deprecated000002"></a>Class <a class="el" href="struct_s_f___c_a_r_t___t_i_m_e_r.html">SF_CART_TIMER</a>  </dt>
+<dd>This feature and will be removed in next major release.  </dd>
+<dt><a class="anchor" id="_deprecated000008"></a>Global <a class="el" href="group__error.html#ga54be9a815e6dcb347a816b3f237f1c20">sf_error_str</a>  (SNDFILE *sndfile, char *str, size_t len)</dt>
 <dd><a class="el" href="group__error.html#ga54be9a815e6dcb347a816b3f237f1c20" title="Fills provided buffer with text description of error code for the given SNDFILE. ">sf_error_str()</a> is deprecated and will be dropped from the library at some later date. </dd>
-<dt><a class="anchor" id="_deprecated000001"></a>Global <a class="el" href="group__error.html#ga50ed577cd4e8d966878866b2a168945c">sf_perror</a>  (SNDFILE *sndfile)</dt>
+<dt><a class="anchor" id="_deprecated000005"></a>Global <a class="el" href="group__file-base.html#gad6635d6c4c00e16a48e14542a27efd91">sf_open_fd</a>  (int fd, int mode, <a class="el" href="struct_s_f___i_n_f_o.html" title="Contains information about format of sound file. ">SF_INFO</a> *sfinfo, int close_desc)</dt>
+<dd>This function and will be removed in next major release. Use <a class="el" href="group__file-virt.html#ga8a73a72234d17776134fc5fe1419ed60" title="Opens sound file using Virtual I/O context. ">sf_open_virtual_ex()</a> function instead. </dd>
+<dt><a class="anchor" id="_deprecated000006"></a>Global <a class="el" href="group__file-virt.html#ga09d282e248951a83f66bc7e6c8dc7fc8">sf_open_virtual</a>  (<a class="el" href="struct_s_f___v_i_r_t_u_a_l___i_o.html" title="Defines virtual file I/O context. ">SF_VIRTUAL_IO</a> *sfvirtual, int mode, <a class="el" href="struct_s_f___i_n_f_o.html" title="Contains information about format of sound file. ">SF_INFO</a> *sfinfo, void *user_data)</dt>
+<dd>This function is deprecated and will be removed in next major release. Use <a class="el" href="group__file-virt.html#ga8a73a72234d17776134fc5fe1419ed60" title="Opens sound file using Virtual I/O context. ">sf_open_virtual_ex()</a> instead. </dd>
+<dt><a class="anchor" id="_deprecated000007"></a>Global <a class="el" href="group__error.html#ga50ed577cd4e8d966878866b2a168945c">sf_perror</a>  (SNDFILE *sndfile)</dt>
 <dd><a class="el" href="group__error.html#ga50ed577cd4e8d966878866b2a168945c" title="Returns internal error code for the given SNDFILE. ">sf_perror()</a> is deprecated and will be dropped from the library at some later date. </dd>
-<dt><a class="anchor" id="_deprecated000004"></a>Global <a class="el" href="group__command.html#gga73828cfefd372217f90f99f930f6fd1fad299d90479bf2c7821d9b0ee00ee795e">SFC_SET_ADD_DITHER_ON_READ</a>  </dt>
+<dt><a class="anchor" id="_deprecated000009"></a>Global <a class="el" href="group__command.html#gga73828cfefd372217f90f99f930f6fd1fab5308159f9e5dc2dcff9cac9d4291def">SFC_GET_BROADCAST_INFO</a>  </dt>
+<dd>This command is deprecated and will be removed in next major release.  </dd>
+<dt><a class="anchor" id="_deprecated000012"></a>Global <a class="el" href="group__command.html#gga73828cfefd372217f90f99f930f6fd1fa58d8a4a80c568e008b0e94fa3553a1ca">SFC_GET_CART_INFO</a>  </dt>
+<dd>This command is deprecated and will be removed in next major release.  </dd>
+<dt><a class="anchor" id="_deprecated000014"></a>Global <a class="el" href="group__command.html#gga73828cfefd372217f90f99f930f6fd1fad299d90479bf2c7821d9b0ee00ee795e">SFC_SET_ADD_DITHER_ON_READ</a>  </dt>
 <dd><a class="el" href="group__command.html#gga73828cfefd372217f90f99f930f6fd1fad299d90479bf2c7821d9b0ee00ee795e" title="Deprecated. ">SFC_SET_ADD_DITHER_ON_READ</a> is deprecated and will be dropped from the library at some later date. </dd>
-<dt><a class="anchor" id="_deprecated000003"></a>Global <a class="el" href="group__command.html#gga73828cfefd372217f90f99f930f6fd1fae17717cf4c04fd6aa37fb35f6c5e3b27">SFC_SET_ADD_DITHER_ON_WRITE</a>  </dt>
-<dd><a class="el" href="group__command.html#gga73828cfefd372217f90f99f930f6fd1fae17717cf4c04fd6aa37fb35f6c5e3b27" title="Deprecated. ">SFC_SET_ADD_DITHER_ON_WRITE</a> is deprecated and will be dropped from the library at some later date.</dd>
+<dt><a class="anchor" id="_deprecated000013"></a>Global <a class="el" href="group__command.html#gga73828cfefd372217f90f99f930f6fd1fae17717cf4c04fd6aa37fb35f6c5e3b27">SFC_SET_ADD_DITHER_ON_WRITE</a>  </dt>
+<dd><a class="el" href="group__command.html#gga73828cfefd372217f90f99f930f6fd1fae17717cf4c04fd6aa37fb35f6c5e3b27" title="Deprecated. ">SFC_SET_ADD_DITHER_ON_WRITE</a> is deprecated and will be dropped from the library at some later date. </dd>
+<dt><a class="anchor" id="_deprecated000010"></a>Global <a class="el" href="group__command.html#gga73828cfefd372217f90f99f930f6fd1faa8d1355dc261548e17f04a11da687d22">SFC_SET_BROADCAST_INFO</a>  </dt>
+<dd>This command is deprecated and will be removed in next major release.  </dd>
+<dt><a class="anchor" id="_deprecated000011"></a>Global <a class="el" href="group__command.html#gga73828cfefd372217f90f99f930f6fd1fa883753b5f0cbd9d3749bc0f00be1a20a">SFC_SET_CART_INFO</a>  </dt>
+<dd>This command is deprecated and will be removed in next major release. </dd>
 </dl>
 </div></div><!-- contents -->
 <!-- start footer part -->
