@@ -1240,9 +1240,12 @@ typedef struct SF_LOOP_INFO
     int future[6];
 } SF_LOOP_INFO;
 
-/*
- * Struct used to retrieve broadcast (EBU) information from a file.
+/* Struct used to retrieve broadcast (EBU) information from a file.
+ *
  * Strongly (!) based on EBU "bext" chunk format used in Broadcast WAVE.
+ *
+ * @deprecated This feature and will be removed in next major release.
+ *
  */
 #define SF_BROADCAST_INFO_VAR(coding_hist_size) \
     struct                                      \
@@ -1262,10 +1265,14 @@ typedef struct SF_LOOP_INFO
     }
 
 /** Defines Broadcast struct with @c coding_history field of 256 bytes
+ *
+ * @deprecated This feature and will be removed in next major release.
  */
 typedef SF_BROADCAST_INFO_VAR(256) SF_BROADCAST_INFO;
 
 /** Contanins information about CART timer
+ *
+ * @deprecated This feature and will be removed in next major release.
  */
 typedef struct SF_CART_TIMER
 {
@@ -1273,6 +1280,10 @@ typedef struct SF_CART_TIMER
     int32_t value;
 } SF_CART_TIMER;
 
+/** Defines CART timer struct with @c tag_text of desired size.
+ *
+ * @deprecated This feature and will be removed in next major release.
+ */
 #define SF_CART_INFO_VAR(p_tag_text_size) \
     struct                                \
     {                                     \
@@ -1299,6 +1310,10 @@ typedef struct SF_CART_TIMER
         char tag_text[p_tag_text_size];   \
     }
 
+ /** Declares CART timer struct with @c tag_text of 256 elements.
+  *
+  * @deprecated This feature and will be removed in next major release.
+  */
 typedef SF_CART_INFO_VAR(256) SF_CART_INFO;
 
 /** Type of user defined function that increases reference count
@@ -1510,6 +1525,9 @@ SNDFILE2K_EXPORT SNDFILE *sf_open(const char *path, int mode, SF_INFO *sfinfo);
  * @return A valid pointer to a #SNDFILE object on success, @c NULL
  * otherwise.
  *
+ * @deprecated This function and will be removed in next major release.
+ * Use sf_open_virtual_ex() function instead.
+ *
  * @sa sf_open(), sf_wchar_open(), sf_open_virtual()
  * @sa sf_close()
  */
@@ -1538,6 +1556,7 @@ SNDFILE2K_EXPORT SNDFILE *sf_open_fd(int fd, int mode, SF_INFO *sfinfo, int clos
  *
  * @return A valid pointer to a #SNDFILE object on success, @c NULL
  * otherwise.
+ *
  * @deprecated This function is deprecated and will be removed in next major release.
  * Use sf_open_virtual_ex() instead.
  *
