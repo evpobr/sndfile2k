@@ -1301,7 +1301,17 @@ typedef struct SF_CART_TIMER
 
 typedef SF_CART_INFO_VAR(256) SF_CART_INFO;
 
+/** Type of user defined function that increases reference count
+ *
+ * @param[in] user_data User defined value.
+ *
+ * @return Reference count.
+ */
 typedef unsigned long (*sf_ref_callback)(void *user_data);
+/** Type of user defined function that decreases reference count
+ *
+ * @param[in] user_data User defined value.
+ */
 typedef void (*sf_unref_callback)(void *user_data);
 
 /** Type of user defined function that returns file size
@@ -1421,8 +1431,9 @@ typedef struct SF_VIRTUAL_IO
 	sf_vio_set_filelen set_filelen;
 	//! Pointer to a user defined function that indicates pipe mode.
 	sf_vio_is_pipe is_pipe;
-
+	//! Pointer to a user defined function that increases reference count.
 	sf_ref_callback ref;
+	//! Pointer to a user defined function that decreases reference count.
 	sf_unref_callback unref;
 } SF_VIRTUAL_IO;
 
@@ -1527,12 +1538,55 @@ SNDFILE2K_EXPORT SNDFILE *sf_open_fd(int fd, int mode, SF_INFO *sfinfo, int clos
  *
  * @return A valid pointer to a #SNDFILE object on success, @c NULL
  * otherwise.
+ * @deprecated This function is deprecated and will be removed in next major release.
+ * Use sf_open_virtual_ex() instead.
  *
- * @sa sf_open(), sf_wchar_open(), sf_open_fd()
+ * @sa sf_open(), sf_wchar_open(), sf_open_fd(), sf_open_virtual_ex()
  * @sa sf_close()
  */
 SNDFILE2K_EXPORT SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo,
                                           void *user_data);
+
+/** Opens sound file using Virtual I/O context
+ *
+ * @param[in] sfvirtual Virtual I/O context
+ * @param[in] mode File open mode
+ * @param[in,out] sfinfo Format information
+ * @param[in] user_data User data
+ *
+ * sf_open_virtual_ex() is similar to sf_open(), but takes Virtual I/O context
+ * of already opened file instead of path.
+ *
+ * sf_open_virtual_ex() uses new SF_VIRTUAL_IO members: SF_VIRTUAL_IO::flush,
+ * SF_VIRTUAL_IO::set_filelen, SF_VIRTUAL_IO::is_pipe, SF_VIRTUAL_IO::ref
+ * and SF_VIRTUAL_IO::unref. Anyway, all this callbaks are not required and
+ * could be set to @c NULL.
+ *
+ * - SF_VIRTUAL_IO::flush is helpful in write mode, performing flashing cache data
+ * to disk.
+ * - SF_VIRTUAL_IO::set_filelen truncates file to desired size by the library.
+ * - SF_VIRTUAL_IO::is_pipe indicates that stream is pipe, activating internal pipe
+ *   support.
+ * - SF_VIRTUAL_IO::ref and SF_VIRTUAL_IO::unref could be implemented to control
+ *   stream life time. When these members are implemented, library will call @c ref
+ *   when file is opened, and call @c unref before closing file. You can pass as
+ *   @p user_data pointer to struct with some counter member, your implementation
+ *   of @c ref must increase this value, and @unref must decrease it and when it
+ *	 reaches zero close stream and free resources. Now, when initial value is zero,
+ *	 library will call @ref and set counter to @c 1, holding reference. In sf_close()
+ *	 @c unref will be called, setting counter to @c 0 and calls yours cleanup code.
+ *
+ *
+ * Care should be taken to ensure that the mode of the file represented by the
+ * descriptor matches the @c mode argument.
+ *
+ * @return A valid pointer to a #SNDFILE object on success, @c NULL
+ * otherwise.
+ *
+ * @sa sf_open(), sf_wchar_open(), sf_open_fd(), sf_open_virtual()
+ * @sa sf_close()
+ */
+SNDFILE2K_EXPORT SNDFILE *sf_open_virtual_ex(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user_data);
 
 /** @}*/
 
