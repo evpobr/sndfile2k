@@ -1455,7 +1455,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
             sndfile->error = SFE_BAD_COMMAND_PARAM;
             return SF_FALSE;
         }
-        uint32_t in_cue_count = min(sndfile->cues.cue_count, datasize);
+        uint32_t in_cue_count = SF_MIN(sndfile->cues.cue_count, datasize);
 
         memcpy(data, sndfile->cues.cue_points, in_cue_count * sizeof(SF_CUE_POINT));
         if (!data)
