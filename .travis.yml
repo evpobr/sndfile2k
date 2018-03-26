@@ -1,4 +1,4 @@
-dist: trusty
+dist: travis_latest
 group: edge
 sudo: false
 language: c
