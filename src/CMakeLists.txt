@@ -177,6 +177,8 @@ set_target_properties(sndfile2k
     VERSION ${SNDFILE2K_SOVERSION}
     DEFINE_SYMBOL SNDFILE2K_EXPORTS)
 
+target_compile_definitions(sndfile2k PRIVATE _USE_MATH_DEFINES)
+
 if(BUILD_SHARED_LIBS)
 
   set_target_properties(sndfile2k
