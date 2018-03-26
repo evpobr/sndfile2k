@@ -398,7 +398,6 @@ int main(int argc, char *argv[])
 static void copy_metadata(SNDFILE *outfile, SNDFILE *infile, int channels)
 {
     SF_INSTRUMENT inst;
-    SF_CUES cues;
     SF_BROADCAST_INFO_2K binfo;
     const char *str;
     int k, chanmap[256];
@@ -411,7 +410,6 @@ static void copy_metadata(SNDFILE *outfile, SNDFILE *infile, int channels)
     };
 
     memset(&inst, 0, sizeof(inst));
-    memset(&cues, 0, sizeof(cues));
     memset(&binfo, 0, sizeof(binfo));
 
     if (channels < ARRAY_LEN(chanmap))
@@ -422,8 +420,12 @@ static void copy_metadata(SNDFILE *outfile, SNDFILE *infile, int channels)
             sf_command(outfile, SFC_SET_CHANNEL_MAP_INFO, chanmap, size);
     };
 
-    if (sf_command(infile, SFC_GET_CUE, &cues, sizeof(cues)) == SF_TRUE)
-        sf_command(outfile, SFC_SET_CUE, &cues, sizeof(cues));
+	uint32_t in_cue_count = 0;
+	sf_command(infile, SFC_GET_CUE_COUNT, &in_cue_count, sizeof(in_cue_count));
+	SF_CUE_POINT *cues = calloc(in_cue_count, sizeof(SF_CUE_POINT));
+    if (sf_command(infile, SFC_GET_CUE, cues, in_cue_count) == SF_TRUE)
+        sf_command(outfile, SFC_SET_CUE, cues, in_cue_count);
+	free(cues);
 
     if (sf_command(infile, SFC_GET_INSTRUMENT, &inst, sizeof(inst)) == SF_TRUE)
         sf_command(outfile, SFC_SET_INSTRUMENT, &inst, sizeof(inst));

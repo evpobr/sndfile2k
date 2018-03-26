@@ -678,6 +678,8 @@ typedef enum SF_COMMAND
      * @param[out] data A pointer to a ::SF_CUES struct
      * @param[in] datasize sizeof(SF_CUES)
      *
+     * @deprecated This command is deprecated, use GET_CUE_POINTS instead.
+     *
      * @return ::SF_TRUE if the file header contains cue marker information for
      * the file, ::SF_FALSE otherwise.
      */
@@ -687,6 +689,8 @@ typedef enum SF_COMMAND
      * @param[in] sndfile a valid ::SNDFILE* pointer
      * @param[in] data A pointer to a ::SF_CUES struct
      * @param[in] datasize sizeof(SF_CUES)
+     *
+     * @deprecated This command is deprecated, use SET_CUE_POINTS instead.
      *
      * @return ::SF_TRUE if the file header contains cue marker information for
      * the file, ::SF_FALSE otherwise.
@@ -917,7 +921,26 @@ typedef enum SF_COMMAND
      * @deprecated ::SFC_SET_ADD_DITHER_ON_READ is deprecated and will be
      * dropped from the library at some later date.
      */
-    SFC_SET_ADD_DITHER_ON_READ = 0x1071
+    SFC_SET_ADD_DITHER_ON_READ = 0x1071,
+
+    /** Gets cue marker information from file
+     *
+     * @param[in] sndfile a valid ::SNDFILE* pointer
+     * @param[out] data A pointer to an array of ::SF_CUE_POINT structs.
+     * @param[in] datasize Count of ::SF_CUE_POINT structs in array
+     *
+     * @return Number of ::SF_CUE_POINT actually retrieved.
+     */
+    SFC_GET_CUE_POINTS = 0x1388,
+    /** Sets cue marker information for the file
+     *
+     * @param[in] sndfile a valid ::SNDFILE* pointer
+     * @param[in] data A pointer to an array of ::SF_CUE_POINT structs
+     * @param[in] datasize Count of ::SF_CUE_POINT structs in array
+     *
+     * @return ::SF_TRUE on success, ::SF_FALSE otherwise.
+     */
+    SFC_SET_CUE_POINTS = 0x1389,
 } SF_COMMAND;
 
 /**
@@ -1175,6 +1198,9 @@ typedef struct SF_CUE_POINT
 /** Defines struct containing desired count of CUE markers
  *
  * @param[in] count Size of @c cue_points array
+ *
+ * @deprecated This struct is deprecated.
+ *
  */
 #define SF_CUES_VAR(count)              \
     struct                              \
@@ -1184,6 +1210,8 @@ typedef struct SF_CUE_POINT
     }
 
 /** Represents CUE markers struct containing maximum of @c 100 CUE markers
+ *
+ * @deprecated This typedef is deprecated.
  */
 typedef SF_CUES_VAR(100) SF_CUES;
 
