@@ -24,11 +24,7 @@
 #include <errno.h>
 #include <inttypes.h>
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#else
 #include "sf_unistd.h"
-#endif
 
 #include "common.h"
 #include "sfendian.h"

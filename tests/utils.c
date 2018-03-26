@@ -29,13 +29,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-
-#ifndef HAVE_DECL_S_IRGRP
 #include <sf_unistd.h>
-#endif
 
 #include <errno.h>
 #include <string.h>
@@ -53,15 +47,6 @@
 #endif
 
 #define LOG_BUFFER_SIZE (2048)
-
-/*
- * Neat solution to the Win32/OS2 binary file flage requirement.
- * If O_BINARY isn't already defined by the inclusion of the system
- * headers, set it to zero.
- */
-#ifndef O_BINARY
-#define O_BINARY 0
-#endif
 
 void gen_windowed_sine_float(float *data, int len, double maximum)
 {

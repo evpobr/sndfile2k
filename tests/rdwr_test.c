@@ -25,13 +25,7 @@
 #include <sys/stat.h>
 #include <math.h>
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-
-#ifndef HAVE_DECL_S_IRGRP
 #include <sf_unistd.h>
-#endif
 
 #if (defined(WIN32) || defined(_WIN32))
 #include <io.h>

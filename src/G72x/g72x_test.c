@@ -19,11 +19,7 @@
 #include "config.h"
 
 #include <stdio.h>
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#else
 #include "sf_unistd.h"
-#endif
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>

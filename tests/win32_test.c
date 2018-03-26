@@ -23,13 +23,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-
-#ifndef HAVE_DECL_S_IRGRP
 #include <sf_unistd.h>
-#endif
 
 #include <string.h>
 #include <fcntl.h>
@@ -68,7 +62,6 @@ static char dir_cmd[] = "dir";
 typedef struct stat STATBUF;
 typedef sf_count_t INT64;
 
-#define O_BINARY (0)
 static char dir_cmd[] = "ls -l";
 
 #endif

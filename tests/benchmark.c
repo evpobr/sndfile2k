@@ -21,13 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-
-#ifndef HAVE_DECL_S_IRGRP
 #include <sf_unistd.h>
-#endif
 
 #include <string.h>
 #include <math.h>
@@ -39,15 +33,6 @@
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338
-#endif
-
-/*
-**	Neat solution to the Win32/OS2 binary file flage requirement.
-**	If O_BINARY isn't already defined by the inclusion of the system
-**	headers, set it to zero.
-*/
-#ifndef O_BINARY
-#define O_BINARY 0
 #endif
 
 #define WRITE_FLAGS (O_WRONLY | O_CREAT | O_TRUNC | O_BINARY)

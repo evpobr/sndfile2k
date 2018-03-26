@@ -22,11 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#else
 #include "sf_unistd.h"
-#endif
 
 #ifdef HAVE_LOCALE_H
 #include <locale.h>

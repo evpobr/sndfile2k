@@ -26,11 +26,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/stat.h>
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#else
 #include <sf_unistd.h>
-#endif
 
 static sf_count_t vfget_filelen(void *user_data);
 static int vfset_filelen(void *user_data, sf_count_t len);
@@ -633,26 +629,17 @@ static int psf_open_fd(PSF_FILE *pfile)
 	switch (pfile->mode)
 	{
 	case SFM_READ:
-		oflag = O_RDONLY;
-#ifdef O_BINARY
-		oflag |= O_BINARY;
-#endif
+		oflag = O_BINARY | O_RDONLY;
 		mode = 0;
 		break;
 
 	case SFM_WRITE:
-		oflag = O_WRONLY | O_CREAT | O_TRUNC;
-#ifdef O_BINARY
-		oflag |= O_BINARY;
-#endif
+		oflag = O_BINARY | O_WRONLY | O_CREAT | O_TRUNC;
 		mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
 		break;
 
 	case SFM_RDWR:
-		oflag = O_RDWR | O_CREAT;
-#ifdef O_BINARY
-		oflag |= O_BINARY;
-#endif
+		oflag = O_BINARY | O_RDWR | O_CREAT;
 		mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
 		break;
 

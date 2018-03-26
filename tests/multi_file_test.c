@@ -24,13 +24,7 @@
 #include <math.h>
 #include <inttypes.h>
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-
-#ifndef HAVE_DECL_S_IRGRP
 #include <sf_unistd.h>
-#endif
 
 #include <fcntl.h>
 #include <errno.h>

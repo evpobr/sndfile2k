@@ -39,11 +39,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <errno.h>
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#else
 #include "sf_unistd.h"
-#endif
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
