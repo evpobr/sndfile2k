@@ -1287,36 +1287,29 @@ void *psf_memset(void *s, int c, sf_count_t len)
 ** bodgy something up instead.
 */
 
-typedef SF_CUES_VAR(0) SF_CUES_0;
-
-#define SF_CUES_VAR_SIZE(count) (sizeof(SF_CUES_0) + count * sizeof(SF_CUE_POINT))
-
-SF_CUES *psf_cues_alloc(uint32_t cue_count)
+SF_CUE_POINT *psf_cues_alloc(uint32_t cue_count)
 {
-    SF_CUES *pcues = calloc(1, SF_CUES_VAR_SIZE(cue_count));
-
-    pcues->cue_count = cue_count;
-    return pcues;
+    return calloc(cue_count, sizeof(SF_CUE_POINT));
 }
 
-SF_CUES *psf_cues_dup(const void *ptr)
+SF_CUE_POINT *psf_cues_dup(const SF_CUE_POINT *cues, uint32_t cue_count)
 {
-    const SF_CUES *pcues = ptr;
-    SF_CUES *pnew = psf_cues_alloc(pcues->cue_count);
-
-    memcpy(pnew, pcues, SF_CUES_VAR_SIZE(pcues->cue_count));
+    SF_CUE_POINT *pnew = psf_cues_alloc(cue_count);
+    memcpy(pnew, cues, sizeof(SF_CUE_POINT) * cue_count);
     return pnew;
 }
 
 void psf_get_cues(SF_PRIVATE *psf, void *data, size_t datasize)
 {
-    if (psf->cues)
+    if (psf->cues.cue_points)
     {
         uint32_t cue_count = (datasize - sizeof(uint32_t)) / sizeof(SF_CUE_POINT);
 
-        cue_count = SF_MIN(cue_count, psf->cues->cue_count);
-        memcpy(data, psf->cues, SF_CUES_VAR_SIZE(cue_count));
-        ((SF_CUES *)data)->cue_count = cue_count;
+        cue_count = SF_MIN(cue_count, psf->cues.cue_count);
+        size_t cues_offset = sizeof(uint32_t);
+        memcpy(data, &psf->cues, sizeof(SF_CUE_POINTS) - cues_offset);
+        memcpy((char *)data + cues_offset, psf->cues.cue_points, sizeof(SF_CUE_POINT) *cue_count);
+        ((SF_CUE_POINTS*)data)->cue_count = cue_count;
     };
 
     return;

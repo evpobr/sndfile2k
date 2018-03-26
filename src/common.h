@@ -283,6 +283,14 @@ struct SF_CHUNK_ITERATOR
     SNDFILE *sndfile;
 };
 
+/** Defines struct containing of CUE markers
+ */
+typedef struct SF_CUE_POINTS
+{
+	uint32_t cue_count;
+	const SF_CUE_POINT *cue_points;
+}  SF_CUE_POINTS;
+
 static inline size_t make_size_t(int x)
 {
     return (size_t)x;
@@ -454,7 +462,7 @@ typedef struct sf_private_tag
     struct PEAK_INFO *peak_info;
 
     /* Cue Marker Info */
-    SF_CUES *cues;
+    SF_CUE_POINTS cues;
 
     /* Loop Info */
     SF_LOOP_INFO *loop_info;
@@ -1007,8 +1015,8 @@ static inline void psf_strlcpy(char *dest, size_t n, const char *src)
 
 void *psf_memset(void *s, int c, sf_count_t n);
 
-SF_CUES *psf_cues_dup(const void *ptr);
-SF_CUES *psf_cues_alloc(uint32_t cue_count);
+SF_CUE_POINT *psf_cues_dup(const SF_CUE_POINT *cues, uint32_t cue_count);
+SF_CUE_POINT *psf_cues_alloc(uint32_t cue_count);
 void psf_get_cues(SF_PRIVATE *psf, void *data, size_t datasize);
 
 SF_INSTRUMENT *psf_instrument_alloc(void);

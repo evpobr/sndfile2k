@@ -49,6 +49,7 @@ static void calc_peak_test(int filetype, const char *filename, int channels);
 static void truncate_test(const char *filename, int filetype);
 static void instrument_test(const char *filename, int filetype);
 static void cue_test(const char *filename, int filetype);
+static void cue_points_test(const char *filename, int filetype);
 static void channel_map_test(const char *filename, int filetype);
 static void current_sf_info_test(const char *filename);
 static void raw_needs_endswap_test(const char *filename, int filetype);
@@ -85,7 +86,7 @@ int main(int argc, char *argv[])
         printf("           peak    - test peak calculation\n");
         printf("           trunc   - test file truncation\n");
         printf("           inst    - test set/get of SF_INSTRUMENT.\n");
-        printf("           cue     - test set/get of SF_CUES.\n");
+        printf("           cue     - test set/get of SF_CUES and SF_CUE_POINTS.\n");
         printf("           chanmap - test set/get of channel map data..\n");
         printf("           bext    - test set/get of SF_BROADCAST_INFO.\n");
         printf("           bextch  - test set/get of SF_BROADCAST_INFO "
@@ -158,6 +159,10 @@ int main(int argc, char *argv[])
     {
         cue_test("cue.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16);
         cue_test("cue.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_24);
+
+        cue_points_test("cue.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16);
+        cue_points_test("cue.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_24);
+
         test_count++;
     };
 
@@ -1025,6 +1030,119 @@ static void cue_test(const char *filename, int filetype)
                read_cue.cue_points[0].name, read_cue.cue_points[1].indx, read_cue.cue_points[1].position,
                read_cue.cue_points[1].fcc_chunk, read_cue.cue_points[1].chunk_start, read_cue.cue_points[1].block_start,
                read_cue.cue_points[1].sample_offset, read_cue.cue_points[1].name);
+
+        exit(1);
+    };
+
+    if (0)
+        cue_rw_test(filename);
+
+    unlink(filename);
+    puts("ok");
+}
+
+static void sf_cue_point_set(SF_CUE_POINT *cue_point,
+                             int32_t indx,
+                             uint32_t position,
+                             int32_t fcc_chunk,
+                             int32_t chunk_start,
+                             int32_t block_start,
+                             uint32_t sample_offset,
+                             const char *name)
+{
+    cue_point->indx = indx;
+    cue_point->position = position;
+    cue_point->fcc_chunk = fcc_chunk;
+    cue_point->chunk_start = chunk_start;
+    cue_point->block_start = block_start;
+    cue_point->sample_offset = sample_offset;
+    strncpy(cue_point->name, name, 256);
+}
+
+static void cue_points_test(const char *filename, int filetype)
+{
+    SF_CUE_POINT write_cue[2];
+    SNDFILE *file;
+    SF_INFO sfinfo;
+
+    if (filetype == (SF_FORMAT_WAV | SF_FORMAT_PCM_16))
+    {
+        sf_cue_point_set(&write_cue[0], 1, 0, data_MARKER, 0, 0, 1, "");
+        sf_cue_point_set(&write_cue[1], 2, 0, data_MARKER, 0, 0, 2, "");
+    }
+    else
+    {
+        sf_cue_point_set(&write_cue[0], 1, 0, data_MARKER, 0, 0, 1, "Cue1");
+        sf_cue_point_set(&write_cue[1], 2, 0, data_MARKER, 0, 0, 2, "Cue2");
+    }
+
+    print_test_name("cue_point_test", filename);
+
+    sfinfo.samplerate = 11025;
+    sfinfo.format = filetype;
+    sfinfo.channels = 1;
+
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    if (sf_command(file, SFC_SET_CUE_POINTS, write_cue, 2) == SF_FALSE)
+    {
+        printf("\n\nLine %d : sf_command (SFC_SET_CUE_POINTS) failed.\n\n", __LINE__);
+        exit(1);
+    };
+    test_write_double_or_die(file, 0, double_data, BUFFER_LEN, __LINE__);
+    sf_close(file);
+
+    SF_CUE_POINT read_cue[2] = { 0 };
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    if (sf_command(file, SFC_GET_CUE_POINTS, read_cue, 2) == SF_FALSE)
+    {
+        printf("\n\nLine %d : sf_command (SFC_SET_CUE_POINTS) failed.\n\n", __LINE__);
+        exit(1);
+        return;
+    };
+    check_log_buffer_or_die(file, __LINE__);
+    sf_close(file);
+
+    if (memcmp(&write_cue, &read_cue, sizeof(write_cue)) != 0)
+    {
+        printf("\n\nLine %d : cue comparison failed.\n\n", __LINE__);
+        printf("W  indx          : %d\n"
+               "   position      : %u\n"
+               "   fcc_chunk     : %x\n"
+               "   chunk_start   : %d\n"
+               "   block_start   : %d\n"
+               "   sample_offset : %u\n"
+               "   name          : %s\n"
+               "   indx          : %d\n"
+               "   position      : %u\n"
+               "   fcc_chunk     : %x\n"
+               "   chunk_start   : %d\n"
+               "   block_start   : %d\n"
+               "   sample_offset : %u\n"
+               "   name          : %s\n",
+               write_cue[0].indx, write_cue[0].position,
+               write_cue[0].fcc_chunk, write_cue[0].chunk_start, write_cue[0].block_start,
+               write_cue[0].sample_offset, write_cue[0].name, write_cue[1].indx,
+               write_cue[1].position, write_cue[1].fcc_chunk, write_cue[1].chunk_start,
+               write_cue[1].block_start, write_cue[1].sample_offset, write_cue[1].name);
+        printf("R  indx          : %d\n"
+               "   position      : %u\n"
+               "   fcc_chunk     : %x\n"
+               "   chunk_start   : %d\n"
+               "   block_start   : %d\n"
+               "   sample_offset : %u\n"
+               "   name          : %s\n"
+               "   indx          : %d\n"
+               "   position      : %u\n"
+               "   fcc_chunk     : %x\n"
+               "   chunk_start   : %d\n"
+               "   block_start   : %d\n"
+               "   sample_offset : %u\n"
+               "   name          : %s\n",
+               read_cue[0].indx, read_cue[0].position, read_cue[0].fcc_chunk,
+               read_cue[0].chunk_start, read_cue[0].block_start, read_cue[0].sample_offset,
+               read_cue[0].name, read_cue[1].indx, read_cue[1].position,
+               read_cue[1].fcc_chunk, read_cue[1].chunk_start, read_cue[1].block_start,
+               read_cue[1].sample_offset, read_cue[1].name);
 
         exit(1);
     };

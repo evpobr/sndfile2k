@@ -1408,9 +1408,9 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
             sndfile->error = SFE_BAD_COMMAND_PARAM;
             return SF_FALSE;
         };
-        if (sndfile->cues != NULL)
+        if (sndfile->cues.cue_points != NULL)
         {
-            *((uint32_t *)data) = sndfile->cues->cue_count;
+            *((uint32_t *)data) = sndfile->cues.cue_count;
             return SF_TRUE;
         };
         return SF_FALSE;
@@ -1421,7 +1421,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
             sndfile->error = SFE_BAD_COMMAND_PARAM;
             return SF_FALSE;
         };
-        if (sndfile->cues == NULL)
+        if (sndfile->cues.cue_points == NULL)
             return SF_FALSE;
         psf_get_cues(sndfile, data, datasize);
         return SF_TRUE;
@@ -1438,12 +1438,63 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
             return SF_FALSE;
         };
 
-        if (sndfile->cues == NULL && (sndfile->cues = psf_cues_dup(data)) == NULL)
+        SF_CUES *cues = data;
+        if (sndfile->cues.cue_points == NULL && (sndfile->cues.cue_points = psf_cues_dup(cues->cue_points, cues->cue_count)) == NULL)
         {
             sndfile->error = SFE_MALLOC_FAILED;
             return SF_FALSE;
         };
+		sndfile->cues.cue_count = cues->cue_count;
         return SF_TRUE;
+
+	case SFC_GET_CUE_POINTS:
+    {
+        if (!data || datasize <= 0)
+        {
+            sndfile->error = SFE_BAD_COMMAND_PARAM;
+            return SF_FALSE;
+        }
+        uint32_t in_cue_count = min(sndfile->cues.cue_count, datasize);
+
+        memcpy(data, sndfile->cues.cue_points, in_cue_count * sizeof(SF_CUE_POINT));
+        if (!data)
+        {
+            sndfile->error = SFE_MALLOC_FAILED;
+            return SF_FALSE;
+        };
+        return in_cue_count;
+    }
+
+	case SFC_SET_CUE_POINTS:
+    {
+        if (sndfile->have_written)
+        {
+            sndfile->error = SFE_CMD_HAS_DATA;
+            return SF_FALSE;
+        };
+        if (!data && datasize <= 0)
+        {
+            sndfile->error = SFE_BAD_COMMAND_PARAM;
+            return SF_FALSE;
+        };
+        if (sndfile->cues.cue_points)
+        {
+            free(sndfile->cues.cue_points);
+            sndfile->cues.cue_count = 0;
+        };
+        if (!data && datasize == 0)
+            return SF_TRUE;
+        SF_CUE_POINT *in_cues = data;
+        uint32_t in_cue_count = (uint32_t)datasize;
+        sndfile->cues.cue_points = psf_cues_dup(in_cues, in_cue_count);
+        if (!sndfile->cues.cue_points)
+        {
+            sndfile->error = SFE_MALLOC_FAILED;
+            return SF_FALSE;
+        };
+        sndfile->cues.cue_count = in_cue_count;
+        return SF_TRUE;
+    }
 
     case SFC_GET_INSTRUMENT:
         if (datasize != sizeof(SF_INSTRUMENT) || data == NULL)
@@ -3142,7 +3193,9 @@ static int psf_close(SF_PRIVATE *psf)
     free(psf->broadcast_16k);
     free(psf->loop_info);
     free(psf->instrument);
-    free(psf->cues);
+    free(psf->cues.cue_points);
+	psf->cues.cue_points = NULL;
+    psf->cues.cue_count = 0;
     free(psf->channel_map);
     free(psf->format_desc);
     free(psf->strings.storage);
