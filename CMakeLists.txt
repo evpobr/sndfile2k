@@ -43,13 +43,13 @@ option(ENABLE_CMAKE_PACKAGE_CONFIG "Generate and install CMake package configura
 option(ENABLE_PKGCONFIG_FILE "Generate and install pkg-config file (sndfile2k.pc)" ON)
 option(ENABLE_EXPERIMENTAL "Enable experimental code" OFF)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH}")
 
 #
 # Setup definitions
 #
 
-include(${CMAKE_MODULE_PATH}/SndFileChecks.cmake)
+include(cmake/SndFileChecks.cmake)
 
 configure_file(src/config.h.cmake src/config.h)
 
