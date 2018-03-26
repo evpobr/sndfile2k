@@ -23,6 +23,7 @@
 #include <ctype.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include "sndfile2k/sndfile2k.h"
 #include "sfendian.h"
