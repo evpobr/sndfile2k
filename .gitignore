@@ -65,3 +65,5 @@ CMakeSettings.json
 *[Bb]uild*/
 
 .vs/
+.vscode/
+
