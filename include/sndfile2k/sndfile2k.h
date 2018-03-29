@@ -1103,26 +1103,6 @@ typedef struct SF_CUE_POINT
     char name[256];
 } SF_CUE_POINT;
 
-/** Defines struct containing desired count of CUE markers
- *
- * @param[in] count Size of @c cue_points array
- *
- * @deprecated This struct is deprecated.
- *
- */
-#define SF_CUES_VAR(count)              \
-    struct                              \
-    {                                   \
-        uint32_t cue_count;             \
-        SF_CUE_POINT cue_points[count]; \
-    }
-
-/** Represents CUE markers struct containing maximum of @c 100 CUE markers
- *
- * @deprecated This typedef is deprecated.
- */
-typedef SF_CUES_VAR(100) SF_CUES;
-
 /** Defines loop mode constants
  *
  * @sa ::SF_INSTRUMENT
