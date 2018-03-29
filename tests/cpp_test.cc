@@ -26,6 +26,8 @@
 
 #include "utils.h"
 
+using namespace sf;
+
 static short sbuffer[100];
 static int ibuffer[100];
 static float fbuffer[100];
