@@ -398,7 +398,6 @@ int main(int argc, char *argv[])
 static void copy_metadata(SNDFILE *outfile, SNDFILE *infile, int channels)
 {
     SF_INSTRUMENT inst;
-    SF_BROADCAST_INFO_2K binfo;
     const char *str;
     int k, chanmap[256];
 
@@ -410,7 +409,6 @@ static void copy_metadata(SNDFILE *outfile, SNDFILE *infile, int channels)
     };
 
     memset(&inst, 0, sizeof(inst));
-    memset(&binfo, 0, sizeof(binfo));
 
     if (channels < ARRAY_LEN(chanmap))
     {
@@ -429,7 +427,4 @@ static void copy_metadata(SNDFILE *outfile, SNDFILE *infile, int channels)
 
     if (sf_command(infile, SFC_GET_INSTRUMENT, &inst, sizeof(inst)) == SF_TRUE)
         sf_command(outfile, SFC_SET_INSTRUMENT, &inst, sizeof(inst));
-
-    if (sf_command(infile, SFC_GET_BROADCAST_INFO, &binfo, sizeof(binfo)) == SF_TRUE)
-        sf_command(outfile, SFC_SET_BROADCAST_INFO, &binfo, sizeof(binfo));
 }

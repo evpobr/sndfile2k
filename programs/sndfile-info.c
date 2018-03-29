@@ -51,7 +51,6 @@ static void usage_exit(const char *progname);
 
 static void info_dump(const char *filename);
 static int instrument_dump(const char *filename);
-static int broadcast_dump(const char *filename);
 static int chanmap_dump(const char *filename);
 static int cart_dump(const char *filename);
 static void total_dump(void);
@@ -71,15 +70,6 @@ int main(int argc, char *argv[])
 
         for (k = 2; k < argc; k++)
             error += instrument_dump(argv[k]);
-        return error;
-    };
-
-    if (strcmp(argv[1], "--broadcast") == 0)
-    {
-        int error = 0;
-
-        for (k = 2; k < argc; k++)
-            error += broadcast_dump(argv[k]);
         return error;
     };
 
@@ -331,67 +321,6 @@ static int instrument_dump(const char *filename)
                inst.loops[k].count);
 
     putchar('\n');
-    return 0;
-}
-
-static int broadcast_dump(const char *filename)
-{
-    SNDFILE *file;
-    SF_INFO sfinfo;
-    SF_BROADCAST_INFO_2K bext;
-    double time_ref_sec;
-    int got_bext;
-
-    memset(&sfinfo, 0, sizeof(sfinfo));
-
-    if ((file = sf_open(filename, SFM_READ, &sfinfo)) == NULL)
-    {
-        printf("Error : Not able to open input file %s.\n", filename);
-        fflush(stdout);
-        memset(data, 0, sizeof(data));
-        puts(sf_strerror(NULL));
-        return 1;
-    };
-
-    memset(&bext, 0, sizeof(SF_BROADCAST_INFO_2K));
-
-    got_bext = sf_command(file, SFC_GET_BROADCAST_INFO, &bext, sizeof(bext));
-    sf_close(file);
-
-    if (got_bext == SF_FALSE)
-    {
-        printf("Error : File '%s' does not contain broadcast information.\n\n", filename);
-        return 1;
-    };
-
-    /*
-	 * From : http://www.ebu.ch/en/technical/publications/userguides/bwf_user_guide.php
-	 *
-	 * Time Reference:
-	 *      This field is a count from midnight in samples to the first sample
-	 *      of the audio sequence.
-	 */
-
-    time_ref_sec = ((pow(2.0, 32) * bext.time_reference_high) + (1.0 * bext.time_reference_low)) /
-                   sfinfo.samplerate;
-
-    printf("Description      : %.*s\n", (int)sizeof(bext.description), bext.description);
-    printf("Originator       : %.*s\n", (int)sizeof(bext.originator), bext.originator);
-    printf("Origination ref  : %.*s\n", (int)sizeof(bext.originator_reference),
-           bext.originator_reference);
-    printf("Origination date : %.*s\n", (int)sizeof(bext.origination_date), bext.origination_date);
-    printf("Origination time : %.*s\n", (int)sizeof(bext.origination_time), bext.origination_time);
-
-    if (bext.time_reference_high == 0 && bext.time_reference_low == 0)
-        printf("Time ref         : 0\n");
-    else
-        printf("Time ref         : 0x%x%08x (%.6f seconds)\n", bext.time_reference_high,
-               bext.time_reference_low, time_ref_sec);
-
-    printf("BWF version      : %d\n", bext.version);
-    printf("UMID             : %.*s\n", (int)sizeof(bext.umid), bext.umid);
-    printf("Coding history   : %.*s\n", bext.coding_history_size, bext.coding_history);
-
     return 0;
 }
 

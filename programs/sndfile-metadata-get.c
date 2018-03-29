@@ -46,13 +46,12 @@
 #define BUFFER_LEN (1 << 16)
 
 static void usage_exit(const char *progname, int exit_code);
-static void process_args(SNDFILE *file, const SF_BROADCAST_INFO_2K *binfo, int argc, char *argv[]);
+static void process_args(SNDFILE *file, int argc, char *argv[]);
 
 int main(int argc, char *argv[])
 {
     SNDFILE *file;
     SF_INFO sfinfo;
-    SF_BROADCAST_INFO_2K binfo;
     const char *progname;
     const char *filename = NULL;
     int start;
@@ -88,11 +87,7 @@ int main(int argc, char *argv[])
         exit(1);
     };
 
-    memset(&binfo, 0, sizeof(binfo));
-    if (sf_command(file, SFC_GET_BROADCAST_INFO, &binfo, sizeof(binfo)) == 0)
-        memset(&binfo, 0, sizeof(binfo));
-
-    process_args(file, &binfo, argc - 2, argv + start);
+    process_args(file, argc - 2, argv + start);
 
     sf_close(file);
     return 0;
@@ -106,14 +101,6 @@ static void usage_exit(const char *progname, int exit_code)
 {
     printf("\nUsage :\n  %s [options] <file>\n\nOptions:\n", progname);
 
-    puts("    --bext-description    Print the 'bext' description.\n"
-         "    --bext-originator     Print the 'bext' originator info.\n"
-         "    --bext-orig-ref       Print the 'bext' origination reference.\n"
-         "    --bext-umid           Print the 'bext' UMID.\n"
-         "    --bext-orig-date      Print the 'bext' origination date.\n"
-         "    --bext-orig-time      Print the 'bext' origination time.\n"
-         "    --bext-coding-hist    Print the 'bext' coding history.\n");
-
     puts("    --str-title           Print the title metadata.\n"
          "    --str-copyright       Print the copyright metadata.\n"
          "    --str-artist          Print the artist metadata.\n"
@@ -126,18 +113,10 @@ static void usage_exit(const char *progname, int exit_code)
     exit(exit_code);
 }
 
-static void process_args(SNDFILE *file, const SF_BROADCAST_INFO_2K *binfo, int argc, char *argv[])
+static void process_args(SNDFILE *file, int argc, char *argv[])
 {
     const char *str;
     int k, do_all = 0;
-
-#define HANDLE_BEXT_ARG(cmd, name, field)                                        \
-    if (do_all || strcmp(argv[k], cmd) == 0)                                     \
-    {                                                                            \
-        printf("%-20s : %.*s\n", name, (int)sizeof(binfo->field), binfo->field); \
-        if (!do_all)                                                             \
-            continue;                                                            \
-    };
 
 #define HANDLE_STR_ARG(cmd, name, id)                 \
     if (do_all || strcmp(argv[k], cmd) == 0)          \
@@ -158,14 +137,6 @@ static void process_args(SNDFILE *file, const SF_BROADCAST_INFO_2K *binfo, int a
     {
         if (do_all || strcmp(argv[k], "--all") == 0)
             do_all = 1;
-
-        HANDLE_BEXT_ARG("--bext-description", "Description", description);
-        HANDLE_BEXT_ARG("--bext-originator", "Originator", originator);
-        HANDLE_BEXT_ARG("--bext-orig-ref", "Origination ref", originator_reference);
-        HANDLE_BEXT_ARG("--bext-umid", "UMID", umid);
-        HANDLE_BEXT_ARG("--bext-orig-date", "Origination date", origination_date);
-        HANDLE_BEXT_ARG("--bext-orig-time", "Origination time", origination_time);
-        HANDLE_BEXT_ARG("--bext-coding-hist", "Coding history", coding_history);
 
         HANDLE_STR_ARG("--str-title", "Name", SF_STR_TITLE);
         HANDLE_STR_ARG("--str-copyright", "Copyright", SF_STR_COPYRIGHT);

@@ -1338,40 +1338,6 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         memcpy(data, sndfile->loop_info, sizeof(SF_LOOP_INFO));
         return SF_TRUE;
 
-    case SFC_SET_BROADCAST_INFO:
-    {
-        int format = SF_CONTAINER(sndfile->sf.format);
-
-        /* Only WAV and RF64 supports the BEXT (Broadcast) chunk. */
-        if (format != SF_FORMAT_WAV && format != SF_FORMAT_WAVEX && format != SF_FORMAT_RF64)
-            return SF_FALSE;
-    };
-
-        /* Only makes sense in SFM_WRITE or SFM_RDWR mode. */
-        if ((sndfile->file.mode != SFM_WRITE) && (sndfile->file.mode != SFM_RDWR))
-            return SF_FALSE;
-        /* If data has already been written this must fail. */
-        if (sndfile->broadcast_16k == NULL && sndfile->have_written)
-        {
-            sndfile->error = SFE_CMD_HAS_DATA;
-            return SF_FALSE;
-        };
-
-        if (!broadcast_var_set(sndfile, (SF_BROADCAST_INFO *)data, datasize))
-            return SF_FALSE;
-
-        if (sndfile->write_header)
-            sndfile->write_header(sndfile, SF_TRUE);
-        return SF_TRUE;
-
-    case SFC_GET_BROADCAST_INFO:
-        if (data == NULL)
-        {
-            sndfile->error = SFE_BAD_COMMAND_PARAM;
-            return SF_FALSE;
-        };
-        return broadcast_var_get(sndfile, (SF_BROADCAST_INFO *)data, datasize);
-
     case SFC_SET_CART_INFO:
     {
         int format = SF_CONTAINER(sndfile->sf.format);
@@ -3161,7 +3127,6 @@ static int psf_close(SF_PRIVATE *psf)
     free(psf->interleave);
     free(psf->dither);
     free(psf->peak_info);
-    free(psf->broadcast_16k);
     free(psf->loop_info);
     free(psf->instrument);
     free(psf->cues.cue_points);

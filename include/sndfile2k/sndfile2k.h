@@ -708,31 +708,6 @@ typedef enum SF_COMMAND
      */
     SFC_GET_LOOP_INFO = 0x10E0,
 
-    /** Gets the Broadcast Chunk info
-     *
-     * @param[in] sndfile a valid ::SNDFILE* pointer
-     * @param[out] data A pointer to a ::SF_BROADCAST_INFO struct
-     * @param[in] datasize sizeof(SF_BROADCAST_INFO)
-     *
-     * @return ::SF_TRUE if the file contained a Broadcast Extension chunk or
-     * ::SF_FALSE otherwise.
-     *
-     * @deprecated This command is deprecated and will be removed in next major release.
-     */
-    SFC_GET_BROADCAST_INFO = 0x10F0,
-    /** Sets the Broadcast Chunk info
-     *
-     * @param[in] sndfile a valid ::SNDFILE* pointer
-     * @param[in] data A pointer to a ::SF_BROADCAST_INFO struct
-     * @param[in] datasize sizeof(SF_BROADCAST_INFO)
-     *
-     * @return ::SF_TRUE if setting the Broadcast Extension chunk was successful
-     * and ::SF_FALSE otherwise.
-     *
-     * @deprecated This command is deprecated and will be removed in next major release.
-     */
-    SFC_SET_BROADCAST_INFO = 0x10F1,
-
     /** Gets the channel mapping info
      *
      * @param[in] sndfile a valid ::SNDFILE* pointer
@@ -1250,36 +1225,6 @@ typedef struct SF_LOOP_INFO
     int root_key; // MIDI note, or -1 for None
     int future[6];
 } SF_LOOP_INFO;
-
-/* Struct used to retrieve broadcast (EBU) information from a file.
- *
- * Strongly (!) based on EBU "bext" chunk format used in Broadcast WAVE.
- *
- * @deprecated This feature and will be removed in next major release.
- *
- */
-#define SF_BROADCAST_INFO_VAR(coding_hist_size) \
-    struct                                      \
-    {                                           \
-        char description[256];                  \
-        char originator[32];                    \
-        char originator_reference[32];          \
-        char origination_date[10];              \
-        char origination_time[8];               \
-        uint32_t time_reference_low;            \
-        uint32_t time_reference_high;           \
-        short version;                          \
-        char umid[64];                          \
-        char reserved[190];                     \
-        uint32_t coding_history_size;           \
-        char coding_history[coding_hist_size];  \
-    }
-
-/** Defines Broadcast struct with @c coding_history field of 256 bytes
- *
- * @deprecated This feature and will be removed in next major release.
- */
-typedef SF_BROADCAST_INFO_VAR(256) SF_BROADCAST_INFO;
 
 /** Contanins information about CART timer
  *

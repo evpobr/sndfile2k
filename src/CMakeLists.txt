@@ -36,7 +36,6 @@ set(COMMON
   strings.c
   dither.c
   cart.c
-  broadcast.c
   audio_detect.c
   ima_oki_adpcm.c
   ima_oki_adpcm.h

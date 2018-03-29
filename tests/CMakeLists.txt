@@ -11,7 +11,6 @@ add_executable(test_main
   ../src/test_file_io.c
   ../src/test_ima_oki_adpcm.c
   ../src/test_strncpy_crlf.c
-  ../src/test_broadcast_var.c
   ../src/test_cart_var.c
   ../src/test_binheader_writef.c
   ../src/test_nms_adpcm.c)
@@ -32,7 +31,6 @@ if(BUILD_SHARED_LIBS)
       ../src/double64.c
       ../src/file_io.c
       ../src/audio_detect.c
-      ../src/broadcast.c
       ../src/cart.c)
 endif()
 add_test(NAME test_main COMMAND $<TARGET_FILE:test_main>)

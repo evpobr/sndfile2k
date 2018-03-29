@@ -554,15 +554,6 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
                 return error;
             break;
 
-        case bext_MARKER:
-            /*
-			 * The 'bext' chunk can actually be updated, so don't need to set this.
-			 * parsestage |= HAVE_other ;
-			 */
-            if ((error = wavlike_read_bext_chunk(psf, chunk_size)))
-                return error;
-            break;
-
         case PAD_MARKER:
             /*
 			 * We can eat into a 'PAD ' chunk if we need to.
@@ -598,6 +589,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
         case DISP_MARKER:
         case MEXT_MARKER:
         case FLLR_MARKER:
+        case bext_MARKER:
             psf_log_printf(psf, "%M : %u\n", marker, chunk_size);
 			psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
             break;
@@ -1173,9 +1165,6 @@ static int wav_write_header(SF_PRIVATE *psf, int calc_length)
 
     if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_START)
         wavlike_write_peak_chunk(psf);
-
-    if (psf->broadcast_16k != NULL)
-        wavlike_write_bext_chunk(psf);
 
     if (psf->cart_16k != NULL)
         wavlike_write_cart_chunk(psf);

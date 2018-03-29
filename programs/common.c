@@ -96,107 +96,6 @@ void sfe_copy_data_int(SNDFILE *outfile, SNDFILE *infile, int channels)
     return;
 }
 
-static int merge_broadcast_info(SNDFILE *infile, SNDFILE *outfile, int format,
-                                const METADATA_INFO *info)
-{
-    SF_BROADCAST_INFO_2K binfo;
-    int infileminor;
-
-    memset(&binfo, 0, sizeof(binfo));
-
-    if ((SF_FORMAT_TYPEMASK & format) != SF_FORMAT_WAV)
-    {
-        printf("Error : This is not a WAV file and hence broadcast info cannot "
-               "be added to it.\n\n");
-        return 1;
-    };
-
-    infileminor = SF_FORMAT_SUBMASK & format;
-
-    switch (infileminor)
-    {
-    case SF_FORMAT_PCM_16:
-    case SF_FORMAT_PCM_24:
-    case SF_FORMAT_PCM_32:
-        break;
-
-    default:
-        printf("Warning : The EBU Technical Recommendation R68-2000 states "
-               "that the only\n"
-               "          allowed encodings are Linear PCM and MPEG3. This "
-               "file is not in\n"
-               "          the right format.\n\n");
-        break;
-    };
-
-    if (sf_command(infile, SFC_GET_BROADCAST_INFO, &binfo, sizeof(binfo)) == 0)
-    {
-        if (infile == outfile)
-        {
-            printf("Error : Attempting in-place broadcast info update, but "
-                   "file does not\n"
-                   "        have a 'bext' chunk to modify. The solution is to "
-                   "specify both\n"
-                   "        input and output files on the command line.\n\n");
-            return 1;
-        };
-    };
-
-#define REPLACE_IF_NEW(x)                                                \
-    if (info->x != NULL)                                                 \
-    {                                                                    \
-        memset(binfo.x, 0, sizeof(binfo.x));                             \
-        memcpy(binfo.x, info->x, MIN(strlen(info->x), sizeof(binfo.x))); \
-    };
-
-    REPLACE_IF_NEW(description);
-    REPLACE_IF_NEW(originator);
-    REPLACE_IF_NEW(originator_reference);
-    REPLACE_IF_NEW(origination_date);
-    REPLACE_IF_NEW(origination_time);
-    REPLACE_IF_NEW(umid);
-
-    /* Special case for Time Ref. */
-    if (info->time_ref != NULL)
-    {
-        uint64_t ts = atoll(info->time_ref);
-
-        binfo.time_reference_high = (ts >> 32);
-        binfo.time_reference_low = (ts & 0xffffffff);
-    };
-
-    /* Special case for coding_history because we may want to append. */
-    if (info->coding_history != NULL)
-    {
-        if (info->coding_hist_append)
-        {
-            int slen = strlen(binfo.coding_history);
-
-            while (slen > 1 && isspace(binfo.coding_history[slen - 1]))
-                slen--;
-
-            memcpy(binfo.coding_history + slen, info->coding_history,
-                   sizeof(binfo.coding_history) - slen);
-        }
-        else
-        {
-            size_t slen = MIN(strlen(info->coding_history), sizeof(binfo.coding_history));
-
-            memset(binfo.coding_history, 0, sizeof(binfo.coding_history));
-            memcpy(binfo.coding_history, info->coding_history, slen);
-            binfo.coding_history_size = slen;
-        };
-    };
-
-    if (sf_command(outfile, SFC_SET_BROADCAST_INFO, &binfo, sizeof(binfo)) == 0)
-    {
-        printf("Error : Setting of broadcast info chunks failed.\n\n");
-        return 1;
-    };
-
-    return 0;
-}
-
 static void update_strings(SNDFILE *outfile, const METADATA_INFO *info)
 {
     if (info->title != NULL)
@@ -254,12 +153,6 @@ void sfe_apply_metadata_changes(const char *filenames[2], const METADATA_INFO *i
     {
         printf("Error : Not able to open output file '%s' : %s\n", filenames[1],
                sf_strerror(outfile));
-        error_code = 1;
-        goto cleanup_exit;
-    };
-
-    if (info->has_bext_fields && merge_broadcast_info(infile, outfile, sfinfo.format, info))
-    {
         error_code = 1;
         goto cleanup_exit;
     };

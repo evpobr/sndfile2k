@@ -273,12 +273,6 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperbloc
             parsestage |= HAVE_fmt;
             break;
 
-        case bext_MARKER:
-            if ((error = wavlike_read_bext_chunk(psf, chunk_size)) != 0)
-                return error;
-            parsestage |= HAVE_bext;
-            break;
-
         case cart_MARKER:
             if ((error = wavlike_read_cart_chunk(psf, chunk_size)) != 0)
                 return error;
@@ -752,9 +746,6 @@ static int rf64_write_header(SF_PRIVATE *psf, int calc_length)
     default:
         return SFE_UNIMPLEMENTED;
     };
-
-    if (psf->broadcast_16k != NULL)
-        wavlike_write_bext_chunk(psf);
 
     if (psf->cart_16k != NULL)
         wavlike_write_cart_chunk(psf);

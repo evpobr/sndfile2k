@@ -45,21 +45,7 @@ typedef struct
     const char *album;
     const char *license;
 
-    /* Stuff to go in the 'bext' chunk of WAV files. */
-    int has_bext_fields;
-    int coding_hist_append;
-
-    const char *description;
-    const char *originator;
-    const char *originator_reference;
-    const char *origination_date;
-    const char *origination_time;
-    const char *umid;
-    const char *coding_history;
-    const char *time_ref;
 } METADATA_INFO;
-
-typedef SF_BROADCAST_INFO_VAR(2048) SF_BROADCAST_INFO_2K;
 
 void sfe_apply_metadata_changes(const char *filenames[2], const METADATA_INFO *info);
 

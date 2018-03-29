@@ -48,7 +48,6 @@
 static void usage_exit(const char *progname, int exit_code);
 static void missing_param(const char *option);
 static void read_localtime(struct tm *timedata);
-static int has_bext_fields_set(const METADATA_INFO *info);
 
 int main(int argc, char *argv[])
 {
@@ -56,7 +55,7 @@ int main(int argc, char *argv[])
     struct tm timedata;
     const char *progname;
     const char *filenames[2] = {NULL, NULL};
-    char date[128], time[128];
+    char date[128];
     int k;
 
     /* Store the program name. */
@@ -90,25 +89,6 @@ int main(int argc, char *argv[])
             continue;
         };
 
-#define HANDLE_BEXT_ARG(cmd, field)     \
-    if (strcmp(argv[k], cmd) == 0)      \
-    {                                   \
-        k++;                            \
-        if (k == argc)                  \
-            missing_param(argv[k - 1]); \
-        info.field = argv[k];           \
-        continue;                       \
-    };
-
-        HANDLE_BEXT_ARG("--bext-description", description);
-        HANDLE_BEXT_ARG("--bext-originator", originator);
-        HANDLE_BEXT_ARG("--bext-orig-ref", originator_reference);
-        HANDLE_BEXT_ARG("--bext-umid", umid);
-        HANDLE_BEXT_ARG("--bext-orig-date", origination_date);
-        HANDLE_BEXT_ARG("--bext-orig-time", origination_time);
-        HANDLE_BEXT_ARG("--bext-coding-hist", coding_history);
-        HANDLE_BEXT_ARG("--bext-time-ref", time_ref);
-
 #define HANDLE_STR_ARG(cmd, field)      \
     if (strcmp(argv[k], cmd) == 0)      \
     {                                   \
@@ -127,35 +107,6 @@ int main(int argc, char *argv[])
         HANDLE_STR_ARG("--str-album", album);
         HANDLE_STR_ARG("--str-license", license);
 
-        /* Following options do not take an argument. */
-        if (strcmp(argv[k], "--bext-auto-time-date") == 0)
-        {
-            snprintf(time, sizeof(time), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min,
-                     timedata.tm_sec);
-            info.origination_time = time;
-
-            snprintf(date, sizeof(date), "%04d-%02d-%02d", timedata.tm_year + 1900,
-                     timedata.tm_mon + 1, timedata.tm_mday);
-            info.origination_date = date;
-            continue;
-        };
-
-        if (strcmp(argv[k], "--bext-auto-time") == 0)
-        {
-            snprintf(time, sizeof(time), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min,
-                     timedata.tm_sec);
-            info.origination_time = time;
-            continue;
-        };
-
-        if (strcmp(argv[k], "--bext-auto-date") == 0)
-        {
-            snprintf(date, sizeof(date), "%04d-%02d-%02d", timedata.tm_year + 1900,
-                     timedata.tm_mon + 1, timedata.tm_mday);
-            info.origination_date = strdup(date);
-            continue;
-        };
-
         if (strcmp(argv[k], "--str-auto-date") == 0)
         {
             snprintf(date, sizeof(date), "%04d-%02d-%02d", timedata.tm_year + 1900,
@@ -169,9 +120,6 @@ int main(int argc, char *argv[])
         usage_exit(progname, 1);
     };
 
-    /* Find out if any of the 'bext' fields are set. */
-    info.has_bext_fields = has_bext_fields_set(&info);
-
     if (filenames[0] == NULL)
     {
         printf("Error : No input file specificed.\n\n");
@@ -181,20 +129,6 @@ int main(int argc, char *argv[])
     if (filenames[1] != NULL && strcmp(filenames[0], filenames[1]) == 0)
     {
         printf("Error : Input and output files are the same.\n\n");
-        exit(1);
-    };
-
-    if (info.coding_history != NULL && filenames[1] == NULL)
-    {
-        printf("\n"
-               "Error : Trying to update coding history of an existing file "
-               "which unfortunately\n"
-               "        is not supported. Instead, create a new file using :\n"
-               "\n"
-               "        %s --bext-coding-hist \"Coding history\" old_file.wav "
-               "new_file.wav\n"
-               "\n",
-               progname);
         exit(1);
     };
 
@@ -216,19 +150,9 @@ static void usage_exit(const char *progname, int exit_code)
            progname, progname);
 
     puts("Where an option is made up of a pair of a field to set (one of\n"
-         "the 'bext' or metadata fields below) and a string. Fields are\n"
+         "the metadata fields below) and a string. Fields are\n"
          "as follows :\n");
-
-    puts("    --bext-description       Set the 'bext' description.\n"
-         "    --bext-originator        Set the 'bext' originator.\n"
-         "    --bext-orig-ref          Set the 'bext' originator reference.\n"
-         "    --bext-umid              Set the 'bext' UMID.\n"
-         "    --bext-orig-date         Set the 'bext' origination date.\n"
-         "    --bext-orig-time         Set the 'bext' origination time.\n"
-         "    --bext-coding-hist       Set the 'bext' coding history.\n"
-         "    --bext-time-ref          Set the 'bext' Time ref.\n"
-         "\n"
-         "    --str-comment            Set the metadata comment.\n"
+    puts("    --str-comment            Set the metadata comment.\n"
          "    --str-title              Set the metadata title.\n"
          "    --str-copyright          Set the metadata copyright.\n"
          "    --str-artist             Set the metadata artist.\n"
@@ -238,10 +162,6 @@ static void usage_exit(const char *progname, int exit_code)
 
     puts("There are also the following arguments which do not take a\n"
          "parameter :\n\n"
-         "    --bext-auto-time-date    Set the 'bext' time and date to current "
-         "time/date.\n"
-         "    --bext-auto-time         Set the 'bext' time to current time.\n"
-         "    --bext-auto-date         Set the 'bext' date to current date.\n"
          "    --str-auto-date          Set the metadata date to current "
          "date.\n");
 
@@ -259,18 +179,6 @@ static void missing_param(const char *option)
            "one.\n\n",
            option);
     exit(1);
-}
-
-static int has_bext_fields_set(const METADATA_INFO *info)
-{
-    if (info->description || info->originator || info->originator_reference)
-        return 1;
-
-    if (info->origination_date || info->origination_time || info->umid || info->coding_history ||
-        info->time_ref)
-        return 1;
-
-    return 0;
 }
 
 static void read_localtime(struct tm *timedata)
