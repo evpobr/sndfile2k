@@ -90,7 +90,7 @@ int dwvw_init(SF_PRIVATE *psf, int bitwidth)
     if (psf->file.mode == SFM_RDWR)
         return SFE_BAD_MODE_RW;
 
-    if ((pdwvw = calloc(1, sizeof(DWVW_PRIVATE))) == NULL)
+    if ((pdwvw = (DWVW_PRIVATE *)calloc(1, sizeof(DWVW_PRIVATE))) == NULL)
         return SFE_MALLOC_FAILED;
 
     psf->codec_data = (void *)pdwvw;

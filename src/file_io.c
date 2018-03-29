@@ -424,7 +424,7 @@ sf_count_t psf_ftell(SF_PRIVATE *psf)
 
 SF_BOOL vfis_pipe(void * user_data)
 {
-	SF_PRIVATE *psf = user_data;
+	SF_PRIVATE *psf = (SF_PRIVATE *)user_data;
 	struct stat statbuf;
 
 	if (psf->file.virtual_io)
@@ -458,7 +458,7 @@ unsigned long vfref(void * user_data)
 {
 	unsigned long ref_counter = 0;
 
-	SF_PRIVATE *psf = user_data;
+	SF_PRIVATE *psf = (SF_PRIVATE *)user_data;
 	if (psf && psf->file.virtual_io && psf->file.use_new_vio && psf->file.vio.ref && psf->file.vio.unref)
 	{
 		ref_counter = ++psf->file.vio_ref_counter;
@@ -468,7 +468,7 @@ unsigned long vfref(void * user_data)
 
 void vfunref(void * user_data)
 {
-	SF_PRIVATE *psf = user_data;
+	SF_PRIVATE *psf = (SF_PRIVATE *)user_data;
 	if (psf && psf->file.virtual_io && psf->file.use_new_vio && psf->file.vio.ref && psf->file.vio.unref)
 	{
 		psf->file.vio_ref_counter--;
@@ -520,7 +520,7 @@ sf_count_t psf_fgets(char *buffer, size_t bufsize, SF_PRIVATE *psf)
 	return k;
 }
 
-int psf_is_pipe(SF_PRIVATE *psf)
+SF_BOOL psf_is_pipe(SF_PRIVATE *psf)
 {
 	struct stat statbuf;
 
@@ -700,13 +700,13 @@ void psf_fsync(SF_PRIVATE *psf)
 
 static sf_count_t vfget_filelen(void *user_data)
 {
-	SF_PRIVATE *psf = user_data;
+	SF_PRIVATE *psf = (SF_PRIVATE *)user_data;
 	return psf_get_filelen_fd(psf->file.filedes);
 }
 
 static sf_count_t vfseek(sf_count_t offset, int whence, void *user_data)
 {
-	SF_PRIVATE *psf = user_data;
+	SF_PRIVATE *psf = (SF_PRIVATE *)user_data;
 #ifdef _WIN32
 	return _lseeki64(psf->file.filedes, offset, whence);
 #else
@@ -716,19 +716,19 @@ static sf_count_t vfseek(sf_count_t offset, int whence, void *user_data)
 
 static sf_count_t vfread(void *ptr, sf_count_t count, void *user_data)
 {
-	SF_PRIVATE *psf = user_data;
+	SF_PRIVATE *psf = (SF_PRIVATE *)user_data;
 	return read(psf->file.filedes, ptr, count);
 }
 
 static sf_count_t vfwrite(const void *ptr, sf_count_t count, void *user_data)
 {
-	SF_PRIVATE *psf = user_data;
+	SF_PRIVATE *psf = (SF_PRIVATE *)user_data;
 	return write(psf->file.filedes, ptr, count);
 }
 
 static sf_count_t vftell(void *user_data)
 {
-	SF_PRIVATE *psf = user_data;
+	SF_PRIVATE *psf = (SF_PRIVATE *)user_data;
 #if _WIN32
 	return _lseeki64(psf->file.filedes, 0, SEEK_CUR);
 #else
@@ -738,7 +738,7 @@ static sf_count_t vftell(void *user_data)
 
 static void vfflush(void *user_data)
 {
-	SF_PRIVATE *psf = user_data;
+	SF_PRIVATE *psf = (SF_PRIVATE *)user_data;
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 #ifdef HAVE_FSYNC
 		fsync(psf->file.filedes);
@@ -750,7 +750,7 @@ static void vfflush(void *user_data)
 
 int vfset_filelen(void * user_data, sf_count_t len)
 {
-	SF_PRIVATE *psf = user_data;
+	SF_PRIVATE *psf = (SF_PRIVATE *)user_data;
 	int retval;
 
 	/* Returns 0 on success, non-zero on failure. */

@@ -111,7 +111,7 @@ int wavlike_read_fmt_chunk(SF_PRIVATE *psf, int fmtsize)
     WAV_FMT *wav_fmt;
     int bytesread, k, bytespersec = 0;
 
-    if ((wpriv = psf->container_data) == NULL)
+    if ((wpriv = (WAVLIKE_PRIVATE *)psf->container_data) == NULL)
         return SFE_INTERNAL;
     wav_fmt = &wpriv->wav_fmt;
 
@@ -355,7 +355,7 @@ int wavlike_read_fmt_chunk(SF_PRIVATE *psf, int fmtsize)
             /* It's probably wise to ignore the channel mask if it is all zero */
             free(psf->channel_map);
 
-            if ((psf->channel_map = calloc(psf->sf.channels, sizeof(psf->channel_map[0]))) == NULL)
+            if ((psf->channel_map = (int *)calloc(psf->sf.channels, sizeof(psf->channel_map[0]))) == NULL)
                 return SFE_MALLOC_FAILED;
 
             /* Terminate the buffer we're going to append_snprintf into. */

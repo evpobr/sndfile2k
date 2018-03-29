@@ -385,7 +385,7 @@ static int sd2_parse_rsrc_fork(SF_PRIVATE *psf)
 
     if (rsrc.rsrc_len > psf->header.len)
     {
-        rsrc.rsrc_data = calloc(1, rsrc.rsrc_len);
+        rsrc.rsrc_data = (unsigned char *)calloc(1, rsrc.rsrc_len);
         rsrc.need_to_free_rsrc_data = SF_TRUE;
     }
     else

@@ -127,7 +127,7 @@ int w64_open(SF_PRIVATE *psf)
     WAVLIKE_PRIVATE *wpriv;
     int subformat, error, blockalign = 0, framesperblock = 0;
 
-    if ((wpriv = calloc(1, sizeof(WAVLIKE_PRIVATE))) == NULL)
+    if ((wpriv = (WAVLIKE_PRIVATE *)calloc(1, sizeof(WAVLIKE_PRIVATE))) == NULL)
         return SFE_MALLOC_FAILED;
     psf->container_data = wpriv;
 
@@ -230,7 +230,7 @@ static int w64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
     sf_count_t chunk_size, bytesread = 0;
     int parsestage = 0, error, done = 0;
 
-    if ((wpriv = psf->container_data) == NULL)
+    if ((wpriv = (WAVLIKE_PRIVATE *)psf->container_data) == NULL)
         return SFE_INTERNAL;
     wav_fmt = &wpriv->wav_fmt;
 

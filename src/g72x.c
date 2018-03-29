@@ -26,7 +26,12 @@
 #include "sndfile2k/sndfile2k.h"
 #include "sfendian.h"
 #include "common.h"
+
+#ifdef __cplusplus
+extern "C" {
 #include "G72x/g72x.h"
+}
+#endif
 
 /* This struct is private to the G72x code. */
 struct g72x_state;
@@ -35,7 +40,7 @@ typedef struct g72x_state G72x_STATE;
 typedef struct
 {
     /* Private data. Don't mess with it. */
-    struct g72x_state *private;
+    struct g72x_state *priv;
 
     /* Public data. Read only. */
     int blocksize, samplesperblock, bytesperblock;
@@ -83,7 +88,7 @@ int g72x_init(SF_PRIVATE *psf)
     if (psf->sf.channels != 1)
         return SFE_G72X_NOT_MONO;
 
-    if ((pg72x = calloc(1, sizeof(G72x_PRIVATE))) == NULL)
+    if ((pg72x = (G72x_PRIVATE *)calloc(1, sizeof(G72x_PRIVATE))) == NULL)
         return SFE_MALLOC_FAILED;
 
     psf->codec_data = (void *)pg72x;
@@ -125,8 +130,8 @@ int g72x_init(SF_PRIVATE *psf)
 
     if (psf->file.mode == SFM_READ)
     {
-        pg72x->private = g72x_reader_init(codec, &(pg72x->blocksize), &(pg72x->samplesperblock));
-        if (pg72x->private == NULL)
+        pg72x->priv = g72x_reader_init(codec, &(pg72x->blocksize), &(pg72x->samplesperblock));
+        if (pg72x->priv == NULL)
             return SFE_MALLOC_FAILED;
 
         pg72x->bytesperblock = bytesperblock;
@@ -155,8 +160,8 @@ int g72x_init(SF_PRIVATE *psf)
     }
     else if (psf->file.mode == SFM_WRITE)
     {
-        pg72x->private = g72x_writer_init(codec, &(pg72x->blocksize), &(pg72x->samplesperblock));
-        if (pg72x->private == NULL)
+        pg72x->priv = g72x_writer_init(codec, &(pg72x->blocksize), &(pg72x->samplesperblock));
+        if (pg72x->priv == NULL)
             return SFE_MALLOC_FAILED;
 
         pg72x->bytesperblock = bytesperblock;
@@ -200,7 +205,7 @@ static int psf_g72x_decode_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x)
         psf_log_printf(psf, "*** Warning : short read (%z != %z).\n", k, pg72x->bytesperblock);
 
     pg72x->blocksize = k;
-    g72x_decode_block(pg72x->private, pg72x->block, pg72x->samples);
+    g72x_decode_block(pg72x->priv, pg72x->block, pg72x->samples);
 
     return 1;
 }
@@ -371,7 +376,7 @@ static int psf_g72x_encode_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x)
     int k;
 
     /* Encode the samples. */
-    g72x_encode_block(pg72x->private, pg72x->samples, pg72x->block);
+    g72x_encode_block(pg72x->priv, pg72x->samples, pg72x->block);
 
     /* Write the block to disk. */
     if ((k = psf_fwrite(pg72x->block, 1, pg72x->blocksize, psf)) != pg72x->blocksize)
@@ -549,7 +554,7 @@ static int g72x_close(SF_PRIVATE *psf)
     };
 
     /* Only free the pointer allocated by g72x_(reader|writer)_init. */
-    free(pg72x->private);
+    free(pg72x->priv);
 
     return 0;
 }

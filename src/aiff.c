@@ -424,7 +424,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
     if (psf->filelength > INT64_C(0xffffffff))
         psf_log_printf(psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n");
 
-    struct AIFF_PRIVATE *paiff = psf->container_data;
+    struct AIFF_PRIVATE *paiff = (struct AIFF_PRIVATE *)psf->container_data;
     if (!paiff)
         return SFE_INTERNAL;
 
@@ -858,7 +858,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
                                         "away the first.\n");
                     free(paiff->markstr);
                 };
-                paiff->markstr = calloc(mark_count, sizeof(struct MARK_ID_POS));
+                paiff->markstr = (struct MARK_ID_POS *)calloc(mark_count, sizeof(struct MARK_ID_POS));
                 if (paiff->markstr == NULL)
                     return SFE_MALLOC_FAILED;
 
@@ -1069,7 +1069,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
 
 static int aiff_close(SF_PRIVATE *psf)
 {
-    struct AIFF_PRIVATE *paiff = psf->container_data;
+    struct AIFF_PRIVATE *paiff = (struct AIFF_PRIVATE *)psf->container_data;
 
     if (paiff != NULL && paiff->markstr != NULL)
     {
@@ -1321,7 +1321,7 @@ static void aiff_rewrite_header(SF_PRIVATE *psf)
 
 static int aiff_write_header(SF_PRIVATE *psf, int calc_length)
 {
-    struct AIFF_PRIVATE *paiff = psf->container_data;
+    struct AIFF_PRIVATE *paiff = (struct AIFF_PRIVATE *)psf->container_data;
     if (!paiff)
         return SFE_INTERNAL;
 
@@ -1713,7 +1713,7 @@ static void aiff_write_strings(SF_PRIVATE *psf, int location)
 
 static size_t aiff_command(SF_PRIVATE *psf, int command, void *UNUSED(data), size_t UNUSED(datasize))
 {
-    struct AIFF_PRIVATE *paiff = psf->container_data;
+    struct AIFF_PRIVATE *paiff = (struct AIFF_PRIVATE *)psf->container_data;
 
     if (!paiff)
         return SFE_INTERNAL;
@@ -1881,7 +1881,7 @@ static int aiff_read_basc_chunk(SF_PRIVATE *psf, int datasize)
 
     psf_log_printf(psf, "  Loop Type : 0x%x (%s)\n", bc.loopType, type_str);
 
-    if ((psf->loop_info = calloc(1, sizeof(SF_LOOP_INFO))) == NULL)
+    if ((psf->loop_info = (SF_LOOP_INFO *)calloc(1, sizeof(SF_LOOP_INFO))) == NULL)
         return SFE_MALLOC_FAILED;
 
     psf->loop_info->time_sig_num = bc.sigNumerator;
@@ -1924,7 +1924,7 @@ static int aiff_read_chanmap(SF_PRIVATE *psf, unsigned dword)
 
         free(psf->channel_map);
 
-        if ((psf->channel_map = malloc(chanmap_size)) == NULL)
+        if ((psf->channel_map = (int *)malloc(chanmap_size)) == NULL)
             return SFE_MALLOC_FAILED;
 
         memcpy(psf->channel_map, map_info->channel_map, chanmap_size);

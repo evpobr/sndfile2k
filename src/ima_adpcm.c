@@ -176,7 +176,7 @@ static int ima_reader_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
     pimasize = sizeof(IMA_ADPCM_PRIVATE) + blockalign * psf->sf.channels +
                3 * psf->sf.channels * samplesperblock;
 
-    if (!(pima = calloc(1, pimasize)))
+    if (!(pima = (IMA_ADPCM_PRIVATE *)calloc(1, pimasize)))
         return SFE_MALLOC_FAILED;
 
     psf->codec_data = (void *)pima;
@@ -865,7 +865,7 @@ static int ima_writer_init(SF_PRIVATE *psf, int blockalign)
 
     pimasize = sizeof(IMA_ADPCM_PRIVATE) + blockalign + 3 * psf->sf.channels * samplesperblock;
 
-    if ((pima = calloc(1, pimasize)) == NULL)
+    if ((pima = (IMA_ADPCM_PRIVATE *)calloc(1, pimasize)) == NULL)
         return SFE_MALLOC_FAILED;
 
     psf->codec_data = (void *)pima;

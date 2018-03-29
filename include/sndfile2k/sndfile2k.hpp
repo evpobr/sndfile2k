@@ -105,7 +105,7 @@ class SndfileHandle
      * @sa sf_wchar_open(), sf_open_fd(), sf_open_virtual()
      * @sa sf_close()
      */
-    SndfileHandle(const char *path, int mode = SFM_READ, int format = 0, int channels = 0,
+    SndfileHandle(const char *path, SF_FILEMODE mode = SFM_READ, int format = 0, int channels = 0,
                   int samplerate = 0);
 
     /** Opens the specified file using path
@@ -122,7 +122,7 @@ class SndfileHandle
      * @sa sf_wchar_open(), sf_open_fd(), sf_open_virtual()
      * @sa sf_close()
      */
-    SndfileHandle(std::string const &path, int mode = SFM_READ, int format = 0, int channels = 0,
+    SndfileHandle(std::string const &path, SF_FILEMODE mode = SFM_READ, int format = 0, int channels = 0,
                   int samplerate = 0);
 
     /** Opens file using @c POSIX file descriptor
@@ -158,7 +158,7 @@ class SndfileHandle
      * @sa sf_open(), sf_wchar_open(), sf_open_virtual()
      * @sa sf_close()
      */
-    SndfileHandle(int fd, bool close_desc, int mode = SFM_READ, int format = 0, int channels = 0,
+    SndfileHandle(int fd, bool close_desc, SF_FILEMODE mode = SFM_READ, int format = 0, int channels = 0,
                   int samplerate = 0);
 
     /** Opens sound file using Virtual I/O context
@@ -179,7 +179,7 @@ class SndfileHandle
      * @sa sf_open(), sf_wchar_open(), sf_open_fd()
      * @sa sf_close()
      */
-    SndfileHandle(SF_VIRTUAL_IO &sfvirtual, void *user_data, int mode = SFM_READ, int format = 0,
+    SndfileHandle(SF_VIRTUAL_IO &sfvirtual, void *user_data, SF_FILEMODE mode = SFM_READ, int format = 0,
                   int channels = 0, int samplerate = 0);
 
 #if (defined(_WIN32) || defined(__CYGWIN__))
@@ -200,7 +200,7 @@ class SndfileHandle
      * @sa sf_open(), sf_open_fd(), sf_open_virtual()
      * @sa sf_close()
      */
-    SndfileHandle(const wchar_t *wpath, int mode = SFM_READ, int format = 0, int channels = 0,
+    SndfileHandle(const wchar_t *wpath, SF_FILEMODE mode = SFM_READ, int format = 0, int channels = 0,
                   int samplerate = 0);
 #endif
 
@@ -568,7 +568,7 @@ inline SndfileHandle::SNDFILE_ref::~SNDFILE_ref(void)
         sf_close(sf);
 }
 
-inline SndfileHandle::SndfileHandle(const char *path, int mode, int fmt, int chans, int srate)
+inline SndfileHandle::SndfileHandle(const char *path, SF_FILEMODE mode, int fmt, int chans, int srate)
     : p(NULL)
 {
     p = new (std::nothrow) SNDFILE_ref();
@@ -590,7 +590,7 @@ inline SndfileHandle::SndfileHandle(const char *path, int mode, int fmt, int cha
     return;
 } /* SndfileHandle const char * constructor */
 
-inline SndfileHandle::SndfileHandle(std::string const &path, int mode, int fmt, int chans,
+inline SndfileHandle::SndfileHandle(std::string const &path, SF_FILEMODE mode, int fmt, int chans,
                                     int srate)
     : p(NULL)
 {
@@ -613,7 +613,7 @@ inline SndfileHandle::SndfileHandle(std::string const &path, int mode, int fmt, 
     return;
 } /* SndfileHandle std::string constructor */
 
-inline SndfileHandle::SndfileHandle(int fd, bool close_desc, int mode, int fmt, int chans,
+inline SndfileHandle::SndfileHandle(int fd, bool close_desc, SF_FILEMODE mode, int fmt, int chans,
                                     int srate)
     : p(NULL)
 {
@@ -639,7 +639,7 @@ inline SndfileHandle::SndfileHandle(int fd, bool close_desc, int mode, int fmt, 
     return;
 } /* SndfileHandle fd constructor */
 
-inline SndfileHandle::SndfileHandle(SF_VIRTUAL_IO &sfvirtual, void *user_data, int mode, int fmt,
+inline SndfileHandle::SndfileHandle(SF_VIRTUAL_IO &sfvirtual, void *user_data, SF_FILEMODE mode, int fmt,
                                     int chans, int srate)
     : p(NULL)
 {
@@ -870,7 +870,7 @@ inline SNDFILE *SndfileHandle::takeOwnership(void)
 
 #if (defined(_WIN32) || defined(__CYGWIN__))
 
-inline SndfileHandle::SndfileHandle(const wchar_t *wpath, int mode, int fmt, int chans, int srate)
+inline SndfileHandle::SndfileHandle(const wchar_t *wpath, SF_FILEMODE mode, int fmt, int chans, int srate)
     : p(NULL)
 {
     p = new (std::nothrow) SNDFILE_ref();

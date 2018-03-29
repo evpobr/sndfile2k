@@ -37,7 +37,7 @@ static inline size_t bc_min_size(const SF_BROADCAST_INFO *info)
 
 SF_BROADCAST_INFO_16K *broadcast_var_alloc(void)
 {
-    return calloc(1, sizeof(SF_BROADCAST_INFO_16K));
+    return (SF_BROADCAST_INFO_16K *)calloc(1, sizeof(SF_BROADCAST_INFO_16K));
 }
 
 int broadcast_var_set(SF_PRIVATE *psf, const SF_BROADCAST_INFO *info, size_t datasize)

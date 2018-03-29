@@ -424,8 +424,8 @@ static int vorbis_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
 
 static int vorbis_close(SF_PRIVATE *psf)
 {
-    OGG_PRIVATE *odata = psf->container_data;
-    VORBIS_PRIVATE *vdata = psf->codec_data;
+    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
+    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
 
     if (odata == NULL || vdata == NULL)
         return 0;
@@ -488,7 +488,7 @@ static int vorbis_close(SF_PRIVATE *psf)
 
 int ogg_vorbis_open(SF_PRIVATE *psf)
 {
-    OGG_PRIVATE *odata = psf->container_data;
+    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
     VORBIS_PRIVATE *vdata;
     int error = 0;
 
@@ -498,7 +498,7 @@ int ogg_vorbis_open(SF_PRIVATE *psf)
         return SFE_INTERNAL;
     };
 
-    vdata = calloc(1, sizeof(VORBIS_PRIVATE));
+    vdata = (VORBIS_PRIVATE *)calloc(1, sizeof(VORBIS_PRIVATE));
     psf->codec_data = vdata;
 
     if (psf->file.mode == SFM_RDWR)
@@ -654,8 +654,8 @@ static int vorbis_rdouble(SF_PRIVATE *UNUSED(psf), int samples, void *vptr, int 
 
 static size_t vorbis_read_sample(SF_PRIVATE *psf, void *ptr, size_t lens, convert_func *transfn)
 {
-    VORBIS_PRIVATE *vdata = psf->codec_data;
-    OGG_PRIVATE *odata = psf->container_data;
+    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
+    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
     size_t len, samples, i = 0;
     float **pcm;
 
@@ -961,9 +961,9 @@ typedef struct
 
 static stream_set *create_stream_set(void)
 {
-    stream_set *set = calloc(1, sizeof(stream_set));
+    stream_set *set = (stream_set *)calloc(1, sizeof(stream_set));
 
-    set->streams = calloc(5, sizeof(stream_processor));
+    set->streams = (stream_processor *)calloc(5, sizeof(stream_processor));
     set->allocated = 5;
     set->used = 0;
 
@@ -1047,7 +1047,7 @@ static stream_processor *find_stream_processor(stream_set *set, ogg_page *page)
     else
     {
         set->allocated += 5;
-        set->streams = realloc(set->streams, sizeof(stream_processor) * set->allocated);
+        set->streams = (stream_processor *)realloc(set->streams, sizeof(stream_processor) * set->allocated);
         stream = &set->streams[set->used];
     };
 

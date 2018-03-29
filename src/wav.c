@@ -142,7 +142,7 @@ int wav_open(SF_PRIVATE *psf)
     WAVLIKE_PRIVATE *wpriv;
     int format, subformat, error, blockalign = 0, framesperblock = 0;
 
-    if ((wpriv = calloc(1, sizeof(WAVLIKE_PRIVATE))) == NULL)
+    if ((wpriv = (WAVLIKE_PRIVATE *)calloc(1, sizeof(WAVLIKE_PRIVATE))) == NULL)
         return SFE_MALLOC_FAILED;
     psf->container_data = wpriv;
 
@@ -282,7 +282,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
     if (psf->file.is_pipe == 0 && psf->filelength > INT64_C(0xffffffff))
         psf_log_printf(psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n");
 
-    if ((wpriv = psf->container_data) == NULL)
+    if ((wpriv = (WAVLIKE_PRIVATE *)psf->container_data) == NULL)
         return SFE_INTERNAL;
     wav_fmt = &wpriv->wav_fmt;
 
@@ -976,7 +976,7 @@ static int wavex_write_fmt_chunk(SF_PRIVATE *psf)
     WAVLIKE_PRIVATE *wpriv;
     int subformat, fmt_size;
 
-    if ((wpriv = psf->container_data) == NULL)
+    if ((wpriv = (WAVLIKE_PRIVATE *)psf->container_data) == NULL)
         return SFE_INTERNAL;
 
     subformat = SF_CODEC(psf->sf.format);
@@ -1325,7 +1325,7 @@ static size_t wav_command(SF_PRIVATE *psf, int command, void *UNUSED(data), size
 {
     WAVLIKE_PRIVATE *wpriv;
 
-    if ((wpriv = psf->container_data) == NULL)
+    if ((wpriv = (WAVLIKE_PRIVATE *)psf->container_data) == NULL)
         return SFE_INTERNAL;
 
     switch (command)
@@ -1565,7 +1565,7 @@ static int wav_read_acid_chunk(SF_PRIVATE *psf, uint32_t chunklen)
 
 	psf_binheader_seekf(psf, chunklen - bytesread, SF_SEEK_CUR);
 
-    if ((psf->loop_info = calloc(1, sizeof(SF_LOOP_INFO))) == NULL)
+    if ((psf->loop_info = (SF_LOOP_INFO *)calloc(1, sizeof(SF_LOOP_INFO))) == NULL)
         return SFE_MALLOC_FAILED;
 
     psf->loop_info->time_sig_num = meter_numer;

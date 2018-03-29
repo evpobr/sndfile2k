@@ -95,7 +95,7 @@ int sds_open(SF_PRIVATE *psf)
     /* Hmmmm, need this here to pass update_header_test. */
     psf->sf.frames = 0;
 
-    if (!(psds = calloc(1, sizeof(SDS_PRIVATE))))
+    if (!(psds = (SDS_PRIVATE *)calloc(1, sizeof(SDS_PRIVATE))))
         return SFE_MALLOC_FAILED;
     psf->codec_data = psds;
 
@@ -711,7 +711,7 @@ static sf_count_t sds_seek(SF_PRIVATE *psf, int mode, sf_count_t seek_from_start
     sf_count_t file_offset;
     int newblock, newsample;
 
-    if ((psds = psf->codec_data) == NULL)
+    if ((psds = (SDS_PRIVATE *)psf->codec_data) == NULL)
     {
         psf->error = SFE_INTERNAL;
         return PSF_SEEK_ERROR;

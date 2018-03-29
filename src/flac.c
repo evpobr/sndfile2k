@@ -245,7 +245,7 @@ static sf_count_t flac_buffer_copy(SF_PRIVATE *psf)
         for (i = 0; i < channels; i++)
         {
             if (pflac->rbuffer[i] == NULL)
-                pflac->rbuffer[i] = calloc(FLAC__MAX_BLOCK_SIZE, sizeof(int32_t));
+                pflac->rbuffer[i] = (int32_t *)calloc(FLAC__MAX_BLOCK_SIZE, sizeof(int32_t));
 
             memcpy(pflac->rbuffer[i], buffer[i], frame->header.blocksize * sizeof(int32_t));
         };
@@ -768,7 +768,7 @@ static int flac_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
 
     if (psf->error == 0)
         psf->dataoffset = psf_ftell(psf);
-    pflac->encbuffer = calloc(ENC_BUFFER_SIZE, sizeof(int32_t));
+    pflac->encbuffer = (int32_t *)calloc(ENC_BUFFER_SIZE, sizeof(int32_t));
 
     /* can only call init_stream once */
     psf->write_header = NULL;
@@ -781,7 +781,7 @@ int flac_open(SF_PRIVATE *psf)
     int subformat;
     int error = 0;
 
-    FLAC_PRIVATE *pflac = calloc(1, sizeof(FLAC_PRIVATE));
+    FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)calloc(1, sizeof(FLAC_PRIVATE));
     psf->codec_data = pflac;
 
     /* Set the default value here. Over-ridden later if necessary. */

@@ -27,7 +27,11 @@
 #include "sfendian.h"
 #include "common.h"
 #include "wavlike.h"
+#ifdef __cplusplus
+extern "C" {
 #include "GSM610/gsm.h"
+}
+#endif
 
 #define GSM610_BLOCKSIZE (33)
 #define GSM610_SAMPLES (160)
@@ -88,7 +92,7 @@ int gsm610_init(SF_PRIVATE *psf)
 
     psf->sf.seekable = SF_FALSE;
 
-    if ((pgsm610 = calloc(1, sizeof(GSM610_PRIVATE))) == NULL)
+    if ((pgsm610 = (GSM610_PRIVATE *)calloc(1, sizeof(GSM610_PRIVATE))) == NULL)
         return SFE_MALLOC_FAILED;
 
     psf->codec_data = pgsm610;

@@ -32,10 +32,6 @@
 #include "sndfile2k/sndfile2k.h"
 #endif
 
-#ifdef __cplusplus
-#error "This code is not designed to be compiled with a C++ compiler."
-#endif
-
 /*
 ** Inspiration : http://sourcefrog.net/weblog/software/languages/C/unused.html
 */
@@ -233,7 +229,7 @@ struct PEAK_INFO
 
 static inline struct PEAK_INFO *peak_info_calloc(int channels)
 {
-    return calloc(1, sizeof(struct PEAK_INFO) + channels * sizeof(struct PEAK_POS));
+    return (struct PEAK_INFO *)calloc(1, sizeof(struct PEAK_INFO) + channels * sizeof(struct PEAK_POS));
 } /* peak_info_calloc */
 
 struct STR_DATA
@@ -288,7 +284,7 @@ struct SF_CHUNK_ITERATOR
 typedef struct SF_CUE_POINTS
 {
 	uint32_t cue_count;
-	const SF_CUE_POINT *cue_points;
+	SF_CUE_POINT *cue_points;
 }  SF_CUE_POINTS;
 
 static inline size_t make_size_t(int x)
@@ -391,7 +387,7 @@ typedef union
     unsigned char ucbuf[SF_BUFFER_LEN / sizeof(signed char)];
 } BUF_UNION;
 
-typedef struct sf_private_tag
+typedef struct SF_PRIVATE
 {
     /* Canary in a coal mine. */
     union canary
@@ -517,27 +513,27 @@ typedef struct sf_private_tag
     int ieee_replace;
 
     /* A set of file specific function pointers */
-    size_t (*read_short)(struct sf_private_tag *, short *ptr, size_t len);
-    size_t (*read_int)(struct sf_private_tag *, int *ptr, size_t len);
-    size_t (*read_float)(struct sf_private_tag *, float *ptr, size_t len);
-    size_t (*read_double)(struct sf_private_tag *, double *ptr, size_t len);
+    size_t (*read_short)(struct SF_PRIVATE *, short *ptr, size_t len);
+    size_t (*read_int)(struct SF_PRIVATE *, int *ptr, size_t len);
+    size_t (*read_float)(struct SF_PRIVATE *, float *ptr, size_t len);
+    size_t (*read_double)(struct SF_PRIVATE *, double *ptr, size_t len);
 
-    size_t (*write_short)(struct sf_private_tag *, const short *ptr, size_t len);
-    size_t (*write_int)(struct sf_private_tag *, const int *ptr, size_t len);
-    size_t (*write_float)(struct sf_private_tag *, const float *ptr, size_t len);
-    size_t (*write_double)(struct sf_private_tag *, const double *ptr, size_t len);
+    size_t (*write_short)(struct SF_PRIVATE *, const short *ptr, size_t len);
+    size_t (*write_int)(struct SF_PRIVATE *, const int *ptr, size_t len);
+    size_t (*write_float)(struct SF_PRIVATE *, const float *ptr, size_t len);
+    size_t (*write_double)(struct SF_PRIVATE *, const double *ptr, size_t len);
 
-    sf_count_t (*seek)(struct sf_private_tag *, int mode, sf_count_t samples_from_start);
-    int (*write_header)(struct sf_private_tag *, int calc_length);
-    size_t (*command)(struct sf_private_tag *, int command, void *data, size_t datasize);
-    int (*byterate)(struct sf_private_tag *);
+    sf_count_t (*seek)(struct SF_PRIVATE *, int mode, sf_count_t samples_from_start);
+    int (*write_header)(struct SF_PRIVATE *, int calc_length);
+    size_t (*command)(struct SF_PRIVATE *, int command, void *data, size_t datasize);
+    int (*byterate)(struct SF_PRIVATE *);
 
     /*
 	**	Separate close functions for the codec and the container.
 	**	The codec close function is always called first.
 	*/
-    int (*codec_close)(struct sf_private_tag *);
-    int (*container_close)(struct sf_private_tag *);
+    int (*codec_close)(struct SF_PRIVATE *);
+    int (*container_close)(struct SF_PRIVATE *);
 
     char *format_desc;
 
@@ -547,11 +543,11 @@ typedef struct sf_private_tag
     struct READ_CHUNKS rchunks;
 	struct WRITE_CHUNKS wchunks;
 
-    int (*set_chunk)(struct sf_private_tag *, const SF_CHUNK_INFO *chunk_info);
-    SF_CHUNK_ITERATOR *(*next_chunk_iterator)(struct sf_private_tag *, SF_CHUNK_ITERATOR *iterator);
-    int (*get_chunk_size)(struct sf_private_tag *, const SF_CHUNK_ITERATOR *iterator,
+    int (*set_chunk)(struct SF_PRIVATE *, const SF_CHUNK_INFO *chunk_info);
+    SF_CHUNK_ITERATOR *(*next_chunk_iterator)(struct SF_PRIVATE *, SF_CHUNK_ITERATOR *iterator);
+    int (*get_chunk_size)(struct SF_PRIVATE *, const SF_CHUNK_ITERATOR *iterator,
                           SF_CHUNK_INFO *chunk_info);
-    int (*get_chunk_data)(struct sf_private_tag *, const SF_CHUNK_ITERATOR *iterator,
+    int (*get_chunk_data)(struct SF_PRIVATE *, const SF_CHUNK_ITERATOR *iterator,
                           SF_CHUNK_INFO *chunk_info);
 } SF_PRIVATE;
 
@@ -767,6 +763,10 @@ enum
     SFE_MAX_ERROR /* This must be last in list. */
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Allocate and initialize the SF_PRIVATE struct. */
 SF_PRIVATE *psf_allocate(void);
 
@@ -877,7 +877,7 @@ sf_count_t psf_get_filelen(SF_PRIVATE *psf);
 
 void psf_fsync(SF_PRIVATE *psf);
 
-int psf_is_pipe(SF_PRIVATE *psf);
+SF_BOOL psf_is_pipe(SF_PRIVATE *psf);
 
 int psf_ftruncate(SF_PRIVATE *psf, sf_count_t len);
 int psf_fclose(SF_PRIVATE *psf);
@@ -1127,3 +1127,7 @@ static inline int32_t ALWAYS_INLINE arith_shift_right(int32_t x, int shift)
         return x >> shift;
     return ~((~x) >> shift);
 } /* arith_shift_right */
+
+#ifdef __cplusplus
+}
+#endif

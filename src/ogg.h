@@ -18,6 +18,10 @@
 
 #pragma once
 
+#include "common.h"
+
+#include <ogg/ogg.h>
+
 enum
 {
     OGG_ANNODEX = 300,

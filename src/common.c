@@ -38,10 +38,10 @@ SF_PRIVATE *psf_allocate(void)
 {
     SF_PRIVATE *psf;
 
-    if ((psf = calloc(1, sizeof(SF_PRIVATE))) == NULL)
+    if ((psf = (SF_PRIVATE *)calloc(1, sizeof(SF_PRIVATE))) == NULL)
         return NULL;
 
-    if ((psf->header.ptr = calloc(1, INITIAL_HEADER_SIZE)) == NULL)
+    if ((psf->header.ptr = (unsigned char *)calloc(1, INITIAL_HEADER_SIZE)) == NULL)
     {
         free(psf);
         return NULL;
@@ -75,7 +75,7 @@ static int psf_bump_header_allocation(SF_PRIVATE *psf, sf_count_t needed)
     if (newlen > psf->header.len)
         memset((char *)ptr + psf->header.len, 0, newlen - psf->header.len);
 
-    psf->header.ptr = ptr;
+    psf->header.ptr = (unsigned char *)ptr;
     psf->header.len = newlen;
     return 0;
 }
@@ -1211,7 +1211,7 @@ void psf_hexdump(const void *ptr, int len)
     char ascii[17];
     int k, m;
 
-    if ((data = ptr) == NULL)
+    if ((data = (const char *)ptr) == NULL)
         return;
     if (len <= 0)
         return;
@@ -1285,7 +1285,7 @@ void *psf_memset(void *s, int c, sf_count_t len)
 
 SF_CUE_POINT *psf_cues_alloc(uint32_t cue_count)
 {
-    return calloc(cue_count, sizeof(SF_CUE_POINT));
+    return (SF_CUE_POINT *)calloc(cue_count, sizeof(SF_CUE_POINT));
 }
 
 SF_CUE_POINT *psf_cues_dup(const SF_CUE_POINT *cues, uint32_t cue_count)
@@ -1315,7 +1315,7 @@ SF_INSTRUMENT *psf_instrument_alloc(void)
 {
     SF_INSTRUMENT *instr;
 
-    instr = calloc(1, sizeof(SF_INSTRUMENT));
+    instr = (SF_INSTRUMENT *)calloc(1, sizeof(SF_INSTRUMENT));
 
     if (instr == NULL)
         return NULL;

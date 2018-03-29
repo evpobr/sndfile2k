@@ -72,7 +72,7 @@ int vox_adpcm_init(SF_PRIVATE *psf)
     if (psf->file.mode == SFM_WRITE && psf->sf.channels != 1)
         return SFE_CHANNEL_COUNT;
 
-    if ((pvox = malloc(sizeof(IMA_OKI_ADPCM))) == NULL)
+    if ((pvox = (IMA_OKI_ADPCM *)malloc(sizeof(IMA_OKI_ADPCM))) == NULL)
         return SFE_MALLOC_FAILED;
 
     psf->codec_data = (void *)pvox;

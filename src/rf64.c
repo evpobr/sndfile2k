@@ -82,7 +82,7 @@ int rf64_open(SF_PRIVATE *psf)
     int subformat, error = 0;
     int blockalign, framesperblock;
 
-    if ((wpriv = calloc(1, sizeof(WAVLIKE_PRIVATE))) == NULL)
+    if ((wpriv = (WAVLIKE_PRIVATE *)calloc(1, sizeof(WAVLIKE_PRIVATE))) == NULL)
         return SFE_MALLOC_FAILED;
     psf->container_data = wpriv;
     wpriv->wavex_ambisonic = SF_AMBISONIC_NONE;
@@ -179,7 +179,7 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperbloc
     uint32_t marks[2], marker, chunk_size, parsestage = 0;
     int error, done = 0, format = 0;
 
-    if ((wpriv = psf->container_data) == NULL)
+    if ((wpriv = (WAVLIKE_PRIVATE *)psf->container_data) == NULL)
         return SFE_INTERNAL;
     wav_fmt = &wpriv->wav_fmt;
 
@@ -561,7 +561,7 @@ static int rf64_write_fmt_chunk(SF_PRIVATE *psf)
     WAVLIKE_PRIVATE *wpriv;
     int subformat, fmt_size;
 
-    if ((wpriv = psf->container_data) == NULL)
+    if ((wpriv = (WAVLIKE_PRIVATE *)psf->container_data) == NULL)
         return SFE_INTERNAL;
 
     subformat = psf->sf.format & SF_FORMAT_SUBMASK;
@@ -689,7 +689,7 @@ static int rf64_write_header(SF_PRIVATE *psf, int calc_length)
     int error = 0, has_data = SF_FALSE, add_fact_chunk = 0;
     WAVLIKE_PRIVATE *wpriv;
 
-    if ((wpriv = psf->container_data) == NULL)
+    if ((wpriv = (WAVLIKE_PRIVATE *)psf->container_data) == NULL)
         return SFE_INTERNAL;
 
     current = psf_ftell(psf);
@@ -881,7 +881,7 @@ static size_t rf64_command(SF_PRIVATE *psf, int command, void *UNUSED(data), siz
 {
     WAVLIKE_PRIVATE *wpriv;
 
-    if ((wpriv = psf->container_data) == NULL)
+    if ((wpriv = (WAVLIKE_PRIVATE *)psf->container_data) == NULL)
         return SFE_INTERNAL;
 
     switch (command)

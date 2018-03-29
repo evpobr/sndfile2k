@@ -61,8 +61,8 @@ int xi_open(SF_PRIVATE *psf)
         return SFE_XI_NO_PIPE;
 
     if (psf->codec_data)
-        pxi = psf->codec_data;
-    else if ((pxi = calloc(1, sizeof(XI_PRIVATE))) == NULL)
+        pxi = (XI_PRIVATE *)psf->codec_data;
+    else if ((pxi = (XI_PRIVATE *)calloc(1, sizeof(XI_PRIVATE))) == NULL)
         return SFE_MALLOC_FAILED;
 
     psf->codec_data = pxi;
@@ -217,7 +217,7 @@ static sf_count_t dpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
     XI_PRIVATE *pxi;
     size_t total, bufferlen, len;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return SFE_INTERNAL;
 
     if (psf->datalength < 0 || psf->dataoffset < 0)
@@ -278,7 +278,7 @@ static int xi_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     sf_count_t current;
     const char *string;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return SFE_INTERNAL;
 
     current = psf_ftell(psf);
@@ -535,7 +535,7 @@ static size_t dpcm_read_dsc2s(SF_PRIVATE *psf, short *ptr, size_t len)
     size_t bufferlen, readcount;
     size_t total = 0;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
@@ -562,7 +562,7 @@ static size_t dpcm_read_dsc2i(SF_PRIVATE *psf, int *ptr, size_t len)
     size_t bufferlen, readcount;
     size_t total = 0;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
@@ -590,7 +590,7 @@ static size_t dpcm_read_dsc2f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
     normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80) : 1.0);
@@ -620,7 +620,7 @@ static size_t dpcm_read_dsc2d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
     normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x80) : 1.0;
@@ -649,7 +649,7 @@ static size_t dpcm_read_dles2s(SF_PRIVATE *psf, short *ptr, size_t len)
     size_t bufferlen, readcount;
     size_t total = 0;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
     bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -676,7 +676,7 @@ static size_t dpcm_read_dles2i(SF_PRIVATE *psf, int *ptr, size_t len)
     size_t bufferlen, readcount;
     size_t total = 0;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
     bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -704,7 +704,7 @@ static size_t dpcm_read_dles2f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
     normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
@@ -734,7 +734,7 @@ static size_t dpcm_read_dles2d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
     normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x8000) : 1.0;
@@ -777,7 +777,7 @@ static size_t dpcm_write_s2dsc(SF_PRIVATE *psf, const short *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
@@ -804,7 +804,7 @@ static size_t dpcm_write_i2dsc(SF_PRIVATE *psf, const int *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
@@ -832,7 +832,7 @@ static size_t dpcm_write_f2dsc(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
     normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x7F) : 1.0);
@@ -862,7 +862,7 @@ static size_t dpcm_write_d2dsc(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
     normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7F) : 1.0;
@@ -891,7 +891,7 @@ static size_t dpcm_write_s2dles(SF_PRIVATE *psf, const short *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
     bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -918,7 +918,7 @@ static size_t dpcm_write_i2dles(SF_PRIVATE *psf, const int *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
     bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -946,7 +946,7 @@ static size_t dpcm_write_f2dles(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
     normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0);
@@ -976,7 +976,7 @@ static size_t dpcm_write_d2dles(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if ((pxi = psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return 0;
 
     normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0;

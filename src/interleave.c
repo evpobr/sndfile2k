@@ -58,7 +58,7 @@ int interleave_init(SF_PRIVATE *psf)
     };
 
     /* Free this in sf_close() function. */
-    if (!(pdata = malloc(sizeof(INTERLEAVE_DATA))))
+    if (!(pdata = (INTERLEAVE_DATA *)malloc(sizeof(INTERLEAVE_DATA))))
         return SFE_MALLOC_FAILED;
 
     puts("interleave_init");
@@ -92,7 +92,7 @@ static size_t interleave_read_short(SF_PRIVATE *psf, short *ptr, size_t len)
     size_t count, k;
     short *inptr, *outptr;
 
-    if (!(pdata = psf->interleave))
+    if (!(pdata = (INTERLEAVE_DATA *)psf->interleave))
         return 0;
 
     inptr = (short *)pdata->buffer;
@@ -145,7 +145,7 @@ static size_t interleave_read_int(SF_PRIVATE *psf, int *ptr, size_t len)
     size_t count, k;
     int *inptr, *outptr;
 
-    if (!(pdata = psf->interleave))
+    if (!(pdata = (INTERLEAVE_DATA *)psf->interleave))
         return 0;
 
     inptr = (int *)pdata->buffer;
@@ -198,7 +198,7 @@ static size_t interleave_read_float(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t count, k;
     float *inptr, *outptr;
 
-    if (!(pdata = psf->interleave))
+    if (!(pdata = (INTERLEAVE_DATA *)psf->interleave))
         return 0;
 
     inptr = (float *)pdata->buffer;
@@ -255,7 +255,7 @@ static size_t interleave_read_double(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t count, k;
     double *inptr, *outptr;
 
-    if (!(pdata = psf->interleave))
+    if (!(pdata = (INTERLEAVE_DATA *)psf->interleave))
         return 0;
 
     inptr = (double *)pdata->buffer;

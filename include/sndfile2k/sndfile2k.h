@@ -1092,7 +1092,7 @@ typedef enum SF_CHANNEL_MAP
  * Any created @c SNDFILE should be destroyed by sf_close() function to avoid
  * memory leaks.
  */
-typedef struct sf_private_tag SNDFILE;
+typedef struct SF_PRIVATE SNDFILE;
 
 /** Represents file offset type
  *
@@ -1528,7 +1528,7 @@ typedef struct SF_VIRTUAL_IO
  * @sa sf_wchar_open(), sf_open_fd(), sf_open_virtual()
  * @sa sf_close()
  */
-SNDFILE2K_EXPORT SNDFILE *sf_open(const char *path, int mode, SF_INFO *sfinfo);
+SNDFILE2K_EXPORT SNDFILE *sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo);
 
 /** Opens sound file using @c POSIX file descriptor
  *
@@ -1567,7 +1567,7 @@ SNDFILE2K_EXPORT SNDFILE *sf_open(const char *path, int mode, SF_INFO *sfinfo);
  * @sa sf_open(), sf_wchar_open(), sf_open_virtual()
  * @sa sf_close()
  */
-SNDFILE2K_EXPORT SNDFILE *sf_open_fd(int fd, int mode, SF_INFO *sfinfo, int close_desc);
+SNDFILE2K_EXPORT SNDFILE *sf_open_fd(int fd, SF_FILEMODE mode, SF_INFO *sfinfo, int close_desc);
 
 /** @defgroup file-virt Virtual I/O
  *
@@ -1599,7 +1599,7 @@ SNDFILE2K_EXPORT SNDFILE *sf_open_fd(int fd, int mode, SF_INFO *sfinfo, int clos
  * @sa sf_open(), sf_wchar_open(), sf_open_fd(), sf_open_virtual_ex()
  * @sa sf_close()
  */
-SNDFILE2K_EXPORT SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo,
+SNDFILE2K_EXPORT SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo,
                                           void *user_data);
 
 /** Opens sound file using Virtual I/O context
@@ -1641,7 +1641,7 @@ SNDFILE2K_EXPORT SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, int mode, SF
  * @sa sf_open(), sf_wchar_open(), sf_open_fd(), sf_open_virtual()
  * @sa sf_close()
  */
-SNDFILE2K_EXPORT SNDFILE *sf_open_virtual_ex(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user_data);
+SNDFILE2K_EXPORT SNDFILE *sf_open_virtual_ex(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data);
 
 /** @}*/
 
@@ -2134,7 +2134,7 @@ SNDFILE2K_EXPORT void sf_write_sync(SNDFILE *sndfile);
  * @sa sf_open(), sf_open_fd(), sf_open_virtual()
  * @sa sf_close()
  */
-SNDFILE2K_EXPORT SNDFILE *sf_wchar_open(const wchar_t *wpath, int mode, SF_INFO *sfinfo);
+SNDFILE2K_EXPORT SNDFILE *sf_wchar_open(const wchar_t *wpath, SF_FILEMODE mode, SF_INFO *sfinfo);
 #endif
 
 /** @defgroup chunks Chunks API

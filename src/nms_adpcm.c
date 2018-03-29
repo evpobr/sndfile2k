@@ -1081,7 +1081,7 @@ int nms_adpcm_init(SF_PRIVATE *psf)
     if (psf->sf.channels != 1)
         return SFE_NMS_ADPCM_NOT_MONO;
 
-    if ((pnms = calloc(1, sizeof(NMS_ADPCM_PRIVATE))) == NULL)
+    if ((pnms = (NMS_ADPCM_PRIVATE *)calloc(1, sizeof(NMS_ADPCM_PRIVATE))) == NULL)
         return SFE_MALLOC_FAILED;
 
     psf->codec_data = (void *)pnms;

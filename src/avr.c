@@ -130,7 +130,7 @@ static int avr_read_header(SF_PRIVATE *psf)
 
     memset(&hdr, 0, sizeof(hdr));
 
-	psf_binheader_seekf(psf, 0, SEEK_SET);
+	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
     psf_binheader_readf(psf, "mb", &hdr.marker, &hdr.name, sizeof(hdr.name));
     psf_log_printf(psf, "%M\n", hdr.marker);
 

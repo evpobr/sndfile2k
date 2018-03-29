@@ -305,7 +305,7 @@ static char sf_syserr[SF_SYSERR_LEN] = {0};
 /*------------------------------------------------------------------------------
 */
 
-static inline _Bool VALIDATE_SNDFILE_AND_ASSIGN_PSF(SNDFILE *sndfile, _Bool clean_error)
+static inline bool VALIDATE_SNDFILE_AND_ASSIGN_PSF(SNDFILE *sndfile, bool clean_error)
 
 {
     if (!sndfile)
@@ -334,7 +334,7 @@ static inline _Bool VALIDATE_SNDFILE_AND_ASSIGN_PSF(SNDFILE *sndfile, _Bool clea
 **	Public functions.
 */
 
-SNDFILE *sf_open(const char *path, int mode, SF_INFO *sfinfo)
+SNDFILE *sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo)
 {
     SF_PRIVATE *psf;
 
@@ -375,7 +375,7 @@ SNDFILE *sf_open(const char *path, int mode, SF_INFO *sfinfo)
     return psf_open_file(psf, sfinfo);
 } /* sf_open */
 
-SNDFILE *sf_open_fd(int fd, int mode, SF_INFO *sfinfo, int close_desc)
+SNDFILE *sf_open_fd(int fd, SF_FILEMODE mode, SF_INFO *sfinfo, int close_desc)
 {
     SF_PRIVATE *psf;
 
@@ -414,7 +414,7 @@ SNDFILE *sf_open_fd(int fd, int mode, SF_INFO *sfinfo, int close_desc)
     return psf_open_file(psf, sfinfo);
 } /* sf_open_fd */
 
-SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user_data)
+SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data)
 {
     SF_PRIVATE *psf;
 
@@ -472,7 +472,7 @@ SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, vo
     return psf_open_file(psf, sfinfo);
 } /* sf_open_virtual */
 
-SNDFILE *sf_open_virtual_ex(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user_data)
+SNDFILE *sf_open_virtual_ex(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data)
 {
 	SF_PRIVATE *psf;
 
@@ -1039,8 +1039,8 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
                 sndfile->error = SFE_BAD_COMMAND_PARAM;
             return 0;
         };
-        snprintf(data, datasize, "%s", sf_version_string());
-        return strlen(data);
+        snprintf((char *)data, datasize, "%s", sf_version_string());
+        return strlen((char *)data);
 
     case SFC_GET_SIMPLE_FORMAT_COUNT:
         if (data == NULL || datasize != SIGNED_SIZEOF(int))
@@ -1051,7 +1051,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
     case SFC_GET_SIMPLE_FORMAT:
         if (data == NULL || datasize != SIGNED_SIZEOF(SF_FORMAT_INFO))
             return (sf_errno = SFE_BAD_COMMAND_PARAM);
-        return psf_get_format_simple(data);
+        return psf_get_format_simple((SF_FORMAT_INFO *)data);
 
     case SFC_GET_FORMAT_MAJOR_COUNT:
         if (data == NULL || datasize != SIGNED_SIZEOF(int))
@@ -1062,7 +1062,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
     case SFC_GET_FORMAT_MAJOR:
         if (data == NULL || datasize != SIGNED_SIZEOF(SF_FORMAT_INFO))
             return (sf_errno = SFE_BAD_COMMAND_PARAM);
-        return psf_get_format_major(data);
+        return psf_get_format_major((SF_FORMAT_INFO *)data);
 
     case SFC_GET_FORMAT_SUBTYPE_COUNT:
         if (data == NULL || datasize != SIGNED_SIZEOF(int))
@@ -1073,20 +1073,20 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
     case SFC_GET_FORMAT_SUBTYPE:
         if (data == NULL || datasize != SIGNED_SIZEOF(SF_FORMAT_INFO))
             return (sf_errno = SFE_BAD_COMMAND_PARAM);
-        return psf_get_format_subtype(data);
+        return psf_get_format_subtype((SF_FORMAT_INFO *)data);
 
     case SFC_GET_FORMAT_INFO:
         if (data == NULL || datasize != SIGNED_SIZEOF(SF_FORMAT_INFO))
             return (sf_errno = SFE_BAD_COMMAND_PARAM);
-        return psf_get_format_info(data);
+        return psf_get_format_info((SF_FORMAT_INFO *)data);
     };
 
     if (sndfile == NULL && command == SFC_GET_LOG_INFO)
     {
         if (data == NULL)
             return (sf_errno = SFE_BAD_COMMAND_PARAM);
-        snprintf(data, datasize, "%s", sf_parselog);
-        return strlen(data);
+        snprintf((char *)data, datasize, "%s", sf_parselog);
+        return strlen((char *)data);
     };
 
     if (!VALIDATE_SNDFILE_AND_ASSIGN_PSF(sndfile, true))
@@ -1186,8 +1186,8 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
     case SFC_GET_LOG_INFO:
         if (data == NULL)
             return 0;
-        snprintf(data, datasize, "%s", sndfile->parselog.buf);
-        return strlen(data);
+        snprintf((char *)data, datasize, "%s", sndfile->parselog.buf);
+        return strlen((char *)data);
 
     case SFC_CALC_SIGNAL_MAX:
         if (data == NULL || datasize != sizeof(double))
@@ -1357,7 +1357,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
             return SF_FALSE;
         };
 
-        if (!broadcast_var_set(sndfile, data, datasize))
+        if (!broadcast_var_set(sndfile, (SF_BROADCAST_INFO *)data, datasize))
             return SF_FALSE;
 
         if (sndfile->write_header)
@@ -1370,7 +1370,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
             sndfile->error = SFE_BAD_COMMAND_PARAM;
             return SF_FALSE;
         };
-        return broadcast_var_get(sndfile, data, datasize);
+        return broadcast_var_get(sndfile, (SF_BROADCAST_INFO *)data, datasize);
 
     case SFC_SET_CART_INFO:
     {
@@ -1389,7 +1389,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
             sndfile->error = SFE_CMD_HAS_DATA;
             return SF_FALSE;
         };
-        if (!cart_var_set(sndfile, data, datasize))
+        if (!cart_var_set(sndfile, (SF_CART_INFO *)data, datasize))
             return SF_FALSE;
         if (sndfile->write_header)
             sndfile->write_header(sndfile, SF_TRUE);
@@ -1401,7 +1401,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
             sndfile->error = SFE_BAD_COMMAND_PARAM;
             return SF_FALSE;
         };
-        return cart_var_get(sndfile, data, datasize);
+        return cart_var_get(sndfile, (SF_CART_INFO *)data, datasize);
 
     case SFC_GET_CUE_COUNT:
         if (datasize != sizeof(uint32_t) || data == NULL)
@@ -1428,43 +1428,47 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         return SF_TRUE;
 
     case SFC_SET_CUE:
-        if (sndfile->have_written)
-        {
-            sndfile->error = SFE_CMD_HAS_DATA;
-            return SF_FALSE;
-        };
-        if (datasize != sizeof(SF_CUES) || data == NULL)
-        {
-            sndfile->error = SFE_BAD_COMMAND_PARAM;
-            return SF_FALSE;
-        };
+	{
+		if (sndfile->have_written)
+		{
+			sndfile->error = SFE_CMD_HAS_DATA;
+			return SF_FALSE;
+		};
+		if (datasize != sizeof(SF_CUES) || data == NULL)
+		{
+			sndfile->error = SFE_BAD_COMMAND_PARAM;
+			return SF_FALSE;
+		};
 
-        SF_CUES *cues = data;
-        if (sndfile->cues.cue_points == NULL && (sndfile->cues.cue_points = psf_cues_dup(cues->cue_points, cues->cue_count)) == NULL)
-        {
-            sndfile->error = SFE_MALLOC_FAILED;
-            return SF_FALSE;
-        };
+		SF_CUES *cues = (SF_CUES *)data;
+		if (sndfile->cues.cue_points == NULL && (sndfile->cues.cue_points = psf_cues_dup(cues->cue_points, cues->cue_count)) == NULL)
+		{
+			sndfile->error = SFE_MALLOC_FAILED;
+			return SF_FALSE;
+		};
 		sndfile->cues.cue_count = cues->cue_count;
-        return SF_TRUE;
+		return SF_TRUE;
+	}
 
 	case SFC_GET_CUE_POINTS:
-    {
-        if (!data || datasize <= 0)
-        {
-            sndfile->error = SFE_BAD_COMMAND_PARAM;
-            return SF_FALSE;
-        }
-        uint32_t in_cue_count = SF_MIN(sndfile->cues.cue_count, datasize);
+	{
+		{
+			if (!data || datasize <= 0)
+			{
+				sndfile->error = SFE_BAD_COMMAND_PARAM;
+				return SF_FALSE;
+			}
+			uint32_t in_cue_count = SF_MIN(sndfile->cues.cue_count, datasize);
 
-        memcpy(data, sndfile->cues.cue_points, in_cue_count * sizeof(SF_CUE_POINT));
-        if (!data)
-        {
-            sndfile->error = SFE_MALLOC_FAILED;
-            return SF_FALSE;
-        };
-        return in_cue_count;
-    }
+			memcpy(data, sndfile->cues.cue_points, in_cue_count * sizeof(SF_CUE_POINT));
+			if (!data)
+			{
+				sndfile->error = SFE_MALLOC_FAILED;
+				return SF_FALSE;
+			};
+			return in_cue_count;
+		}
+	}
 
 	case SFC_SET_CUE_POINTS:
     {
@@ -1485,7 +1489,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         };
         if (!data && datasize == 0)
             return SF_TRUE;
-        SF_CUE_POINT *in_cues = data;
+        SF_CUE_POINT *in_cues = (SF_CUE_POINT *)data;
         uint32_t in_cue_count = (uint32_t)datasize;
         sndfile->cues.cue_points = psf_cues_dup(in_cues, in_cue_count);
         if (!sndfile->cues.cue_points)
@@ -1560,7 +1564,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         {
             int *iptr;
 
-            for (iptr = data; iptr < (int *)data + sndfile->sf.channels; iptr++)
+            for (iptr = (int *)data; iptr < (int *)data + sndfile->sf.channels; iptr++)
             {
                 if (*iptr <= SF_CHANNEL_MAP_INVALID || *iptr >= SF_CHANNEL_MAP_MAX)
                 {
@@ -1571,7 +1575,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         };
 
         free(sndfile->channel_map);
-        if ((sndfile->channel_map = malloc(datasize)) == NULL)
+        if ((sndfile->channel_map = (int *)malloc(datasize)) == NULL)
         {
             sndfile->error = SFE_MALLOC_FAILED;
             return SF_FALSE;

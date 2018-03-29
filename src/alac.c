@@ -27,8 +27,15 @@
 #include "sndfile2k/sndfile2k.h"
 #include "sfendian.h"
 #include "common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "ALAC/alac_codec.h"
 #include "ALAC/ALACBitUtilities.h"
+#ifdef __cplusplus
+}
+#endif
 
 #define ALAC_MAX_FRAME_SIZE (8192)
 #define ALAC_BYTE_BUFFER_SIZE (0x20000)
@@ -170,7 +177,7 @@ static int alac_close(SF_PRIVATE *psf)
     ALAC_PRIVATE *plac;
     BUF_UNION ubuf;
 
-    plac = psf->codec_data;
+    plac = (ALAC_PRIVATE *)psf->codec_data;
 
     if (psf->file.mode == SFM_WRITE)
     {
@@ -265,7 +272,7 @@ static int alac_reader_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *inf
         return SFE_INTERNAL;
     };
 
-    plac = psf->codec_data;
+    plac = (ALAC_PRIVATE *)psf->codec_data;
 
     plac->channels = psf->sf.channels;
     plac->frames_per_block = info->frames_per_packet;
@@ -330,7 +337,7 @@ static int alac_writer_init(SF_PRIVATE *psf)
     ALAC_PRIVATE *plac;
     uint32_t alac_format_flags = 0;
 
-    plac = psf->codec_data;
+    plac = (ALAC_PRIVATE *)psf->codec_data;
 
     if (psf->file.mode != SFM_WRITE)
         return SFE_BAD_MODE_RW;
@@ -814,7 +821,7 @@ static PAKT_INFO *alac_pakt_alloc(uint32_t initial_count)
 {
     PAKT_INFO *info;
 
-    if ((info = calloc(1, sizeof(PAKT_INFO) + initial_count * sizeof(info->packet_size[0]))) ==
+    if ((info = (PAKT_INFO *)calloc(1, sizeof(PAKT_INFO) + initial_count * sizeof(info->packet_size[0]))) ==
         NULL)
         return NULL;
 
@@ -832,7 +839,7 @@ static PAKT_INFO *alac_pakt_append(PAKT_INFO *info, uint32_t value)
         PAKT_INFO *temp;
         uint32_t newcount = info->allocated + info->allocated / 2;
 
-        if ((temp = realloc(info, sizeof(PAKT_INFO) + newcount * sizeof(info->packet_size[0]))) ==
+        if ((temp = (PAKT_INFO *)realloc(info, sizeof(PAKT_INFO) + newcount * sizeof(info->packet_size[0]))) ==
             NULL)
             return NULL;
 
@@ -867,7 +874,8 @@ static PAKT_INFO *alac_pakt_read_decode(SF_PRIVATE *psf, uint32_t UNUSED(pakt_of
     psf->get_chunk_size(psf, chunk_iterator, &chunk_info);
 
     pakt_size = chunk_info.datalen;
-    chunk_info.data = pakt_data = malloc(pakt_size + 5);
+	pakt_data = (uint8_t *)malloc(pakt_size + 5);
+    chunk_info.data = pakt_data;
 
     if ((bcount = psf->get_chunk_data(psf, chunk_iterator, &chunk_info)) != SF_ERR_NO_ERROR)
     {
@@ -927,11 +935,11 @@ static uint8_t *alac_pakt_encode(const SF_PRIVATE *psf, uint32_t *pakt_size_out)
     uint8_t *data;
     uint32_t k, allocated, pakt_size;
 
-    plac = psf->codec_data;
+    plac = (const ALAC_PRIVATE *)psf->codec_data;
     info = plac->pakt_info;
 
     allocated = 100 + 2 * info->count;
-    if ((data = calloc(1, allocated)) == NULL)
+    if ((data = (uint8_t *)calloc(1, allocated)) == NULL)
         return NULL;
 
     psf_put_be64(data, 0, info->count);

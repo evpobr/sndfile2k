@@ -116,7 +116,7 @@ int caf_open(SF_PRIVATE *psf)
     if ((psf->container_data = calloc(1, sizeof(struct CAF_PRIVATE))) == NULL)
         return SFE_MALLOC_FAILED;
 
-    pcaf = psf->container_data;
+    pcaf = (struct CAF_PRIVATE *)psf->container_data;
 
     if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
     {
@@ -231,7 +231,7 @@ static size_t caf_command(SF_PRIVATE *psf, int command, void *UNUSED(data), size
 {
 	struct CAF_PRIVATE *pcaf;
 
-    if ((pcaf = psf->container_data) == NULL)
+    if ((pcaf = (struct CAF_PRIVATE *)psf->container_data) == NULL)
         return SFE_INTERNAL;
 
     switch (command)
@@ -257,7 +257,7 @@ static int decode_desc_chunk(SF_PRIVATE *psf, const struct DESC_CHUNK *desc)
     {
 		struct CAF_PRIVATE *pcaf;
 
-        if ((pcaf = psf->container_data) != NULL)
+        if ((pcaf = (struct CAF_PRIVATE *)psf->container_data) != NULL)
         {
             switch (desc->fmt_flags)
             {
@@ -356,7 +356,7 @@ static int caf_read_header(SF_PRIVATE *psf)
     short version, flags;
     int marker, k, have_data = 0, error;
 
-    if ((pcaf = psf->container_data) == NULL)
+    if ((pcaf = (struct CAF_PRIVATE *)psf->container_data) == NULL)
         return SFE_INTERNAL;
 
     memset(&desc, 0, sizeof(desc));
@@ -615,7 +615,7 @@ static int caf_write_header(SF_PRIVATE *psf, int calc_length)
     uint32_t uk;
     int subformat, append_free_block = SF_TRUE;
 
-    if ((pcaf = psf->container_data) == NULL)
+    if ((pcaf = (struct CAF_PRIVATE *)psf->container_data) == NULL)
         return SFE_INTERNAL;
 
     memset(&desc, 0, sizeof(desc));
@@ -862,7 +862,7 @@ static int caf_read_chanmap(SF_PRIVATE *psf, sf_count_t chunk_size)
 
         free(psf->channel_map);
 
-        if ((psf->channel_map = malloc(chanmap_size)) == NULL)
+        if ((psf->channel_map = (int *)malloc(chanmap_size)) == NULL)
             return SFE_MALLOC_FAILED;
 
         memcpy(psf->channel_map, map_info->channel_map, chanmap_size);
@@ -890,7 +890,7 @@ static int caf_read_strings(SF_PRIVATE *psf, sf_count_t chunk_size)
     char *key, *value;
     uint32_t count, hash;
 
-    if ((buf = malloc(chunk_size + 1)) == NULL)
+    if ((buf = (char *)malloc(chunk_size + 1)) == NULL)
         return (psf->error = SFE_MALLOC_FAILED);
 
     psf_binheader_readf(psf, "E4b", &count, buf, make_size_t(chunk_size));

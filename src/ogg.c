@@ -129,7 +129,7 @@ int ogg_read_first_page(SF_PRIVATE *psf, OGG_PRIVATE *odata)
 
 int ogg_open(SF_PRIVATE *psf)
 {
-    OGG_PRIVATE *odata = calloc(1, sizeof(OGG_PRIVATE));
+    OGG_PRIVATE *odata = (OGG_PRIVATE *)calloc(1, sizeof(OGG_PRIVATE));
     sf_count_t pos = psf_ftell(psf);
     int error = 0;
 
@@ -180,7 +180,7 @@ int ogg_open(SF_PRIVATE *psf)
 
 static int ogg_close(SF_PRIVATE *psf)
 {
-    OGG_PRIVATE *odata = psf->container_data;
+    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
 
     ogg_sync_clear(&odata->osync);
     ogg_stream_clear(&odata->ostream);
