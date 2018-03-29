@@ -1237,15 +1237,6 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         return sndfile->auto_header;
         break;
 
-    case SFC_SET_ADD_DITHER_ON_WRITE:
-    case SFC_SET_ADD_DITHER_ON_READ:
-        /*
-		** FIXME !
-		** These are obsolete. Just return.
-		** Remove some time after version 1.0.8.
-		*/
-        break;
-
     case SFC_SET_DITHER_ON_WRITE:
         if (data == NULL || datasize != SIGNED_SIZEOF(SF_DITHER_INFO))
             return (sndfile->error = SFE_BAD_COMMAND_PARAM);

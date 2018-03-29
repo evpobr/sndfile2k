@@ -831,17 +831,6 @@ typedef enum SF_COMMAND
      */
     SFC_TEST_IEEE_FLOAT_REPLACE = 0x6001,
 
-    /** Deprecated
-     * @deprecated ::SFC_SET_ADD_DITHER_ON_WRITE is deprecated and will be
-     * dropped from the library at some later date.
-     */
-    SFC_SET_ADD_DITHER_ON_WRITE = 0x1070,
-    /** Deprecated
-     * @deprecated ::SFC_SET_ADD_DITHER_ON_READ is deprecated and will be
-     * dropped from the library at some later date.
-     */
-    SFC_SET_ADD_DITHER_ON_READ = 0x1071,
-
     /** Gets cue marker information from file
      *
      * @param[in] sndfile a valid ::SNDFILE* pointer
