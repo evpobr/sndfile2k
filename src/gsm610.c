@@ -29,7 +29,9 @@
 #include "wavlike.h"
 #ifdef __cplusplus
 extern "C" {
+#endif
 #include "GSM610/gsm.h"
+#ifdef __cplusplus
 }
 #endif
 
