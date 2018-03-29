@@ -35,7 +35,6 @@ set(COMMON
   interleave.c
   strings.c
   dither.c
-  cart.c
   audio_detect.c
   ima_oki_adpcm.c
   ima_oki_adpcm.h

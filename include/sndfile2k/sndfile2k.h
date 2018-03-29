@@ -827,37 +827,6 @@ typedef enum SF_COMMAND
      */
     SFC_SET_COMPRESSION_LEVEL = 0x1301,
 
-    /** Gets the Cart Chunk info
-     *
-     * @param[in] sndfile a valid ::SNDFILE* pointer
-     * @param[out] data A pointer to a ::SF_CART_INFO struct
-     * @param[in] datasize datasize sizeof (SF_CART_INFO)
-     *
-     * This command retrieves the Cart Chunk from WAV (and related) files. Based
-     * on AES46 standard for CartChunk (see CartChunk.org for more information.
-     *
-     * @return ::SF_TRUE if the file contains a Cart chunk or ::SF_FALSE
-     * otherwise.
-     *
-     * @deprecated This command is deprecated and will be removed in next major release.
-     */
-    SFC_SET_CART_INFO = 0x1400,
-    /** Gets the Cart Chunk info
-     *
-     * @param[in] sndfile a valid ::SNDFILE* pointer
-     * @param[out] data A pointer to a ::SF_CART_INFO struct
-     * @param[in] datasize datasize sizeof (SF_CART_INFO)
-     *
-     * This command retrieves the Cart Chunk from WAV (and related) files. Based
-     * on AES46 standard for CartChunk (see CartChunk.org for more information.
-     *
-     * @return ::SF_TRUE if the file contains a Cart chunk or ::SF_FALSE
-     * otherwise.
-     *
-     * @deprecated This command is deprecated and will be removed in next major release.
-     */
-    SFC_GET_CART_INFO = 0x1401,
-
     /** Internal, do not use
      */
     SFC_TEST_IEEE_FLOAT_REPLACE = 0x6001,
@@ -1225,52 +1194,6 @@ typedef struct SF_LOOP_INFO
     int root_key; // MIDI note, or -1 for None
     int future[6];
 } SF_LOOP_INFO;
-
-/** Contanins information about CART timer
- *
- * @deprecated This feature and will be removed in next major release.
- */
-typedef struct SF_CART_TIMER
-{
-    char usage[4];
-    int32_t value;
-} SF_CART_TIMER;
-
-/** Defines CART timer struct with @c tag_text of desired size.
- *
- * @deprecated This feature and will be removed in next major release.
- */
-#define SF_CART_INFO_VAR(p_tag_text_size) \
-    struct                                \
-    {                                     \
-        char version[4];                  \
-        char title[64];                   \
-        char artist[64];                  \
-        char cut_id[64];                  \
-        char client_id[64];               \
-        char category[64];                \
-        char classification[64];          \
-        char out_cue[64];                 \
-        char start_date[10];              \
-        char start_time[8];               \
-        char end_date[10];                \
-        char end_time[8];                 \
-        char producer_app_id[64];         \
-        char producer_app_version[64];    \
-        char user_def[64];                \
-        int32_t level_reference;          \
-        SF_CART_TIMER post_timers[8];     \
-        char reserved[276];               \
-        char url[1024];                   \
-        uint32_t tag_text_size;           \
-        char tag_text[p_tag_text_size];   \
-    }
-
- /** Declares CART timer struct with @c tag_text of 256 elements.
-  *
-  * @deprecated This feature and will be removed in next major release.
-  */
-typedef SF_CART_INFO_VAR(256) SF_CART_INFO;
 
 /** Type of user defined function that increases reference count
  *

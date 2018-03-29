@@ -44,7 +44,6 @@ int main(void)
     test_ima_oki_adpcm();
 
     test_psf_strlcpy_crlf();
-    test_cart_var();
     test_nms_adpcm();
 
     return 0;

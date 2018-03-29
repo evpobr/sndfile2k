@@ -564,10 +564,6 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
             break;
 
         case cart_MARKER:
-            if ((error = wavlike_read_cart_chunk(psf, chunk_size)))
-                return error;
-            break;
-
         case iXML_MARKER: /* See http://en.wikipedia.org/wiki/IXML */
         case strc_MARKER: /* Multiple of 32 bytes. */
         case afsp_MARKER:
@@ -1165,9 +1161,6 @@ static int wav_write_header(SF_PRIVATE *psf, int calc_length)
 
     if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_START)
         wavlike_write_peak_chunk(psf);
-
-    if (psf->cart_16k != NULL)
-        wavlike_write_cart_chunk(psf);
 
     if (psf->cues.cue_points != NULL)
     {

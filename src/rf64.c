@@ -273,12 +273,6 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperbloc
             parsestage |= HAVE_fmt;
             break;
 
-        case cart_MARKER:
-            if ((error = wavlike_read_cart_chunk(psf, chunk_size)) != 0)
-                return error;
-            parsestage |= HAVE_cart;
-            break;
-
         case INFO_MARKER:
         case LIST_MARKER:
             if ((error = wavlike_subchunk_parse(psf, marker, chunk_size)) != 0)
@@ -354,6 +348,7 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperbloc
             };
             break;
 
+		case cart_MARKER:
         case JUNK_MARKER:
         case PAD_MARKER:
             psf_log_printf(psf, "%M : %d\n", marker, chunk_size);
@@ -746,9 +741,6 @@ static int rf64_write_header(SF_PRIVATE *psf, int calc_length)
     default:
         return SFE_UNIMPLEMENTED;
     };
-
-    if (psf->cart_16k != NULL)
-        wavlike_write_cart_chunk(psf);
 
     /* The LIST/INFO chunk. */
     if (psf->strings.flags & SF_STR_LOCATE_START)

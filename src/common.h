@@ -292,8 +292,6 @@ static inline size_t make_size_t(int x)
     return (size_t)x;
 } /* make_size_t */
 
-typedef SF_CART_INFO_VAR(16 * 1024) SF_CART_INFO_16K;
-
 #if SIZEOF_WCHAR_T == 2
 typedef wchar_t sfwchar_t;
 #else
@@ -461,9 +459,6 @@ typedef struct SF_PRIVATE
     /* Loop Info */
     SF_LOOP_INFO *loop_info;
     SF_INSTRUMENT *instrument;
-
-    /* Cart (AES46) Info */
-    SF_CART_INFO_16K *cart_16k;
 
     /* Channel map data (if present) : an array of ints. */
     int *channel_map;
@@ -1020,10 +1015,6 @@ void psf_sanitize_string(char *cptr, int len);
 
 /* Generate the current date as a string. */
 void psf_get_date_str(char *str, int maxlen);
-
-SF_CART_INFO_16K *cart_var_alloc(void);
-int cart_var_set(SF_PRIVATE *psf, const SF_CART_INFO *date, size_t datasize);
-int cart_var_get(SF_PRIVATE *psf, SF_CART_INFO *data, size_t datasize);
 
 struct AUDIO_DETECT
 {

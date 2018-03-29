@@ -466,9 +466,6 @@ void wavlike_write_guid(SF_PRIVATE *psf, const EXT_SUBFORMAT *subformat);
 void wavlike_analyze(SF_PRIVATE *psf);
 int wavlike_gen_channel_mask(const int *chan_map, int channels);
 
-int wavlike_read_cart_chunk(SF_PRIVATE *psf, uint32_t chunksize);
-int wavlike_write_cart_chunk(SF_PRIVATE *psf);
-
 int wavlike_subchunk_parse(SF_PRIVATE *psf, int chunk, uint32_t length);
 void wavlike_write_strings(SF_PRIVATE *psf, int location);
 
