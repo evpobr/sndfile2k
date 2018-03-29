@@ -672,31 +672,6 @@ typedef enum SF_COMMAND
      */
     SFC_GET_CUE_COUNT = 0x10CD,
 
-    /** Gets cue marker information from file
-     *
-     * @param[in] sndfile a valid ::SNDFILE* pointer
-     * @param[out] data A pointer to a ::SF_CUES struct
-     * @param[in] datasize sizeof(SF_CUES)
-     *
-     * @deprecated This command is deprecated, use GET_CUE_POINTS instead.
-     *
-     * @return ::SF_TRUE if the file header contains cue marker information for
-     * the file, ::SF_FALSE otherwise.
-     */
-    SFC_GET_CUE = 0x10CE,
-    /** Sets cue marker information for the file
-     *
-     * @param[in] sndfile a valid ::SNDFILE* pointer
-     * @param[in] data A pointer to a ::SF_CUES struct
-     * @param[in] datasize sizeof(SF_CUES)
-     *
-     * @deprecated This command is deprecated, use SET_CUE_POINTS instead.
-     *
-     * @return ::SF_TRUE if the file header contains cue marker information for
-     * the file, ::SF_FALSE otherwise.
-     */
-    SFC_SET_CUE = 0x10CF,
-
     /** Gets instrument information
      *
      * @param[in] sndfile a valid ::SNDFILE* pointer

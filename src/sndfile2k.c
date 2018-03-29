@@ -1416,40 +1416,6 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         };
         return SF_FALSE;
 
-    case SFC_GET_CUE:
-        if (datasize != sizeof(SF_CUES) || data == NULL)
-        {
-            sndfile->error = SFE_BAD_COMMAND_PARAM;
-            return SF_FALSE;
-        };
-        if (sndfile->cues.cue_points == NULL)
-            return SF_FALSE;
-        psf_get_cues(sndfile, data, datasize);
-        return SF_TRUE;
-
-    case SFC_SET_CUE:
-	{
-		if (sndfile->have_written)
-		{
-			sndfile->error = SFE_CMD_HAS_DATA;
-			return SF_FALSE;
-		};
-		if (datasize != sizeof(SF_CUES) || data == NULL)
-		{
-			sndfile->error = SFE_BAD_COMMAND_PARAM;
-			return SF_FALSE;
-		};
-
-		SF_CUES *cues = (SF_CUES *)data;
-		if (sndfile->cues.cue_points == NULL && (sndfile->cues.cue_points = psf_cues_dup(cues->cue_points, cues->cue_count)) == NULL)
-		{
-			sndfile->error = SFE_MALLOC_FAILED;
-			return SF_FALSE;
-		};
-		sndfile->cues.cue_count = cues->cue_count;
-		return SF_TRUE;
-	}
-
 	case SFC_GET_CUE_POINTS:
 	{
 		{
