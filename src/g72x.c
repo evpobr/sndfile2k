@@ -29,7 +29,9 @@
 
 #ifdef __cplusplus
 extern "C" {
+#endif
 #include "G72x/g72x.h"
+#ifdef __cplusplus
 }
 #endif
 
