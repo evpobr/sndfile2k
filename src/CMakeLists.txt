@@ -20,71 +20,73 @@ set(noinst_HEADERS
 
 # Common sources
 set(COMMON
-  common.c
-  command.c
-  pcm.c
-  ulaw.c
-  alaw.c
-  float32.c
-  double64.c
-  ima_adpcm.c
-  ms_adpcm.c
-  gsm610.c
-  dwvw.c
-  vox_adpcm.c
-  interleave.c
-  strings.c
-  dither.c
-  audio_detect.c
-  ima_oki_adpcm.c
+  common.cpp
+  command.cpp
+  pcm.cpp
+  ulaw.cpp
+  alaw.cpp
+  float32.cpp
+  double64.cpp
+  ima_adpcm.cpp
+  ms_adpcm.cpp
+  gsm610.cpp
+  dwvw.cpp
+  vox_adpcm.cpp
+  interleave.cpp
+  strings.cpp
+  dither.cpp
+  audio_detect.cpp
+  ima_oki_adpcm.cpp
   ima_oki_adpcm.h
-  alac.c
-  chunk.c
-  ogg.c
-  chanmap.c
-  file_io.c
-  id3.c)
+  alac.cpp
+  chunk.cpp
+  ogg.cpp
+  chanmap.cpp
+  file_io.cpp
+  id3.cpp
+)
 if(WIN32 OR CYGWIN)
-  list(APPEND COMMON windows.c)
+  list(APPEND COMMON windows.cpp)
 endif()
 
 # File specific sources
 set(FILESPECIFIC
-  sndfile2k.c
-  aiff.c
-  au.c
-  avr.c
-  caf.c
-  dwd.c
-  flac.c
-  g72x.c
-  htk.c
-  ircam.c
-  macos.c
-  mat4.c
-  mat5.c
-  nist.c
-  paf.c
-  pvf.c
-  raw.c
-  rx2.c
-  sd2.c
-  sds.c
-  svx.c
-  txw.c
-  voc.c
-  wve.c
-  w64.c
-  wavlike.c
-  wav.c
-  xi.c
-  mpc2k.c
-  rf64.c
-  ogg_vorbis.c
-  ogg_speex.c
-  ogg_pcm.c
-  ogg_opus.c
-  nms_adpcm.c)
+  sndfile2k.cpp
+  aiff.cpp
+  au.cpp
+  avr.cpp
+  caf.cpp
+  dwd.cpp
+  flac.cpp
+  g72x.cpp
+  htk.cpp
+  ircam.cpp
+  macos.cpp
+  mat4.cpp
+  mat5.cpp
+  nist.cpp
+  paf.cpp
+  pvf.cpp
+  raw.cpp
+  rx2.cpp
+  sd2.cpp
+  sds.cpp
+  svx.cpp
+  txw.cpp
+  voc.cpp
+  wve.cpp
+  w64.cpp
+  wavlike.cpp
+  wav.cpp
+  xi.cpp
+  mpc2k.cpp
+  rf64.cpp
+  ogg_vorbis.cpp
+  ogg_speex.cpp
+  ogg_pcm.cpp
+  ogg_opus.cpp
+  nms_adpcm.cpp
+)
 
 # GSM610 sources
 set(libgsm_SOURCES

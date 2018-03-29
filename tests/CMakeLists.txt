@@ -25,11 +25,11 @@ if(BUILD_SHARED_LIBS)
       ${PROJECT_BINARY_DIR}/src)
   target_sources(test_main
     PRIVATE
-      ../src/common.c
-      ../src/float32.c
-      ../src/double64.c
-      ../src/file_io.c
-      ../src/audio_detect.c
+      ../src/common.cpp
+      ../src/float32.cpp
+      ../src/double64.cpp
+      ../src/file_io.cpp
+      ../src/audio_detect.cpp
   )
 endif()
 add_test(NAME test_main COMMAND $<TARGET_FILE:test_main>)
