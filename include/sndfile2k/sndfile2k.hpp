@@ -894,6 +894,6 @@ inline SndfileHandle::SndfileHandle(const wchar_t *wpath, SF_FILEMODE mode, int 
 	return;
 } /* SndfileHandle const wchar_t * constructor */
 
-}
-
 #endif
+
+}
