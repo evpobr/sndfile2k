@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "common.h"
+#include "shift.h"
 
 #include "gsm610_priv.h"
 

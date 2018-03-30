@@ -23,6 +23,7 @@
 #include "sndfile2k/sndfile2k.h"
 #include "sfendian.h"
 #include "common.h"
+#include "shift.h"
 
 /*
  * Need to be able to handle 3 byte (24 bit) integers. So defined a

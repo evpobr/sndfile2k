@@ -26,6 +26,7 @@
 #include "sndfile2k/sndfile2k.h"
 #include "sfendian.h"
 #include "common.h"
+#include "shift.h"
 
 typedef struct IMA_ADPCM_PRIVATE_tag
 {

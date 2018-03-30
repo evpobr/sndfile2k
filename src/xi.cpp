@@ -28,6 +28,7 @@
 #include "sndfile2k/sndfile2k.h"
 #include "sfendian.h"
 #include "common.h"
+#include "shift.h"
 
 #define MAX_XI_SAMPLES (16)
 

@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "common.h"
+#include "shift.h"
 
 #define CODE_TO_LONG_MAXBITS (32)
 #define N_MAX_MEAN_CLAMP (0xffff)

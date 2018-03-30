@@ -25,7 +25,7 @@
 
 /* Set up for libsndfile environment: */
 #include "common.h"
-
+#include "shift.h"
 #include "ima_oki_adpcm.h"
 
 #include <algorithm>

@@ -28,6 +28,7 @@
 #include "sndfile2k/sndfile2k.h"
 #include "sfendian.h"
 #include "common.h"
+#include "shift.h"
 
 #define SDS_DATA_OFFSET (0x15)
 #define SDS_BLOCK_SIZE (127)

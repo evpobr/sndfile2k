@@ -16,7 +16,9 @@ set(noinst_HEADERS
   wavlike.h
   sf_unistd.h
   ogg.h
-  chanmap.h)
+  chanmap.h
+  shift.h
+)
 
 # Common sources
 set(COMMON
@@ -129,7 +131,7 @@ set(libalac_SOURCES
   ALAC/dplib.h
   ALAC/matrixlib.h
   ALAC/alac_codec.h
-  ALAC/shift.h
+  ${PROJECT_SOURCE_DIR}/src/shift.h
   ALAC/ALACBitUtilities.c
   ALAC/ag_dec.c
   ALAC/ag_enc.c

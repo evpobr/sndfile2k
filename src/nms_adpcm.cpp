@@ -38,6 +38,7 @@
 #include <sndfile2k/sndfile2k.h>
 #include "sfendian.h"
 #include "common.h"
+#include "shift.h"
 
 #define NMS_SAMPLES_PER_BLOCK 160
 #define NMS_BLOCK_SHORTS_32 41

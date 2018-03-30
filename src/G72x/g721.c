@@ -49,7 +49,7 @@
   *
   */
 
-#include "common.h"
+#include "shift.h"
 
 #include "g72x.h"
 #include "g72x_priv.h"

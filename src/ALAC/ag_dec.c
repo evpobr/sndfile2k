@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "common.h"
+#include "shift.h"
 
 #include "aglib.h"
 #include "ALACBitUtilities.h"

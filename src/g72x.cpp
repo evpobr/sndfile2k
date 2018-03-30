@@ -26,7 +26,7 @@
 #include "sndfile2k/sndfile2k.h"
 #include "sfendian.h"
 #include "common.h"
-
+#include "shift.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -39,6 +39,7 @@
 #include "sndfile2k/sndfile2k.h"
 #include "sfendian.h"
 #include "common.h"
+#include "shift.h"
 #include "ima_oki_adpcm.h"
 
 static size_t vox_read_s(SF_PRIVATE *psf, short *ptr, size_t len);
