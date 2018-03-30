@@ -31,11 +31,13 @@
 ** ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdint.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cctype>
+#include <cstdint>
+
+using namespace std;
 
 #include "sndfile2k/sndfile2k.h"
 
@@ -230,12 +232,13 @@ static OUTPUT_FORMAT_MAP format_map[] = {
 
 int sfe_file_type_of_ext(const char *str, int format)
 {
-    char buffer[16], *cptr;
+    char buffer[16];
+    const char *cptr;
     int k;
 
     format &= SF_FORMAT_SUBMASK;
 
-    if ((cptr = strrchr(str, '.')) == NULL)
+    if ((cptr = strrchr((char *)str, '.')) == NULL)
         return 0;
 
     strncpy(buffer, cptr + 1, 15);
