@@ -339,8 +339,8 @@ static void wav_subchunk_test(size_t chunk_size)
 
     file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
-    exit_if_true(sfinfo.frames != ARRAY_LEN(audio), "\n\nLine %d : Incorrect sample count (%d should be %d)\n", __LINE__,
-                 (int)sfinfo.frames, (int)ARRAY_LEN(audio));
+    exit_if_true(sfinfo.frames != ARRAY_LEN(audio), "\n\nLine %d : Incorrect sample count (%d should be %zu)\n", __LINE__,
+                 (int)sfinfo.frames, ARRAY_LEN(audio));
 
     if (chunk_size < 512)
         check_log_buffer_or_die(file, __LINE__);
@@ -395,7 +395,7 @@ static void large_free_test(const char *filename, int format, size_t chunk_size)
 
     file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
 
-    exit_if_true(sfinfo.frames != ARRAY_LEN(audio), "\n\nLine %d : Incorrect sample count (%d should be %d)\n", __LINE__,
+    exit_if_true(sfinfo.frames != ARRAY_LEN(audio), "\n\nLine %d : Incorrect sample count (%d should be %zu)\n", __LINE__,
                  (int)sfinfo.frames, (int)ARRAY_LEN(audio));
 
     if (chunk_size < 512)
