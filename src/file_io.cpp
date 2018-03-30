@@ -182,10 +182,16 @@ sf_count_t psf_get_filelen(SF_PRIVATE *psf)
 	sf_count_t filelen;
 
 	if (psf->file.virtual_io)
+	{
 		if (psf->file.use_new_vio)
+		{
 			filelen = psf->file.vio.get_filelen(psf->file.vio_user_data);
+		}
 		else
+		{
 			return psf->file.vio.get_filelen(psf->file.vio_user_data);
+		}
+	}
 
 	if (filelen == -1)
 	{
