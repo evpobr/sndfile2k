@@ -62,7 +62,7 @@ static int mat4_format_to_encoding(int format, int endian);
 static int mat4_write_header(SF_PRIVATE *psf, int calc_length);
 static int mat4_read_header(SF_PRIVATE *psf);
 
-static const char *mat4_marker_to_str(int marker);
+static const char *mat4_marker_to_str(uint32_t marker);
 
 int mat4_open(SF_PRIVATE *psf)
 {
@@ -373,7 +373,7 @@ static int mat4_format_to_encoding(int format, int endian)
     return -1;
 }
 
-static const char *mat4_marker_to_str(int marker)
+static const char *mat4_marker_to_str(uint32_t marker)
 {
     static char str[32];
 
