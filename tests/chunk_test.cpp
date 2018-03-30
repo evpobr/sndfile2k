@@ -130,8 +130,8 @@ static void chunk_test_helper(const char *filename, int format, const char *test
     memset(&chunk_info, 0, sizeof(chunk_info));
     snprintf(chunk_info.id, sizeof(chunk_info.id), "Test");
     chunk_info.id_size = 4;
-    chunk_info.data = strdup(testdata);
-    chunk_info.datalen = strlen(chunk_info.data);
+    chunk_info.data = (void *)strdup(testdata);
+    chunk_info.datalen = strlen((char *)chunk_info.data);
 
     length_before = chunk_info.datalen;
 
@@ -209,8 +209,8 @@ static void multichunk_test_helper(const char *filename, int format, const char 
         snprintf(chunk_info.id, sizeof(chunk_info.id), "Test");
         chunk_info.id_size = 4;
 
-        chunk_info.data = strdup(testdata[i]);
-        chunk_info.datalen = strlen(chunk_info.data);
+        chunk_info.data = (void *)strdup(testdata[i]);
+        chunk_info.datalen = strlen((char *)chunk_info.data);
 
         length_before[i] = chunk_info.datalen;
 

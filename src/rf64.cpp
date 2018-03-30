@@ -37,6 +37,8 @@
 #include "common.h"
 #include "wavlike.h"
 
+#include <algorithm>
+
 /*------------------------------------------------------------------------------
 ** Macros to handle big/little endian issues.
 */
@@ -941,7 +943,7 @@ static int rf64_get_chunk_data(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterato
 
     pos = psf_ftell(psf);
     psf_fseek(psf, psf->rchunks.chunks[indx].offset, SEEK_SET);
-    psf_fread(chunk_info->data, SF_MIN(chunk_info->datalen, psf->rchunks.chunks[indx].len), 1, psf);
+    psf_fread(chunk_info->data, std::min(chunk_info->datalen, psf->rchunks.chunks[indx].len), 1, psf);
     psf_fseek(psf, pos, SEEK_SET);
 
     return SFE_NO_ERROR;

@@ -31,6 +31,8 @@
 #include "common.h"
 #include "wavlike.h"
 
+#include <algorithm>
+
 #define RIFF_MARKER (MAKE_MARKER('R', 'I', 'F', 'F'))
 #define RIFX_MARKER (MAKE_MARKER('R', 'I', 'F', 'X'))
 #define WAVE_MARKER (MAKE_MARKER('W', 'A', 'V', 'E'))
@@ -1601,7 +1603,7 @@ static int wav_get_chunk_data(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator
 
     pos = psf_ftell(psf);
     psf_fseek(psf, psf->rchunks.chunks[indx].offset, SEEK_SET);
-    psf_fread(chunk_info->data, SF_MIN(chunk_info->datalen, psf->rchunks.chunks[indx].len), 1, psf);
+    psf_fread(chunk_info->data, std::min(chunk_info->datalen, psf->rchunks.chunks[indx].len), 1, psf);
     psf_fseek(psf, pos, SEEK_SET);
 
     return SFE_NO_ERROR;

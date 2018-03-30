@@ -32,6 +32,9 @@
 
 #include "config.h"
 
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -239,8 +242,8 @@ static sf_count_t find_data_offset(int fd, int format)
         exit(1);
     };
 
-    cptr = memchr(buffer, target[0], rlen - slen);
-    if (cptr && memcmp(cptr, target, slen) == 0)
+    cptr = (char *)memchr((void *)buffer, target[0], rlen - slen);
+    if (cptr && memcmp((void *)cptr, target, slen) == 0)
         offset = cptr - buffer;
     else
     {
@@ -258,7 +261,7 @@ static void copy_data(int fd, SNDFILE *sndfile, int readsize)
     int bufferlen, done = 0;
 
     bufferlen = readsize * 1024;
-    buffer = malloc(bufferlen);
+    buffer = (char *)malloc(bufferlen);
 
     while (!done && (readlen = read(fd, buffer, bufferlen)) >= 0)
     {

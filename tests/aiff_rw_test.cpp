@@ -18,12 +18,14 @@
 
 #include "config.h"
 
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "sf_unistd.h"
 #include <math.h>
-#include <inttypes.h>
 
 #include "sndfile2k/sndfile2k.h"
 

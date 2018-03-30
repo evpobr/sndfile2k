@@ -25,6 +25,8 @@
 #include "sndfile2k/sndfile2k.h"
 #include "common.h"
 
+#include <algorithm>
+
 static SF_FORMAT_INFO const simple_formats[] = {
     {SF_FORMAT_AIFF | SF_FORMAT_PCM_16, "AIFF (Apple/SGI 16 bit PCM)", "aiff"},
 
@@ -353,7 +355,7 @@ int psf_get_signal_max(SF_PRIVATE *psf, double *peak)
     peak[0] = psf->peak_info->peaks[0].value;
 
     for (k = 1; k < psf->sf.channels; k++)
-        peak[0] = SF_MAX(peak[0], psf->peak_info->peaks[k].value);
+        peak[0] = std::max(peak[0], psf->peak_info->peaks[k].value);
 
     return SF_TRUE;
 }

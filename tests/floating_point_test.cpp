@@ -18,11 +18,13 @@
 
 #include "config.h"
 
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <inttypes.h>
 
 #include "sf_unistd.h"
 
@@ -51,7 +53,6 @@ static double double_test[DFT_DATA_LENGTH];
 static float float_data[DFT_DATA_LENGTH];
 static float float_test[DFT_DATA_LENGTH];
 
-static double double_data[DFT_DATA_LENGTH];
 static short short_data[DFT_DATA_LENGTH];
 static int int_data[DFT_DATA_LENGTH];
 

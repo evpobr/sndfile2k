@@ -35,6 +35,8 @@
 #include <FLAC/stream_encoder.h>
 #include <FLAC/metadata.h>
 
+#include <algorithm>
+
 #define FLAC_DEFAULT_COMPRESSION_LEVEL (5)
 
 #define ENC_BUFFER_SIZE (8192)
@@ -234,7 +236,7 @@ static sf_count_t flac_buffer_copy(SF_PRIVATE *psf)
         psf_log_printf(psf, "Ooops : frame->header.channels (%d) > FLAC__MAX_BLOCK_SIZE (%d)\n",
                        __func__, __LINE__, frame->header.channels, FLAC__MAX_CHANNELS);
 
-    channels = SF_MIN(frame->header.channels, FLAC__MAX_CHANNELS);
+    channels = std::min(frame->header.channels, FLAC__MAX_CHANNELS);
 
     if (pflac->ptr == NULL)
     {
@@ -254,7 +256,7 @@ static sf_count_t flac_buffer_copy(SF_PRIVATE *psf)
         return 0;
     };
 
-    len = SF_MIN(pflac->len, frame->header.blocksize);
+    len = std::min(pflac->len, (size_t)frame->header.blocksize);
 
     if (pflac->remain % channels != 0)
     {
@@ -1003,7 +1005,7 @@ static size_t flac_command(SF_PRIVATE *psf, int command, void *data, size_t data
 		 */
         quality = (*((double *)data)) * 8.0;
         /* Clip range. */
-        pflac->compression = lrint(SF_MAX(0.0, SF_MIN(8.0, quality)));
+        pflac->compression = lrint(std::max(0.0, std::min(8.0, quality)));
 
         psf_log_printf(psf, "%s : Setting SFC_SET_COMPRESSION_LEVEL to %u.\n", __func__,
                        pflac->compression);

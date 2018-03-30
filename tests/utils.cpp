@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 
 #include <sf_unistd.h>
@@ -466,7 +467,7 @@ void test_sf_format_or_die(const SF_INFO *info, int line_num)
     return;
 }
 
-SNDFILE *test_open_file_or_die(const char *filename, int mode, SF_INFO *sfinfo, int allow_fd, int line_num)
+SNDFILE *test_open_file_or_die(const char *filename, SF_FILEMODE mode, SF_INFO *sfinfo, int allow_fd, int line_num)
 {
     static int count = 0;
 

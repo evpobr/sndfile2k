@@ -35,7 +35,7 @@ void test_psf_strlcpy_crlf(void)
 
     for (dest_len = 3; dest_len < 30; dest_len++)
     {
-        dest = calloc(1, dest_len + 1);
+        dest = (char *)calloc(1, dest_len + 1);
         if (dest == NULL)
         {
             printf("\n\nLine %d: calloc failed!\n\n", __LINE__);

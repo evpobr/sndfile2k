@@ -38,6 +38,8 @@
 #include "sfendian.h"
 #include "common.h"
 
+#include <algorithm>
+
 /*
  * Markers.
  */
@@ -544,7 +546,7 @@ static int parse_str_rsrc(SF_PRIVATE *psf, SD2_RSRC *rsrc)
         int slen;
 
         slen = read_rsrc_char(rsrc, str_offset);
-        read_rsrc_str(rsrc, str_offset + 1, name, SF_MIN(SIGNED_SIZEOF(name), slen + 1));
+        read_rsrc_str(rsrc, str_offset + 1, name, std::min(SIGNED_SIZEOF(name), slen + 1));
         str_offset += slen + 1;
 
         rsrc_id = read_rsrc_short(rsrc, rsrc->item_offset + k * 12);
@@ -564,7 +566,7 @@ static int parse_str_rsrc(SF_PRIVATE *psf, SD2_RSRC *rsrc)
         };
 
         slen = read_rsrc_char(rsrc, data_offset + 4);
-        read_rsrc_str(rsrc, data_offset + 5, value, SF_MIN(SIGNED_SIZEOF(value), slen + 1));
+        read_rsrc_str(rsrc, data_offset + 5, value, std::min(SIGNED_SIZEOF(value), slen + 1));
 
         psf_log_printf(psf, "  0x%04x     %4d     %4d     %3d    '%s'\n", data_offset, rsrc_id,
                        data_len, slen, value);

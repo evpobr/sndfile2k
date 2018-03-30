@@ -420,7 +420,7 @@ static void copy_metadata(SNDFILE *outfile, SNDFILE *infile, int channels)
 
 	uint32_t in_cue_count = 0;
 	sf_command(infile, SFC_GET_CUE_COUNT, &in_cue_count, sizeof(in_cue_count));
-	SF_CUE_POINT *cues = calloc(in_cue_count, sizeof(SF_CUE_POINT));
+	SF_CUE_POINT *cues = (SF_CUE_POINT *)calloc(in_cue_count, sizeof(SF_CUE_POINT));
     if (sf_command(infile, SFC_GET_CUE_POINTS, cues, in_cue_count) == SF_TRUE)
         sf_command(outfile, SFC_SET_CUE_POINTS, cues, in_cue_count);
 	free(cues);

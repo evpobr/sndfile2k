@@ -389,7 +389,7 @@ typedef struct
     unsigned int esf_field1;
     unsigned short esf_field2;
     unsigned short esf_field3;
-    char esf_field4[8];
+    unsigned char esf_field4[8];
 } EXT_SUBFORMAT;
 
 typedef struct

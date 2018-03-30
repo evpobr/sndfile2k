@@ -74,6 +74,8 @@
 
 #include "ogg.h"
 
+#include <algorithm>
+
 typedef int convert_func(SF_PRIVATE *psf, int, void *, int, int, float **);
 
 static int vorbis_read_header(SF_PRIVATE *psf, int log_data);
@@ -569,7 +571,7 @@ static size_t vorbis_command(SF_PRIVATE *psf, int command, void *data, size_t da
         vdata->quality = 1.0 - *((double *)data);
 
         /* Clip range. */
-        vdata->quality = SF_MAX(0.0, SF_MIN(1.0, vdata->quality));
+        vdata->quality = std::max(0.0, std::min(1.0, vdata->quality));
 
         psf_log_printf(psf, "%s : Setting SFC_SET_VBR_ENCODING_QUALITY to %f.\n", __func__,
                        vdata->quality);
@@ -658,6 +660,7 @@ static size_t vorbis_read_sample(SF_PRIVATE *psf, void *ptr, size_t lens, conver
     OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
     size_t len, samples, i = 0;
     float **pcm;
+    int result = 0;
 
     len = lens / psf->sf.channels;
 
@@ -678,7 +681,7 @@ static size_t vorbis_read_sample(SF_PRIVATE *psf, void *ptr, size_t lens, conver
     {
         while (len > 0 && !odata->eos)
         {
-            int result = ogg_sync_pageout(&odata->osync, &odata->opage);
+            result = ogg_sync_pageout(&odata->osync, &odata->opage);
             if (result == 0)
                 break; /* need more data */
             if (result < 0)

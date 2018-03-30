@@ -23,12 +23,16 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
+
+#define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 
 #include "sndfile2k/sndfile2k.h"
 #include "sfendian.h"
 #include "common.h"
 #include "chanmap.h"
+
+#include <algorithm>
 
 /*
  * Macros to handle big/little endian issues.
@@ -858,7 +862,7 @@ static int caf_read_chanmap(SF_PRIVATE *psf, sf_count_t chunk_size)
     if (map_info && map_info->channel_map != NULL)
     {
         size_t chanmap_size =
-            SF_MIN(psf->sf.channels, layout_tag & 0xff) * sizeof(psf->channel_map[0]);
+            std::min(psf->sf.channels, layout_tag & 0xff) * sizeof(psf->channel_map[0]);
 
         free(psf->channel_map);
 
@@ -1081,7 +1085,7 @@ static int caf_get_chunk_data(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator
 
     pos = psf_ftell(psf);
     psf_fseek(psf, psf->rchunks.chunks[indx].offset, SEEK_SET);
-    psf_fread(chunk_info->data, SF_MIN(chunk_info->datalen, psf->rchunks.chunks[indx].len), 1, psf);
+    psf_fread(chunk_info->data, std::min(chunk_info->datalen, psf->rchunks.chunks[indx].len), 1, psf);
     psf_fseek(psf, pos, SEEK_SET);
 
     return SFE_NO_ERROR;

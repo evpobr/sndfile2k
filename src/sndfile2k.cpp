@@ -29,6 +29,8 @@
 #include "sfendian.h"
 #include "common.h"
 
+#include <algorithm>
+
 #define SNDFILE_MAGICK (0x1234C0DE)
 
 #ifdef __APPLE__
@@ -1350,7 +1352,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
 				sndfile->error = SFE_BAD_COMMAND_PARAM;
 				return SF_FALSE;
 			}
-			uint32_t in_cue_count = SF_MIN(sndfile->cues.cue_count, datasize);
+			uint32_t in_cue_count = std::min(sndfile->cues.cue_count, static_cast<uint32_t>(datasize));
 
 			memcpy(data, sndfile->cues.cue_points, in_cue_count * sizeof(SF_CUE_POINT));
 			if (!data)
@@ -1488,7 +1490,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
             return SF_FALSE;
 
         quality = *((double *)data);
-        quality = 1.0 - SF_MAX(0.0, SF_MIN(1.0, quality));
+        quality = 1.0 - std::max(0.0, std::min(1.0, quality));
         return sf_command(sndfile, SFC_SET_COMPRESSION_LEVEL, &quality, sizeof(quality));
 
     default:

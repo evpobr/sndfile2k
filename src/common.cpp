@@ -18,18 +18,24 @@
 
 #include <config.h>
 
+#include <stddef.h>
 #include <stdarg.h>
 #include <string.h>
 #include "sf_unistd.h"
 #include <ctype.h>
 #include <math.h>
 #include <time.h>
+#include <memory.h>
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
 #include "sndfile2k/sndfile2k.h"
 #include "sfendian.h"
 #include "common.h"
+
+#include <stdlib.h>
+
+#include <algorithm>
 
 #define INITIAL_HEADER_SIZE (256)
 
@@ -56,7 +62,7 @@ static int psf_bump_header_allocation(SF_PRIVATE *psf, sf_count_t needed)
     size_t newlen, smallest = INITIAL_HEADER_SIZE;
     void *ptr;
 
-    newlen = (needed > psf->header.len) ? 2 * SF_MAX(needed, smallest) : 2 * psf->header.len;
+    newlen = (needed > psf->header.len) ? 2 * std::max(needed, static_cast<sf_count_t>(smallest)) : 2 * psf->header.len;
 
     if (newlen > 100 * 1024)
     {
@@ -1301,7 +1307,7 @@ void psf_get_cues(SF_PRIVATE *psf, void *data, size_t datasize)
     {
         uint32_t cue_count = (datasize - sizeof(uint32_t)) / sizeof(SF_CUE_POINT);
 
-        cue_count = SF_MIN(cue_count, psf->cues.cue_count);
+        cue_count = std::min(cue_count, psf->cues.cue_count);
         size_t cues_offset = sizeof(uint32_t);
         memcpy(data, &psf->cues, sizeof(SF_CUE_POINTS) - cues_offset);
         memcpy((char *)data + cues_offset, psf->cues.cue_points, sizeof(SF_CUE_POINT) *cue_count);

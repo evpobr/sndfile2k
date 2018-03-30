@@ -18,12 +18,14 @@
 
 #include "config.h"
 
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 #include <errno.h>
-#include <inttypes.h>
 
 #include "common.h"
 #include "test_main.h"

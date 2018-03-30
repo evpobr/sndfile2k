@@ -28,6 +28,8 @@
 
 #include "ima_oki_adpcm.h"
 
+#include <algorithm>
+
 #define MIN_SAMPLE (-0x8000)
 #define MAX_SAMPLE (0x7fff)
 
@@ -90,7 +92,7 @@ int adpcm_decode(IMA_OKI_ADPCM *state, int code)
     };
 
     state->step_index += step_changes[code & 7];
-    state->step_index = SF_MIN(SF_MAX(state->step_index, 0), state->max_step_index);
+    state->step_index = std::min(std::max(state->step_index, 0), state->max_step_index);
     state->last_output = s;
 
     return s;
@@ -109,7 +111,7 @@ int adpcm_encode(IMA_OKI_ADPCM *state, int sample)
     };
 
     code = 4 * delta / state->steps[state->step_index];
-    code = sign | SF_MIN(code, 7);
+    code = sign | std::min(code, 7);
     adpcm_decode(state, code); /* Update encoder state */
 
     return code;

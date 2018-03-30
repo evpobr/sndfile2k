@@ -30,6 +30,9 @@
 ** ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -122,8 +125,6 @@ static void usage_exit(const char *progname)
 /*
  * Dumping of sndfile info.
  */
-
-static double data[BUFFER_LEN];
 
 static double calc_decibels(SF_INFO *sfinfo, double max)
 {
@@ -330,7 +331,7 @@ static int chanmap_dump(const char *filename)
         return 1;
     };
 
-    if ((channel_map = calloc(sfinfo.channels, sizeof(int))) == NULL)
+    if ((channel_map = (int *)calloc(sfinfo.channels, sizeof(int))) == NULL)
     {
         printf("Error : malloc failed.\n\n");
         return 1;

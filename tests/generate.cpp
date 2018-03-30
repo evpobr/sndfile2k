@@ -38,7 +38,7 @@ void generate_file(const char *filename, int format, int len)
     float *output;
     float maxabs = 0.0;
 
-    output = calloc(len, sizeof(float));
+    output = (float *)calloc(len, sizeof(float));
 
     maxabs = crappy_snare(output, len, 0, 0.95, maxabs);
     maxabs = crappy_snare(output, len, len / 4, 0.85, maxabs);

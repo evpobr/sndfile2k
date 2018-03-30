@@ -28,6 +28,8 @@
 #include "common.h"
 #include "wavlike.h"
 
+#include <algorithm>
+
 /*
  * W64 files use 16 byte markers as opposed to the four byte marker of
  * WAV files.
@@ -312,7 +314,7 @@ static int w64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
                 return SFE_W64_NO_DATA;
 
             psf->dataoffset = psf_ftell(psf);
-            psf->datalength = SF_MIN(chunk_size - 24, psf->filelength - psf->dataoffset);
+            psf->datalength = std::min(chunk_size - 24, psf->filelength - psf->dataoffset);
 
             if (chunk_size % 8)
                 chunk_size += 8 - (chunk_size % 8);

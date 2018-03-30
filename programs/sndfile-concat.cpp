@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     argc--;
     outfilename = argv[argc];
 
-    if ((infiles = calloc(argc, sizeof(SNDFILE *))) == NULL)
+    if ((infiles = (SNDFILE **)calloc(argc, sizeof(SNDFILE *))) == NULL)
     {
         printf("\nError : Malloc failed.\n\n");
         exit(1);

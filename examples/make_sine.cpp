@@ -54,7 +54,7 @@ int main(void)
     int k;
     int *buffer;
 
-    if (!(buffer = malloc(2 * SAMPLE_COUNT * sizeof(int))))
+    if (!(buffer = (int *)malloc(2 * SAMPLE_COUNT * sizeof(int))))
     {
         printf("Error : Malloc failed.\n");
         return 1;

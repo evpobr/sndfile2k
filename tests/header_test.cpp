@@ -18,10 +18,13 @@
 
 #include "config.h"
 
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <inttypes.h>
+#include <stdint.h>
 #include <math.h>
 
 #include <sys/stat.h>
@@ -260,7 +263,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-static void update_header_sub(const char *filename, int typemajor, int write_mode)
+static void update_header_sub(const char *filename, int typemajor, SF_FILEMODE write_mode)
 {
     SNDFILE *outfile, *infile;
     SF_INFO sfinfo;
