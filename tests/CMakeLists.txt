@@ -1,18 +1,19 @@
 ### test_main
 
 add_executable(test_main
-  ../src/test_main.c
+  ../src/test_main.cpp
   ../src/test_main.h
-  ../src/test_conversions.c
-  ../src/test_float.c
-  ../src/test_endswap.c
-  ../src/test_audio_detect.c
-  ../src/test_log_printf.c
-  ../src/test_file_io.c
-  ../src/test_ima_oki_adpcm.c
-  ../src/test_strncpy_crlf.c
-  ../src/test_binheader_writef.c
-  ../src/test_nms_adpcm.c)
+  ../src/test_conversions.cpp
+  ../src/test_float.cpp
+  ../src/test_endswap.cpp
+  ../src/test_audio_detect.cpp
+  ../src/test_log_printf.cpp
+  ../src/test_file_io.cpp
+  ../src/test_ima_oki_adpcm.cpp
+  ../src/test_strncpy_crlf.cpp
+  ../src/test_binheader_writef.cpp
+  ../src/test_nms_adpcm.cpp
+)
 target_link_libraries(test_main PUBLIC sndfile2k)
 if(MSVC)
   target_compile_definitions(test_main PRIVATE _USE_MATH_DEFINES)
@@ -36,7 +37,7 @@ add_test(NAME test_main COMMAND $<TARGET_FILE:test_main>)
 
 ### sfversion_test
 
-add_executable(sfversion sfversion.c)
+add_executable(sfversion sfversion.cpp)
 target_link_libraries(sfversion sndfile2k)
 add_test(NAME sfversion COMMAND $<TARGET_FILE:sfversion>)
 set_tests_properties(sfversion PROPERTIES
@@ -44,7 +45,7 @@ set_tests_properties(sfversion PROPERTIES
 
 ### error_test
 
-add_executable(error_test error_test.c utils.c utils.h)
+add_executable(error_test error_test.cpp utils.cpp utils.h)
 target_include_directories(error_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -57,7 +58,7 @@ add_test(NAME error_test COMMAND $<TARGET_FILE:error_test>)
 
 ### ulaw_test
 
-add_executable(ulaw_test ulaw_test.c utils.c utils.h)
+add_executable(ulaw_test ulaw_test.cpp utils.cpp utils.h)
 target_include_directories(ulaw_test
   PRIVATE
   ${PROJECT_SOURCE_DIR}/src
@@ -70,7 +71,7 @@ add_test(NAME ulaw_test COMMAND $<TARGET_FILE:ulaw_test>)
 
 ### alaw_test
 
-add_executable(alaw_test alaw_test.c utils.c utils.h)
+add_executable(alaw_test alaw_test.cpp utils.cpp utils.h)
 target_include_directories(alaw_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -83,7 +84,7 @@ add_test(NAME alaw_test COMMAND $<TARGET_FILE:alaw_test>)
 
 ### dwvw_test
 
-add_executable(dwvw_test dwvw_test.c utils.c utils.h)
+add_executable(dwvw_test dwvw_test.cpp utils.cpp utils.h)
 target_include_directories(dwvw_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -96,7 +97,7 @@ add_test(NAME dwvw_test COMMAND $<TARGET_FILE:dwvw_test>)
 
 ### command_test
 
-add_executable(command_test command_test.c utils.c utils.h)
+add_executable(command_test command_test.cpp utils.cpp utils.h)
 target_include_directories(command_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -108,8 +109,8 @@ add_test(NAME command_test COMMAND $<TARGET_FILE:command_test> all)
 
 ### floating_point_test
 
-add_executable(floating_point_test dft_cmp.c floating_point_test.c
-  utils.c utils.h)
+add_executable(floating_point_test dft_cmp.cpp floating_point_test.cpp
+  utils.cpp utils.h)
 target_include_directories(floating_point_test
 PRIVATE
   ${PROJECT_SOURCE_DIR}/src
@@ -121,7 +122,7 @@ add_test(NAME floating_point_test COMMAND $<TARGET_FILE:floating_point_test>)
 
 ### checksum_test
 
-add_executable(checksum_test checksum_test.c utils.c utils.h)
+add_executable(checksum_test checksum_test.cpp utils.cpp utils.h)
 target_include_directories(checksum_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -133,7 +134,7 @@ add_test(NAME checksum_test COMMAND $<TARGET_FILE:checksum_test>)
 
 ### scale_clip_test
 
-add_executable(scale_clip_test scale_clip_test.c utils.c utils.h)
+add_executable(scale_clip_test scale_clip_test.cpp utils.cpp utils.h)
 target_include_directories(scale_clip_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -145,7 +146,7 @@ add_test(NAME scale_clip_test COMMAND $<TARGET_FILE:scale_clip_test>)
 
 ### headerless_test
 
-add_executable(headerless_test headerless_test.c utils.c utils.h)
+add_executable(headerless_test headerless_test.cpp utils.cpp utils.h)
 target_include_directories(headerless_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -157,7 +158,7 @@ add_test(NAME headerless_test COMMAND $<TARGET_FILE:headerless_test>)
 
 ### rdwr_test
 
-add_executable(rdwr_test rdwr_test.c utils.c utils.h)
+add_executable(rdwr_test rdwr_test.cpp utils.cpp utils.h)
 target_include_directories(rdwr_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -169,7 +170,7 @@ add_test(NAME rdwr_test COMMAND $<TARGET_FILE:rdwr_test>)
 
 ### locale_test
 
-add_executable(locale_test locale_test.c utils.c utils.h)
+add_executable(locale_test locale_test.cpp utils.cpp utils.h)
 target_include_directories(locale_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -181,7 +182,7 @@ add_test(NAME locale_test COMMAND $<TARGET_FILE:locale_test>)
 
 ### cpp_test
 
-add_executable(cpp_test cpp_test.cc utils.c utils.h)
+add_executable(cpp_test cpp_test.cpp utils.cpp utils.h)
 target_include_directories(cpp_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -193,7 +194,7 @@ add_test(NAME cpp_test COMMAND $<TARGET_FILE:cpp_test>)
 
 ### external_libs_test
 
-add_executable(external_libs_test external_libs_test.c utils.c utils.h)
+add_executable(external_libs_test external_libs_test.cpp utils.cpp utils.h)
 target_include_directories(external_libs_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -205,7 +206,7 @@ add_test(NAME external_libs_test COMMAND $<TARGET_FILE:external_libs_test>)
 
 ### format_check_test
 
-add_executable(format_check_test format_check_test.c utils.c utils.h)
+add_executable(format_check_test format_check_test.cpp utils.cpp utils.h)
 target_include_directories(format_check_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -217,7 +218,7 @@ add_test(NAME format_check_test COMMAND $<TARGET_FILE:format_check_test>)
 
 ### channel_test
 
-add_executable(channel_test channel_test.c utils.c utils.h)
+add_executable(channel_test channel_test.cpp utils.cpp utils.h)
 target_link_libraries(channel_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
@@ -229,7 +230,7 @@ add_test(NAME channel_test COMMAND $<TARGET_FILE:channel_test>)
 
 ### pcm_test
 
-add_executable(pcm_test pcm_test.c utils.c utils.h)
+add_executable(pcm_test pcm_test.cpp utils.cpp utils.h)
 target_include_directories(pcm_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -241,7 +242,7 @@ add_test(NAME pcm_test COMMAND $<TARGET_FILE:pcm_test>)
 
 ### common test executables
 
-add_executable(write_read_test generate.c write_read_test.c utils.c utils.h)
+add_executable(write_read_test generate.cpp write_read_test.cpp utils.cpp utils.h)
 target_include_directories(write_read_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -251,7 +252,7 @@ target_link_libraries(write_read_test PRIVATE
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 target_include_directories(write_read_test PRIVATE tests)
 
-add_executable(lossy_comp_test lossy_comp_test.c utils.c utils.h)
+add_executable(lossy_comp_test lossy_comp_test.cpp utils.cpp utils.h)
 target_include_directories(lossy_comp_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -260,7 +261,7 @@ target_link_libraries(lossy_comp_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 
-add_executable(peak_chunk_test peak_chunk_test.c utils.c utils.h)
+add_executable(peak_chunk_test peak_chunk_test.cpp utils.cpp utils.h)
 target_include_directories(peak_chunk_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -269,7 +270,7 @@ target_link_libraries(peak_chunk_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 
-add_executable(header_test header_test.c utils.c utils.h)
+add_executable(header_test header_test.cpp utils.cpp utils.h)
 target_include_directories(header_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -278,7 +279,7 @@ target_link_libraries(header_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 
-add_executable(misc_test misc_test.c utils.c utils.h)
+add_executable(misc_test misc_test.cpp utils.cpp utils.h)
 target_include_directories(misc_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -287,7 +288,7 @@ target_link_libraries(misc_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 
-add_executable(string_test string_test.c utils.c utils.h)
+add_executable(string_test string_test.cpp utils.cpp utils.h)
 target_include_directories(string_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -296,7 +297,7 @@ target_link_libraries(string_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 
-add_executable(multi_file_test multi_file_test.c utils.c utils.h)
+add_executable(multi_file_test multi_file_test.cpp utils.cpp utils.h)
 target_include_directories(multi_file_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -305,7 +306,7 @@ target_link_libraries(multi_file_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 
-add_executable(aiff_rw_test aiff_rw_test.c utils.c utils.h)
+add_executable(aiff_rw_test aiff_rw_test.cpp utils.cpp utils.h)
 target_include_directories(aiff_rw_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -314,7 +315,7 @@ target_link_libraries(aiff_rw_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 
-add_executable(chunk_test chunk_test.c utils.c utils.h)
+add_executable(chunk_test chunk_test.cpp utils.cpp utils.h)
 target_include_directories(chunk_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -323,7 +324,7 @@ target_link_libraries(chunk_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 
-add_executable(long_read_write_test long_read_write_test.c utils.c utils.h)
+add_executable(long_read_write_test long_read_write_test.cpp utils.cpp utils.h)
 target_include_directories(long_read_write_test
   PRIVATE
   ${PROJECT_SOURCE_DIR}/src
@@ -332,7 +333,7 @@ target_link_libraries(long_read_write_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 
-add_executable(raw_test raw_test.c utils.c utils.h)
+add_executable(raw_test raw_test.cpp utils.cpp utils.h)
 target_include_directories(raw_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -341,7 +342,7 @@ target_link_libraries(raw_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 
-add_executable(compression_size_test compression_size_test.c utils.c utils.h)
+add_executable(compression_size_test compression_size_test.cpp utils.cpp utils.h)
 target_include_directories(compression_size_test
   PRIVATE
   ${PROJECT_SOURCE_DIR}/src
@@ -350,7 +351,7 @@ target_link_libraries(compression_size_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 
-add_executable(ogg_test ogg_test.c utils.c utils.h)
+add_executable(ogg_test ogg_test.cpp utils.cpp utils.h)
 target_include_directories(ogg_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -359,7 +360,7 @@ target_link_libraries(ogg_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 
-add_executable(stdin_test stdin_test.c utils.c utils.h)
+add_executable(stdin_test stdin_test.cpp utils.cpp utils.h)
 target_include_directories(stdin_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -371,7 +372,7 @@ set_target_properties(stdin_test
   PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "tests")
 
-add_executable(stdout_test stdout_test.c utils.c utils.h)
+add_executable(stdout_test stdout_test.cpp utils.cpp utils.h)
 target_include_directories(stdout_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -383,7 +384,7 @@ set_target_properties(stdout_test
 PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "tests")
 
-add_executable(stdio_test stdio_test.c utils.c utils.h)
+add_executable(stdio_test stdio_test.cpp utils.cpp utils.h)
 target_include_directories(stdio_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -392,7 +393,7 @@ target_link_libraries(stdio_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 
-add_executable(pipe_test pipe_test.c utils.c utils.h)
+add_executable(pipe_test pipe_test.cpp utils.cpp utils.h)
 target_include_directories(pipe_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
@@ -401,7 +402,7 @@ target_link_libraries(pipe_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 
-add_executable(virtual_io_test virtual_io_test.c utils.c utils.h)
+add_executable(virtual_io_test virtual_io_test.cpp utils.cpp utils.h)
 target_include_directories(virtual_io_test
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src

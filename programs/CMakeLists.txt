@@ -1,8 +1,8 @@
 # sndfile-info
 
 add_executable(sndfile2k-info
-  sndfile-info.c
-  common.c
+  sndfile-info.cpp
+  common.cpp
   common.h)
 target_link_libraries(sndfile2k-info PRIVATE
   sndfile2k
@@ -11,8 +11,8 @@ target_link_libraries(sndfile2k-info PRIVATE
 # sndfile-play
 
 add_executable(sndfile2k-play
-  sndfile-play.c
-  common.c
+  sndfile-play.cpp
+  common.cpp
   common.h)
 target_include_directories(sndfile2k-play
   PRIVATE
@@ -32,64 +32,64 @@ target_link_libraries(sndfile2k-play
 # sndfile-convert
 
 add_executable(sndfile2k-convert
-  sndfile-convert.c
-  common.c
+  sndfile-convert.cpp
+  common.cpp
   common.h)
 target_link_libraries(sndfile2k-convert PUBLIC sndfile2k)
 
 # sndfile-cmp
 
 add_executable(sndfile2k-cmp
-  sndfile-cmp.c
-  common.c
+  sndfile-cmp.cpp
+  common.cpp
   common.h)
 target_link_libraries(sndfile2k-cmp PUBLIC sndfile2k)
 
 # sndfile-metadata-set
 
 add_executable(sndfile2k-metadata-set
-  sndfile-metadata-set.c
-  common.c
+  sndfile-metadata-set.cpp
+  common.cpp
   common.h)
 target_link_libraries(sndfile2k-metadata-set PUBLIC sndfile2k)
 
 # sndfile-metadata-get
 
 add_executable(sndfile2k-metadata-get
-  sndfile-metadata-get.c
-  common.c
+  sndfile-metadata-get.cpp
+  common.cpp
   common.h)
 target_link_libraries(sndfile2k-metadata-get PUBLIC sndfile2k)
 
 # sndfile-interleave
 
 add_executable(sndfile2k-interleave
-  sndfile-interleave.c
-  common.c
+  sndfile-interleave.cpp
+  common.cpp
   common.h)
 target_link_libraries(sndfile2k-interleave PUBLIC sndfile2k)
 
 # sndfile-deinterleave
 
 add_executable(sndfile2k-deinterleave
-  sndfile-deinterleave.c
-  common.c
+  sndfile-deinterleave.cpp
+  common.cpp
   common.h)
 target_link_libraries(sndfile2k-deinterleave PUBLIC sndfile2k)
 
 # sndfile-concat
 
 add_executable(sndfile2k-concat
-  sndfile-concat.c
-  common.c
+  sndfile-concat.cpp
+  common.cpp
   common.h)
 target_link_libraries(sndfile2k-concat PUBLIC sndfile2k)
 
 # sndfile-salvage
 
 add_executable(sndfile2k-salvage
-  sndfile-salvage.c
-  common.c
+  sndfile-salvage.cpp
+  common.cpp
   common.h)
 target_include_directories(sndfile2k-salvage
   PRIVATE
