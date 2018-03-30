@@ -28,8 +28,6 @@
 
 #include <string.h>
 
-#include "common.h"
-
 #include "dplib.h"
 #include "shift.h"
 

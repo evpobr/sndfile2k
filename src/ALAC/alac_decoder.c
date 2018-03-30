@@ -28,8 +28,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "common.h"
-
 #include "alac_codec.h"
 
 #include "dplib.h"
