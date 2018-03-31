@@ -3,7 +3,7 @@ root = true
 [*]
 insert_final_newline = true
 
-[*.{h,hpp,cc,c}]
+[*.{h,hpp,cpp,c}]
 indent_style = space
 indent_size = 4
 
