@@ -32,6 +32,8 @@
 #include "sndfile2k/sndfile2k.h"
 #endif
 
+#include <vector>
+
 /*
 ** Inspiration : http://sourcefrog.net/weblog/software/languages/C/unused.html
 */
@@ -257,14 +259,6 @@ struct SF_CHUNK_ITERATOR
     SNDFILE *sndfile;
 };
 
-/** Defines struct containing of CUE markers
- */
-typedef struct SF_CUE_POINTS
-{
-	uint32_t cue_count;
-	SF_CUE_POINT *cue_points;
-}  SF_CUE_POINTS;
-
 static inline size_t make_size_t(int x)
 {
     return (size_t)x;
@@ -361,7 +355,7 @@ typedef union
     unsigned char ucbuf[SF_BUFFER_LEN / sizeof(signed char)];
 } BUF_UNION;
 
-typedef struct SF_PRIVATE
+struct SF_PRIVATE
 {
     /* Canary in a coal mine. */
     union canary
@@ -432,7 +426,7 @@ typedef struct SF_PRIVATE
     struct PEAK_INFO *peak_info;
 
     /* Cue Marker Info */
-    SF_CUE_POINTS cues;
+    std::vector<SF_CUE_POINT> cues;
 
     /* Loop Info */
     SF_LOOP_INFO *loop_info;
@@ -517,7 +511,7 @@ typedef struct SF_PRIVATE
                           SF_CHUNK_INFO *chunk_info);
     int (*get_chunk_data)(struct SF_PRIVATE *, const SF_CHUNK_ITERATOR *iterator,
                           SF_CHUNK_INFO *chunk_info);
-} SF_PRIVATE;
+};
 
 enum
 {

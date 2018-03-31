@@ -42,14 +42,11 @@
 /* Allocate and initialize the SF_PRIVATE struct. */
 SF_PRIVATE *psf_allocate(void)
 {
-    SF_PRIVATE *psf;
-
-    if ((psf = (SF_PRIVATE *)calloc(1, sizeof(SF_PRIVATE))) == NULL)
-        return NULL;
+	SF_PRIVATE *psf = new SF_PRIVATE();
 
     if ((psf->header.ptr = (unsigned char *)calloc(1, INITIAL_HEADER_SIZE)) == NULL)
     {
-        free(psf);
+        delete psf;
         return NULL;
     };
     psf->header.len = INITIAL_HEADER_SIZE;
@@ -1299,22 +1296,6 @@ SF_CUE_POINT *psf_cues_dup(const SF_CUE_POINT *cues, uint32_t cue_count)
     SF_CUE_POINT *pnew = psf_cues_alloc(cue_count);
     memcpy(pnew, cues, sizeof(SF_CUE_POINT) * cue_count);
     return pnew;
-}
-
-void psf_get_cues(SF_PRIVATE *psf, void *data, size_t datasize)
-{
-    if (psf->cues.cue_points)
-    {
-        uint32_t cue_count = (datasize - sizeof(uint32_t)) / sizeof(SF_CUE_POINT);
-
-        cue_count = std::min(cue_count, psf->cues.cue_count);
-        size_t cues_offset = sizeof(uint32_t);
-        memcpy(data, &psf->cues, sizeof(SF_CUE_POINTS) - cues_offset);
-        memcpy((char *)data + cues_offset, psf->cues.cue_points, sizeof(SF_CUE_POINT) *cue_count);
-        ((SF_CUE_POINTS*)data)->cue_count = cue_count;
-    };
-
-    return;
 }
 
 SF_INSTRUMENT *psf_instrument_alloc(void)

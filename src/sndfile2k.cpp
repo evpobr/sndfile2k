@@ -1337,9 +1337,9 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
             sndfile->error = SFE_BAD_COMMAND_PARAM;
             return SF_FALSE;
         };
-        if (sndfile->cues.cue_points != NULL)
+        if (!sndfile->cues.empty())
         {
-            *((uint32_t *)data) = sndfile->cues.cue_count;
+            *((uint32_t *)data) = sndfile->cues.size();
             return SF_TRUE;
         };
         return SF_FALSE;
@@ -1352,11 +1352,12 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
 				sndfile->error = SFE_BAD_COMMAND_PARAM;
 				return SF_FALSE;
 			}
-			uint32_t in_cue_count = std::min(sndfile->cues.cue_count, static_cast<uint32_t>(datasize));
+			SF_CUE_POINT *in_cue = reinterpret_cast<SF_CUE_POINT *>(data);
+			size_t in_cue_count = std::min(sndfile->cues.size(), static_cast<size_t>(datasize));
 
-			memcpy(data, sndfile->cues.cue_points, in_cue_count * sizeof(SF_CUE_POINT));
-			if (!data)
-			{
+			memcpy(data, sndfile->cues.data(), in_cue_count * sizeof(SF_CUE_POINT));
+
+			if (!data) {
 				sndfile->error = SFE_MALLOC_FAILED;
 				return SF_FALSE;
 			};
@@ -1376,22 +1377,19 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
             sndfile->error = SFE_BAD_COMMAND_PARAM;
             return SF_FALSE;
         };
-        if (sndfile->cues.cue_points)
-        {
-            free(sndfile->cues.cue_points);
-            sndfile->cues.cue_count = 0;
-        };
         if (!data && datasize == 0)
             return SF_TRUE;
         SF_CUE_POINT *in_cues = (SF_CUE_POINT *)data;
-        uint32_t in_cue_count = (uint32_t)datasize;
-        sndfile->cues.cue_points = psf_cues_dup(in_cues, in_cue_count);
-        if (!sndfile->cues.cue_points)
-        {
-            sndfile->error = SFE_MALLOC_FAILED;
-            return SF_FALSE;
-        };
-        sndfile->cues.cue_count = in_cue_count;
+		size_t in_cue_count = (size_t)datasize;
+
+		sndfile->cues.clear();
+		for (size_t i = 0; i <= in_cue_count; i++)
+		{
+			sndfile->cues.push_back(in_cues[i]);
+		}
+
+		//sndfile->cues.resize(in_cue_count);
+		//sndfile->cues.insert(sndfile->cues.begin(), in_cues, in_cues + 1);
         return SF_TRUE;
     }
 
@@ -3091,9 +3089,7 @@ static int psf_close(SF_PRIVATE *psf)
     free(psf->peak_info);
     free(psf->loop_info);
     free(psf->instrument);
-    free(psf->cues.cue_points);
-	psf->cues.cue_points = NULL;
-    psf->cues.cue_count = 0;
+	psf->cues.clear();
     free(psf->channel_map);
     free(psf->format_desc);
     free(psf->strings.storage);
@@ -3105,7 +3101,7 @@ static int psf_close(SF_PRIVATE *psf)
     free(psf->wchunks.chunks);
     free(psf->iterator);
 
-    free(psf);
+    delete psf;
 
     return error;
 }
