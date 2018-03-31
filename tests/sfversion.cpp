@@ -1,5 +1,6 @@
 /*
 ** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2018 evpobr <evpobr@github.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,30 +19,32 @@
 
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdint.h>
-
 #include "sndfile2k/sndfile2k.h"
+
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
 
 #define BUFFER_SIZE (256)
 
 int main(void)
 {
-    static char strbuffer[BUFFER_SIZE];
-    const char *ver;
+    vector<char> strbuffer(BUFFER_SIZE);
+    int ver1_length = sf_command(NULL, SFC_GET_LIB_VERSION, strbuffer.data(), sizeof(strbuffer));
+	string ver1(strbuffer.begin(), strbuffer.end());
+	ver1.resize(ver1_length);
+	string ver2 = sf_version_string();
 
-    sf_command(NULL, SFC_GET_LIB_VERSION, strbuffer, sizeof(strbuffer));
-    ver = sf_version_string();
-
-    if (strcmp(ver, strbuffer) != 0)
+    if (ver1 == ver2)
     {
-        printf("Version mismatch : '%s' != '%s'\n\n", ver, strbuffer);
-        exit(1);
-    };
-
-    printf("%s", strbuffer);
-
-    return 0;
+		cout << "Version: '" << ver1 << "'" << endl;
+		return 0;
+    }
+	else
+	{
+		cerr << "Version mismatch: '" << ver1 << "' != '" << ver2 << "'" << endl;
+		return 1;
+	}
 }
