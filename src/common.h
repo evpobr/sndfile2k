@@ -332,11 +332,6 @@ typedef struct PSF_FILE
 
     SF_BOOL do_not_close_descriptor;
     SF_FILEMODE mode; /* Open mode : SFM_READ, SFM_WRITE or SFM_RDWR. */
-
-    /* Vairables for handling pipes. */
-    SF_BOOL is_pipe; /* True if file is a pipe. */
-    sf_count_t pipeoffset; /* Number of bytes read from a pipe. */
-
 } PSF_FILE;
 
 typedef union
@@ -541,7 +536,6 @@ struct SF_PRIVATE
     void header_put_le_8byte(sf_count_t x);
 
     int fopen();
-    int set_stdio();
     int file_valid();
     void set_file(int fd);
     void init_files();
@@ -558,8 +552,6 @@ struct SF_PRIVATE
     sf_count_t get_filelen();
 
     void fsync();
-
-    SF_BOOL is_pipe();
 
     int ftruncate(sf_count_t len);
     int fclose();
@@ -596,7 +588,6 @@ enum
     SFE_BAD_OFFSET,
     SFE_NO_EMBED_SUPPORT,
     SFE_NO_EMBEDDED_RDWR,
-    SFE_NO_PIPE_WRITE,
 
     SFE_INTERNAL,
     SFE_BAD_COMMAND_PARAM,
@@ -618,7 +609,6 @@ enum
     SFE_SEEK_FAILED,
 
     SFE_BAD_OPEN_MODE,
-    SFE_OPEN_PIPE_RDWR,
     SFE_RDWR_POSITION,
     SFE_RDWR_BAD_HEADER,
     SFE_CMD_HAS_DATA,
@@ -702,7 +692,6 @@ enum
     SFE_VOC_MULTI_SECTION,
     SFE_VOC_MULTI_PARAM,
     SFE_VOC_SECTION_COUNT,
-    SFE_VOC_NO_PIPE,
 
     SFE_IRCAM_NO_MARKER,
     SFE_IRCAM_BAD_CHANNELS,
@@ -733,9 +722,6 @@ enum
 
     SFE_XI_BAD_HEADER,
     SFE_XI_EXCESS_SAMPLES,
-    SFE_XI_NO_PIPE,
-
-    SFE_HTK_NO_PIPE,
 
     SFE_SDS_NOT_SDS,
     SFE_SDS_BAD_BIT_WIDTH,
@@ -749,7 +735,6 @@ enum
     SFE_FLAC_UNKOWN_ERROR,
 
     SFE_WVE_NOT_WVE,
-    SFE_WVE_NO_PIPE,
 
     SFE_VORBIS_ENCODER_BUG,
 

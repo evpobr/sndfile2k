@@ -35,7 +35,6 @@ static sf_count_t vfread(void *ptr, sf_count_t count, void *user_data);
 static sf_count_t vfwrite(const void *ptr, sf_count_t count, void *user_data);
 static sf_count_t vftell(void *user_data);
 static void vfflush(void *user_data);
-static SF_BOOL vfis_pipe(void *user_data);
 static unsigned long vfref(void *user_data);
 static void vfunref(void *user_data);
 
@@ -57,7 +56,6 @@ SF_VIRTUAL_IO *psf_get_vio()
 	vio.flush = vfflush;
 	vio.tell = vftell;
 	vio.flush = vfflush;
-	vio.is_pipe = vfis_pipe;
 
 	return &vio;
 }
@@ -174,33 +172,6 @@ sf_count_t SF_PRIVATE::get_filelen()
 	return filelen;
 }
 
-int SF_PRIVATE::set_stdio()
-{
-	int error = 0;
-
-	switch (file.mode)
-	{
-	case SFM_RDWR:
-		error = SFE_OPEN_PIPE_RDWR;
-		break;
-
-	case SFM_READ:
-		file.filedes = 0;
-		break;
-
-	case SFM_WRITE:
-		file.filedes = 1;
-		break;
-
-	default:
-		error = SFE_BAD_OPEN_MODE;
-		break;
-	};
-	filelength = 0;
-
-	return error;
-}
-
 void SF_PRIVATE::set_file(int fd)
 {
 	file.filedes = fd;
@@ -217,15 +188,6 @@ sf_count_t SF_PRIVATE::fseek(sf_count_t offset, int whence)
 
 	if (file.virtual_io && !file.use_new_vio)
 		return file.vio.seek(offset, whence, file.vio_user_data);
-
-	/* When decoding from pipes sometimes see seeks to the pipeoffset, which
-	appears to mean do nothing. */
-	if (file.is_pipe)
-	{
-		if (whence != SEEK_SET || offset != file.pipeoffset)
-			log_printf("psf_fseek : pipe seek to value other than pipeoffset\n");
-		return offset;
-	}
 
 	switch (whence)
 	{
@@ -290,9 +252,6 @@ size_t SF_PRIVATE::fread(void *ptr, size_t bytes, size_t items)
 		items -= count;
 	};
 
-	if (file.is_pipe)
-		file.pipeoffset += total;
-
 	return total / bytes;
 }
 
@@ -336,9 +295,6 @@ size_t SF_PRIVATE::fwrite(const void *ptr, size_t bytes, size_t items)
 		items -= count;
 	};
 
-	if (file.is_pipe)
-		file.pipeoffset += total;
-
 	return total / bytes;
 }
 
@@ -349,9 +305,6 @@ sf_count_t SF_PRIVATE::ftell()
 	if (file.virtual_io && !file.use_new_vio)
 		return file.vio.tell(file.vio_user_data);
 
-	if (file.is_pipe)
-		return file.pipeoffset;
-
 	pos = file.vio.tell(file.vio_user_data);
 
 	if (pos == ((sf_count_t)-1))
@@ -361,38 +314,6 @@ sf_count_t SF_PRIVATE::ftell()
 	};
 
 	return pos - fileoffset;
-}
-
-SF_BOOL vfis_pipe(void * user_data)
-{
-	SF_PRIVATE *psf = (SF_PRIVATE *)user_data;
-	struct stat statbuf;
-
-	if (psf->file.virtual_io)
-	{
-		if (psf->file.use_new_vio && psf->file.vio.is_pipe)
-		{
-			return psf->file.vio.is_pipe(psf);
-		}
-		else
-		{
-			return SF_FALSE;
-		}
-	}
-	else
-	{
-		if (fstat(psf->file.filedes, &statbuf) == -1)
-		{
-			psf_log_syserr(psf, errno);
-			/* Default to maximum safety. */
-			return SF_TRUE;
-		};
-
-		if (S_ISFIFO(statbuf.st_mode) || S_ISSOCK(statbuf.st_mode))
-			return SF_TRUE;
-	}
-
-	return SF_FALSE;
 }
 
 unsigned long vfref(void * user_data)
@@ -459,26 +380,6 @@ sf_count_t SF_PRIVATE::fgets(char *buffer, size_t bufsize)
 	buffer[k] = 0;
 
 	return k;
-}
-
-SF_BOOL SF_PRIVATE::is_pipe()
-{
-	struct stat statbuf;
-
-	if (file.virtual_io && !file.use_new_vio)
-		return SF_FALSE;
-
-	if (fstat(file.filedes, &statbuf) == -1)
-	{
-		psf_log_syserr(this, errno);
-		/* Default to maximum safety. */
-		return SF_TRUE;
-	};
-
-	if (S_ISFIFO(statbuf.st_mode) || S_ISSOCK(statbuf.st_mode))
-		return SF_TRUE;
-
-	return SF_FALSE;
 }
 
 static sf_count_t psf_get_filelen_fd(int fd)

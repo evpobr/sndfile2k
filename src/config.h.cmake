@@ -70,9 +70,6 @@
 /* Define if you have C99's lrintf function. */
 #cmakedefine HAVE_LRINTF
 
-/* Define if you have the `pipe' function. */
-#cmakedefine HAVE_PIPE
-
 /* Define if you have the `setlocale' function. */
 #cmakedefine HAVE_SETLOCALE
 

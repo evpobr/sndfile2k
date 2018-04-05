@@ -146,9 +146,6 @@ int w64_open(SF_PRIVATE *psf)
 
     if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
     {
-        if (psf->file.is_pipe)
-            return SFE_NO_PIPE_WRITE;
-
         psf->endian = SF_ENDIAN_LITTLE; /* All W64 files are little endian. */
 
         psf->blockwidth = psf->bytewidth * psf->sf.channels;

@@ -44,9 +44,6 @@ int wve_open(SF_PRIVATE *psf)
 {
     int error = 0;
 
-    if (psf->file.is_pipe)
-        return SFE_WVE_NO_PIPE;
-
     if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = wve_read_header(psf)))

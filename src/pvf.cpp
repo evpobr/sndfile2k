@@ -88,17 +88,13 @@ static int pvf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
 {
     sf_count_t current;
 
-    if (psf->file.pipeoffset > 0)
-        return 0;
-
     current = psf->ftell();
 
     /* Reset the current header length to zero. */
     psf->header.ptr[0] = 0;
     psf->header.indx = 0;
 
-    if (psf->file.is_pipe == SF_FALSE)
-        psf->fseek(0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
 
     snprintf((char *)psf->header.ptr, psf->header.len, "PVF1\n%d %d %d\n", psf->sf.channels,
              psf->sf.samplerate, psf->bytewidth * 8);

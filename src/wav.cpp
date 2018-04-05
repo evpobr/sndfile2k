@@ -165,9 +165,6 @@ int wav_open(SF_PRIVATE *psf)
 
     if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
     {
-        if (psf->file.is_pipe)
-            return SFE_NO_PIPE_WRITE;
-
         wpriv->wavex_ambisonic = SF_AMBISONIC_NONE;
 
         format = SF_CONTAINER(psf->sf.format);
@@ -281,7 +278,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
     uint32_t marker, chunk_size = 0, RIFFsize = 0, done = 0;
     int parsestage = 0, error, format = 0;
 
-    if (psf->file.is_pipe == 0 && psf->filelength > INT64_C(0xffffffff))
+    if (psf->filelength > INT64_C(0xffffffff))
         psf->log_printf("Warning : filelength > 0xffffffff. This is bad!!!!\n");
 
     if ((wpriv = (WAVLIKE_PRIVATE *)psf->container_data) == NULL)
@@ -657,16 +654,13 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
 
     psf->fseek(psf->dataoffset, SEEK_SET);
 
-    if (psf->file.is_pipe == SF_FALSE)
-    {
-        /*
-		 * Check for 'wvpk' at the start of the DATA section. Not able to
-		 * handle this.
-		 */
-        psf->binheader_readf("4", &marker);
-        if (marker == wvpk_MARKER || marker == OggS_MARKER)
-            return SFE_WAV_WVPK_DATA;
-    };
+    /*
+     * Check for 'wvpk' at the start of the DATA section. Not able to
+     * handle this.
+     */
+    psf->binheader_readf("4", &marker);
+    if (marker == wvpk_MARKER || marker == OggS_MARKER)
+        return SFE_WAV_WVPK_DATA;
 
     /* Seek to start of DATA section. */
     psf->fseek(psf->dataoffset, SEEK_SET);

@@ -91,7 +91,6 @@ static ErrorStruct SndfileErrors[] = {
     {SFE_BAD_OFFSET, "Error : supplied offset beyond end of file."},
     {SFE_NO_EMBED_SUPPORT, "Error : embedding not supported for this file format."},
     {SFE_NO_EMBEDDED_RDWR, "Error : cannot open embedded file read/write."},
-    {SFE_NO_PIPE_WRITE, "Error : this file format does not support pipe write."},
     {SFE_BAD_VIRTUAL_IO, "Error : bad pointer on SF_VIRTUAL_IO struct."},
     {SFE_BAD_BROADCAST_INFO_SIZE, "Error : bad coding_history_size in SF_BROADCAST_INFO struct."},
     {SFE_BAD_BROADCAST_INFO_TOO_BIG, "Error : SF_BROADCAST_INFO struct too large."},
@@ -115,7 +114,6 @@ static ErrorStruct SndfileErrors[] = {
     {SFE_SEEK_FAILED, "Error : parameters OK, but psf_seek() failed."},
 
     {SFE_BAD_OPEN_MODE, "Error : bad mode parameter for file open."},
-    {SFE_OPEN_PIPE_RDWR, "Error : attempt to open a pipe in read/write mode."},
     {SFE_RDWR_POSITION, "Error on RDWR position (cryptic)."},
     {SFE_RDWR_BAD_HEADER, "Error : Cannot open file in read/write mode due to "
                           "string data in header."},
@@ -205,7 +203,6 @@ static ErrorStruct SndfileErrors[] = {
      "Unimplemented VOC file feature, file contains multiple sound sections."},
     {SFE_VOC_MULTI_PARAM, "Error in VOC file, file contains multiple bit or channel widths."},
     {SFE_VOC_SECTION_COUNT, "Error in VOC file, too many sections."},
-    {SFE_VOC_NO_PIPE, "Error : not able to operate on VOC files over a pipe."},
 
     {SFE_IRCAM_NO_MARKER, "Error in IRCAM file, bad IRCAM marker."},
     {SFE_IRCAM_BAD_CHANNELS, "Error in IRCAM file, bad channel count."},
@@ -232,9 +229,6 @@ static ErrorStruct SndfileErrors[] = {
 
     {SFE_XI_BAD_HEADER, "Error in XI file. Bad header."},
     {SFE_XI_EXCESS_SAMPLES, "Error in XI file. Excess samples in file."},
-    {SFE_XI_NO_PIPE, "Error : not able to operate on XI files over a pipe."},
-
-    {SFE_HTK_NO_PIPE, "Error : not able to operate on HTK files over a pipe."},
 
     {SFE_SDS_NOT_SDS, "Error : not an SDS file."},
     {SFE_SDS_BAD_BIT_WIDTH, "Error : bad bit width for SDS file."},
@@ -248,7 +242,6 @@ static ErrorStruct SndfileErrors[] = {
     {SFE_FLAC_UNKOWN_ERROR, "Error : unknown error in flac decoder."},
 
     {SFE_WVE_NOT_WVE, "Error : not a WVE file."},
-    {SFE_WVE_NO_PIPE, "Error : not able to operate on WVE files over a pipe."},
 
     {SFE_DWVW_BAD_BITWIDTH, "Error : Bad bit width for DWVW encoding. Must be 12, 16 or 24."},
     {SFE_G72X_NOT_MONO, "Error : G72x encoding does not support more than 1 channel."},
@@ -349,10 +342,7 @@ SNDFILE *sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo)
     };
 
     psf->file.mode = mode;
-    if (strcmp(path, "-") == 0)
-        psf->error = psf->set_stdio();
-    else
-        psf->error = psf->fopen();
+    psf->error = psf->fopen();
 
 	if (psf->error == 0)
 	{
@@ -390,7 +380,6 @@ SNDFILE *sf_open_fd(int fd, SF_FILEMODE mode, SF_INFO *sfinfo, int close_desc)
     if (!close_desc)
         psf->file.vio.ref(psf);
 
-    psf->file.is_pipe = psf->is_pipe();
     psf->fileoffset = psf->ftell();
 
     if (!close_desc)
@@ -445,7 +434,6 @@ SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sf
 	psf->file.vio.seek = sfvirtual->seek;
 	psf->file.vio.tell = sfvirtual->tell;
 	psf->file.vio.flush = NULL;
-    psf->file.vio.is_pipe = NULL;
     psf->file.vio.ref = NULL;
     psf->file.vio.unref = NULL;
 
@@ -503,7 +491,6 @@ SNDFILE *sf_open_virtual_ex(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO 
 	psf->file.vio.seek = sfvirtual->seek;
 	psf->file.vio.tell = sfvirtual->tell;
 	psf->file.vio.flush = sfvirtual->flush;
-	psf->file.vio.is_pipe = sfvirtual->is_pipe;
 	psf->file.vio.ref = sfvirtual->ref;
 	psf->file.vio.unref = sfvirtual->unref;
 
@@ -3118,20 +3105,10 @@ SNDFILE *SF_PRIVATE::open_file(SF_INFO *sfinfo)
 
     sf.sections = 1;
 
-    file.is_pipe = is_pipe();
-
-    if (file.is_pipe)
-    {
-        sf.seekable = SF_FALSE;
-        filelength = SF_COUNT_MAX;
-    }
-    else
-    {
-        sf.seekable = SF_TRUE;
+    sf.seekable = SF_TRUE;
 
         /* File is open, so get the length. */
-        filelength = get_filelen();
-    };
+    filelength = get_filelen();
 
     if (fileoffset > 0)
     {

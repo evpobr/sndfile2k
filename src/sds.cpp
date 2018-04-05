@@ -351,9 +351,6 @@ static int sds_write_header(SF_PRIVATE *psf, int calc_length)
         return SFE_INTERNAL;
     };
 
-    if (psf->file.pipeoffset > 0)
-        return 0;
-
     current = psf->ftell();
 
     if (calc_length)
@@ -376,8 +373,7 @@ static int sds_write_header(SF_PRIVATE *psf, int calc_length)
     psf->header.ptr[0] = 0;
     psf->header.indx = 0;
 
-    if (psf->file.is_pipe == SF_FALSE)
-        psf->fseek(0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
 
     psf->binheader_writef("E211", BHW2(0xF07E), BHW1(0), BHW1(1));
 

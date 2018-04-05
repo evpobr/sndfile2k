@@ -337,11 +337,9 @@ echo "  $sfversion passed tests on OGG/VORBIS files."
 echo "----------------------------------------------------------------------"
 
 # io-tests
-./tests/stdio_test@EXEEXT@
-./tests/pipe_test@EXEEXT@
 ./tests/virtual_io_test@EXEEXT@
 echo "----------------------------------------------------------------------"
-echo "  $sfversion passed stdio/pipe/vio tests."
+echo "  $sfversion passed vio tests."
 echo "----------------------------------------------------------------------"
 
 "${PYTHON}" "${ABS_TOP_SRCDIR}/src/binheader_writef_check.py" "${ABS_TOP_SRCDIR}/src"/*.c

@@ -96,9 +96,6 @@ static int mpc2k_write_header(SF_PRIVATE *psf, int calc_length)
     char sample_name[HEADER_NAME_LEN + 1];
     sf_count_t current;
 
-    if (psf->file.pipeoffset > 0)
-        return 0;
-
     current = psf->ftell();
 
     if (calc_length)
@@ -115,12 +112,7 @@ static int mpc2k_write_header(SF_PRIVATE *psf, int calc_length)
     psf->header.ptr[0] = 0;
     psf->header.indx = 0;
 
-    /*
-	** Only attempt to seek if we are not writng to a pipe. If we are
-	** writing to a pipe we shouldn't be here anyway.
-	*/
-    if (psf->file.is_pipe == SF_FALSE)
-        psf->fseek(0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
 
     snprintf(sample_name, sizeof(sample_name), "%s                    ", psf->file.name.c);
 

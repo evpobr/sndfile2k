@@ -1252,16 +1252,6 @@ typedef void (*sf_vio_flush)(void *user_data);
 */
 typedef int (*sf_vio_set_filelen)(void *user_data, sf_count_t len);
 
-/** Type of user defined function indicates pipe mode.
-*
-* @ingroup file - base
-*
-* @param[in] user_data User defined value.
-*
-* @return SF_TRUE on success, @c - 1 otherwise.
-*/
-typedef SF_BOOL (*sf_vio_is_pipe)(void *user_data);
-
 /** Defines virtual file I/O context
  *
  * @ingroup file-virt
@@ -1290,8 +1280,6 @@ typedef struct SF_VIRTUAL_IO
     sf_vio_flush flush;
 	//! Pointer to a user defined function that truncates stream
 	sf_vio_set_filelen set_filelen;
-	//! Pointer to a user defined function that indicates pipe mode.
-	sf_vio_is_pipe is_pipe;
 	//! Pointer to a user defined function that increases reference count.
 	sf_ref_callback ref;
 	//! Pointer to a user defined function that decreases reference count.
@@ -1423,15 +1411,13 @@ SNDFILE2K_EXPORT SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE 
  * of already opened file instead of path.
  *
  * sf_open_virtual_ex() uses new SF_VIRTUAL_IO members: SF_VIRTUAL_IO::flush,
- * SF_VIRTUAL_IO::set_filelen, SF_VIRTUAL_IO::is_pipe, SF_VIRTUAL_IO::ref
- * and SF_VIRTUAL_IO::unref. Anyway, all this callbaks are not required and
+ * SF_VIRTUAL_IO::set_filelen, SF_VIRTUAL_IO::ref and SF_VIRTUAL_IO::unref.
+ * Anyway, all this callbaks are not required and
  * could be set to @c NULL.
  *
  * - SF_VIRTUAL_IO::flush is helpful in write mode, performing flashing cache data
  * to disk.
  * - SF_VIRTUAL_IO::set_filelen truncates file to desired size by the library.
- * - SF_VIRTUAL_IO::is_pipe indicates that stream is pipe, activating internal pipe
- *   support.
  * - SF_VIRTUAL_IO::ref and SF_VIRTUAL_IO::unref could be implemented to control
  *   stream life time. When these members are implemented, library will call @c ref
  *   when file is opened, and call @c unref before closing file. You can pass as

@@ -111,9 +111,6 @@ int rf64_open(SF_PRIVATE *psf)
 
     if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
     {
-        if (psf->file.is_pipe)
-            return SFE_NO_PIPE_WRITE;
-
         psf->blockwidth = psf->bytewidth * psf->sf.channels;
 
         if ((error = rf64_write_header(psf, SF_FALSE)))
@@ -422,16 +419,13 @@ static int rf64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperbloc
 
     psf->fseek(psf->dataoffset, SEEK_SET);
 
-    if (psf->file.is_pipe == 0)
-    {
-        /*
-		 * Check for 'wvpk' at the start of the DATA section. Not able to
-		 * handle this.
-		 */
-        psf->binheader_readf("4", &marker);
-        if (marker == wvpk_MARKER || marker == OggS_MARKER)
-            return SFE_WAV_WVPK_DATA;
-    };
+    /*
+     * Check for 'wvpk' at the start of the DATA section. Not able to
+     * handle this.
+     */
+    psf->binheader_readf("4", &marker);
+    if (marker == wvpk_MARKER || marker == OggS_MARKER)
+        return SFE_WAV_WVPK_DATA;
 
     /* Seek to start of DATA section. */
     psf->fseek(psf->dataoffset, SEEK_SET);

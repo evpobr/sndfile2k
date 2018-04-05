@@ -85,9 +85,6 @@ int mat5_open(SF_PRIVATE *psf)
 
     if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
     {
-        if (psf->file.is_pipe)
-            return SFE_NO_PIPE_WRITE;
-
         psf->endian = SF_ENDIAN(psf->sf.format);
         if (CPU_IS_LITTLE_ENDIAN && (psf->endian == SF_ENDIAN_CPU || psf->endian == 0))
             psf->endian = SF_ENDIAN_LITTLE;

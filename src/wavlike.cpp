@@ -565,13 +565,6 @@ void wavlike_analyze(SF_PRIVATE *psf)
 	struct AUDIO_DETECT ad;
     int format = 0;
 
-    if (psf->file.is_pipe)
-    {
-        psf->log_printf("*** Error : Reading from a pipe. Can't analyze "
-                            "data section to figure out real data format.\n\n");
-        return;
-    };
-
     psf->log_printf("---------------------------------------------------\n"
                         "Format is known to be broken. Using detection code.\n");
 

@@ -360,48 +360,6 @@ target_link_libraries(ogg_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 
-add_executable(stdin_test stdin_test.cpp utils.cpp utils.h)
-target_include_directories(stdin_test
-  PRIVATE
-    ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_BINARY_DIR}/src)
-target_link_libraries(stdin_test PRIVATE
-  sndfile2k
-  $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
-set_target_properties(stdin_test
-  PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "tests")
-
-add_executable(stdout_test stdout_test.cpp utils.cpp utils.h)
-target_include_directories(stdout_test
-  PRIVATE
-    ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_BINARY_DIR}/src)
-target_link_libraries(stdout_test PRIVATE
-  sndfile2k
-  $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
-set_target_properties(stdout_test
-PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY "tests")
-
-add_executable(stdio_test stdio_test.cpp utils.cpp utils.h)
-target_include_directories(stdio_test
-  PRIVATE
-    ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_BINARY_DIR}/src)
-target_link_libraries(stdio_test PRIVATE
-  sndfile2k
-  $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
-
-add_executable(pipe_test pipe_test.cpp utils.cpp utils.h)
-target_include_directories(pipe_test
-  PRIVATE
-    ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_BINARY_DIR}/src)
-target_link_libraries(pipe_test PRIVATE
-  sndfile2k
-  $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
-
 add_executable(virtual_io_test virtual_io_test.cpp utils.cpp utils.h)
 target_include_directories(virtual_io_test
   PRIVATE
@@ -615,8 +573,6 @@ add_test(NAME misc_test_ogg COMMAND $<TARGET_FILE:misc_test> ogg)
 
 ### io-tests
 
-add_test(NAME stdio_test COMMAND $<TARGET_FILE:stdio_test>)
-add_test(NAME pipe_test COMMAND $<TARGET_FILE:pipe_test>)
 add_test(NAME virtual_io_test COMMAND $<TARGET_FILE:virtual_io_test>)
 
 set(SNDFILE_TEST_TARGETS
@@ -651,10 +607,6 @@ set(SNDFILE_TEST_TARGETS
   raw_test
   compression_size_test
   ogg_test
-  stdin_test
-  stdout_test
-  stdio_test
-  pipe_test
   virtual_io_test
   g72x_test)
 

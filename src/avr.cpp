@@ -205,9 +205,6 @@ static int avr_write_header(SF_PRIVATE *psf, int calc_length)
     sf_count_t current;
     int sign;
 
-    if (psf->file.pipeoffset > 0)
-        return 0;
-
     current = psf->ftell();
 
     if (calc_length)
@@ -225,12 +222,7 @@ static int avr_write_header(SF_PRIVATE *psf, int calc_length)
     psf->header.ptr[0] = 0;
     psf->header.indx = 0;
 
-    /*
-     * Only attempt to seek if we are not writng to a pipe. If we are
-     * writing to a pipe we shouldn't be here anyway.
-     */
-    if (psf->file.is_pipe == SF_FALSE)
-        psf->fseek(0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
 
     psf->binheader_writef("Emz22", BHWm(TWOBIT_MARKER), BHWz(8),
                          BHW2(psf->sf.channels == 2 ? 0xFFFF : 0), BHW2(psf->bytewidth * 8));

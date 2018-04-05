@@ -35,9 +35,6 @@ extern "C" {
 #define SIGNED_SIZEOF(x) ((int64_t)(sizeof(x)))
 #define ABS(x) ((x) >= 0 ? (x) : -(x))
 
-#define PIPE_INDEX(x) ((x) + 500)
-#define PIPE_TEST_LEN 12345
-
 void gen_windowed_sine_float(float *data, int len, double maximum);
 void gen_windowed_sine_double(double *data, int len, double maximum);
 

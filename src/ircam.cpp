@@ -236,9 +236,6 @@ static int ircam_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     float samplerate;
     sf_count_t current;
 
-    if (psf->file.pipeoffset > 0)
-        return 0;
-
     current = psf->ftell();
 
     /* This also sets psf->endian. */
@@ -251,8 +248,7 @@ static int ircam_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     psf->header.ptr[0] = 0;
     psf->header.indx = 0;
 
-    if (psf->file.is_pipe == SF_FALSE)
-        psf->fseek(0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
 
     samplerate = (float)psf->sf.samplerate;
 

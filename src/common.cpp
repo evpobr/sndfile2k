@@ -1473,8 +1473,8 @@ sf_count_t psf_decode_frame_count(SF_PRIVATE *psf)
     sf_count_t count, readlen, total = 0;
     BUF_UNION ubuf;
 
-    /* If we're reading from a pipe or the file is too long, just return SF_COUNT_MAX. */
-    if (psf->is_pipe() || psf->datalength > 0x1000000)
+    /* If the file is too long, just return SF_COUNT_MAX. */
+    if (psf->datalength > 0x1000000)
         return SF_COUNT_MAX;
 
     psf->fseek(psf->dataoffset, SEEK_SET);
