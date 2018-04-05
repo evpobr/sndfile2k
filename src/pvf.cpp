@@ -91,14 +91,14 @@ static int pvf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     if (psf->file.pipeoffset > 0)
         return 0;
 
-    current = psf_ftell(psf);
+    current = psf->ftell();
 
     /* Reset the current header length to zero. */
     psf->header.ptr[0] = 0;
     psf->header.indx = 0;
 
     if (psf->file.is_pipe == SF_FALSE)
-        psf_fseek(psf, 0, SEEK_SET);
+        psf->fseek(0, SEEK_SET);
 
     snprintf((char *)psf->header.ptr, psf->header.len, "PVF1\n%d %d %d\n", psf->sf.channels,
              psf->sf.samplerate, psf->bytewidth * 8);
@@ -106,7 +106,7 @@ static int pvf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     psf->header.indx = strlen((char *)psf->header.ptr);
 
     /* Header construction complete so write it out. */
-    psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
 
     if (psf->error)
         return psf->error;
@@ -114,7 +114,7 @@ static int pvf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     psf->dataoffset = psf->header.indx;
 
     if (current > 0)
-        psf_fseek(psf, current, SEEK_SET);
+        psf->fseek(current, SEEK_SET);
 
     return psf->error;
 }
@@ -124,21 +124,21 @@ static int pvf_read_header(SF_PRIVATE *psf)
     char buffer[32];
     int marker, channels, samplerate, bitwidth;
 
-	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-    psf_binheader_readf(psf, "m", &marker);
-	psf_binheader_seekf(psf, 1, SF_SEEK_CUR);
-    psf_log_printf(psf, "%M\n", marker);
+	psf->binheader_seekf(0, SF_SEEK_SET);
+    psf->binheader_readf("m", &marker);
+	psf->binheader_seekf(1, SF_SEEK_CUR);
+    psf->log_printf("%M\n", marker);
 
     if (marker != PVF1_MARKER)
         return SFE_PVF_NO_PVF1;
 
     /* Grab characters up until a newline which is replaced by an EOS. */
-    psf_binheader_readf(psf, "G", buffer, sizeof(buffer));
+    psf->binheader_readf("G", buffer, sizeof(buffer));
 
     if (sscanf(buffer, "%d %d %d", &channels, &samplerate, &bitwidth) != 3)
         return SFE_PVF_BAD_HEADER;
 
-    psf_log_printf(psf, " Channels    : %d\n Sample rate : %d\n Bit width   : %d\n", channels,
+    psf->log_printf(" Channels    : %d\n Sample rate : %d\n Bit width   : %d\n", channels,
                    samplerate, bitwidth);
 
     psf->sf.channels = channels;
@@ -164,8 +164,8 @@ static int pvf_read_header(SF_PRIVATE *psf)
         return SFE_PVF_BAD_BITWIDTH;
     };
 
-    psf->dataoffset = psf_ftell(psf);
-    psf_log_printf(psf, " Data Offset : %D\n", psf->dataoffset);
+    psf->dataoffset = psf->ftell();
+    psf->log_printf(" Data Offset : %D\n", psf->dataoffset);
 
     psf->endian = SF_ENDIAN_BIG;
 

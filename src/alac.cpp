@@ -142,7 +142,7 @@ int alac_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *info)
         break;
 
     default:
-        psf_log_printf(psf, "%s : Bad psf->file.mode.\n", __func__);
+        psf->log_printf("%s : Bad psf->file.mode.\n", __func__);
         return SFE_INTERNAL;
     };
 
@@ -224,7 +224,7 @@ static int alac_close(SF_PRIVATE *psf)
             fseek(plac->enctmp, 0, SEEK_SET);
 
             while ((readcount = fread(ubuf.ucbuf, 1, sizeof(ubuf.ucbuf), plac->enctmp)) > 0)
-                psf_fwrite(ubuf.ucbuf, 1, readcount, psf);
+                psf->fwrite(ubuf.ucbuf, 1, readcount);
             fclose(plac->enctmp);
             remove(plac->enctmpname);
         };
@@ -262,13 +262,13 @@ static int alac_reader_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *inf
 
     if (info == NULL)
     {
-        psf_log_printf(psf, "%s : ALAC_DECODER_INFO is NULL.\n", __func__);
+        psf->log_printf("%s : ALAC_DECODER_INFO is NULL.\n", __func__);
         return SFE_INTERNAL;
     };
 
     if (info->frames_per_packet > ALAC_FRAME_LENGTH)
     {
-        psf_log_printf(psf, "*** Error : frames_per_packet (%u) is too big. ***\n",
+        psf->log_printf("*** Error : frames_per_packet (%u) is too big. ***\n",
                        info->frames_per_packet);
         return SFE_INTERNAL;
     };
@@ -285,7 +285,7 @@ static int alac_reader_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *inf
 
     if (plac->pakt_info == NULL)
     {
-        psf_log_printf(psf, "%s : alac_pkt_read() returns NULL.\n", __func__);
+        psf->log_printf("%s : alac_pkt_read() returns NULL.\n", __func__);
         return SFE_INTERNAL;
     };
 
@@ -294,13 +294,13 @@ static int alac_reader_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *inf
 
     if ((error = alac_decoder_init(&plac->decoder, u.kuki, kuki_size)) != ALAC_noErr)
     {
-        psf_log_printf(psf, "*** alac_decoder_init() returned %s. ***\n", alac_error_string(error));
+        psf->log_printf("*** alac_decoder_init() returned %s. ***\n", alac_error_string(error));
         return SFE_INTERNAL;
     };
 
     if (plac->decoder.mNumChannels != (unsigned)psf->sf.channels)
     {
-        psf_log_printf(psf,
+        psf->log_printf(
                        "*** Initialized decoder has %u channels, but it "
                        "should be %d. ***\n",
                        plac->decoder.mNumChannels, psf->sf.channels);
@@ -374,7 +374,7 @@ static int alac_writer_init(SF_PRIVATE *psf)
         break;
 
     default:
-        psf_log_printf(psf, "%s : Can't figure out bits per sample.\n", __func__);
+        psf->log_printf("%s : Can't figure out bits per sample.\n", __func__);
         return SFE_UNIMPLEMENTED;
     };
 
@@ -384,7 +384,7 @@ static int alac_writer_init(SF_PRIVATE *psf)
 
     if ((plac->enctmp = psf_open_tmpfile(plac->enctmpname, sizeof(plac->enctmpname))) == NULL)
     {
-        psf_log_printf(psf, "Error : Failed to open temp file '%s' : \n", plac->enctmpname,
+        psf->log_printf("Error : Failed to open temp file '%s' : \n", plac->enctmpname,
                        strerror(errno));
         return SFE_ALAC_FAIL_TMPFILE;
     };
@@ -444,20 +444,20 @@ static int alac_decode_block(SF_PRIVATE *psf, ALAC_PRIVATE *plac)
     if (packet_size == 0)
     {
         if (plac->pakt_info->current < plac->pakt_info->count)
-            psf_log_printf(psf, "packet_size is 0 (%d of %d)\n", plac->pakt_info->current,
+            psf->log_printf("packet_size is 0 (%d of %d)\n", plac->pakt_info->current,
                            plac->pakt_info->count);
         return 0;
     };
 
-    psf_fseek(psf, plac->input_data_pos, SEEK_SET);
+    psf->fseek(plac->input_data_pos, SEEK_SET);
 
     if (packet_size > sizeof(plac->byte_buffer))
     {
-        psf_log_printf(psf, "%s : bad packet_size (%u)\n", __func__, packet_size);
+        psf->log_printf("%s : bad packet_size (%u)\n", __func__, packet_size);
         return 0;
     };
 
-    if ((packet_size != psf_fread(plac->byte_buffer, 1, packet_size, psf)))
+    if ((packet_size != psf->fread(plac->byte_buffer, 1, packet_size)))
         return 0;
 
     BitBufferInit(&bit_buffer, plac->byte_buffer, packet_size);
@@ -643,7 +643,7 @@ static sf_count_t alac_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
     if (offset == 0)
     {
-        psf_fseek(psf, psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->dataoffset, SEEK_SET);
 
         plac->frames_this_block = 0;
         plac->input_data_pos = psf->dataoffset;
@@ -866,7 +866,7 @@ static PAKT_INFO *alac_pakt_read_decode(SF_PRIVATE *psf, uint32_t UNUSED(pakt_of
 
     if ((chunk_iterator = psf_get_chunk_iterator(psf, chunk_info.id)) == NULL)
     {
-        psf_log_printf(psf, "%s : no chunk iterator found\n", __func__);
+        psf->log_printf("%s : no chunk iterator found\n", __func__);
         free(chunk_info.data);
         chunk_info.data = NULL;
         return NULL;
@@ -1010,23 +1010,23 @@ static uint32_t alac_kuki_read(SF_PRIVATE *psf, uint32_t kuki_offset, uint8_t *k
     uint32_t marker;
     uint64_t kuki_size;
 
-    if (psf_fseek(psf, kuki_offset, SEEK_SET) != kuki_offset)
+    if (psf->fseek(kuki_offset, SEEK_SET) != kuki_offset)
         return 0;
 
-    psf_fread(&marker, 1, sizeof(marker), psf);
+    psf->fread(&marker, 1, sizeof(marker));
     if (marker != MAKE_MARKER('k', 'u', 'k', 'i'))
         return 0;
 
-    psf_fread(&kuki_size, 1, sizeof(kuki_size), psf);
+    psf->fread(&kuki_size, 1, sizeof(kuki_size));
     kuki_size = BE2H_64(kuki_size);
 
     if (kuki_size == 0 || kuki_size > kuki_maxlen)
     {
-        psf_log_printf(psf, "%s : Bad size (%D) of 'kuki' chunk.\n", __func__, kuki_size);
+        psf->log_printf("%s : Bad size (%D) of 'kuki' chunk.\n", __func__, kuki_size);
         return 0;
     };
 
-    psf_fread(kuki, 1, kuki_size, psf);
+    psf->fread(kuki, 1, kuki_size);
 
     return kuki_size;
 }

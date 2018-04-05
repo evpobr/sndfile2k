@@ -147,46 +147,46 @@ static int paf_read_header(SF_PRIVATE *psf)
         return SFE_PAF_SHORT_HEADER;
 
     memset(&paf_fmt, 0, sizeof(paf_fmt));
-	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-    psf_binheader_readf(psf, "m", &marker);
+	psf->binheader_seekf(0, SF_SEEK_SET);
+    psf->binheader_readf("m", &marker);
 
-    psf_log_printf(psf, "Signature   : '%M'\n", marker);
+    psf->log_printf("Signature   : '%M'\n", marker);
 
     if (marker == PAF_MARKER)
     {
-        psf_binheader_readf(psf, "E444444", &(paf_fmt.version), &(paf_fmt.endianness),
+        psf->binheader_readf("E444444", &(paf_fmt.version), &(paf_fmt.endianness),
                             &(paf_fmt.samplerate), &(paf_fmt.format), &(paf_fmt.channels),
                             &(paf_fmt.source));
     }
     else if (marker == FAP_MARKER)
     {
-        psf_binheader_readf(psf, "e444444", &(paf_fmt.version), &(paf_fmt.endianness),
+        psf->binheader_readf("e444444", &(paf_fmt.version), &(paf_fmt.endianness),
                             &(paf_fmt.samplerate), &(paf_fmt.format), &(paf_fmt.channels),
                             &(paf_fmt.source));
     }
     else
         return SFE_PAF_NO_MARKER;
 
-    psf_log_printf(psf, "Version     : %d\n", paf_fmt.version);
+    psf->log_printf("Version     : %d\n", paf_fmt.version);
 
     if (paf_fmt.version != 0)
     {
-        psf_log_printf(psf, "*** Bad version number. should be zero.\n");
+        psf->log_printf("*** Bad version number. should be zero.\n");
         return SFE_PAF_VERSION;
     };
 
-    psf_log_printf(psf, "Sample Rate : %d\n", paf_fmt.samplerate);
-    psf_log_printf(psf, "Channels    : %d\n", paf_fmt.channels);
+    psf->log_printf("Sample Rate : %d\n", paf_fmt.samplerate);
+    psf->log_printf("Channels    : %d\n", paf_fmt.channels);
 
-    psf_log_printf(psf, "Endianness  : %d => ", paf_fmt.endianness);
+    psf->log_printf("Endianness  : %d => ", paf_fmt.endianness);
     if (paf_fmt.endianness)
     {
-        psf_log_printf(psf, "Little\n", paf_fmt.endianness);
+        psf->log_printf("Little\n", paf_fmt.endianness);
         psf->endian = SF_ENDIAN_LITTLE;
     }
     else
     {
-        psf_log_printf(psf, "Big\n", paf_fmt.endianness);
+        psf->log_printf("Big\n", paf_fmt.endianness);
         psf->endian = SF_ENDIAN_BIG;
     };
 
@@ -195,7 +195,7 @@ static int paf_read_header(SF_PRIVATE *psf)
 
     psf->datalength = psf->filelength - psf->dataoffset;
 
-	psf_binheader_seekf(psf, psf->dataoffset, SF_SEEK_SET);
+	psf->binheader_seekf(psf->dataoffset, SF_SEEK_SET);
 
     psf->sf.samplerate = paf_fmt.samplerate;
     psf->sf.channels = paf_fmt.channels;
@@ -203,7 +203,7 @@ static int paf_read_header(SF_PRIVATE *psf)
     /* Only fill in type major. */
     psf->sf.format = SF_FORMAT_PAF;
 
-    psf_log_printf(psf, "Format      : %d => ", paf_fmt.format);
+    psf->log_printf("Format      : %d => ", paf_fmt.format);
 
     /* PAF is by default big endian. */
     psf->sf.format |= paf_fmt.endianness ? SF_ENDIAN_LITTLE : SF_ENDIAN_BIG;
@@ -211,7 +211,7 @@ static int paf_read_header(SF_PRIVATE *psf)
     switch (paf_fmt.format)
     {
     case PAF_PCM_S8:
-        psf_log_printf(psf, "8 bit linear PCM\n");
+        psf->log_printf("8 bit linear PCM\n");
         psf->bytewidth = 1;
 
         psf->sf.format |= SF_FORMAT_PCM_S8;
@@ -221,7 +221,7 @@ static int paf_read_header(SF_PRIVATE *psf)
         break;
 
     case PAF_PCM_16:
-        psf_log_printf(psf, "16 bit linear PCM\n");
+        psf->log_printf("16 bit linear PCM\n");
         psf->bytewidth = 2;
 
         psf->sf.format |= SF_FORMAT_PCM_16;
@@ -231,7 +231,7 @@ static int paf_read_header(SF_PRIVATE *psf)
         break;
 
     case PAF_PCM_24:
-        psf_log_printf(psf, "24 bit linear PCM\n");
+        psf->log_printf("24 bit linear PCM\n");
         psf->bytewidth = 3;
 
         psf->sf.format |= SF_FORMAT_PCM_24;
@@ -242,29 +242,29 @@ static int paf_read_header(SF_PRIVATE *psf)
         break;
 
     default:
-        psf_log_printf(psf, "Unknown\n");
+        psf->log_printf("Unknown\n");
         return SFE_PAF_UNKNOWN_FORMAT;
         break;
     };
 
-    psf_log_printf(psf, "Source      : %d => ", paf_fmt.source);
+    psf->log_printf("Source      : %d => ", paf_fmt.source);
 
     switch (paf_fmt.source)
     {
     case 1:
-        psf_log_printf(psf, "Analog Recording\n");
+        psf->log_printf("Analog Recording\n");
         break;
     case 2:
-        psf_log_printf(psf, "Digital Transfer\n");
+        psf->log_printf("Digital Transfer\n");
         break;
     case 3:
-        psf_log_printf(psf, "Multi-track Mixdown\n");
+        psf->log_printf("Multi-track Mixdown\n");
         break;
     case 5:
-        psf_log_printf(psf, "Audio Resulting From DSP Processing\n");
+        psf->log_printf("Audio Resulting From DSP Processing\n");
         break;
     default:
-        psf_log_printf(psf, "Unknown\n");
+        psf->log_printf("Unknown\n");
         break;
     };
 
@@ -276,7 +276,7 @@ static int paf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     int paf_format;
 
     /* PAF header already written so no need to re-write. */
-    if (psf_ftell(psf) >= PAF_HEADER_LENGTH)
+    if (psf->ftell() >= PAF_HEADER_LENGTH)
         return 0;
 
     psf->dataoffset = PAF_HEADER_LENGTH;
@@ -306,24 +306,24 @@ static int paf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     if (psf->endian == SF_ENDIAN_BIG)
     {
         /* Marker, version, endianness, samplerate */
-        psf_binheader_writef(psf, "Em444", BHWm(PAF_MARKER), BHW4(0), BHW4(0),
+        psf->binheader_writef("Em444", BHWm(PAF_MARKER), BHW4(0), BHW4(0),
                              BHW4(psf->sf.samplerate));
         /* format, channels, source */
-        psf_binheader_writef(psf, "E444", BHW4(paf_format), BHW4(psf->sf.channels), BHW4(0));
+        psf->binheader_writef("E444", BHW4(paf_format), BHW4(psf->sf.channels), BHW4(0));
     }
     else if (psf->endian == SF_ENDIAN_LITTLE)
     {
         /* Marker, version, endianness, samplerate */
-        psf_binheader_writef(psf, "em444", BHWm(FAP_MARKER), BHW4(0), BHW4(1),
+        psf->binheader_writef("em444", BHWm(FAP_MARKER), BHW4(0), BHW4(1),
                              BHW4(psf->sf.samplerate));
         /* format, channels, source */
-        psf_binheader_writef(psf, "e444", BHW4(paf_format), BHW4(psf->sf.channels), BHW4(0));
+        psf->binheader_writef("e444", BHW4(paf_format), BHW4(psf->sf.channels), BHW4(0));
     };
 
     /* Zero fill to dataoffset. */
-    psf_binheader_writef(psf, "z", BHWz((size_t)(psf->dataoffset - psf->header.indx)));
+    psf->binheader_writef("z", BHWz((size_t)(psf->dataoffset - psf->header.indx)));
 
-    psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
 
     return psf->error;
 }
@@ -392,13 +392,13 @@ static int paf24_init(SF_PRIVATE *psf)
     psf->seek = paf24_seek;
     psf->container_close = paf24_close;
 
-    psf->filelength = psf_get_filelen(psf);
+    psf->filelength = psf->get_filelen();
     psf->datalength = psf->filelength - psf->dataoffset;
 
     if (psf->datalength % PAF24_BLOCK_SIZE)
     {
         if (psf->file.mode == SFM_READ)
-            psf_log_printf(psf, "*** Warning : file seems to be truncated.\n");
+            psf->log_printf("*** Warning : file seems to be truncated.\n");
         ppaf24->max_blocks = psf->datalength / ppaf24->blocksize + 1;
     }
     else
@@ -441,7 +441,7 @@ static sf_count_t paf24_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
         if (psf->last_op == SFM_WRITE && ppaf24->write_count)
             paf24_write_block(psf, ppaf24);
 
-        psf_fseek(psf, psf->dataoffset + newblock * ppaf24->blocksize, SEEK_SET);
+        psf->fseek(psf->dataoffset + newblock * ppaf24->blocksize, SEEK_SET);
         ppaf24->read_block = newblock;
         paf24_read_block(psf, ppaf24);
         ppaf24->read_count = newsample;
@@ -457,7 +457,7 @@ static sf_count_t paf24_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
         if (psf->last_op == SFM_WRITE && ppaf24->write_count)
             paf24_write_block(psf, ppaf24);
 
-        psf_fseek(psf, psf->dataoffset + newblock * ppaf24->blocksize, SEEK_SET);
+        psf->fseek(psf->dataoffset + newblock * ppaf24->blocksize, SEEK_SET);
         ppaf24->write_block = newblock;
         paf24_read_block(psf, ppaf24);
         ppaf24->write_count = newsample;
@@ -504,8 +504,8 @@ static int paf24_read_block(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
     };
 
     /* Read the block. */
-    if ((k = psf_fread(ppaf24->block, 1, ppaf24->blocksize, psf)) != ppaf24->blocksize)
-        psf_log_printf(psf, "*** Warning : short read (%d != %d).\n", k, ppaf24->blocksize);
+    if ((k = psf->fread(ppaf24->block, 1, ppaf24->blocksize)) != ppaf24->blocksize)
+        psf->log_printf("*** Warning : short read (%d != %d).\n", k, ppaf24->blocksize);
 
     /* Do endian swapping if necessary. */
     if ((CPU_IS_BIG_ENDIAN && psf->endian == SF_ENDIAN_LITTLE) ||
@@ -691,8 +691,8 @@ static int paf24_write_block(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
     };
 
     /* Write block to disk. */
-    if ((k = psf_fwrite(ppaf24->block, 1, ppaf24->blocksize, psf)) != ppaf24->blocksize)
-        psf_log_printf(psf, "*** Warning : short write (%d != %d).\n", k, ppaf24->blocksize);
+    if ((k = psf->fwrite(ppaf24->block, 1, ppaf24->blocksize)) != ppaf24->blocksize)
+        psf->log_printf("*** Warning : short write (%d != %d).\n", k, ppaf24->blocksize);
 
     if (ppaf24->sample_count < ppaf24->write_block * PAF24_SAMPLES_PER_BLOCK + ppaf24->write_count)
         ppaf24->sample_count = ppaf24->write_block * PAF24_SAMPLES_PER_BLOCK + ppaf24->write_count;

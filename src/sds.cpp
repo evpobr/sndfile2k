@@ -116,7 +116,7 @@ int sds_open(SF_PRIVATE *psf)
 
         psf->write_header = sds_write_header;
 
-        psf_fseek(psf, SDS_DATA_OFFSET, SEEK_SET);
+        psf->fseek(SDS_DATA_OFFSET, SEEK_SET);
     };
 
     if ((error = sds_init(psf, psds)) != 0)
@@ -139,7 +139,7 @@ static int sds_close(SF_PRIVATE *psf)
 
         if ((psds = (SDS_PRIVATE *)psf->codec_data) == NULL)
         {
-            psf_log_printf(psf, "*** Bad psf->codec_data ptr.\n");
+            psf->log_printf("*** Bad psf->codec_data ptr.\n");
             return SFE_INTERNAL;
         };
 
@@ -210,21 +210,21 @@ static int sds_read_header(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     int bytesread, blockcount;
 
     /* Set position to start of file to begin reading header. */
-	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-    bytesread = psf_binheader_readf(psf, "E211", &marker, &channel, &byte);
+	psf->binheader_seekf(0, SF_SEEK_SET);
+    bytesread = psf->binheader_readf("E211", &marker, &channel, &byte);
 
     if (marker != 0xF07E || byte != 0x01)
         return SFE_SDS_NOT_SDS;
 
-    bytesread += psf_binheader_readf(psf, "e2", &sample_no);
+    bytesread += psf->binheader_readf("e2", &sample_no);
     sample_no = SDS_3BYTE_TO_INT_DECODE(sample_no);
 
-    psf_log_printf(psf,
+    psf->log_printf(
                    "Midi Sample Dump Standard (.sds)\nF07E\n"
                    " Midi Channel  : %d\n Sample Number : %d\n",
                    channel, sample_no);
 
-    bytesread += psf_binheader_readf(psf, "e13", &bitwidth, &samp_period);
+    bytesread += psf->binheader_readf("e13", &bitwidth, &samp_period);
 
     samp_period = SDS_3BYTE_TO_INT_DECODE(samp_period);
 
@@ -232,11 +232,11 @@ static int sds_read_header(SF_PRIVATE *psf, SDS_PRIVATE *psds)
 
     if (psds->bitwidth > 1)
     {
-        psf_log_printf(psf, " Bit Width     : %d\n", psds->bitwidth);
+        psf->log_printf(" Bit Width     : %d\n", psds->bitwidth);
     }
     else
     {
-        psf_log_printf(psf, " Bit Width     : %d (should be > 1)\n", psds->bitwidth);
+        psf->log_printf(" Bit Width     : %d (should be > 1)\n", psds->bitwidth);
         return SFE_SDS_BAD_BIT_WIDTH;
     };
 
@@ -244,7 +244,7 @@ static int sds_read_header(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     {
         psf->sf.samplerate = 1000000000 / samp_period;
 
-        psf_log_printf(psf,
+        psf->log_printf(
                        " Sample Period : %d\n"
                        " Sample Rate   : %d\n",
                        samp_period, psf->sf.samplerate);
@@ -253,13 +253,13 @@ static int sds_read_header(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     {
         psf->sf.samplerate = 16000;
 
-        psf_log_printf(psf,
+        psf->log_printf(
                        " Sample Period : %d (should be > 0)\n"
                        " Sample Rate   : %d (guessed)\n",
                        samp_period, psf->sf.samplerate);
     };
 
-    bytesread += psf_binheader_readf(psf, "e3331", &data_length, &sustain_loop_start,
+    bytesread += psf->binheader_readf("e3331", &data_length, &sustain_loop_start,
                                      &sustain_loop_end, &loop_type);
 
     data_length = SDS_3BYTE_TO_INT_DECODE(data_length);
@@ -269,7 +269,7 @@ static int sds_read_header(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     sustain_loop_start = SDS_3BYTE_TO_INT_DECODE(sustain_loop_start);
     sustain_loop_end = SDS_3BYTE_TO_INT_DECODE(sustain_loop_end);
 
-    psf_log_printf(psf,
+    psf->log_printf(
                    " Sustain Loop\n"
                    "     Start     : %d\n"
                    "     End       : %d\n"
@@ -279,28 +279,28 @@ static int sds_read_header(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     psf->dataoffset = SDS_DATA_OFFSET;
     psf->datalength = psf->filelength - psf->dataoffset;
 
-    bytesread += psf_binheader_readf(psf, "1", &byte);
+    bytesread += psf->binheader_readf("1", &byte);
     if (byte != 0xF7)
-        psf_log_printf(psf, "bad end : %X\n", byte & 0xFF);
+        psf->log_printf("bad end : %X\n", byte & 0xFF);
 
     for (blockcount = 0; bytesread < psf->filelength; blockcount++)
     {
-        bytesread += psf_fread(&marker, 1, 2, psf);
+        bytesread += psf->fread(&marker, 1, 2);
 
         if (marker == 0)
             break;
 
-        psf_fseek(psf, SDS_BLOCK_SIZE - 2, SEEK_CUR);
+        psf->fseek(SDS_BLOCK_SIZE - 2, SEEK_CUR);
         bytesread += SDS_BLOCK_SIZE - 2;
     };
 
-    psf_log_printf(psf, "\nBlocks         : %d\n", blockcount);
+    psf->log_printf("\nBlocks         : %d\n", blockcount);
     psds->total_blocks = blockcount;
 
     psds->samplesperblock = SDS_AUDIO_BYTES_PER_BLOCK / ((psds->bitwidth + 6) / 7);
-    psf_log_printf(psf, "Samples/Block  : %d\n", psds->samplesperblock);
+    psf->log_printf("Samples/Block  : %d\n", psds->samplesperblock);
 
-    psf_log_printf(psf, "Frames         : %d\n", blockcount * psds->samplesperblock);
+    psf->log_printf("Frames         : %d\n", blockcount * psds->samplesperblock);
 
     /* Always Mono */
     psf->sf.channels = 1;
@@ -329,11 +329,11 @@ static int sds_read_header(SF_PRIVATE *psf, SDS_PRIVATE *psds)
         break;
 
     default:
-        psf_log_printf(psf, "*** Weird byte width (%d)\n", (psds->bitwidth + 7) / 8);
+        psf->log_printf("*** Weird byte width (%d)\n", (psds->bitwidth + 7) / 8);
         return SFE_SDS_BAD_BIT_WIDTH;
     };
 
-    psf_fseek(psf, SDS_DATA_OFFSET, SEEK_SET);
+    psf->fseek(SDS_DATA_OFFSET, SEEK_SET);
 
     return 0;
 }
@@ -347,14 +347,14 @@ static int sds_write_header(SF_PRIVATE *psf, int calc_length)
 
     if ((psds = (SDS_PRIVATE *)psf->codec_data) == NULL)
     {
-        psf_log_printf(psf, "*** Bad psf->codec_data ptr.\n");
+        psf->log_printf("*** Bad psf->codec_data ptr.\n");
         return SFE_INTERNAL;
     };
 
     if (psf->file.pipeoffset > 0)
         return 0;
 
-    current = psf_ftell(psf);
+    current = psf->ftell();
 
     if (calc_length)
         psf->sf.frames = psds->total_written;
@@ -366,7 +366,7 @@ static int sds_write_header(SF_PRIVATE *psf, int calc_length)
 
         psds->writer(psf, psds);
 
-        psf_fseek(psf, -1 * SDS_BLOCK_SIZE, SEEK_CUR);
+        psf->fseek(-1 * SDS_BLOCK_SIZE, SEEK_CUR);
 
         psds->write_count = current_count;
         psds->write_block = current_block;
@@ -377,9 +377,9 @@ static int sds_write_header(SF_PRIVATE *psf, int calc_length)
     psf->header.indx = 0;
 
     if (psf->file.is_pipe == SF_FALSE)
-        psf_fseek(psf, 0, SEEK_SET);
+        psf->fseek(0, SEEK_SET);
 
-    psf_binheader_writef(psf, "E211", BHW2(0xF07E), BHW1(0), BHW1(1));
+    psf->binheader_writef("E211", BHW2(0xF07E), BHW1(0), BHW1(1));
 
     switch (SF_CODEC(psf->sf.format))
     {
@@ -398,17 +398,17 @@ static int sds_write_header(SF_PRIVATE *psf, int calc_length)
 
     samp_period = SDS_INT_TO_3BYTE_ENCODE(1000000000 / psf->sf.samplerate);
 
-    psf_binheader_writef(psf, "e213", BHW2(0), BHW1(psds->bitwidth), BHW3(samp_period));
+    psf->binheader_writef("e213", BHW2(0), BHW1(psds->bitwidth), BHW3(samp_period));
 
     data_length = SDS_INT_TO_3BYTE_ENCODE(psds->total_written);
     sustain_loop_start = SDS_INT_TO_3BYTE_ENCODE(0);
     sustain_loop_end = SDS_INT_TO_3BYTE_ENCODE(0);
 
-    psf_binheader_writef(psf, "e33311", BHW3(data_length), BHW3(sustain_loop_start),
+    psf->binheader_writef("e33311", BHW3(data_length), BHW3(sustain_loop_start),
                          BHW3(sustain_loop_end), BHW1(loop_type), BHW1(0xF7));
 
     /* Header construction complete so write it out. */
-    psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
 
     if (psf->error)
         return psf->error;
@@ -417,7 +417,7 @@ static int sds_write_header(SF_PRIVATE *psf, int calc_length)
     psf->datalength = psds->write_block * SDS_BLOCK_SIZE;
 
     if (current > 0)
-        psf_fseek(psf, current, SEEK_SET);
+        psf->fseek(current, SEEK_SET);
 
     return psf->error;
 }
@@ -437,8 +437,8 @@ static int sds_2byte_read(SF_PRIVATE *psf, SDS_PRIVATE *psds)
         return 1;
     };
 
-    if ((k = psf_fread(psds->read_data, 1, SDS_BLOCK_SIZE, psf)) != SDS_BLOCK_SIZE)
-        psf_log_printf(psf, "*** Warning : short read (%d != %d).\n", k, SDS_BLOCK_SIZE);
+    if ((k = psf->fread(psds->read_data, 1, SDS_BLOCK_SIZE)) != SDS_BLOCK_SIZE)
+        psf->log_printf("*** Warning : short read (%d != %d).\n", k, SDS_BLOCK_SIZE);
 
     if (psds->read_data[0] != 0xF0)
     {
@@ -458,7 +458,7 @@ static int sds_2byte_read(SF_PRIVATE *psf, SDS_PRIVATE *psds)
 
     if (checksum != psds->read_data[SDS_BLOCK_SIZE - 2])
     {
-        psf_log_printf(psf, "Block %d : checksum is %02X should be %02X\n", psds->read_data[4],
+        psf->log_printf("Block %d : checksum is %02X should be %02X\n", psds->read_data[4],
                        checksum, psds->read_data[SDS_BLOCK_SIZE - 2]);
     };
 
@@ -487,8 +487,8 @@ static int sds_3byte_read(SF_PRIVATE *psf, SDS_PRIVATE *psds)
         return 1;
     };
 
-    if ((k = psf_fread(psds->read_data, 1, SDS_BLOCK_SIZE, psf)) != SDS_BLOCK_SIZE)
-        psf_log_printf(psf, "*** Warning : short read (%d != %d).\n", k, SDS_BLOCK_SIZE);
+    if ((k = psf->fread(psds->read_data, 1, SDS_BLOCK_SIZE)) != SDS_BLOCK_SIZE)
+        psf->log_printf("*** Warning : short read (%d != %d).\n", k, SDS_BLOCK_SIZE);
 
     if (psds->read_data[0] != 0xF0)
     {
@@ -508,7 +508,7 @@ static int sds_3byte_read(SF_PRIVATE *psf, SDS_PRIVATE *psds)
 
     if (checksum != psds->read_data[SDS_BLOCK_SIZE - 2])
     {
-        psf_log_printf(psf, "Block %d : checksum is %02X should be %02X\n", psds->read_data[4],
+        psf->log_printf("Block %d : checksum is %02X should be %02X\n", psds->read_data[4],
                        checksum, psds->read_data[SDS_BLOCK_SIZE - 2]);
     };
 
@@ -537,8 +537,8 @@ static int sds_4byte_read(SF_PRIVATE *psf, SDS_PRIVATE *psds)
         return 1;
     };
 
-    if ((k = psf_fread(psds->read_data, 1, SDS_BLOCK_SIZE, psf)) != SDS_BLOCK_SIZE)
-        psf_log_printf(psf, "*** Warning : short read (%d != %d).\n", k, SDS_BLOCK_SIZE);
+    if ((k = psf->fread(psds->read_data, 1, SDS_BLOCK_SIZE)) != SDS_BLOCK_SIZE)
+        psf->log_printf("*** Warning : short read (%d != %d).\n", k, SDS_BLOCK_SIZE);
 
     if (psds->read_data[0] != 0xF0)
     {
@@ -558,7 +558,7 @@ static int sds_4byte_read(SF_PRIVATE *psf, SDS_PRIVATE *psds)
 
     if (checksum != psds->read_data[SDS_BLOCK_SIZE - 2])
     {
-        psf_log_printf(psf, "Block %d : checksum is %02X should be %02X\n", psds->read_data[4],
+        psf->log_printf("Block %d : checksum is %02X should be %02X\n", psds->read_data[4],
                        checksum, psds->read_data[SDS_BLOCK_SIZE - 2]);
     };
 
@@ -747,7 +747,7 @@ static sf_count_t sds_seek(SF_PRIVATE *psf, int mode, sf_count_t seek_from_start
 
         file_offset = psf->dataoffset + newblock * SDS_BLOCK_SIZE;
 
-        if (psf_fseek(psf, file_offset, SEEK_SET) != file_offset)
+        if (psf->fseek(file_offset, SEEK_SET) != file_offset)
         {
             psf->error = SFE_SEEK_FAILED;
             return PSF_SEEK_ERROR;
@@ -767,7 +767,7 @@ static sf_count_t sds_seek(SF_PRIVATE *psf, int mode, sf_count_t seek_from_start
 
         file_offset = psf->dataoffset + newblock * SDS_BLOCK_SIZE;
 
-        if (psf_fseek(psf, file_offset, SEEK_SET) != file_offset)
+        if (psf->fseek(file_offset, SEEK_SET) != file_offset)
         {
             psf->error = SFE_SEEK_FAILED;
             return PSF_SEEK_ERROR;
@@ -824,8 +824,8 @@ static int sds_2byte_write(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     psds->write_data[SDS_BLOCK_SIZE - 2] = checksum;
     psds->write_data[SDS_BLOCK_SIZE - 1] = 0xF7;
 
-    if ((k = psf_fwrite(psds->write_data, 1, SDS_BLOCK_SIZE, psf)) != SDS_BLOCK_SIZE)
-        psf_log_printf(psf, "*** Warning : psf_fwrite (%d != %d).\n", k, SDS_BLOCK_SIZE);
+    if ((k = psf->fwrite(psds->write_data, 1, SDS_BLOCK_SIZE)) != SDS_BLOCK_SIZE)
+        psf->log_printf("*** Warning : psf->fwrite (%d != %d).\n", k, SDS_BLOCK_SIZE);
 
     psds->write_block++;
     psds->write_count = 0;
@@ -867,8 +867,8 @@ static int sds_3byte_write(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     psds->write_data[SDS_BLOCK_SIZE - 2] = checksum;
     psds->write_data[SDS_BLOCK_SIZE - 1] = 0xF7;
 
-    if ((k = psf_fwrite(psds->write_data, 1, SDS_BLOCK_SIZE, psf)) != SDS_BLOCK_SIZE)
-        psf_log_printf(psf, "*** Warning : psf_fwrite (%d != %d).\n", k, SDS_BLOCK_SIZE);
+    if ((k = psf->fwrite(psds->write_data, 1, SDS_BLOCK_SIZE)) != SDS_BLOCK_SIZE)
+        psf->log_printf("*** Warning : psf->fwrite (%d != %d).\n", k, SDS_BLOCK_SIZE);
 
     psds->write_block++;
     psds->write_count = 0;
@@ -911,8 +911,8 @@ static int sds_4byte_write(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     psds->write_data[SDS_BLOCK_SIZE - 2] = checksum;
     psds->write_data[SDS_BLOCK_SIZE - 1] = 0xF7;
 
-    if ((k = psf_fwrite(psds->write_data, 1, SDS_BLOCK_SIZE, psf)) != SDS_BLOCK_SIZE)
-        psf_log_printf(psf, "*** Warning : psf_fwrite (%d != %d).\n", k, SDS_BLOCK_SIZE);
+    if ((k = psf->fwrite(psds->write_data, 1, SDS_BLOCK_SIZE)) != SDS_BLOCK_SIZE)
+        psf->log_printf("*** Warning : psf->fwrite (%d != %d).\n", k, SDS_BLOCK_SIZE);
 
     psds->write_block++;
     psds->write_count = 0;

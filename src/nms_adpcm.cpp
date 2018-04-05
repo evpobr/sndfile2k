@@ -676,7 +676,7 @@ static int nms_adpcm_decode_block(SF_PRIVATE *psf, NMS_ADPCM_PRIVATE *pnms, uint
         break;
 
     default:
-        psf_log_printf(psf, "*** Error : Unhandled NMS ADPCM type %d.\n", pnms->type);
+        psf->log_printf("*** Error : Unhandled NMS ADPCM type %d.\n", pnms->type);
         return 0;
     };
 
@@ -720,7 +720,7 @@ static int nms_adpcm_encode_block(SF_PRIVATE *psf, NMS_ADPCM_PRIVATE *pnms, int1
         break;
 
     default:
-        psf_log_printf(psf, "*** Error : Unhandled NMS ADPCM type %d.\n", pnms->type);
+        psf->log_printf("*** Error : Unhandled NMS ADPCM type %d.\n", pnms->type);
         return 0;
     };
 
@@ -731,10 +731,9 @@ static int psf_nms_adpcm_decode_block(SF_PRIVATE *psf, NMS_ADPCM_PRIVATE *pnms)
 {
     int k;
 
-    if ((k = psf_fread(pnms->block, sizeof(short), pnms->shortsperblock, psf)) !=
-        pnms->shortsperblock)
+    if ((k = psf->fread(pnms->block, sizeof(short), pnms->shortsperblock)) != pnms->shortsperblock)
     {
-        psf_log_printf(psf, "*** Warning : short read (%d != %d).\n", k, pnms->shortsperblock);
+        psf->log_printf("*** Warning : short read (%d != %d).\n", k, pnms->shortsperblock);
         memset(pnms->block + (k * sizeof(short)), 0, (pnms->shortsperblock - k) * sizeof(short));
     };
 
@@ -913,9 +912,9 @@ static int psf_nms_adpcm_encode_block(SF_PRIVATE *psf, NMS_ADPCM_PRIVATE *pnms)
         endswap_short_array((signed short *)pnms->block, pnms->shortsperblock);
 
     /* Write the block to disk. */
-    if ((k = psf_fwrite(pnms->block, sizeof(short), pnms->shortsperblock, psf)) !=
+    if ((k = psf->fwrite(pnms->block, sizeof(short), pnms->shortsperblock)) !=
         pnms->shortsperblock)
-        psf_log_printf(psf, "*** Warning : short write (%d != %d).\n", k, pnms->shortsperblock);
+        psf->log_printf("*** Warning : short write (%d != %d).\n", k, pnms->shortsperblock);
 
     pnms->sample_curr = 0;
     pnms->block_curr++;
@@ -1073,7 +1072,7 @@ int nms_adpcm_init(SF_PRIVATE *psf)
 
     if (psf->codec_data != NULL)
     {
-        psf_log_printf(psf, "*** psf->codec_data is not NULL.\n");
+        psf->log_printf("*** psf->codec_data is not NULL.\n");
         return SFE_INTERNAL;
     };
 
@@ -1110,7 +1109,7 @@ int nms_adpcm_init(SF_PRIVATE *psf)
     };
     nms_adpcm_codec_init(&pnms->state, pnms->type);
 
-    psf->filelength = psf_get_filelen(psf);
+    psf->filelength = psf->get_filelen();
     if (psf->filelength < psf->dataoffset)
         psf->filelength = psf->dataoffset;
 
@@ -1135,7 +1134,7 @@ int nms_adpcm_init(SF_PRIVATE *psf)
 
     if (psf->datalength % (pnms->shortsperblock * sizeof(short)))
     {
-        psf_log_printf(psf, "*** Odd psf->datalength (%D) should be a multiple of %d\n",
+        psf->log_printf("*** Odd psf->datalength (%D) should be a multiple of %d\n",
                        psf->datalength, pnms->shortsperblock * sizeof(short));
         pnms->blocks_total = (psf->datalength / (pnms->shortsperblock * sizeof(short))) + 1;
     }
@@ -1201,7 +1200,7 @@ static sf_count_t nms_adpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
         return PSF_SEEK_ERROR;
     };
 
-    if (psf_fseek(psf, psf->dataoffset, SEEK_SET) == PSF_SEEK_ERROR)
+    if (psf->fseek(psf->dataoffset, SEEK_SET) == PSF_SEEK_ERROR)
         return PSF_SEEK_ERROR;
 
     nms_adpcm_codec_init(&pnms->state, pnms->type);

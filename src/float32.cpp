@@ -91,7 +91,7 @@ int float32_init(SF_PRIVATE *psf)
 
     if (psf->sf.channels < 1)
     {
-        psf_log_printf(psf, "float32_init : internal error : channels = %d\n", psf->sf.channels);
+        psf->log_printf("float32_init : internal error : channels = %d\n", psf->sf.channels);
         return SFE_INTERNAL;
     };
 
@@ -439,7 +439,7 @@ static int float32_get_capability(SF_PRIVATE *psf)
     };
 
     /* Floats are broken. Don't expect reading or writing to be fast. */
-    psf_log_printf(psf, "Using IEEE replacement code for float.\n");
+    psf->log_printf("Using IEEE replacement code for float.\n");
 
     return (CPU_IS_LITTLE_ENDIAN) ? FLOAT_BROKEN_LE : FLOAT_BROKEN_BE;
 }
@@ -546,7 +546,7 @@ static size_t host_read_f2s(SF_PRIVATE *psf, short *ptr, size_t len)
     {
         if (len < bufferlen)
             bufferlen = len;
-        readcount = psf_fread(ubuf.fbuf, sizeof(float), bufferlen, psf);
+        readcount = psf->fread(ubuf.fbuf, sizeof(float), bufferlen);
 
         /* Fix me : Need lef2s_array */
         if (psf->data_endswap == SF_TRUE)
@@ -578,7 +578,7 @@ static size_t host_read_f2i(SF_PRIVATE *psf, int *ptr, size_t len)
     {
         if (len < bufferlen)
             bufferlen = len;
-        readcount = psf_fread(ubuf.fbuf, sizeof(float), bufferlen, psf);
+        readcount = psf->fread(ubuf.fbuf, sizeof(float), bufferlen);
 
         if (psf->data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
@@ -600,7 +600,7 @@ static size_t host_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
 
     if (psf->data_endswap != SF_TRUE)
-        return psf_fread(ptr, sizeof(float), len, psf);
+        return psf->fread(ptr, sizeof(float), len);
 
     bufferlen = ARRAY_LEN(ubuf.fbuf);
 
@@ -608,7 +608,7 @@ static size_t host_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     {
         if (len < bufferlen)
             bufferlen = len;
-        readcount = psf_fread(ubuf.fbuf, sizeof(float), bufferlen, psf);
+        readcount = psf->fread(ubuf.fbuf, sizeof(float), bufferlen);
 
         endswap_int_copy((int *)(ptr + total), ubuf.ibuf, readcount);
 
@@ -633,7 +633,7 @@ static size_t host_read_f2d(SF_PRIVATE *psf, double *ptr, size_t len)
     {
         if (len < bufferlen)
             bufferlen = len;
-        readcount = psf_fread(ubuf.fbuf, sizeof(float), bufferlen, psf);
+        readcount = psf->fread(ubuf.fbuf, sizeof(float), bufferlen);
 
         if (psf->data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
@@ -672,7 +672,7 @@ static size_t host_write_s2f(SF_PRIVATE *psf, const short *ptr, size_t len)
         if (psf->data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
-        writecount = psf_fwrite(ubuf.fbuf, sizeof(float), bufferlen, psf);
+        writecount = psf->fwrite(ubuf.fbuf, sizeof(float), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
             break;
@@ -704,7 +704,7 @@ static size_t host_write_i2f(SF_PRIVATE *psf, const int *ptr, size_t len)
         if (psf->data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
-        writecount = psf_fwrite(ubuf.fbuf, sizeof(float), bufferlen, psf);
+        writecount = psf->fwrite(ubuf.fbuf, sizeof(float), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
             break;
@@ -724,7 +724,7 @@ static size_t host_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
         float32_peak_update(psf, ptr, len, 0);
 
     if (psf->data_endswap != SF_TRUE)
-        return psf_fwrite(ptr, sizeof(float), len, psf);
+        return psf->fwrite(ptr, sizeof(float), len);
 
     bufferlen = ARRAY_LEN(ubuf.fbuf);
 
@@ -735,7 +735,7 @@ static size_t host_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
 
         endswap_int_copy(ubuf.ibuf, (const int *)(ptr + total), bufferlen);
 
-        writecount = psf_fwrite(ubuf.fbuf, sizeof(float), bufferlen, psf);
+        writecount = psf->fwrite(ubuf.fbuf, sizeof(float), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
             break;
@@ -766,7 +766,7 @@ static size_t host_write_d2f(SF_PRIVATE *psf, const double *ptr, size_t len)
         if (psf->data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
-        writecount = psf_fwrite(ubuf.fbuf, sizeof(float), bufferlen, psf);
+        writecount = psf->fwrite(ubuf.fbuf, sizeof(float), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
             break;
@@ -790,7 +790,7 @@ static size_t replace_read_f2s(SF_PRIVATE *psf, short *ptr, size_t len)
     {
         if (len < bufferlen)
             bufferlen = len;
-        readcount = psf_fread(ubuf.fbuf, sizeof(float), bufferlen, psf);
+        readcount = psf->fread(ubuf.fbuf, sizeof(float), bufferlen);
 
         if (psf->data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
@@ -821,7 +821,7 @@ static size_t replace_read_f2i(SF_PRIVATE *psf, int *ptr, size_t len)
     {
         if (len < bufferlen)
             bufferlen = len;
-        readcount = psf_fread(ubuf.fbuf, sizeof(float), bufferlen, psf);
+        readcount = psf->fread(ubuf.fbuf, sizeof(float), bufferlen);
 
         if (psf->data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
@@ -852,7 +852,7 @@ static size_t replace_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     {
         if (len < bufferlen)
             bufferlen = len;
-        readcount = psf_fread(ubuf.fbuf, sizeof(float), bufferlen, psf);
+        readcount = psf->fread(ubuf.fbuf, sizeof(float), bufferlen);
 
         if (psf->data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
@@ -882,7 +882,7 @@ static size_t replace_read_f2d(SF_PRIVATE *psf, double *ptr, size_t len)
     {
         if (len < bufferlen)
             bufferlen = len;
-        readcount = psf_fread(ubuf.fbuf, sizeof(float), bufferlen, psf);
+        readcount = psf->fread(ubuf.fbuf, sizeof(float), bufferlen);
 
         if (psf->data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
@@ -923,7 +923,7 @@ static size_t replace_write_s2f(SF_PRIVATE *psf, const short *ptr, size_t len)
         if (psf->data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
-        writecount = psf_fwrite(ubuf.fbuf, sizeof(float), bufferlen, psf);
+        writecount = psf->fwrite(ubuf.fbuf, sizeof(float), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
             break;
@@ -957,7 +957,7 @@ static size_t replace_write_i2f(SF_PRIVATE *psf, const int *ptr, size_t len)
         if (psf->data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
-        writecount = psf_fwrite(ubuf.fbuf, sizeof(float), bufferlen, psf);
+        writecount = psf->fwrite(ubuf.fbuf, sizeof(float), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
             break;
@@ -991,7 +991,7 @@ static size_t replace_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
         if (psf->data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
-        writecount = psf_fwrite(ubuf.fbuf, sizeof(float), bufferlen, psf);
+        writecount = psf->fwrite(ubuf.fbuf, sizeof(float), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
             break;
@@ -1023,7 +1023,7 @@ static size_t replace_write_d2f(SF_PRIVATE *psf, const double *ptr, size_t len)
         if (psf->data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
-        writecount = psf_fwrite(ubuf.fbuf, sizeof(float), bufferlen, psf);
+        writecount = psf->fwrite(ubuf.fbuf, sizeof(float), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
             break;

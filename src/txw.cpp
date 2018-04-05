@@ -99,7 +99,7 @@ int txw_open(SF_PRIVATE *psf)
     if ((error = txw_read_header(psf)))
         return error;
 
-    if (psf_fseek(psf, psf->dataoffset, SEEK_SET) != psf->dataoffset)
+    if (psf->fseek(psf->dataoffset, SEEK_SET) != psf->dataoffset)
         return SFE_BAD_SEEK;
 
     psf->read_short = txw_read_s;
@@ -120,18 +120,18 @@ static int txw_read_header(SF_PRIVATE *psf)
 
     memset(&txwh, 0, sizeof(txwh));
     memset(ubuf.cbuf, 0, sizeof(ubuf.cbuf));
-    psf_binheader_readf(psf, "pb", 0, ubuf.cbuf, 16);
+    psf->binheader_readf("pb", 0, ubuf.cbuf, 16);
 
     if (memcmp(ubuf.cbuf, "LM8953\0\0\0\0\0\0\0\0\0\0", 16) != 0)
         return ERROR_666;
 
-    psf_log_printf(psf, "Read only : Yamaha TX-16 Sampler (.txw)\nLM8953\n");
+    psf->log_printf("Read only : Yamaha TX-16 Sampler (.txw)\nLM8953\n");
 
     /* Jump 6 bytes (dummp_aeg), read format, read sample rate. */
-    psf_binheader_readf(psf, "j11", 6, &txwh.format, &txwh.srate);
+    psf->binheader_readf("j11", 6, &txwh.format, &txwh.srate);
 
     /* 8 bytes (atc_length[3], rpt_length[3], unused[2]). */
-    psf_binheader_readf(psf, "e33j", &txwh.attacklen, &txwh.repeatlen, 2);
+    psf->binheader_readf("e33j", &txwh.attacklen, &txwh.repeatlen, 2);
     txwh.sr2 = (txwh.attacklen >> 16) & 0xFE;
     txwh.sr3 = (txwh.repeatlen >> 16) & 0xFE;
     txwh.attacklen &= 0x1FFFF;
@@ -148,11 +148,11 @@ static int txw_read_header(SF_PRIVATE *psf)
         break;
 
     default:
-        psf_log_printf(psf, " Format      : 0x%02x => ?????\n", txwh.format);
+        psf->log_printf(" Format      : 0x%02x => ?????\n", txwh.format);
         return ERROR_666;
     };
 
-    psf_log_printf(psf, " Format      : 0x%02X => %s\n", txwh.format, strptr);
+    psf->log_printf(" Format      : 0x%02X => %s\n", txwh.format, strptr);
 
     strptr = NULL;
 
@@ -195,17 +195,17 @@ static int txw_read_header(SF_PRIVATE *psf)
     };
 
     if (strptr)
-        psf_log_printf(psf, strptr);
+        psf->log_printf(strptr);
     else if (txwh.srhash)
-        psf_log_printf(psf, " Sample Rate : %d (0x%X) => %d\n", txwh.srate, txwh.srhash,
+        psf->log_printf(" Sample Rate : %d (0x%X) => %d\n", txwh.srate, txwh.srhash,
                        psf->sf.samplerate);
     else
-        psf_log_printf(psf, " Sample Rate : %d => %d\n", txwh.srate, psf->sf.samplerate);
+        psf->log_printf(" Sample Rate : %d => %d\n", txwh.srate, psf->sf.samplerate);
 
     if (txwh.format == TXW_LOOPED)
     {
-        psf_log_printf(psf, " Attack Len  : %d\n", txwh.attacklen);
-        psf_log_printf(psf, " Repeat Len  : %d\n", txwh.repeatlen);
+        psf->log_printf(" Attack Len  : %d\n", txwh.attacklen);
+        psf->log_printf(" Repeat Len  : %d\n", txwh.repeatlen);
     };
 
     psf->dataoffset = TXW_DATA_OFFSET;
@@ -213,11 +213,11 @@ static int txw_read_header(SF_PRIVATE *psf)
     psf->sf.frames = 2 * psf->datalength / 3;
 
     if (psf->datalength % 3 == 1)
-        psf_log_printf(psf, "*** File seems to be truncated, %d extra bytes.\n",
+        psf->log_printf("*** File seems to be truncated, %d extra bytes.\n",
                        (int)(psf->datalength % 3));
 
     if (txwh.attacklen + txwh.repeatlen > psf->sf.frames)
-        psf_log_printf(psf, "*** File has been truncated.\n");
+        psf->log_printf("*** File has been truncated.\n");
 
     psf->sf.format = SF_FORMAT_TXW | SF_FORMAT_PCM_16;
     psf->sf.channels = 1;
@@ -239,7 +239,7 @@ static size_t txw_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     while (len > 0)
     {
         readcount = (len >= bufferlen) ? bufferlen : len;
-        count = psf_fread(ubuf.cbuf, 3, readcount, psf);
+        count = psf->fread(ubuf.cbuf, 3, readcount);
 
         ucptr = ubuf.ucbuf;
         for (k = 0; k < readcount; k += 2)
@@ -270,7 +270,7 @@ static size_t txw_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     while (len > 0)
     {
         readcount = (len >= bufferlen) ? bufferlen : len;
-        count = psf_fread(ubuf.cbuf, 3, readcount, psf);
+        count = psf->fread(ubuf.cbuf, 3, readcount);
 
         ucptr = ubuf.ucbuf;
         for (k = 0; k < readcount; k += 2)
@@ -307,7 +307,7 @@ static size_t txw_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     while (len > 0)
     {
         readcount = (len >= bufferlen) ? bufferlen : len;
-        count = psf_fread(ubuf.cbuf, 3, readcount, psf);
+        count = psf->fread(ubuf.cbuf, 3, readcount);
 
         ucptr = ubuf.ucbuf;
         for (k = 0; k < readcount; k += 2)
@@ -344,7 +344,7 @@ static size_t txw_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     while (len > 0)
     {
         readcount = (len >= bufferlen) ? bufferlen : len;
-        count = psf_fread(ubuf.cbuf, 3, readcount, psf);
+        count = psf->fread(ubuf.cbuf, 3, readcount);
 
         ucptr = ubuf.ucbuf;
         for (k = 0; k < readcount; k += 2)

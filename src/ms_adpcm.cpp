@@ -109,7 +109,7 @@ int wavlike_msadpcm_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 
     if (psf->codec_data != NULL)
     {
-        psf_log_printf(psf, "*** psf->codec_data is not NULL.\n");
+        psf->log_printf("*** psf->codec_data is not NULL.\n");
         return SFE_INTERNAL;
     };
 
@@ -118,7 +118,7 @@ int wavlike_msadpcm_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 
     if (blockalign < 7 * psf->sf.channels)
     {
-        psf_log_printf(psf, "*** Error blockalign (%d) should be > %d.\n", blockalign,
+        psf->log_printf("*** Error blockalign (%d) should be > %d.\n", blockalign,
                        7 * psf->sf.channels);
         return SFE_INTERNAL;
     };
@@ -139,7 +139,7 @@ int wavlike_msadpcm_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 
     if (pms->blocksize <= 0)
     {
-        psf_log_printf(psf, "*** Error : pms->blocksize should be > 0.\n");
+        psf->log_printf("*** Error : pms->blocksize should be > 0.\n");
         return SFE_INTERNAL;
     };
 
@@ -155,7 +155,7 @@ int wavlike_msadpcm_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
         count = 2 * (pms->blocksize - 6 * pms->channels) / pms->channels;
         if (pms->samplesperblock != count)
         {
-            psf_log_printf(psf, "*** Error : samplesperblock should be %d.\n", count);
+            psf->log_printf("*** Error : samplesperblock should be %d.\n", count);
             return SFE_INTERNAL;
         };
 
@@ -194,7 +194,7 @@ static inline short msadpcm_get_bpred(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, uns
         if (pms->sync_error == 0)
         {
             pms->sync_error = 1;
-            psf_log_printf(psf, "MS ADPCM synchronisation error (%u should be < %u).\n", value,
+            psf->log_printf("MS ADPCM synchronisation error (%u should be < %u).\n", value,
                            WAVLIKE_MSADPCM_ADAPT_COEFF_COUNT);
         };
         return 0;
@@ -220,9 +220,9 @@ static int msadpcm_decode_block(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
         return 1;
     };
 
-    if ((k = psf_fread(pms->block, 1, pms->blocksize, psf)) != pms->blocksize)
+    if ((k = psf->fread(pms->block, 1, pms->blocksize)) != pms->blocksize)
     {
-        psf_log_printf(psf, "*** Warning : short read (%d != %d).\n", k, pms->blocksize);
+        psf->log_printf("*** Warning : short read (%d != %d).\n", k, pms->blocksize);
         if (k <= 0)
             return 1;
     };
@@ -483,7 +483,7 @@ static sf_count_t msadpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
     if (offset == 0)
     {
-        psf_fseek(psf, psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->dataoffset, SEEK_SET);
         pms->blockcount = 0;
         msadpcm_decode_block(psf, pms);
         pms->samplecount = 0;
@@ -501,7 +501,7 @@ static sf_count_t msadpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
     if (mode == SFM_READ)
     {
-        psf_fseek(psf, psf->dataoffset + newblock * pms->blocksize, SEEK_SET);
+        psf->fseek(psf->dataoffset + newblock * pms->blocksize, SEEK_SET);
         pms->blockcount = newblock;
         msadpcm_decode_block(psf, pms);
         pms->samplecount = newsample;
@@ -521,7 +521,7 @@ void wavlike_msadpcm_write_adapt_coeffs(SF_PRIVATE *psf)
     int k;
 
     for (k = 0; k < WAVLIKE_MSADPCM_ADAPT_COEFF_COUNT; k++)
-        psf_binheader_writef(psf, "22", BHW2(AdaptCoeff1[k]), BHW2(AdaptCoeff2[k]));
+        psf->binheader_writef("22", BHW2(AdaptCoeff1[k]), BHW2(AdaptCoeff2[k]));
 }
 
 static int msadpcm_encode_block(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
@@ -643,8 +643,8 @@ static int msadpcm_encode_block(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
 
     /* Write the block to disk. */
 
-    if ((k = psf_fwrite(pms->block, 1, pms->blocksize, psf)) != pms->blocksize)
-        psf_log_printf(psf, "*** Warning : short write (%d != %d).\n", k, pms->blocksize);
+    if ((k = psf->fwrite(pms->block, 1, pms->blocksize)) != pms->blocksize)
+        psf->log_printf("*** Warning : short write (%d != %d).\n", k, pms->blocksize);
 
     memset(pms->samples, 0, pms->samplesperblock * sizeof(short));
 

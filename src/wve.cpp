@@ -79,53 +79,53 @@ static int wve_read_header(SF_PRIVATE *psf)
 {
     /* Set position to start of file to begin reading header. */
     uint32_t marker;
-	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-    psf_binheader_readf(psf, "m", &marker);
+	psf->binheader_seekf(0, SF_SEEK_SET);
+    psf->binheader_readf("m", &marker);
     if (marker != ALAW_MARKER)
     {
-        psf_log_printf(psf, "Could not find '%M'\n", ALAW_MARKER);
+        psf->log_printf("Could not find '%M'\n", ALAW_MARKER);
         return SFE_WVE_NOT_WVE;
     };
 
-    psf_binheader_readf(psf, "m", &marker);
+    psf->binheader_readf("m", &marker);
     if (marker != SOUN_MARKER)
     {
-        psf_log_printf(psf, "Could not find '%M'\n", SOUN_MARKER);
+        psf->log_printf("Could not find '%M'\n", SOUN_MARKER);
         return SFE_WVE_NOT_WVE;
     };
 
-    psf_binheader_readf(psf, "m", &marker);
+    psf->binheader_readf("m", &marker);
     if (marker != DFIL_MARKER)
     {
-        psf_log_printf(psf, "Could not find '%M'\n", DFIL_MARKER);
+        psf->log_printf("Could not find '%M'\n", DFIL_MARKER);
         return SFE_WVE_NOT_WVE;
     };
 
-    psf_binheader_readf(psf, "m", &marker);
+    psf->binheader_readf("m", &marker);
     if (marker != ESSN_MARKER)
     {
-        psf_log_printf(psf, "Could not find '%M'\n", ESSN_MARKER);
+        psf->log_printf("Could not find '%M'\n", ESSN_MARKER);
         return SFE_WVE_NOT_WVE;
     };
 
     uint16_t version;
-    psf_binheader_readf(psf, "E2", &version);
+    psf->binheader_readf("E2", &version);
 
-    psf_log_printf(psf, "Psion Palmtop Alaw (.wve)\n"
+    psf->log_printf("Psion Palmtop Alaw (.wve)\n"
                         "  Sample Rate : 8000\n"
                         "  Channels    : 1\n"
                         "  Encoding    : A-law\n");
 
     if (version != PSION_VERSION)
-        psf_log_printf(psf, "Psion version %d should be %d\n", version, PSION_VERSION);
+        psf->log_printf("Psion version %d should be %d\n", version, PSION_VERSION);
 
     uint32_t datalength;
-    psf_binheader_readf(psf, "E4", &datalength);
+    psf->binheader_readf("E4", &datalength);
     psf->dataoffset = PSION_DATAOFFSET;
     if (datalength != psf->filelength - psf->dataoffset)
     {
         psf->datalength = psf->filelength - psf->dataoffset;
-        psf_log_printf(psf, "Data length %d should be %D\n", datalength, psf->datalength);
+        psf->log_printf("Data length %d should be %D\n", datalength, psf->datalength);
     }
     else
     {
@@ -133,7 +133,7 @@ static int wve_read_header(SF_PRIVATE *psf)
     }
 
     uint16_t padding, repeats, trash;
-    psf_binheader_readf(psf, "E22222", &padding, &repeats, &trash, &trash, &trash);
+    psf->binheader_readf("E22222", &padding, &repeats, &trash, &trash, &trash);
 
     psf->sf.format = SF_FORMAT_WVE | SF_FORMAT_ALAW;
     psf->sf.samplerate = 8000;
@@ -145,11 +145,11 @@ static int wve_read_header(SF_PRIVATE *psf)
 
 static int wve_write_header(SF_PRIVATE *psf, int calc_length)
 {
-    sf_count_t current = current = psf_ftell(psf);
+    sf_count_t current = current = psf->ftell();
 
     if (calc_length)
     {
-        psf->filelength = psf_get_filelen(psf);
+        psf->filelength = psf->get_filelen();
 
         psf->datalength = psf->filelength - psf->dataoffset;
         if (psf->dataend)
@@ -161,15 +161,15 @@ static int wve_write_header(SF_PRIVATE *psf, int calc_length)
     /* Reset the current header length to zero. */
     psf->header.ptr[0] = 0;
     psf->header.indx = 0;
-    psf_fseek(psf, 0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
 
     /* Write header. */
     uint32_t datalen = (uint32_t)psf->datalength;
-    psf_binheader_writef(psf, "Emmmm", BHWm(ALAW_MARKER), BHWm(SOUN_MARKER), BHWm(DFIL_MARKER),
+    psf->binheader_writef("Emmmm", BHWm(ALAW_MARKER), BHWm(SOUN_MARKER), BHWm(DFIL_MARKER),
                          BHWm(ESSN_MARKER));
-    psf_binheader_writef(psf, "E2422222", BHW2(PSION_VERSION), BHW4(datalen), BHW2(0), BHW2(0),
+    psf->binheader_writef("E2422222", BHW2(PSION_VERSION), BHW4(datalen), BHW2(0), BHW2(0),
                          BHW2(0), BHW2(0), BHW2(0));
-    psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
 
     if (psf->sf.channels != 1)
         return SFE_CHANNEL_COUNT;
@@ -180,7 +180,7 @@ static int wve_write_header(SF_PRIVATE *psf, int calc_length)
     psf->dataoffset = psf->header.indx;
 
     if (current > 0)
-        psf_fseek(psf, current, SEEK_SET);
+        psf->fseek(current, SEEK_SET);
 
     return psf->error;
 }

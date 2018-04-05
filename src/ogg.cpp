@@ -70,18 +70,18 @@ int ogg_read_first_page(SF_PRIVATE *psf, OGG_PRIVATE *odata)
     */
 
     /* Avoid seeking if the file has just been opened. */
-    if (psf_ftell(psf) == psf->header.indx)
+    if (psf->ftell() == psf->header.indx)
     {
         // Grab the part of the header that has already been read.
         memcpy(buffer, psf->header.ptr, psf->header.indx);
         bytes = psf->header.indx;
-        bytes += psf_fread(buffer + psf->header.indx, 1, 4096 - psf->header.indx, psf);
+        bytes += psf->fread(buffer + psf->header.indx, 1, 4096 - psf->header.indx);
     }
     else
     {
-        if (psf_fseek(psf, 0, SEEK_SET) != 0)
+        if (psf->fseek(0, SEEK_SET) != 0)
             return SFE_NOT_SEEKABLE;
-        bytes = psf_fread(buffer, 1, 4096, psf);
+        bytes = psf->fread(buffer, 1, 4096);
     }
 
     ogg_sync_wrote(&odata->osync, bytes);
@@ -99,7 +99,7 @@ int ogg_read_first_page(SF_PRIVATE *psf, OGG_PRIVATE *odata)
         ** bitstream and no complete page was in the buffer.
         */
 
-        psf_log_printf(psf, "Input does not appear to be the start of an Ogg bitstream.\n");
+        psf->log_printf("Input does not appear to be the start of an Ogg bitstream.\n");
         return SFE_MALFORMED_FILE;
     };
 
@@ -113,14 +113,14 @@ int ogg_read_first_page(SF_PRIVATE *psf, OGG_PRIVATE *odata)
     if (ogg_stream_pagein(&odata->ostream, &odata->opage) < 0)
     {
         // Error ; stream version mismatch perhaps.
-        psf_log_printf(psf, "Error reading first page of Ogg bitstream data\n");
+        psf->log_printf("Error reading first page of Ogg bitstream data\n");
         return SFE_MALFORMED_FILE;
     };
 
     if (ogg_stream_packetout(&odata->ostream, &odata->opacket) != 1)
     {
         // No page?
-        psf_log_printf(psf, "Error reading initial header page packet.\n");
+        psf->log_printf("Error reading initial header page packet.\n");
         return SFE_MALFORMED_FILE;
     };
 
@@ -130,7 +130,7 @@ int ogg_read_first_page(SF_PRIVATE *psf, OGG_PRIVATE *odata)
 int ogg_open(SF_PRIVATE *psf)
 {
     OGG_PRIVATE *odata = (OGG_PRIVATE *)calloc(1, sizeof(OGG_PRIVATE));
-    sf_count_t pos = psf_ftell(psf);
+    sf_count_t pos = psf->ftell();
     int error = 0;
 
     psf->container_data = odata;
@@ -155,7 +155,7 @@ int ogg_open(SF_PRIVATE *psf)
         // Reset everything to an initial state.
         ogg_sync_clear(&odata->osync);
         ogg_stream_clear(&odata->ostream);
-        psf_fseek(psf, pos, SEEK_SET);
+        psf->fseek(pos, SEEK_SET);
         free(psf->container_data);
         psf->container_data = NULL;
         psf->container_close = NULL;
@@ -174,7 +174,7 @@ int ogg_open(SF_PRIVATE *psf)
         break;
     };
 
-    psf_log_printf(psf, "%s : bad psf->sf.format 0x%x.\n", __func__, psf->sf.format);
+    psf->log_printf("%s : bad psf->sf.format 0x%x.\n", __func__, psf->sf.format);
     return SFE_INTERNAL;
 }
 
@@ -217,14 +217,14 @@ static int ogg_stream_classify(SF_PRIVATE *psf, OGG_PRIVATE *odata)
         return 0;
 
     case OGG_PCM:
-        psf_log_printf(psf, "Detected Ogg/PCM data. This is not supported yet.\n");
+        psf->log_printf("Detected Ogg/PCM data. This is not supported yet.\n");
         return SFE_UNIMPLEMENTED;
 
     default:
         break;
     };
 
-    psf_log_printf(psf, "This Ogg bitstream contains some uknown data type.\n");
+    psf->log_printf("This Ogg bitstream contains some uknown data type.\n");
     return SFE_UNIMPLEMENTED;
 }
 
@@ -250,21 +250,21 @@ static int ogg_page_classify(SF_PRIVATE *psf, const ogg_page *og)
 
         if (memcmp(og->body, codec_lookup[k].str, codec_lookup[k].len) == 0)
         {
-            psf_log_printf(psf, "Ogg stream data : %s\n", codec_lookup[k].name);
-            psf_log_printf(psf, "Stream serialno : %u\n", (uint32_t)ogg_page_serialno(og));
+            psf->log_printf("Ogg stream data : %s\n", codec_lookup[k].name);
+            psf->log_printf("Stream serialno : %u\n", (uint32_t)ogg_page_serialno(og));
             return codec_lookup[k].codec;
         };
     };
 
     len = og->body_len < 8 ? og->body_len : 8;
 
-    psf_log_printf(psf, "Ogg_stream data : '");
+    psf->log_printf("Ogg_stream data : '");
     for (k = 0; k < len; k++)
-        psf_log_printf(psf, "%c", isprint(og->body[k]) ? og->body[k] : '.');
-    psf_log_printf(psf, "'     ");
+        psf->log_printf("%c", isprint(og->body[k]) ? og->body[k] : '.');
+    psf->log_printf("'     ");
     for (k = 0; k < len; k++)
-        psf_log_printf(psf, " %02x", og->body[k] & 0xff);
-    psf_log_printf(psf, "\n");
+        psf->log_printf(" %02x", og->body[k] & 0xff);
+    psf->log_printf("\n");
 
     return 0;
 }
@@ -273,7 +273,7 @@ static int ogg_page_classify(SF_PRIVATE *psf, const ogg_page *og)
 
 int ogg_open(SF_PRIVATE *psf)
 {
-    psf_log_printf(psf, "This version of libsndfile was compiled without "
+    psf->log_printf("This version of libsndfile was compiled without "
                         "Ogg/Vorbis support.\n");
     return SFE_UNIMPLEMENTED;
 }

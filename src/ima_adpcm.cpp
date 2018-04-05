@@ -103,7 +103,7 @@ int wavlike_ima_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 
     if (psf->codec_data != NULL)
     {
-        psf_log_printf(psf, "*** psf->codec_data is not NULL.\n");
+        psf->log_printf("*** psf->codec_data is not NULL.\n");
         return SFE_INTERNAL;
     };
 
@@ -189,19 +189,19 @@ static int ima_reader_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
     pima->blocksize = blockalign;
     pima->samplesperblock = samplesperblock;
 
-    psf->filelength = psf_get_filelen(psf);
+    psf->filelength = psf->get_filelen();
     psf->datalength =
         (psf->dataend) ? psf->dataend - psf->dataoffset : psf->filelength - psf->dataoffset;
 
     if (pima->blocksize <= 0)
     {
-        psf_log_printf(psf, "*** Error : pima->blocksize should be > 0.\n");
+        psf->log_printf("*** Error : pima->blocksize should be > 0.\n");
         return SFE_INTERNAL;
     };
 
     if (pima->samplesperblock <= 0)
     {
-        psf_log_printf(psf, "*** Error : pima->samplesperblock should be > 0.\n");
+        psf->log_printf("*** Error : pima->samplesperblock should be > 0.\n");
         return SFE_INTERNAL;
     };
 
@@ -218,7 +218,7 @@ static int ima_reader_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 
         if (pima->samplesperblock != count)
         {
-            psf_log_printf(psf, "*** Error : samplesperblock should be %d.\n", count);
+            psf->log_printf("*** Error : samplesperblock should be %d.\n", count);
             return SFE_INTERNAL;
         };
 
@@ -228,13 +228,13 @@ static int ima_reader_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
         break;
 
     case SF_FORMAT_AIFF:
-        psf_log_printf(psf, "still need to check block count\n");
+        psf->log_printf("still need to check block count\n");
         pima->decode_block = aiff_ima_decode_block;
         psf->sf.frames = pima->samplesperblock * pima->blocks / pima->channels;
         break;
 
     default:
-        psf_log_printf(psf, "ima_reader_init: bad psf->sf.format\n");
+        psf->log_printf("ima_reader_init: bad psf->sf.format\n");
         return SFE_INTERNAL;
     };
 
@@ -266,9 +266,9 @@ static int aiff_ima_decode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
         return 1;
     };
 
-    if ((k = psf_fread(pima->block, 1, pima->blocksize * pima->channels, psf)) !=
+    if ((k = psf->fread(pima->block, 1, pima->blocksize * pima->channels)) !=
         pima->blocksize * pima->channels)
-        psf_log_printf(psf, "*** Warning : short read (%d != %d).\n", k, pima->blocksize);
+        psf->log_printf("*** Warning : short read (%d != %d).\n", k, pima->blocksize);
 
     /* Read and check the block header. */
     for (chan = 0; chan < pima->channels; chan++)
@@ -402,10 +402,10 @@ static int aiff_ima_encode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 
     /* Write the block to disk. */
 
-    if ((k = psf_fwrite(pima->block, 1, pima->channels * pima->blocksize, psf)) !=
+    if ((k = psf->fwrite(pima->block, 1, pima->channels * pima->blocksize)) !=
         pima->channels * pima->blocksize)
-        psf_log_printf(psf, "*** Warning : short write (%d != %d).\n", k,
-                       pima->channels * pima->blocksize);
+        psf->log_printf("*** Warning : short write (%d != %d).\n", k,
+                        pima->channels * pima->blocksize);
 
     memset(pima->samples, 0, pima->channels * pima->samplesperblock * sizeof(short));
     pima->samplecount = 0;
@@ -428,8 +428,8 @@ static int wavlike_ima_decode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
         return 1;
     };
 
-    if ((k = psf_fread(pima->block, 1, pima->blocksize, psf)) != pima->blocksize)
-        psf_log_printf(psf, "*** Warning : short read (%d != %d).\n", k, pima->blocksize);
+    if ((k = psf->fread(pima->block, 1, pima->blocksize)) != pima->blocksize)
+        psf->log_printf("*** Warning : short read (%d != %d).\n", k, pima->blocksize);
 
     /* Read and check the block header. */
 
@@ -443,7 +443,7 @@ static int wavlike_ima_decode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
         stepindx[chan] = clamp_ima_step_index(stepindx[chan]);
 
         if (pima->block[chan * 4 + 3] != 0)
-            psf_log_printf(psf, "IMA ADPCM synchronisation error.\n");
+            psf->log_printf("IMA ADPCM synchronisation error.\n");
 
         pima->samples[chan] = predictor;
     };
@@ -596,8 +596,8 @@ static int wavlike_ima_encode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 
     /* Write the block to disk. */
 
-    if ((k = psf_fwrite(pima->block, 1, pima->blocksize, psf)) != pima->blocksize)
-        psf_log_printf(psf, "*** Warning : short write (%d != %d).\n", k, pima->blocksize);
+    if ((k = psf->fwrite(pima->block, 1, pima->blocksize)) != pima->blocksize)
+        psf->log_printf("*** Warning : short write (%d != %d).\n", k, pima->blocksize);
 
     memset(pima->samples, 0, pima->samplesperblock * sizeof(short));
     pima->samplecount = 0;
@@ -769,7 +769,7 @@ static sf_count_t aiff_ima_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
     if (offset == 0)
     {
-        psf_fseek(psf, psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->dataoffset, SEEK_SET);
         pima->blockcount = 0;
         pima->decode_block(psf, pima);
         pima->samplecount = 0;
@@ -788,7 +788,7 @@ static sf_count_t aiff_ima_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
     if (mode == SFM_READ)
     {
-        psf_fseek(psf, psf->dataoffset + newblockaiff * pima->blocksize, SEEK_SET);
+        psf->fseek(psf->dataoffset + newblockaiff * pima->blocksize, SEEK_SET);
         pima->blockcount = newblockaiff;
         pima->decode_block(psf, pima);
         pima->samplecount = newsample;
@@ -820,7 +820,7 @@ static sf_count_t wavlike_ima_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
     if (offset == 0)
     {
-        psf_fseek(psf, psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->dataoffset, SEEK_SET);
         pima->blockcount = 0;
         pima->decode_block(psf, pima);
         pima->samplecount = 0;
@@ -838,7 +838,7 @@ static sf_count_t wavlike_ima_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
     if (mode == SFM_READ)
     {
-        psf_fseek(psf, psf->dataoffset + newblock * pima->blocksize, SEEK_SET);
+        psf->fseek(psf->dataoffset + newblock * pima->blocksize, SEEK_SET);
         pima->blockcount = newblock;
         pima->decode_block(psf, pima);
         pima->samplecount = newsample;
@@ -892,7 +892,7 @@ static int ima_writer_init(SF_PRIVATE *psf, int blockalign)
         break;
 
     default:
-        psf_log_printf(psf, "ima_reader_init: bad psf->sf.format\n");
+        psf->log_printf("ima_reader_init: bad psf->sf.format\n");
         return SFE_INTERNAL;
     };
 

@@ -94,15 +94,15 @@ static int htk_write_header(SF_PRIVATE *psf, int calc_length)
     sf_count_t current;
     int sample_count, sample_period;
 
-    current = psf_ftell(psf);
+    current = psf->ftell();
 
     if (calc_length)
-        psf->filelength = psf_get_filelen(psf);
+        psf->filelength = psf->get_filelen();
 
     /* Reset the current header length to zero. */
     psf->header.ptr[0] = 0;
     psf->header.indx = 0;
-    psf_fseek(psf, 0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
 
     if (psf->filelength > 12)
         sample_count = (psf->filelength - 12) / 2;
@@ -111,10 +111,10 @@ static int htk_write_header(SF_PRIVATE *psf, int calc_length)
 
     sample_period = 10000000 / psf->sf.samplerate;
 
-    psf_binheader_writef(psf, "E444", BHW4(sample_count), BHW4(sample_period), BHW4(0x20000));
+    psf->binheader_writef("E444", BHW4(sample_count), BHW4(sample_period), BHW4(0x20000));
 
     /* Header construction complete so write it out. */
-    psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
 
     if (psf->error)
         return psf->error;
@@ -122,7 +122,7 @@ static int htk_write_header(SF_PRIVATE *psf, int calc_length)
     psf->dataoffset = psf->header.indx;
 
     if (current > 0)
-        psf_fseek(psf, current, SEEK_SET);
+        psf->fseek(current, SEEK_SET);
 
     return psf->error;
 }
@@ -174,8 +174,8 @@ static int htk_read_header(SF_PRIVATE *psf)
 {
     int sample_count, sample_period, marker;
 
-	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-    psf_binheader_readf(psf, "E444", &sample_count, &sample_period, &marker);
+	psf->binheader_seekf(0, SF_SEEK_SET);
+    psf->binheader_readf("E444", &sample_count, &sample_period, &marker);
 
     if (2 * sample_count + 12 != psf->filelength)
         return SFE_HTK_BAD_FILE_LEN;
@@ -188,7 +188,7 @@ static int htk_read_header(SF_PRIVATE *psf)
     if (sample_period > 0)
     {
         psf->sf.samplerate = 10000000 / sample_period;
-        psf_log_printf(psf,
+        psf->log_printf(
                        "HTK Waveform file\n  Sample Count  : %d\n  Sample "
                        "Period : %d => %d Hz\n",
                        sample_count, sample_period, psf->sf.samplerate);
@@ -196,7 +196,7 @@ static int htk_read_header(SF_PRIVATE *psf)
     else
     {
         psf->sf.samplerate = 16000;
-        psf_log_printf(psf,
+        psf->log_printf(
                        "HTK Waveform file\n  Sample Count  : %d\n  Sample "
                        "Period : %d (should be > 0) => Guessed sample "
                        "rate %d Hz\n",

@@ -70,10 +70,10 @@ static void file_open_test(const char *filename)
     snprintf(psf->file.path.c, sizeof(psf->file.path.c), "%s", filename);
 
     /* Test that open for read fails if the file doesn't exist. */
-    error = psf_fopen(psf);
+    error = psf->fopen();
     if (error == 0)
     {
-        printf("\n\nLine %d: psf_fopen() should have failed.\n\n", __LINE__);
+        printf("\n\nLine %d: psf->fopen() should have failed.\n\n", __LINE__);
         exit(1);
     };
 
@@ -130,7 +130,7 @@ static void file_read_write_test(const char *filename)
     make_data(data_out, ARRAY_LEN(data_out), 1);
     test_write_or_die(psf, data_out, sizeof(data_out[0]), ARRAY_LEN(data_out), sizeof(data_out), __LINE__);
 
-    if ((retval = psf_get_filelen(psf)) != sizeof(data_out))
+    if ((retval = psf->get_filelen()) != sizeof(data_out))
     {
         printf("\n\nLine %d: file length after write is not correct (%" PRId64 " should be %zd).\n\n", __LINE__, retval,
                sizeof(data_out));
@@ -143,7 +143,7 @@ static void file_read_write_test(const char *filename)
     make_data(data_out, ARRAY_LEN(data_out), 2);
     test_write_or_die(psf, data_out, ARRAY_LEN(data_out), sizeof(data_out[0]), 2 * sizeof(data_out), __LINE__);
 
-    if ((retval = psf_get_filelen(psf)) != 2 * sizeof(data_out))
+    if ((retval = psf->get_filelen()) != 2 * sizeof(data_out))
     {
         printf("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %zd)\n\n", __LINE__, retval,
                2 * sizeof(data_out));
@@ -227,7 +227,7 @@ static void file_read_write_test(const char *filename)
     psf->fileoffset = sizeof(data_out[0]) * ARRAY_LEN(data_out);
     test_open_or_die(psf, __LINE__);
 
-    if ((retval = psf_get_filelen(psf)) != 3 * sizeof(data_out))
+    if ((retval = psf->get_filelen()) != 3 * sizeof(data_out))
     {
         printf("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %zd)\n\n", __LINE__, retval,
                3 * sizeof(data_out));
@@ -245,7 +245,7 @@ static void file_read_write_test(const char *filename)
     psf->fileoffset = 0;
     test_open_or_die(psf, __LINE__);
 
-    if ((retval = psf_get_filelen(psf)) != 3 * sizeof(data_out))
+    if ((retval = psf->get_filelen()) != 3 * sizeof(data_out))
     {
         printf("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %zd)\n\n", __LINE__, retval,
                3 * sizeof(data_out));
@@ -295,7 +295,7 @@ static void file_truncate_test(const char *filename)
     psf->file.mode = SFM_WRITE;
     test_open_or_die(psf, __LINE__);
     test_write_or_die(psf, buffer, sizeof(buffer) / 2, 1, sizeof(buffer) / 2, __LINE__);
-    psf_ftruncate(psf, sizeof(buffer));
+    psf->ftruncate(sizeof(buffer));
     test_close_or_die(psf, __LINE__);
 
     /* Open the file in read mode and check the data. */
@@ -321,7 +321,7 @@ static void file_truncate_test(const char *filename)
     /* Open the file in read/write and shorten the file using truncate. */
     psf->file.mode = SFM_RDWR;
     test_open_or_die(psf, __LINE__);
-    psf_ftruncate(psf, sizeof(buffer) / 4);
+    psf->ftruncate(sizeof(buffer) / 4);
     test_close_or_die(psf, __LINE__);
 
     /* Check the file length. */
@@ -349,7 +349,7 @@ static void file_seek_with_offset_test(const char *filename)
     test_open_or_die(psf, __LINE__);
 
     /* Gather basic info before setting offset. */
-    real_end = psf_fseek(psf, 0, SEEK_END);
+    real_end = psf->fseek(0, SEEK_END);
     test_tell_or_die(psf, real_end, __LINE__);
 
     /* Set the fileoffset (usually in a real system this is due to an id3 tag). */
@@ -374,18 +374,18 @@ static void test_open_or_die(SF_PRIVATE *psf, int linenum)
     int error;
 
     /* Test that open for read fails if the file doesn't exist. */
-    error = psf_fopen(psf);
+    error = psf->fopen();
     if (error)
     {
-        printf("\n\nLine %d: psf_fopen() failed : %s\n\n", linenum, strerror(errno));
+        printf("\n\nLine %d: psf->fopen() failed : %s\n\n", linenum, strerror(errno));
         exit(1);
     };
 }
 
 static void test_close_or_die(SF_PRIVATE *psf, int linenum)
 {
-    psf_fclose(psf);
-    if (psf_file_valid(psf))
+    psf->fclose();
+    if (psf->file_valid())
     {
         printf("\n\nLine %d: psf->file.filedes should not be valid.\n\n", linenum);
         exit(1);
@@ -396,14 +396,14 @@ static void test_write_or_die(SF_PRIVATE *psf, void *data, sf_count_t bytes, sf_
 {
     sf_count_t retval;
 
-    retval = psf_fwrite(data, bytes, items, psf);
+    retval = psf->fwrite(data, bytes, items);
     if (retval != items)
     {
         printf("\n\nLine %d: psf_write() returned %" PRId64 " (should be %" PRId64 ")\n\n", linenum, retval, items);
         exit(1);
     };
 
-    if ((retval = psf_ftell(psf)) != new_position)
+    if ((retval = psf->ftell()) != new_position)
     {
         printf("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %" PRId64 ")\n\n", linenum, retval,
                new_position);
@@ -417,14 +417,14 @@ static void test_read_or_die(SF_PRIVATE *psf, void *data, sf_count_t bytes, sf_c
 {
     sf_count_t retval;
 
-    retval = psf_fread(data, bytes, items, psf);
+    retval = psf->fread(data, bytes, items);
     if (retval != items)
     {
         printf("\n\nLine %d: psf_write() returned %" PRId64 " (should be %" PRId64 ")\n\n", linenum, retval, items);
         exit(1);
     };
 
-    if ((retval = psf_ftell(psf)) != new_position)
+    if ((retval = psf->ftell()) != new_position)
     {
         printf("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %" PRId64 ")\n\n", linenum, retval,
                new_position);
@@ -438,7 +438,7 @@ static void test_seek_or_die(SF_PRIVATE *psf, sf_count_t offset, int whence, sf_
 {
     sf_count_t retval;
 
-    retval = psf_fseek(psf, offset, whence);
+    retval = psf->fseek(offset, whence);
 
     if (retval != new_position)
     {
@@ -452,11 +452,11 @@ static void test_tell_or_die(SF_PRIVATE *psf, sf_count_t expected_position, int 
 {
     sf_count_t retval;
 
-    retval = psf_ftell(psf);
+    retval = psf->ftell();
 
     if (retval != expected_position)
     {
-        printf("\n\nLine %d: psf_ftell() failed. Position reported as %" PRId64 " (should be %" PRId64 ").\n\n", linenum, retval,
+        printf("\n\nLine %d: psf->ftell() failed. Position reported as %" PRId64 " (should be %" PRId64 ").\n\n", linenum, retval,
                expected_position);
         exit(1);
     };

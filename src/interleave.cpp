@@ -53,7 +53,7 @@ int interleave_init(SF_PRIVATE *psf)
 
     if (psf->interleave)
     {
-        psf_log_printf(psf, "*** Weird, already have interleave.\n");
+        psf->log_printf("*** Weird, already have interleave.\n");
         return 666;
     };
 
@@ -103,7 +103,7 @@ static size_t interleave_read_short(SF_PRIVATE *psf, short *ptr, size_t len)
 
         offset = psf->dataoffset + chan * psf->bytewidth * psf->read_current;
 
-        if (psf_fseek(psf, offset, SEEK_SET) != offset)
+        if (psf->fseek(offset, SEEK_SET) != offset)
         {
             psf->error = SFE_INTERLEAVE_SEEK;
             return 0;
@@ -156,7 +156,7 @@ static size_t interleave_read_int(SF_PRIVATE *psf, int *ptr, size_t len)
 
         offset = psf->dataoffset + chan * psf->bytewidth * psf->read_current;
 
-        if (psf_fseek(psf, offset, SEEK_SET) != offset)
+        if (psf->fseek(offset, SEEK_SET) != offset)
         {
             psf->error = SFE_INTERLEAVE_SEEK;
             return 0;
@@ -211,7 +211,7 @@ static size_t interleave_read_float(SF_PRIVATE *psf, float *ptr, size_t len)
 
         /*-printf ("chan : %d     read_current : %6lld    offset : %6lld\n", chan, psf->read_current, offset) ;-*/
 
-        if (psf_fseek(psf, offset, SEEK_SET) != offset)
+        if (psf->fseek(offset, SEEK_SET) != offset)
         {
             psf->error = SFE_INTERLEAVE_SEEK;
             /*-puts ("interleave_seek error") ; exit (1) ;-*/
@@ -266,7 +266,7 @@ static size_t interleave_read_double(SF_PRIVATE *psf, double *ptr, size_t len)
 
         offset = psf->dataoffset + chan * psf->bytewidth * psf->read_current;
 
-        if (psf_fseek(psf, offset, SEEK_SET) != offset)
+        if (psf->fseek(offset, SEEK_SET) != offset)
         {
             psf->error = SFE_INTERLEAVE_SEEK;
             return 0;

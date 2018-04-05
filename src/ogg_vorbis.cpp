@@ -160,7 +160,7 @@ static int vorbis_read_header(SF_PRIVATE *psf, int log_data)
     if (vorbis_synthesis_headerin(&vdata->vinfo, &vdata->vcomment, &odata->opacket) < 0)
     {
         /* Error case ; not a vorbis header. */
-        psf_log_printf(psf, "Found Vorbis in stream header, but "
+        psf->log_printf("Found Vorbis in stream header, but "
                             "vorbis_synthesis_headerin failed.\n");
         return SFE_MALFORMED_FILE;
     };
@@ -206,11 +206,11 @@ static int vorbis_read_header(SF_PRIVATE *psf, int log_data)
         {
             /* Need more data */
             buffer = ogg_sync_buffer(&odata->osync, 4096);
-            bytes = psf_fread(buffer, 1, 4096, psf);
+            bytes = psf->fread(buffer, 1, 4096);
 
             if (bytes == 0 && i < 2)
             {
-                psf_log_printf(psf, "End of file before finding all Vorbis headers!\n");
+                psf->log_printf("End of file before finding all Vorbis headers!\n");
                 return SFE_MALFORMED_FILE;
             };
             ogg_sync_wrote(&odata->osync, bytes);
@@ -236,7 +236,7 @@ static int vorbis_read_header(SF_PRIVATE *psf, int log_data)
 					 * Uh oh ; data at some point was corrupted or missing!
 					 * We can't tolerate that in a header. Die.
 					 */
-                    psf_log_printf(psf, "Corrupt secondary header.	Exiting.\n");
+                    psf->log_printf("Corrupt secondary header.	Exiting.\n");
                     return SFE_MALFORMED_FILE;
                 };
 
@@ -251,9 +251,9 @@ static int vorbis_read_header(SF_PRIVATE *psf, int log_data)
         int printed_metadata_msg = 0;
         int k;
 
-        psf_log_printf(psf, "Bitstream is %d channel, %D Hz\n", vdata->vinfo.channels,
+        psf->log_printf("Bitstream is %d channel, %D Hz\n", vdata->vinfo.channels,
                        vdata->vinfo.rate);
-        psf_log_printf(psf, "Encoded by : %s\n", vdata->vcomment.vendor);
+        psf->log_printf("Encoded by : %s\n", vdata->vcomment.vendor);
 
         /* Throw the comments plus a few lines about the bitstream we're decoding. */
         for (k = 0; k < ARRAY_LEN(vorbis_metatypes); k++)
@@ -266,15 +266,15 @@ static int vorbis_read_header(SF_PRIVATE *psf, int log_data)
 
             if (printed_metadata_msg == 0)
             {
-                psf_log_printf(psf, "Metadata :\n");
+                psf->log_printf("Metadata :\n");
                 printed_metadata_msg = 1;
             };
 
             psf_store_string(psf, vorbis_metatypes[k].id, dd);
-            psf_log_printf(psf, "  %-10s : %s\n", vorbis_metatypes[k].name, dd);
+            psf->log_printf("  %-10s : %s\n", vorbis_metatypes[k].name, dd);
         };
 
-        psf_log_printf(psf, "End\n");
+        psf->log_printf("End\n");
     };
 
     psf->sf.samplerate = vdata->vinfo.rate;
@@ -416,8 +416,8 @@ static int vorbis_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
 		 */
         while ((result = ogg_stream_flush(&odata->ostream, &odata->opage)) != 0)
         {
-            psf_fwrite(odata->opage.header, 1, odata->opage.header_len, psf);
-            psf_fwrite(odata->opage.body, 1, odata->opage.body_len, psf);
+            psf->fwrite(odata->opage.header, 1, odata->opage.header_len);
+            psf->fwrite(odata->opage.body, 1, odata->opage.body_len);
         };
     }
 
@@ -460,8 +460,8 @@ static int vorbis_close(SF_PRIVATE *psf)
                     int result = ogg_stream_pageout(&odata->ostream, &odata->opage);
                     if (result == 0)
                         break;
-                    psf_fwrite(odata->opage.header, 1, odata->opage.header_len, psf);
-                    psf_fwrite(odata->opage.body, 1, odata->opage.body_len, psf);
+                    psf->fwrite(odata->opage.header, 1, odata->opage.header_len);
+                    psf->fwrite(odata->opage.body, 1, odata->opage.body_len);
 
                     /*
 					 * this could be set above, but for illustrative purposes, I do
@@ -496,7 +496,7 @@ int ogg_vorbis_open(SF_PRIVATE *psf)
 
     if (odata == NULL)
     {
-        psf_log_printf(psf, "%s : odata is NULL???\n", __func__);
+        psf->log_printf("%s : odata is NULL???\n", __func__);
         return SFE_INTERNAL;
     };
 
@@ -506,7 +506,7 @@ int ogg_vorbis_open(SF_PRIVATE *psf)
     if (psf->file.mode == SFM_RDWR)
         return SFE_BAD_MODE_RW;
 
-    psf_log_printf(psf, "Vorbis library version : %s\n", vorbis_version_string());
+    psf->log_printf("Vorbis library version : %s\n", vorbis_version_string());
 
     if (psf->file.mode == SFM_READ)
     {
@@ -573,7 +573,7 @@ static size_t vorbis_command(SF_PRIVATE *psf, int command, void *data, size_t da
         /* Clip range. */
         vdata->quality = std::max(0.0, std::min(1.0, vdata->quality));
 
-        psf_log_printf(psf, "%s : Setting SFC_SET_VBR_ENCODING_QUALITY to %f.\n", __func__,
+        psf->log_printf("%s : Setting SFC_SET_VBR_ENCODING_QUALITY to %f.\n", __func__,
                        vdata->quality);
         return SF_TRUE;
 
@@ -687,7 +687,7 @@ static size_t vorbis_read_sample(SF_PRIVATE *psf, void *ptr, size_t lens, conver
             if (result < 0)
             {
                 /* missing or corrupt data at this page position */
-                psf_log_printf(psf, "Corrupt or missing data in bitstream ; continuing...\n");
+                psf->log_printf("Corrupt or missing data in bitstream ; continuing...\n");
             }
             else
             {
@@ -742,7 +742,7 @@ static size_t vorbis_read_sample(SF_PRIVATE *psf, void *ptr, size_t lens, conver
             char *buffer;
             int bytes;
             buffer = ogg_sync_buffer(&odata->osync, 4096);
-            bytes = psf_fread(buffer, 1, 4096, psf);
+            bytes = psf->fread(buffer, 1, 4096);
             ogg_sync_wrote(&odata->osync, bytes);
             if (bytes == 0)
                 odata->eos = 1;
@@ -798,8 +798,8 @@ static void vorbis_write_samples(SF_PRIVATE *psf, OGG_PRIVATE *odata, VORBIS_PRI
                 int result = ogg_stream_pageout(&odata->ostream, &odata->opage);
                 if (result == 0)
                     break;
-                psf_fwrite(odata->opage.header, 1, odata->opage.header_len, psf);
-                psf_fwrite(odata->opage.body, 1, odata->opage.body_len, psf);
+                psf->fwrite(odata->opage.header, 1, odata->opage.header_len);
+                psf->fwrite(odata->opage.body, 1, odata->opage.body_len);
 
                 /*
 				 * This could be set above, but for illustrative purposes, I do
@@ -1096,7 +1096,7 @@ static int vorbis_length_get_next_page(SF_PRIVATE *psf, ogg_sync_state *osync, o
     while (ogg_sync_pageout(osync, page) <= 0)
     {
         char *buffer = ogg_sync_buffer(osync, CHUNK_SIZE);
-        int bytes = psf_fread(buffer, 1, 4096, psf);
+        int bytes = psf->fread(buffer, 1, 4096);
 
         if (bytes <= 0)
         {
@@ -1190,7 +1190,7 @@ static sf_count_t vorbis_length(SF_PRIVATE *psf)
     if (psf->sf.seekable == 0)
         return SF_COUNT_MAX;
 
-    psf_fseek(psf, 0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
     length = vorbis_length_aux(psf);
 
     if ((error = ogg_read_first_page(psf, (OGG_PRIVATE *)psf->container_data)) != 0 ||
@@ -1204,7 +1204,7 @@ static sf_count_t vorbis_length(SF_PRIVATE *psf)
 
 int ogg_vorbis_open(SF_PRIVATE *psf)
 {
-    psf_log_printf(psf, "This version of libsndfile was compiled without "
+    psf->log_printf("This version of libsndfile was compiled without "
                         "Ogg/Vorbis support.\n");
     return SFE_UNIMPLEMENTED;
 }

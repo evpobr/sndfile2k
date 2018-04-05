@@ -71,31 +71,31 @@ static void conversion_test(char endian)
     psf->file.mode = SFM_WRITE;
     snprintf(psf->file.path.c, sizeof(psf->file.path.c), "%s", filename);
 
-    if (psf_fopen(psf) != 0)
+    if (psf->fopen() != 0)
     {
         printf("\n\nError : failed to open file '%s' for write.\n\n", filename);
         exit(1);
     };
 
-    psf_binheader_writef(psf, format_str, i8, i16, i24, i32, i64);
-    psf_fwrite(psf->header.ptr, 1, psf->header.indx, psf);
+    psf->binheader_writef(format_str, i8, i16, i24, i32, i64);
+    psf->fwrite(psf->header.ptr, 1, psf->header.indx);
     free(psf->header.ptr);
-    psf_fclose(psf);
+    psf->fclose();
 
     memset(psf, 0, sizeof(sf_private));
 
     psf->file.mode = SFM_READ;
     snprintf(psf->file.path.c, sizeof(psf->file.path.c), "%s", filename);
 
-    if (psf_fopen(psf) != 0)
+    if (psf->fopen() != 0)
     {
         printf("\n\nError : failed to open file '%s' for read.\n\n", filename);
         exit(1);
     };
 
-    bytes = psf_binheader_readf(psf, format_str, &t8, &t16, &t24, &t32, &t64);
+    bytes = psf->binheader_readf(format_str, &t8, &t16, &t24, &t32, &t64);
     free(psf->header.ptr);
-    psf_fclose(psf);
+    psf->fclose();
 
     if (bytes != 18)
     {

@@ -44,7 +44,7 @@ void test_binheader_writef(void)
         psf_strlcpy(buffer, sizeof(buffer), "abcdefghijklmnop");
         buffer[k] = 0;
 
-        psf_binheader_writef(psf, "Ep", BHWp(buffer));
+        psf->binheader_writef("Ep", BHWp(buffer));
 
         if ((psf->header.indx & 1) != 0)
             errors = 1;

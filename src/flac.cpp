@@ -209,7 +209,7 @@ static sf_count_t flac_buffer_copy(SF_PRIVATE *psf)
 
     if (psf->sf.channels != (int)frame->header.channels)
     {
-        psf_log_printf(psf,
+        psf->log_printf(
                        "Error: FLAC frame changed from %d to %d channels\n"
                        "Nothing to do but to error out.\n",
                        psf->sf.channels, frame->header.channels);
@@ -224,7 +224,7 @@ static sf_count_t flac_buffer_copy(SF_PRIVATE *psf)
 	*/
     if (frame->header.blocksize > FLAC__MAX_BLOCK_SIZE)
     {
-        psf_log_printf(psf,
+        psf->log_printf(
                        "Ooops : frame->header.blocksize (%d) > "
                        "FLAC__MAX_BLOCK_SIZE (%d)\n",
                        __func__, __LINE__, frame->header.blocksize, FLAC__MAX_BLOCK_SIZE);
@@ -233,7 +233,7 @@ static sf_count_t flac_buffer_copy(SF_PRIVATE *psf)
     };
 
     if (frame->header.channels > FLAC__MAX_CHANNELS)
-        psf_log_printf(psf, "Ooops : frame->header.channels (%d) > FLAC__MAX_BLOCK_SIZE (%d)\n",
+        psf->log_printf("Ooops : frame->header.channels (%d) > FLAC__MAX_BLOCK_SIZE (%d)\n",
                        __func__, __LINE__, frame->header.channels, FLAC__MAX_CHANNELS);
 
     channels = std::min(frame->header.channels, FLAC__MAX_CHANNELS);
@@ -260,7 +260,7 @@ static sf_count_t flac_buffer_copy(SF_PRIVATE *psf)
 
     if (pflac->remain % channels != 0)
     {
-        psf_log_printf(psf, "Error: pflac->remain %u    channels %u\n", pflac->remain, channels);
+        psf->log_printf("Error: pflac->remain %u    channels %u\n", pflac->remain, channels);
         return 0;
     };
 
@@ -398,7 +398,7 @@ sf_flac_read_callback(const FLAC__StreamDecoder *UNUSED(decoder), FLAC__byte buf
 {
     SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
 
-    *bytes = psf_fread(buffer, 1, *bytes, psf);
+    *bytes = psf->fread(buffer, 1, *bytes);
     if (*bytes > 0 && psf->error == 0)
         return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
 
@@ -411,7 +411,7 @@ sf_flac_seek_callback(const FLAC__StreamDecoder *UNUSED(decoder), FLAC__uint64 a
 {
     SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
 
-    psf_fseek(psf, absolute_byte_offset, SEEK_SET);
+    psf->fseek(absolute_byte_offset, SEEK_SET);
     if (psf->error)
         return FLAC__STREAM_DECODER_SEEK_STATUS_ERROR;
 
@@ -424,7 +424,7 @@ sf_flac_tell_callback(const FLAC__StreamDecoder *UNUSED(decoder),
 {
     SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
 
-    *absolute_byte_offset = psf_ftell(psf);
+    *absolute_byte_offset = psf->ftell();
     if (psf->error)
         return FLAC__STREAM_DECODER_TELL_STATUS_ERROR;
 
@@ -448,7 +448,7 @@ static FLAC__bool sf_flac_eof_callback(const FLAC__StreamDecoder *UNUSED(decoder
 {
     SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
 
-    if (psf_ftell(psf) == psf->filelength)
+    if (psf->ftell() == psf->filelength)
         return SF_TRUE;
 
     return SF_FALSE;
@@ -498,7 +498,7 @@ static void sf_flac_meta_get_vorbiscomments(SF_PRIVATE *psf, const FLAC__StreamM
         if ((cptr = strchr(value, '=')) != NULL)
             value = cptr + 1;
 
-        psf_log_printf(psf, "  %-12s : %s\n", tags[k].tag, value);
+        psf->log_printf("  %-12s : %s\n", tags[k].tag, value);
         psf_store_string(psf, tags[k].type, value);
     };
 
@@ -516,7 +516,7 @@ static void sf_flac_meta_callback(const FLAC__StreamDecoder *UNUSED(decoder),
     case FLAC__METADATA_TYPE_STREAMINFO:
         if (psf->sf.channels > 0 && psf->sf.channels != (int)metadata->data.stream_info.channels)
         {
-            psf_log_printf(psf,
+            psf->log_printf(
                            "Error: FLAC stream changed from %d to %d channels\n"
                            "Nothing to do but to error out.\n",
                            psf->sf.channels, metadata->data.stream_info.channels);
@@ -527,7 +527,7 @@ static void sf_flac_meta_callback(const FLAC__StreamDecoder *UNUSED(decoder),
         if (psf->sf.channels > 0 &&
             psf->sf.samplerate != (int)metadata->data.stream_info.sample_rate)
         {
-            psf_log_printf(psf,
+            psf->log_printf(
                            "Warning: FLAC stream changed sample rates from %d to %d.\n"
                            "Carrying on as if nothing happened.",
                            psf->sf.samplerate, metadata->data.stream_info.sample_rate);
@@ -536,17 +536,17 @@ static void sf_flac_meta_callback(const FLAC__StreamDecoder *UNUSED(decoder),
         psf->sf.samplerate = metadata->data.stream_info.sample_rate;
         psf->sf.frames = metadata->data.stream_info.total_samples;
 
-        psf_log_printf(psf, "FLAC Stream Metadata\n  Channels    : %d\n  Sample rate : %d\n",
+        psf->log_printf("FLAC Stream Metadata\n  Channels    : %d\n  Sample rate : %d\n",
                        psf->sf.channels, psf->sf.samplerate);
 
         if (psf->sf.frames == 0)
         {
-            psf_log_printf(psf, "  Frames      : 0 (bumping to SF_COUNT_MAX)\n");
+            psf->log_printf("  Frames      : 0 (bumping to SF_COUNT_MAX)\n");
             psf->sf.frames = SF_COUNT_MAX;
         }
         else
         {
-            psf_log_printf(psf, "  Frames      : %D\n", psf->sf.frames);
+            psf->log_printf("  Frames      : %D\n", psf->sf.frames);
         }
 
         switch (metadata->data.stream_info.bits_per_sample)
@@ -564,7 +564,7 @@ static void sf_flac_meta_callback(const FLAC__StreamDecoder *UNUSED(decoder),
             bitwidth = 24;
             break;
         default:
-            psf_log_printf(psf,
+            psf->log_printf(
                            "sf_flac_meta_callback : bits_per_sample %d "
                            "not yet implemented.\n",
                            metadata->data.stream_info.bits_per_sample);
@@ -572,40 +572,40 @@ static void sf_flac_meta_callback(const FLAC__StreamDecoder *UNUSED(decoder),
         };
 
         if (bitwidth > 0)
-            psf_log_printf(psf, "  Bit width   : %d\n", bitwidth);
+            psf->log_printf("  Bit width   : %d\n", bitwidth);
         break;
 
     case FLAC__METADATA_TYPE_VORBIS_COMMENT:
-        psf_log_printf(psf, "Vorbis Comment Metadata\n");
+        psf->log_printf("Vorbis Comment Metadata\n");
         sf_flac_meta_get_vorbiscomments(psf, metadata);
         break;
 
     case FLAC__METADATA_TYPE_PADDING:
-        psf_log_printf(psf, "Padding Metadata\n");
+        psf->log_printf("Padding Metadata\n");
         break;
 
     case FLAC__METADATA_TYPE_APPLICATION:
-        psf_log_printf(psf, "Application Metadata\n");
+        psf->log_printf("Application Metadata\n");
         break;
 
     case FLAC__METADATA_TYPE_SEEKTABLE:
-        psf_log_printf(psf, "Seektable Metadata\n");
+        psf->log_printf("Seektable Metadata\n");
         break;
 
     case FLAC__METADATA_TYPE_CUESHEET:
-        psf_log_printf(psf, "Cuesheet Metadata\n");
+        psf->log_printf("Cuesheet Metadata\n");
         break;
 
     case FLAC__METADATA_TYPE_PICTURE:
-        psf_log_printf(psf, "Picture Metadata\n");
+        psf->log_printf("Picture Metadata\n");
         break;
 
     case FLAC__METADATA_TYPE_UNDEFINED:
-        psf_log_printf(psf, "Undefined Metadata\n");
+        psf->log_printf("Undefined Metadata\n");
         break;
 
     default:
-        psf_log_printf(psf, "sf_flac_meta_callback : metadata-type %d not yet implemented.\n",
+        psf->log_printf("sf_flac_meta_callback : metadata-type %d not yet implemented.\n",
                        metadata->type);
         break;
     };
@@ -618,7 +618,7 @@ static void sf_flac_error_callback(const FLAC__StreamDecoder *UNUSED(decoder),
 {
     SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
 
-    psf_log_printf(psf, "ERROR : %s\n", FLAC__StreamDecoderErrorStatusString[status]);
+    psf->log_printf("ERROR : %s\n", FLAC__StreamDecoderErrorStatusString[status]);
 
     switch (status)
     {
@@ -642,7 +642,7 @@ sf_flac_enc_seek_callback(const FLAC__StreamEncoder *UNUSED(encoder),
 {
     SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
 
-    psf_fseek(psf, absolute_byte_offset, SEEK_SET);
+    psf->fseek(absolute_byte_offset, SEEK_SET);
     if (psf->error)
         return FLAC__STREAM_ENCODER_SEEK_STATUS_ERROR;
 
@@ -655,7 +655,7 @@ sf_flac_enc_tell_callback(const FLAC__StreamEncoder *UNUSED(encoder),
 {
     SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
 
-    *absolute_byte_offset = psf_ftell(psf);
+    *absolute_byte_offset = psf->ftell();
     if (psf->error)
         return FLAC__STREAM_ENCODER_TELL_STATUS_ERROR;
 
@@ -669,7 +669,7 @@ sf_flac_enc_write_callback(const FLAC__StreamEncoder *UNUSED(encoder), const FLA
 {
     SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
 
-    if (psf_fwrite(buffer, 1, bytes, psf) == (sf_count_t)bytes && psf->error == 0)
+    if (psf->fwrite(buffer, 1, bytes) == (sf_count_t)bytes && psf->error == 0)
         return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
 
     return FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR;
@@ -692,7 +692,7 @@ static void flac_write_strings(SF_PRIVATE *psf, FLAC_PRIVATE *pflac)
     if (pflac->metadata == NULL &&
         (pflac->metadata = FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT)) == NULL)
     {
-        psf_log_printf(psf, "FLAC__metadata_object_new returned NULL\n");
+        psf->log_printf("FLAC__metadata_object_new returned NULL\n");
         return;
     };
 
@@ -763,13 +763,13 @@ static int flac_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
              pflac->fse, sf_flac_enc_write_callback, sf_flac_enc_seek_callback,
              sf_flac_enc_tell_callback, NULL, psf)) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
     {
-        psf_log_printf(psf, "Error : FLAC encoder init returned error : %s\n",
+        psf->log_printf("Error : FLAC encoder init returned error : %s\n",
                        FLAC__StreamEncoderInitStatusString[err]);
         return SFE_FLAC_INIT_DECODER;
     };
 
     if (psf->error == 0)
-        psf->dataoffset = psf_ftell(psf);
+        psf->dataoffset = psf->ftell();
     pflac->encbuffer = (int32_t *)calloc(ENC_BUFFER_SIZE, sizeof(int32_t));
 
     /* can only call init_stream once */
@@ -889,11 +889,11 @@ static int flac_enc_init(SF_PRIVATE *psf)
 	 */
     if (psf->sf.samplerate < 1 || psf->sf.samplerate > 655350)
     {
-        psf_log_printf(psf, "flac sample rate out of range.\n", psf->sf.samplerate);
+        psf->log_printf("flac sample rate out of range.\n", psf->sf.samplerate);
         return SFE_FLAC_BAD_SAMPLE_RATE;
     };
 
-    psf_fseek(psf, 0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
 
     switch (SF_CODEC(psf->sf.format))
     {
@@ -919,27 +919,27 @@ static int flac_enc_init(SF_PRIVATE *psf)
 
     if (!FLAC__stream_encoder_set_channels(pflac->fse, psf->sf.channels))
     {
-        psf_log_printf(psf, "FLAC__stream_encoder_set_channels (%d) return false.\n",
+        psf->log_printf("FLAC__stream_encoder_set_channels (%d) return false.\n",
                        psf->sf.channels);
         return SFE_FLAC_INIT_DECODER;
     };
 
     if (!FLAC__stream_encoder_set_sample_rate(pflac->fse, psf->sf.samplerate))
     {
-        psf_log_printf(psf, "FLAC__stream_encoder_set_sample_rate (%d) returned false.\n",
+        psf->log_printf("FLAC__stream_encoder_set_sample_rate (%d) returned false.\n",
                        psf->sf.samplerate);
         return SFE_FLAC_BAD_SAMPLE_RATE;
     };
 
     if (!FLAC__stream_encoder_set_bits_per_sample(pflac->fse, bps))
     {
-        psf_log_printf(psf, "FLAC__stream_encoder_set_bits_per_sample (%d) return false.\n", bps);
+        psf->log_printf("FLAC__stream_encoder_set_bits_per_sample (%d) return false.\n", bps);
         return SFE_FLAC_INIT_DECODER;
     };
 
     if (!FLAC__stream_encoder_set_compression_level(pflac->fse, pflac->compression))
     {
-        psf_log_printf(psf, "FLAC__stream_encoder_set_compression_level (%d) return false.\n",
+        psf->log_printf("FLAC__stream_encoder_set_compression_level (%d) return false.\n",
                        pflac->compression);
         return SFE_FLAC_INIT_DECODER;
     };
@@ -951,7 +951,7 @@ static int flac_read_header(SF_PRIVATE *psf)
 {
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->codec_data;
 
-    psf_fseek(psf, 0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
     if (pflac->fsd)
         FLAC__stream_decoder_delete(pflac->fsd);
     if ((pflac->fsd = FLAC__stream_decoder_new()) == NULL)
@@ -968,7 +968,7 @@ static int flac_read_header(SF_PRIVATE *psf)
 
     FLAC__stream_decoder_process_until_end_of_metadata(pflac->fsd);
 
-    psf_log_printf(psf, "End\n");
+    psf->log_printf("End\n");
 
     if (psf->error != 0)
     {
@@ -1007,7 +1007,7 @@ static size_t flac_command(SF_PRIVATE *psf, int command, void *data, size_t data
         /* Clip range. */
         pflac->compression = lrint(std::max(0.0, std::min(8.0, quality)));
 
-        psf_log_printf(psf, "%s : Setting SFC_SET_COMPRESSION_LEVEL to %u.\n", __func__,
+        psf->log_printf("%s : Setting SFC_SET_COMPRESSION_LEVEL to %u.\n", __func__,
                        pflac->compression);
 
         if (flac_enc_init(psf))
@@ -1064,7 +1064,7 @@ static unsigned flac_read_loop(SF_PRIVATE *psf, size_t len)
     state = FLAC__stream_decoder_get_state(pflac->fsd);
     if (state > FLAC__STREAM_DECODER_END_OF_STREAM)
     {
-        psf_log_printf(psf, "FLAC__stream_decoder_get_state returned %s\n",
+        psf->log_printf("FLAC__stream_decoder_get_state returned %s\n",
                        FLAC__StreamDecoderStateString[state]);
         /* Current frame is busted, so NULL the pointer. */
         pflac->frame = NULL;
@@ -1082,7 +1082,7 @@ static unsigned flac_read_loop(SF_PRIVATE *psf, size_t len)
         state = FLAC__stream_decoder_get_state(pflac->fsd);
         if (state >= FLAC__STREAM_DECODER_END_OF_STREAM)
         {
-            psf_log_printf(psf, "FLAC__stream_decoder_get_state returned %s\n",
+            psf->log_printf("FLAC__stream_decoder_get_state returned %s\n",
                            FLAC__StreamDecoderStateString[state]);
             /* Current frame is busted, so NULL the pointer. */
             pflac->frame = NULL;
@@ -1633,7 +1633,7 @@ static int flac_byterate(SF_PRIVATE *psf)
 
 int flac_open(SF_PRIVATE *psf)
 {
-    psf_log_printf(psf, "This version of libsndfile was compiled without FLAC support.\n");
+    psf->log_printf("This version of libsndfile was compiled without FLAC support.\n");
     return SFE_UNIMPLEMENTED;
 }
 

@@ -69,104 +69,104 @@ int rx2_open(SF_PRIVATE *psf)
 
     /* So far only doing read. */
 
-    psf_binheader_readf(psf, "Epm4", 0, &marker, &length);
+    psf->binheader_readf("Epm4", 0, &marker, &length);
 
     if (marker != CAT_MARKER)
     {
-        psf_log_printf(psf, "length : %d\n", length);
+        psf->log_printf("length : %d\n", length);
         return -1000;
     };
 
     if (length != psf->filelength - 8)
-        psf_log_printf(psf, "%M : %d (should be %d)\n", marker, length, psf->filelength - 8);
+        psf->log_printf("%M : %d (should be %d)\n", marker, length, psf->filelength - 8);
     else
-        psf_log_printf(psf, "%M : %d\n", marker, length);
+        psf->log_printf("%M : %d\n", marker, length);
 
     /* 'REX2' marker */
-    psf_binheader_readf(psf, "m", &marker);
-    psf_log_printf(psf, "%M", marker);
+    psf->binheader_readf("m", &marker);
+    psf->log_printf("%M", marker);
 
     /* 'HEAD' marker */
-    psf_binheader_readf(psf, "m", &marker);
-    psf_log_printf(psf, "%M\n", marker);
+    psf->binheader_readf("m", &marker);
+    psf->log_printf("%M\n", marker);
 
     /* Grab 'GLOB' offset. */
-    psf_binheader_readf(psf, "E4", &glob_offset);
+    psf->binheader_readf("E4", &glob_offset);
     glob_offset += 0x14; /* Add the current file offset. */
 
     /* Jump to offset 0x30 */
-    psf_binheader_readf(psf, "p", 0x30);
+    psf->binheader_readf("p", 0x30);
 
     /* Get name length */
     length = 0;
-    psf_binheader_readf(psf, "1", &length);
+    psf->binheader_readf("1", &length);
     if (length >= SIGNED_SIZEOF(ubuf.cbuf))
     {
-        psf_log_printf(psf, "  Text : %d *** Error : Too sf_count_t!\n");
+        psf->log_printf("  Text : %d *** Error : Too sf_count_t!\n");
         return -1001;
     }
 
     memset(ubuf.cbuf, 0, sizeof(ubuf.cbuf));
-    psf_binheader_readf(psf, "b", ubuf.cbuf, length);
-    psf_log_printf(psf, " Text : \"%s\"\n", ubuf.cbuf);
+    psf->binheader_readf("b", ubuf.cbuf, length);
+    psf->log_printf(" Text : \"%s\"\n", ubuf.cbuf);
 
     /* Jump to GLOB offset position. */
     if (glob_offset & 1)
         glob_offset++;
 
-    psf_binheader_readf(psf, "p", glob_offset);
+    psf->binheader_readf("p", glob_offset);
 
     slce_count = 0;
     /* GLOB */
     while (1)
     {
-        psf_binheader_readf(psf, "m", &marker);
+        psf->binheader_readf("m", &marker);
 
         if (marker != SLCE_MARKER && slce_count > 0)
         {
-            psf_log_printf(psf, "   SLCE count : %d\n", slce_count);
+            psf->log_printf("   SLCE count : %d\n", slce_count);
             slce_count = 0;
         }
         switch (marker)
         {
         case GLOB_MARKER:
-            psf_binheader_readf(psf, "E4", &length);
-            psf_log_printf(psf, " %M : %d\n", marker, length);
-            psf_binheader_readf(psf, "j", length);
+            psf->binheader_readf("E4", &length);
+            psf->log_printf(" %M : %d\n", marker, length);
+            psf->binheader_readf("j", length);
             break;
 
         case RECY_MARKER:
-            psf_binheader_readf(psf, "E4", &length);
-            psf_log_printf(psf, " %M : %d\n", marker, length);
-            psf_binheader_readf(psf, "j", (length + 1) & 0xFFFFFFFE); /* ?????? */
+            psf->binheader_readf("E4", &length);
+            psf->log_printf(" %M : %d\n", marker, length);
+            psf->binheader_readf("j", (length + 1) & 0xFFFFFFFE); /* ?????? */
             break;
 
         case CAT_MARKER:
-            psf_binheader_readf(psf, "E4", &length);
-            psf_log_printf(psf, " %M : %d\n", marker, length);
+            psf->binheader_readf("E4", &length);
+            psf->log_printf(" %M : %d\n", marker, length);
             /*-psf_binheader_readf (psf, "j", length) ;-*/
             break;
 
         case DEVL_MARKER:
-            psf_binheader_readf(psf, "mE4", &marker, &length);
-            psf_log_printf(psf, "  DEVL%M : %d\n", marker, length);
+            psf->binheader_readf("mE4", &marker, &length);
+            psf->log_printf("  DEVL%M : %d\n", marker, length);
             if (length & 1)
                 length++;
-            psf_binheader_readf(psf, "j", length);
+            psf->binheader_readf("j", length);
             break;
 
         case EQ_MARKER:
         case COMP_MARKER:
-            psf_binheader_readf(psf, "E4", &length);
-            psf_log_printf(psf, "   %M : %d\n", marker, length);
+            psf->binheader_readf("E4", &length);
+            psf->log_printf("   %M : %d\n", marker, length);
             /* This is weird!!!! why make this (length - 1) */
             if (length & 1)
                 length++;
-            psf_binheader_readf(psf, "j", length);
+            psf->binheader_readf("j", length);
             break;
 
         case SLCL_MARKER:
-            psf_log_printf(psf, "  %M\n    (Offset, Next Offset, Type)\n", marker);
+            psf->log_printf("  %M\n    (Offset, Next Offset, Type)\n", marker);
             slce_count = 0;
             break;
 
@@ -174,7 +174,7 @@ int rx2_open(SF_PRIVATE *psf)
         {
             int len[4], indx;
 
-            psf_binheader_readf(psf, "E4444", &len[0], &len[1], &len[2], &len[3]);
+            psf->binheader_readf("E4444", &len[0], &len[1], &len[2], &len[3]);
 
             indx = ((len[3] & 0x0000FFFF) >> 8) & 3;
 
@@ -184,14 +184,14 @@ int rx2_open(SF_PRIVATE *psf)
                     indx =
                         3; /* 2 cases, where next slice offset = 1 -> disabled & enabled/hidden */
 
-                psf_log_printf(psf, "   %M : (%6d, ?: 0x%X, %s)\n", marker, len[1],
+                psf->log_printf("   %M : (%6d, ?: 0x%X, %s)\n", marker, len[1],
                                (len[3] & 0xFFFF0000) >> 16, marker_type[indx]);
             }
             else
             {
                 slce_total += len[2];
 
-                psf_log_printf(psf, "   %M : (%6d, SLCE_next_ofs:%d, ?: 0x%X, %s)\n", marker,
+                psf->log_printf("   %M : (%6d, SLCE_next_ofs:%d, ?: 0x%X, %s)\n", marker,
                                len[1], len[2], (len[3] & 0xFFFF0000) >> 16, marker_type[indx]);
             };
 
@@ -200,42 +200,42 @@ int rx2_open(SF_PRIVATE *psf)
         break;
 
         case SINF_MARKER:
-            psf_binheader_readf(psf, "E4", &length);
-            psf_log_printf(psf, " %M : %d\n", marker, length);
+            psf->binheader_readf("E4", &length);
+            psf->log_printf(" %M : %d\n", marker, length);
 
-            psf_binheader_readf(psf, "E2", &n_channels);
+            psf->binheader_readf("E2", &n_channels);
             n_channels = (n_channels & 0x0000FF00) >> 8;
-            psf_log_printf(psf, "  Channels    : %d\n", n_channels);
+            psf->log_printf("  Channels    : %d\n", n_channels);
 
-            psf_binheader_readf(psf, "E44", &psf->sf.samplerate, &frames);
+            psf->binheader_readf("E44", &psf->sf.samplerate, &frames);
             psf->sf.frames = frames;
-            psf_log_printf(psf, "  Sample Rate : %d\n", psf->sf.samplerate);
-            psf_log_printf(psf, "  Frames      : %D\n", psf->sf.frames);
+            psf->log_printf("  Sample Rate : %d\n", psf->sf.samplerate);
+            psf->log_printf("  Frames      : %D\n", psf->sf.frames);
 
-            psf_binheader_readf(psf, "E4", &length);
-            psf_log_printf(psf, "  ??????????? : %d\n", length);
+            psf->binheader_readf("E4", &length);
+            psf->log_printf("  ??????????? : %d\n", length);
 
-            psf_binheader_readf(psf, "E4", &length);
-            psf_log_printf(psf, "  ??????????? : %d\n", length);
+            psf->binheader_readf("E4", &length);
+            psf->log_printf("  ??????????? : %d\n", length);
             break;
 
         case SDAT_MARKER:
-            psf_binheader_readf(psf, "E4", &length);
+            psf->binheader_readf("E4", &length);
 
             sdat_length = length;
 
             /* Get the current offset. */
-            psf->dataoffset = psf_binheader_readf(psf, NULL);
+            psf->dataoffset = psf->binheader_readf(NULL);
 
             if (psf->dataoffset + length != psf->filelength)
-                psf_log_printf(psf, " %M : %d (should be %d)\n", marker, length,
+                psf->log_printf(" %M : %d (should be %d)\n", marker, length,
                                psf->dataoffset + psf->filelength);
             else
-                psf_log_printf(psf, " %M : %d\n", marker, length);
+                psf->log_printf(" %M : %d\n", marker, length);
             break;
 
         default:
-            psf_log_printf(psf, "Unknown marker : 0x%X %M", marker, marker);
+            psf->log_printf("Unknown marker : 0x%X %M", marker, marker);
             return -1003;
             break;
         };
@@ -270,7 +270,7 @@ int rx2_open(SF_PRIVATE *psf)
 
     psf->datalength = psf->filelength - psf->dataoffset;
 
-    if (psf_fseek(psf, psf->dataoffset, SEEK_SET))
+    if (psf->fseek(psf->dataoffset, SEEK_SET))
         return SFE_BAD_SEEK;
 
     psf->sf.format = (SF_FORMAT_REX2 | SF_FORMAT_DWVW_12);

@@ -282,7 +282,7 @@ static int decode_desc_chunk(SF_PRIVATE *psf, const struct DESC_CHUNK *desc)
                 format |= SF_FORMAT_ALAC_32;
                 break;
             default:
-                psf_log_printf(psf, "Bad ALAC format flag value of %d\n", desc->fmt_flags);
+                psf->log_printf("Bad ALAC format flag value of %d\n", desc->fmt_flags);
             };
 
             pcaf->alac.frames_per_packet = desc->frames_per_packet;
@@ -345,7 +345,7 @@ static int decode_desc_chunk(SF_PRIVATE *psf, const struct DESC_CHUNK *desc)
         return format | SF_FORMAT_ULAW;
     };
 
-    psf_log_printf(psf, "**** Unknown format identifier.\n");
+    psf->log_printf("**** Unknown format identifier.\n");
 
     return 0;
 }
@@ -366,30 +366,30 @@ static int caf_read_header(SF_PRIVATE *psf)
     memset(&desc, 0, sizeof(desc));
 
     /* Set position to start of file to begin reading header. */
-	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-    psf_binheader_readf(psf, "mE2E2", &marker, &version, &flags);
-    psf_log_printf(psf, "%M\n  Version : %d\n  Flags   : %x\n", marker, version, flags);
+	psf->binheader_seekf(0, SF_SEEK_SET);
+    psf->binheader_readf("mE2E2", &marker, &version, &flags);
+    psf->log_printf("%M\n  Version : %d\n  Flags   : %x\n", marker, version, flags);
     if (marker != caff_MARKER)
         return SFE_CAF_NOT_CAF;
 
-    psf_binheader_readf(psf, "mE8b", &marker, &chunk_size, ubuf.ucbuf, 8);
+    psf->binheader_readf("mE8b", &marker, &chunk_size, ubuf.ucbuf, 8);
     srate = double64_be_read(ubuf.ucbuf);
     snprintf(ubuf.cbuf, sizeof(ubuf.cbuf), "%5.3f", srate);
-    psf_log_printf(psf, "%M : %D\n  Sample rate  : %s\n", marker, chunk_size, ubuf.cbuf);
+    psf->log_printf("%M : %D\n  Sample rate  : %s\n", marker, chunk_size, ubuf.cbuf);
     if (marker != desc_MARKER)
         return SFE_CAF_NO_DESC;
 
     if (chunk_size < SIGNED_SIZEOF(struct DESC_CHUNK))
     {
-        psf_log_printf(psf, "**** Chunk size too small. Should be > 32 bytes.\n");
+        psf->log_printf("**** Chunk size too small. Should be > 32 bytes.\n");
         return SFE_MALFORMED_FILE;
     };
 
     psf->sf.samplerate = lrint(srate);
 
-    psf_binheader_readf(psf, "mE44444", &desc.fmt_id, &desc.fmt_flags, &desc.pkt_bytes,
+    psf->binheader_readf("mE44444", &desc.fmt_id, &desc.fmt_flags, &desc.pkt_bytes,
                         &desc.frames_per_packet, &desc.channels_per_frame, &desc.bits_per_chan);
-    psf_log_printf(psf,
+    psf->log_printf(
                    "  Format id    : %M\n  Format flags : %x\n  Bytes / packet   : %u\n"
                    "  Frames / packet  : %u\n  Channels / frame : %u\n  Bits / channel   "
                    ": %u\n",
@@ -398,12 +398,12 @@ static int caf_read_header(SF_PRIVATE *psf)
 
     if (desc.channels_per_frame > SF_MAX_CHANNELS)
     {
-        psf_log_printf(psf, "**** Bad channels per frame value %u.\n", desc.channels_per_frame);
+        psf->log_printf("**** Bad channels per frame value %u.\n", desc.channels_per_frame);
         return SFE_MALFORMED_FILE;
     };
 
 	if (chunk_size > SIGNED_SIZEOF(struct DESC_CHUNK))
-		psf_binheader_seekf(psf, chunk_size - sizeof(struct DESC_CHUNK), SF_SEEK_CUR);
+		psf->binheader_seekf(chunk_size - sizeof(struct DESC_CHUNK), SF_SEEK_CUR);
 
     psf->sf.channels = desc.channels_per_frame;
 
@@ -412,31 +412,31 @@ static int caf_read_header(SF_PRIVATE *psf)
         marker = 0;
         chunk_size = 0;
 
-        psf_binheader_readf(psf, "mE8", &marker, &chunk_size);
+        psf->binheader_readf("mE8", &marker, &chunk_size);
         if (marker == 0)
         {
-            sf_count_t pos = psf_ftell(psf);
-            psf_log_printf(psf, "Have 0 marker at position %D (0x%x).\n", pos, pos);
+            sf_count_t pos = psf->ftell();
+            psf->log_printf("Have 0 marker at position %D (0x%x).\n", pos, pos);
             break;
         };
         if (chunk_size < 0)
         {
-            psf_log_printf(psf, "%M : %D *** Should be >= 0 ***\n", marker, chunk_size);
+            psf->log_printf("%M : %D *** Should be >= 0 ***\n", marker, chunk_size);
             break;
         };
         if (chunk_size > psf->filelength)
             break;
 
-        psf_store_read_chunk_u32(&psf->rchunks, marker, psf_ftell(psf), chunk_size);
+        psf_store_read_chunk_u32(&psf->rchunks, marker, psf->ftell(), chunk_size);
 
         switch (marker)
         {
         case peak_MARKER:
-            psf_log_printf(psf, "%M : %D\n", marker, chunk_size);
+            psf->log_printf("%M : %D\n", marker, chunk_size);
             if (chunk_size != CAF_PEAK_CHUNK_SIZE(psf->sf.channels))
             {
-				psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
-                psf_log_printf(psf, "*** File PEAK chunk %D should be %d.\n", chunk_size,
+				psf->binheader_seekf(chunk_size, SF_SEEK_CUR);
+                psf->log_printf("*** File PEAK chunk %D should be %d.\n", chunk_size,
                                CAF_PEAK_CHUNK_SIZE(psf->sf.channels));
                 return SFE_CAF_BAD_PEAK;
             };
@@ -445,22 +445,22 @@ static int caf_read_header(SF_PRIVATE *psf)
                 return SFE_MALLOC_FAILED;
 
             /* read in rest of PEAK chunk. */
-            psf_binheader_readf(psf, "E4", &(psf->peak_info->edit_number));
-            psf_log_printf(psf, "  edit count : %d\n", psf->peak_info->edit_number);
+            psf->binheader_readf("E4", &(psf->peak_info->edit_number));
+            psf->log_printf("  edit count : %d\n", psf->peak_info->edit_number);
 
-            psf_log_printf(psf, "     Ch   Position       Value\n");
+            psf->log_printf("     Ch   Position       Value\n");
             for (k = 0; k < psf->sf.channels; k++)
             {
                 sf_count_t position;
                 float value;
 
-                psf_binheader_readf(psf, "Ef8", &value, &position);
+                psf->binheader_readf("Ef8", &value, &position);
                 psf->peak_info->peaks[k].value = value;
                 psf->peak_info->peaks[k].position = position;
 
                 snprintf(ubuf.cbuf, sizeof(ubuf.cbuf), "    %2d   %-12" PRId64 "   %g\n", k,
                          position, value);
-                psf_log_printf(psf, ubuf.cbuf);
+                psf->log_printf(ubuf.cbuf);
             };
 
             psf->peak_info->peak_loc = SF_PEAK_START;
@@ -469,77 +469,77 @@ static int caf_read_header(SF_PRIVATE *psf)
         case chan_MARKER:
             if (chunk_size < 12)
             {
-                psf_log_printf(psf, "%M : %D (should be >= 12)\n", marker, chunk_size);
-				psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
+                psf->log_printf("%M : %D (should be >= 12)\n", marker, chunk_size);
+				psf->binheader_seekf(chunk_size, SF_SEEK_CUR);
                 break;
             }
 
-            psf_log_printf(psf, "%M : %D\n", marker, chunk_size);
+            psf->log_printf("%M : %D\n", marker, chunk_size);
 
             if ((error = caf_read_chanmap(psf, chunk_size)))
                 return error;
             break;
 
         case free_MARKER:
-            psf_log_printf(psf, "%M : %D\n", marker, chunk_size);
-			psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
+            psf->log_printf("%M : %D\n", marker, chunk_size);
+			psf->binheader_seekf(chunk_size, SF_SEEK_CUR);
             break;
 
         case data_MARKER:
-            psf_binheader_readf(psf, "E4", &k);
+            psf->binheader_readf("E4", &k);
             if (chunk_size == -1)
             {
-                psf_log_printf(psf, "%M : -1\n");
+                psf->log_printf("%M : -1\n");
                 chunk_size = psf->filelength - psf->header.indx;
             }
             else if (psf->filelength > 0 && chunk_size > psf->filelength - psf->header.indx + 10)
             {
-                psf_log_printf(psf, "%M : %D (should be %D)\n", marker, chunk_size,
+                psf->log_printf("%M : %D (should be %D)\n", marker, chunk_size,
                                psf->filelength - psf->header.indx - 8);
                 psf->datalength = psf->filelength - psf->header.indx - 8;
             }
             else
             {
-                psf_log_printf(psf, "%M : %D\n", marker, chunk_size);
+                psf->log_printf("%M : %D\n", marker, chunk_size);
                 /* Subtract the 4 bytes of the 'edit' field above. */
                 psf->datalength = chunk_size - 4;
             };
 
-            psf_log_printf(psf, "  edit : %u\n", k);
+            psf->log_printf("  edit : %u\n", k);
 
             psf->dataoffset = psf->header.indx;
             if (psf->datalength + psf->dataoffset < psf->filelength)
                 psf->dataend = psf->datalength + psf->dataoffset;
 
-			psf_binheader_seekf(psf, psf->datalength, SF_SEEK_CUR);
+			psf->binheader_seekf(psf->datalength, SF_SEEK_CUR);
             have_data = 1;
             break;
 
         case kuki_MARKER:
-            psf_log_printf(psf, "%M : %D\n", marker, chunk_size);
-            pcaf->alac.kuki_offset = psf_ftell(psf) - 12;
-			psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
+            psf->log_printf("%M : %D\n", marker, chunk_size);
+            pcaf->alac.kuki_offset = psf->ftell() - 12;
+			psf->binheader_seekf(chunk_size, SF_SEEK_CUR);
             break;
 
         case pakt_MARKER:
             if (chunk_size < 24)
             {
-                psf_log_printf(psf, "%M : %D (should be > 24)\n", marker, chunk_size);
+                psf->log_printf("%M : %D (should be > 24)\n", marker, chunk_size);
                 return SFE_MALFORMED_FILE;
             }
             else if (chunk_size > psf->filelength - psf->header.indx)
             {
-                psf_log_printf(psf, "%M : %D (should be < %D)\n", marker, chunk_size,
+                psf->log_printf("%M : %D (should be < %D)\n", marker, chunk_size,
                                psf->filelength - psf->header.indx);
                 return SFE_MALFORMED_FILE;
             }
             else
-                psf_log_printf(psf, "%M : %D\n", marker, chunk_size);
+                psf->log_printf("%M : %D\n", marker, chunk_size);
 
-            psf_binheader_readf(psf, "E8844", &pcaf->alac.packets, &pcaf->alac.valid_frames,
+            psf->binheader_readf("E8844", &pcaf->alac.packets, &pcaf->alac.valid_frames,
                                 &pcaf->alac.priming_frames, &pcaf->alac.remainder_frames);
 
-            psf_log_printf(psf,
+            psf->log_printf(
                            "  Packets          : %D\n"
                            "  Valid frames     : %D\n"
                            "  Priming frames   : %d\n"
@@ -549,32 +549,32 @@ static int caf_read_header(SF_PRIVATE *psf)
 
             if (pcaf->alac.packets == 0 && pcaf->alac.valid_frames == 0 &&
                 pcaf->alac.priming_frames == 0 && pcaf->alac.remainder_frames == 0)
-                psf_log_printf(psf, "*** 'pakt' chunk header is all zero.\n");
+                psf->log_printf("*** 'pakt' chunk header is all zero.\n");
 
-            pcaf->alac.pakt_offset = psf_ftell(psf) - 12;
-			psf_binheader_seekf(psf, chunk_size - 24, SF_SEEK_CUR);
+            pcaf->alac.pakt_offset = psf->ftell() - 12;
+			psf->binheader_seekf(chunk_size - 24, SF_SEEK_CUR);
             break;
 
         case info_MARKER:
             if (chunk_size < 4)
             {
-                psf_log_printf(psf, "%M : %D (should be > 4)\n", marker, chunk_size);
+                psf->log_printf("%M : %D (should be > 4)\n", marker, chunk_size);
                 return SFE_MALFORMED_FILE;
             }
             else if (chunk_size > psf->filelength - psf->header.indx)
             {
-                psf_log_printf(psf, "%M : %D (should be < %z)\n", marker, chunk_size,
+                psf->log_printf("%M : %D (should be < %z)\n", marker, chunk_size,
                                psf->filelength - psf->header.indx);
                 return SFE_MALFORMED_FILE;
             };
-            psf_log_printf(psf, "%M : %D\n", marker, chunk_size);
+            psf->log_printf("%M : %D\n", marker, chunk_size);
             if (chunk_size > 4)
                 caf_read_strings(psf, chunk_size - 4);
             break;
 
         default:
-            psf_log_printf(psf, "%M : %D (skipped)\n", marker, chunk_size);
-			psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
+            psf->log_printf("%M : %D (skipped)\n", marker, chunk_size);
+			psf->binheader_seekf(chunk_size, SF_SEEK_CUR);
             break;
         };
 
@@ -584,22 +584,22 @@ static int caf_read_header(SF_PRIVATE *psf)
         if (!psf->sf.seekable && have_data)
             break;
 
-        if (psf_ftell(psf) >= psf->filelength - SIGNED_SIZEOF(chunk_size))
+        if (psf->ftell() >= psf->filelength - SIGNED_SIZEOF(chunk_size))
         {
-            psf_log_printf(psf, "End\n");
+            psf->log_printf("End\n");
             break;
         };
     };
 
     if (have_data == 0)
     {
-        psf_log_printf(psf, "**** Error, could not find 'data' chunk.\n");
+        psf->log_printf("**** Error, could not find 'data' chunk.\n");
         return SFE_MALFORMED_FILE;
     };
 
     psf->endian = (desc.fmt_flags & 2) ? SF_ENDIAN_LITTLE : SF_ENDIAN_BIG;
 
-    psf_fseek(psf, psf->dataoffset, SEEK_SET);
+    psf->fseek(psf->dataoffset, SEEK_SET);
 
     if ((psf->sf.format = decode_desc_chunk(psf, &desc)) == 0)
         return SFE_UNSUPPORTED_ENCODING;
@@ -624,11 +624,11 @@ static int caf_write_header(SF_PRIVATE *psf, int calc_length)
 
     memset(&desc, 0, sizeof(desc));
 
-    current = psf_ftell(psf);
+    current = psf->ftell();
 
     if (calc_length)
     {
-        psf->filelength = psf_get_filelen(psf);
+        psf->filelength = psf->get_filelen();
 
         psf->datalength = psf->filelength - psf->dataoffset;
 
@@ -642,16 +642,16 @@ static int caf_write_header(SF_PRIVATE *psf, int calc_length)
     /* Reset the current header length to zero. */
     psf->header.ptr[0] = 0;
     psf->header.indx = 0;
-    psf_fseek(psf, 0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
 
     /* 'caff' marker, version and flags. */
-    psf_binheader_writef(psf, "Em22", BHWm(caff_MARKER), BHW2(1), BHW2(0));
+    psf->binheader_writef("Em22", BHWm(caff_MARKER), BHW2(1), BHW2(0));
 
     /* 'desc' marker and chunk size. */
-    psf_binheader_writef(psf, "Em8", BHWm(desc_MARKER), BHW8((sf_count_t)(sizeof(struct DESC_CHUNK))));
+    psf->binheader_writef("Em8", BHWm(desc_MARKER), BHW8((sf_count_t)(sizeof(struct DESC_CHUNK))));
 
     double64_be_write(1.0 * psf->sf.samplerate, ubuf.ucbuf);
-    psf_binheader_writef(psf, "b", BHWv(ubuf.ucbuf), BHWz(8));
+    psf->binheader_writef("b", BHWv(ubuf.ucbuf), BHWz(8));
 
     subformat = SF_CODEC(psf->sf.format);
 
@@ -760,7 +760,7 @@ static int caf_write_header(SF_PRIVATE *psf, int calc_length)
         return SFE_UNIMPLEMENTED;
     };
 
-    psf_binheader_writef(psf, "mE44444", BHWm(desc.fmt_id), BHW4(desc.fmt_flags),
+    psf->binheader_writef("mE44444", BHWm(desc.fmt_id), BHW4(desc.fmt_flags),
                          BHW4(desc.pkt_bytes), BHW4(desc.frames_per_packet),
                          BHW4(desc.channels_per_frame), BHW4(desc.bits_per_chan));
 
@@ -769,21 +769,21 @@ static int caf_write_header(SF_PRIVATE *psf, int calc_length)
     if (psf->peak_info != NULL)
     {
         int k;
-        psf_binheader_writef(psf, "Em84", BHWm(peak_MARKER),
+        psf->binheader_writef("Em84", BHWm(peak_MARKER),
                              BHW8((sf_count_t)CAF_PEAK_CHUNK_SIZE(psf->sf.channels)),
                              BHW4(psf->peak_info->edit_number));
         for (k = 0; k < psf->sf.channels; k++)
-            psf_binheader_writef(psf, "Ef8", BHWf((float)psf->peak_info->peaks[k].value),
+            psf->binheader_writef("Ef8", BHWf((float)psf->peak_info->peaks[k].value),
                                  BHW8(psf->peak_info->peaks[k].position));
     };
 
     if (psf->channel_map && pcaf->chanmap_tag)
-        psf_binheader_writef(psf, "Em8444", BHWm(chan_MARKER), BHW8((sf_count_t)12),
+        psf->binheader_writef("Em8444", BHWm(chan_MARKER), BHW8((sf_count_t)12),
                              BHW4(pcaf->chanmap_tag), BHW4(0), BHW4(0));
 
     /* Write custom headers. */
     for (uk = 0; uk < psf->wchunks.used; uk++)
-        psf_binheader_writef(psf, "m44b", BHWm((int)psf->wchunks.chunks[uk].mark32), BHW4(0),
+        psf->binheader_writef("m44b", BHWm((int)psf->wchunks.chunks[uk].mark32), BHW4(0),
                              BHW4(psf->wchunks.chunks[uk].len), BHWv(psf->wchunks.chunks[uk].data),
                              BHWz(psf->wchunks.chunks[uk].len));
 
@@ -793,20 +793,20 @@ static int caf_write_header(SF_PRIVATE *psf, int calc_length)
         sf_count_t free_len = 0x1000 - psf->header.indx - 16 - 12;
         while (free_len < 0)
             free_len += 0x1000;
-        psf_binheader_writef(psf, "Em8z", BHWm(free_MARKER), BHW8(free_len), BHWz(free_len));
+        psf->binheader_writef("Em8z", BHWm(free_MARKER), BHW8(free_len), BHWz(free_len));
     };
 
-    psf_binheader_writef(psf, "Em84", BHWm(data_MARKER), BHW8(psf->datalength + 4), BHW4(0));
+    psf->binheader_writef("Em84", BHWm(data_MARKER), BHW8(psf->datalength + 4), BHW4(0));
 
-    psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
     if (psf->error)
         return psf->error;
 
     psf->dataoffset = psf->header.indx;
     if (current < psf->dataoffset)
-        psf_fseek(psf, psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->dataoffset, SEEK_SET);
     else if (current > 0)
-        psf_fseek(psf, current, SEEK_SET);
+        psf->fseek(current, SEEK_SET);
 
     return psf->error;
 }
@@ -824,19 +824,19 @@ static int caf_write_tailer(SF_PRIVATE *psf)
     };
 
     if (psf->dataend > 0)
-        psf_fseek(psf, psf->dataend, SEEK_SET);
+        psf->fseek(psf->dataend, SEEK_SET);
     else
-        psf->dataend = psf_fseek(psf, 0, SEEK_END);
+        psf->dataend = psf->fseek(0, SEEK_END);
 
     if (psf->dataend & 1)
-        psf_binheader_writef(psf, "z", BHWz(1));
+        psf->binheader_writef("z", BHWz(1));
 
     if (psf->strings.flags & SF_STR_LOCATE_END)
         caf_write_strings(psf, SF_STR_LOCATE_END);
 
     /* Write the tailer. */
     if (psf->header.indx > 0)
-        psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+        psf->fwrite(psf->header.ptr, psf->header.indx, 1);
 
     return 0;
 }
@@ -848,16 +848,16 @@ static int caf_read_chanmap(SF_PRIVATE *psf, sf_count_t chunk_size)
     int layout_tag;
 
     bytesread =
-        psf_binheader_readf(psf, "E444", &layout_tag, &channel_bitmap, &channel_decriptions);
+        psf->binheader_readf("E444", &layout_tag, &channel_bitmap, &channel_decriptions);
 
     map_info = aiff_caf_of_channel_layout_tag(layout_tag);
 
-    psf_log_printf(psf, "  Tag    : %x\n", layout_tag);
+    psf->log_printf("  Tag    : %x\n", layout_tag);
     if (map_info)
-        psf_log_printf(psf, "  Layout : %s\n", map_info->name);
+        psf->log_printf("  Layout : %s\n", map_info->name);
 
 	if (bytesread < chunk_size)
-		psf_binheader_seekf(psf, chunk_size - bytesread, SF_SEEK_CUR);
+		psf->binheader_seekf(chunk_size - bytesread, SF_SEEK_CUR);
 
     if (map_info && map_info->channel_map != NULL)
     {
@@ -897,8 +897,8 @@ static int caf_read_strings(SF_PRIVATE *psf, sf_count_t chunk_size)
     if ((buf = (char *)malloc(chunk_size + 1)) == NULL)
         return (psf->error = SFE_MALLOC_FAILED);
 
-    psf_binheader_readf(psf, "E4b", &count, buf, make_size_t(chunk_size));
-    psf_log_printf(psf, " count: %u\n", count);
+    psf->binheader_readf("E4b", &count, buf, make_size_t(chunk_size));
+    psf->log_printf(" count: %u\n", count);
 
     /* Force terminate `buf` to make sure. */
     buf[chunk_size] = 0;
@@ -908,7 +908,7 @@ static int caf_read_strings(SF_PRIVATE *psf, sf_count_t chunk_size)
         value = key + strlen(key) + 1;
         if (value > buf + chunk_size)
             break;
-        psf_log_printf(psf, "   %-12s : %s\n", key, value);
+        psf->log_printf("   %-12s : %s\n", key, value);
 
         hash = string_hash32(key);
         switch (hash)
@@ -945,7 +945,7 @@ static int caf_read_strings(SF_PRIVATE *psf, sf_count_t chunk_size)
             psf_store_string(psf, SF_STR_LICENSE, value);
             break;
         default:
-            psf_log_printf(psf, " Unhandled hash 0x%x : /* '%s' */\n", hash, key);
+            psf->log_printf(" Unhandled hash 0x%x : /* '%s' */\n", hash, key);
             break;
         };
 
@@ -1040,7 +1040,7 @@ static void caf_write_strings(SF_PRIVATE *psf, int location)
     if (string_count == 0 || buf.index == 0)
         return;
 
-    psf_binheader_writef(psf, "Em84b", BHWm(info_MARKER), BHW8(buf.index + 4), BHW4(string_count),
+    psf->binheader_writef("Em84b", BHWm(info_MARKER), BHW8(buf.index + 4), BHW4(string_count),
                          BHWv(buf.s), BHWz(buf.index));
 }
 
@@ -1083,10 +1083,10 @@ static int caf_get_chunk_data(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator
     memcpy(chunk_info->id, psf->rchunks.chunks[indx].id,
            sizeof(chunk_info->id) / sizeof(*chunk_info->id));
 
-    pos = psf_ftell(psf);
-    psf_fseek(psf, psf->rchunks.chunks[indx].offset, SEEK_SET);
-    psf_fread(chunk_info->data, std::min(chunk_info->datalen, psf->rchunks.chunks[indx].len), 1, psf);
-    psf_fseek(psf, pos, SEEK_SET);
+    pos = psf->ftell();
+    psf->fseek(psf->rchunks.chunks[indx].offset, SEEK_SET);
+    psf->fread(chunk_info->data, std::min(chunk_info->datalen, psf->rchunks.chunks[indx].len), 1);
+    psf->fseek(pos, SEEK_SET);
 
     return SFE_NO_ERROR;
 }

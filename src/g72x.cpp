@@ -81,7 +81,7 @@ int g72x_init(SF_PRIVATE *psf)
 
     if (psf->codec_data != NULL)
     {
-        psf_log_printf(psf, "*** psf->codec_data is not NULL.\n");
+        psf->log_printf("*** psf->codec_data is not NULL.\n");
         return SFE_INTERNAL;
     };
 
@@ -122,7 +122,7 @@ int g72x_init(SF_PRIVATE *psf)
         return SFE_UNIMPLEMENTED;
     };
 
-    psf->filelength = psf_get_filelen(psf);
+    psf->filelength = psf->get_filelen();
     if (psf->filelength < psf->dataoffset)
         psf->filelength = psf->dataoffset;
 
@@ -147,7 +147,7 @@ int g72x_init(SF_PRIVATE *psf)
 
         if (psf->datalength % pg72x->blocksize)
         {
-            psf_log_printf(psf, "*** Odd psf->datalength (%D) should be a multiple of %d\n",
+            psf->log_printf("*** Odd psf->datalength (%D) should be a multiple of %d\n",
                            psf->datalength, pg72x->blocksize);
             pg72x->blocks_total = (psf->datalength / pg72x->blocksize) + 1;
         }
@@ -182,7 +182,7 @@ int g72x_init(SF_PRIVATE *psf)
             psf->sf.frames = (8 * psf->datalength) / bitspersample;
 
         if ((psf->sf.frames * bitspersample) / 8 != psf->datalength)
-            psf_log_printf(psf, "*** Warning : weird psf->datalength.\n");
+            psf->log_printf("*** Warning : weird psf->datalength.\n");
     };
 
     psf->codec_close = g72x_close;
@@ -203,8 +203,8 @@ static int psf_g72x_decode_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x)
         return 1;
     };
 
-    if ((k = psf_fread(pg72x->block, 1, pg72x->bytesperblock, psf)) != pg72x->bytesperblock)
-        psf_log_printf(psf, "*** Warning : short read (%z != %z).\n", k, pg72x->bytesperblock);
+    if ((k = psf->fread(pg72x->block, 1, pg72x->bytesperblock)) != pg72x->bytesperblock)
+        psf->log_printf("*** Warning : short read (%z != %z).\n", k, pg72x->bytesperblock);
 
     pg72x->blocksize = k;
     g72x_decode_block(pg72x->priv, pg72x->block, pg72x->samples);
@@ -364,7 +364,7 @@ static size_t g72x_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
 
 static sf_count_t g72x_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t UNUSED(offset))
 {
-    psf_log_printf(psf, "seek unsupported\n");
+    psf->log_printf("seek unsupported\n");
 
     /* No simple solution. To do properly, would need to seek
 	 * to start of file and decode everything up to seek position.
@@ -381,8 +381,8 @@ static int psf_g72x_encode_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x)
     g72x_encode_block(pg72x->priv, pg72x->samples, pg72x->block);
 
     /* Write the block to disk. */
-    if ((k = psf_fwrite(pg72x->block, 1, pg72x->blocksize, psf)) != pg72x->blocksize)
-        psf_log_printf(psf, "*** Warning : short write (%d != %d).\n", k, pg72x->blocksize);
+    if ((k = psf->fwrite(pg72x->block, 1, pg72x->blocksize)) != pg72x->blocksize)
+        psf->log_printf("*** Warning : short write (%d != %d).\n", k, pg72x->blocksize);
 
     pg72x->sample_curr = 0;
     pg72x->block_curr++;

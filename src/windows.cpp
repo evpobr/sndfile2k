@@ -47,19 +47,19 @@ SNDFILE *sf_wchar_open(const wchar_t *wpath, SF_FILEMODE mode, SF_INFO *sfinfo)
         return NULL;
     };
 
-    psf_init_files(psf);
+    psf->init_files();
 
     if (WideCharToMultiByte(CP_UTF8, 0, wpath, -1, utf8name, sizeof(utf8name), NULL, NULL) == 0)
         psf->file.path.wc[0] = 0;
 
-    psf_log_printf(psf, "File : '%s' (utf-8 converted from ucs-2)\n", utf8name);
+    psf->log_printf("File : '%s' (utf-8 converted from ucs-2)\n", utf8name);
     copy_filename(psf, wpath);
     psf->file.use_wchar = SF_TRUE;
     psf->file.mode = mode;
 
-    psf->error = psf_fopen(psf);
+    psf->error = psf->fopen();
 
-    return psf_open_file(psf, sfinfo);
+    return psf->open_file(sfinfo);
 }
 
 static void copy_filename(SF_PRIVATE *psf, LPCWSTR wpath)

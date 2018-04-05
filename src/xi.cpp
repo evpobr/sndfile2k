@@ -177,7 +177,7 @@ static int dpcm_init(SF_PRIVATE *psf)
             psf->read_double = dpcm_read_dles2d;
             break;
         default:
-            psf_log_printf(psf, "dpcm_init() returning SFE_UNIMPLEMENTED\n");
+            psf->log_printf("dpcm_init() returning SFE_UNIMPLEMENTED\n");
             return SFE_UNIMPLEMENTED;
         };
     };
@@ -199,12 +199,12 @@ static int dpcm_init(SF_PRIVATE *psf)
             psf->write_double = dpcm_write_d2dles;
             break;
         default:
-            psf_log_printf(psf, "dpcm_init() returning SFE_UNIMPLEMENTED\n");
+            psf->log_printf("dpcm_init() returning SFE_UNIMPLEMENTED\n");
             return SFE_UNIMPLEMENTED;
         };
     };
 
-    psf->filelength = psf_get_filelen(psf);
+    psf->filelength = psf->get_filelen();
     psf->datalength =
         (psf->dataend) ? psf->dataend - psf->dataoffset : psf->filelength - psf->dataoffset;
     psf->sf.frames = psf->datalength / psf->blockwidth;
@@ -229,7 +229,7 @@ static sf_count_t dpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
     if (offset == 0)
     {
-        psf_fseek(psf, psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->dataoffset, SEEK_SET);
         pxi->last_16 = 0;
         return 0;
     };
@@ -247,7 +247,7 @@ static sf_count_t dpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
         return PSF_SEEK_ERROR;
     };
 
-    psf_fseek(psf, psf->dataoffset, SEEK_SET);
+    psf->fseek(psf->dataoffset, SEEK_SET);
 
     if ((SF_CODEC(psf->sf.format)) == SF_FORMAT_DPCM_16)
     {
@@ -282,47 +282,47 @@ static int xi_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
         return SFE_INTERNAL;
 
-    current = psf_ftell(psf);
+    current = psf->ftell();
 
     /* Reset the current header length to zero. */
     psf->header.ptr[0] = 0;
     psf->header.indx = 0;
-    psf_fseek(psf, 0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
 
     string = "Extended Instrument: ";
-    psf_binheader_writef(psf, "b", BHWv(string), BHWz(strlen(string)));
-    psf_binheader_writef(psf, "b1", BHWv(pxi->filename), BHWz(sizeof(pxi->filename)), BHW1(0x1A));
+    psf->binheader_writef("b", BHWv(string), BHWz(strlen(string)));
+    psf->binheader_writef("b1", BHWv(pxi->filename), BHWz(sizeof(pxi->filename)), BHW1(0x1A));
 
     /* Write software version and two byte XI version. */
-    psf_binheader_writef(psf, "eb2", BHWv(pxi->software), BHWz(sizeof(pxi->software)),
+    psf->binheader_writef("eb2", BHWv(pxi->software), BHWz(sizeof(pxi->software)),
                          BHW2((1 << 8) + 2));
 
     /*
 	 * Jump note numbers (96), volume envelope (48), pan envelope (48),
 	 * volume points (1), pan points (1)
 	 */
-    psf_binheader_writef(psf, "z", BHWz((size_t)(96 + 48 + 48 + 1 + 1)));
+    psf->binheader_writef("z", BHWz((size_t)(96 + 48 + 48 + 1 + 1)));
 
     /*
 	 * Jump volume loop (3 bytes), pan loop (3), envelope flags (3), vibrato (3)
 	 * fade out (2), 22 unknown bytes, and then write sample_count (2 bytes).
 	 */
-    psf_binheader_writef(psf, "ez2z2", BHWz((size_t)(4 * 3)), BHW2(0x1234), BHWz(22), BHW2(1));
+    psf->binheader_writef("ez2z2", BHWz((size_t)(4 * 3)), BHW2(0x1234), BHWz(22), BHW2(1));
 
     pxi->loop_begin = 0;
     pxi->loop_end = 0;
 
-    psf_binheader_writef(psf, "et844", BHW8(psf->sf.frames), BHW4(pxi->loop_begin),
+    psf->binheader_writef("et844", BHW8(psf->sf.frames), BHW4(pxi->loop_begin),
                          BHW4(pxi->loop_end));
 
     /* volume, fine tune, flags, pan, note, namelen */
-    psf_binheader_writef(psf, "111111", BHW1(128), BHW1(0), BHW1(pxi->sample_flags), BHW1(128),
+    psf->binheader_writef("111111", BHW1(128), BHW1(0), BHW1(pxi->sample_flags), BHW1(128),
                          BHW1(0), BHW1(strlen(pxi->sample_name)));
 
-    psf_binheader_writef(psf, "b", BHWv(pxi->sample_name), BHWz(sizeof(pxi->sample_name)));
+    psf->binheader_writef("b", BHWv(pxi->sample_name), BHWz(sizeof(pxi->sample_name)));
 
     /* Header construction complete so write it out. */
-    psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
 
     if (psf->error)
         return psf->error;
@@ -330,7 +330,7 @@ static int xi_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     psf->dataoffset = psf->header.indx;
 
     if (current > 0)
-        psf_fseek(psf, current, SEEK_SET);
+        psf->fseek(current, SEEK_SET);
 
     return psf->error;
 }
@@ -342,8 +342,8 @@ static int xi_read_header(SF_PRIVATE *psf)
     int k, loop_begin, loop_end;
     int sample_sizes[MAX_XI_SAMPLES];
 
-	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-    psf_binheader_readf(psf, "b", buffer, 21);
+	psf->binheader_seekf(0, SF_SEEK_SET);
+    psf->binheader_readf("b", buffer, 21);
 
     memset(sample_sizes, 0, sizeof(sample_sizes));
 
@@ -352,7 +352,7 @@ static int xi_read_header(SF_PRIVATE *psf)
         return SFE_XI_BAD_HEADER;
 
     memset(buffer, 0, sizeof(buffer));
-    psf_binheader_readf(psf, "b", buffer, 23);
+    psf->binheader_readf("b", buffer, 23);
 
     if (buffer[22] != 0x1A)
         return SFE_XI_BAD_HEADER;
@@ -361,15 +361,15 @@ static int xi_read_header(SF_PRIVATE *psf)
     for (k = 21; k >= 0 && buffer[k] == ' '; k--)
         buffer[k] = 0;
 
-    psf_log_printf(psf, "Extended Instrument : %s\n", buffer);
+    psf->log_printf("Extended Instrument : %s\n", buffer);
     psf_store_string(psf, SF_STR_TITLE, buffer);
 
-    psf_binheader_readf(psf, "be2", buffer, 20, &version);
+    psf->binheader_readf("be2", buffer, 20, &version);
     buffer[19] = 0;
     for (k = 18; k >= 0 && buffer[k] == ' '; k--)
         buffer[k] = 0;
 
-    psf_log_printf(psf, "Software : %s\nVersion  : %d.%02d\n", buffer, version / 256,
+    psf->log_printf("Software : %s\nVersion  : %d.%02d\n", buffer, version / 256,
                    version % 256);
     psf_store_string(psf, SF_STR_SOFTWARE, buffer);
 
@@ -377,17 +377,17 @@ static int xi_read_header(SF_PRIVATE *psf)
 	 * Jump note numbers (96), volume envelope (48), pan envelope (48),
 	 * volume points (1), pan points (1)
 	 */
-	psf_binheader_seekf(psf, 96 + 48 + 48 + 1 + 1, SF_SEEK_CUR);
+	psf->binheader_seekf(96 + 48 + 48 + 1 + 1, SF_SEEK_CUR);
 
-    psf_binheader_readf(psf, "b", buffer, 12);
-    psf_log_printf(psf, "Volume Loop\n  sustain : %u\n  begin   : %u\n  end     : %u\n", buffer[0],
+    psf->binheader_readf("b", buffer, 12);
+    psf->log_printf("Volume Loop\n  sustain : %u\n  begin   : %u\n  end     : %u\n", buffer[0],
                    buffer[1], buffer[2]);
-    psf_log_printf(psf, "Pan Loop\n  sustain : %u\n  begin   : %u\n  end     : %u\n", buffer[3],
+    psf->log_printf("Pan Loop\n  sustain : %u\n  begin   : %u\n  end     : %u\n", buffer[3],
                    buffer[4], buffer[5]);
-    psf_log_printf(psf, "Envelope Flags\n  volume  : 0x%X\n  pan     : 0x%X\n", buffer[6] & 0xFF,
+    psf->log_printf("Envelope Flags\n  volume  : 0x%X\n  pan     : 0x%X\n", buffer[6] & 0xFF,
                    buffer[7] & 0xFF);
 
-    psf_log_printf(psf,
+    psf->log_printf(
                    "Vibrato\n  type    : %u\n  sweep   : %u\n  depth   : "
                    "%u\n  rate    : %u\n",
                    buffer[8], buffer[9], buffer[10], buffer[11]);
@@ -396,10 +396,10 @@ static int xi_read_header(SF_PRIVATE *psf)
 	 * Read fade_out then jump reserved (2 bytes) and ???? (20 bytes) and
 	 * sample_count.
 	 */
-    psf_binheader_readf(psf, "e2", &fade_out);
-	psf_binheader_seekf(psf, 2 + 20, SF_SEEK_CUR);
-	psf_binheader_readf(psf, "e2", &sample_count);
-    psf_log_printf(psf, "Fade out  : %d\n", fade_out);
+    psf->binheader_readf("e2", &fade_out);
+	psf->binheader_seekf(2 + 20, SF_SEEK_CUR);
+	psf->binheader_readf("e2", &sample_count);
+    psf->log_printf("Fade out  : %d\n", fade_out);
 
     /* XI file can contain up to 16 samples. */
     if (sample_count > MAX_XI_SAMPLES)
@@ -412,30 +412,30 @@ static int xi_read_header(SF_PRIVATE *psf)
     /* Log all data for each sample. */
     for (k = 0; k < sample_count; k++)
     {
-        psf_binheader_readf(psf, "e444", &(sample_sizes[k]), &loop_begin, &loop_end);
+        psf->binheader_readf("e444", &(sample_sizes[k]), &loop_begin, &loop_end);
 
         /* Read 5 know bytes, 1 unknown byte and 22 name bytes. */
-        psf_binheader_readf(psf, "bb", buffer, 6, name, 22);
+        psf->binheader_readf("bb", buffer, 6, name, 22);
         name[21] = 0;
 
-        psf_log_printf(psf, "Sample #%d\n  name    : %s\n", k + 1, name);
+        psf->log_printf("Sample #%d\n  name    : %s\n", k + 1, name);
 
-        psf_log_printf(psf, "  size    : %d\n", sample_sizes[k]);
+        psf->log_printf("  size    : %d\n", sample_sizes[k]);
 
-        psf_log_printf(psf, "  loop\n    begin : %d\n    end   : %d\n", loop_begin, loop_end);
+        psf->log_printf("  loop\n    begin : %d\n    end   : %d\n", loop_begin, loop_end);
 
-        psf_log_printf(psf, "  volume  : %u\n  f. tune : %d\n  flags   : 0x%02X ", buffer[0] & 0xFF,
+        psf->log_printf("  volume  : %u\n  f. tune : %d\n  flags   : 0x%02X ", buffer[0] & 0xFF,
                        buffer[1] & 0xFF, buffer[2] & 0xFF);
 
-        psf_log_printf(psf, " (");
+        psf->log_printf(" (");
         if (buffer[2] & 1)
-            psf_log_printf(psf, " Loop");
+            psf->log_printf(" Loop");
         if (buffer[2] & 2)
-            psf_log_printf(psf, " PingPong");
-        psf_log_printf(psf, (buffer[2] & 16) ? " 16bit" : " 8bit");
-        psf_log_printf(psf, " )\n");
+            psf->log_printf(" PingPong");
+        psf->log_printf((buffer[2] & 16) ? " 16bit" : " 8bit");
+        psf->log_printf(" )\n");
 
-        psf_log_printf(psf, "  pan     : %u\n  note    : %d\n  namelen : %d\n", buffer[3] & 0xFF,
+        psf->log_printf("  pan     : %u\n  note    : %d\n  namelen : %d\n", buffer[3] & 0xFF,
                        buffer[4], buffer[5]);
 
         psf->instrument->basenote = buffer[4];
@@ -470,32 +470,32 @@ static int xi_read_header(SF_PRIVATE *psf)
 
     if (sample_count > 2)
     {
-        psf_log_printf(psf, "*** Sample count is less than 16 but more than 1.\n");
-        psf_log_printf(psf, "  sample count : %d    sample_sizes [%d] : %d\n", sample_count,
+        psf->log_printf("*** Sample count is less than 16 but more than 1.\n");
+        psf->log_printf("  sample count : %d    sample_sizes [%d] : %d\n", sample_count,
                        sample_count - 1, sample_sizes[sample_count - 1]);
         return SFE_XI_EXCESS_SAMPLES;
     };
 
     psf->datalength = sample_sizes[0];
 
-    psf->dataoffset = psf_ftell(psf);
+    psf->dataoffset = psf->ftell();
     if (psf->dataoffset < 0)
     {
-        psf_log_printf(psf, "*** Bad Data Offset : %D\n", psf->dataoffset);
+        psf->log_printf("*** Bad Data Offset : %D\n", psf->dataoffset);
         return SFE_BAD_OFFSET;
     };
-    psf_log_printf(psf, "Data Offset : %D\n", psf->dataoffset);
+    psf->log_printf("Data Offset : %D\n", psf->dataoffset);
 
     if (psf->dataoffset + psf->datalength > psf->filelength)
     {
-        psf_log_printf(psf,
+        psf->log_printf(
                        "*** File seems to be truncated. Should be at "
                        "least %D bytes long.\n",
                        psf->dataoffset + sample_sizes[0]);
         psf->datalength = psf->filelength - psf->dataoffset;
     };
 
-    if (psf_fseek(psf, psf->dataoffset, SEEK_SET) != psf->dataoffset)
+    if (psf->fseek(psf->dataoffset, SEEK_SET) != psf->dataoffset)
         return SFE_BAD_SEEK;
 
     psf->endian = SF_ENDIAN_LITTLE;
@@ -545,7 +545,7 @@ static size_t dpcm_read_dsc2s(SF_PRIVATE *psf, short *ptr, size_t len)
     {
         if (len < bufferlen)
             bufferlen = len;
-        readcount = psf_fread(ubuf.scbuf, sizeof(signed char), bufferlen, psf);
+        readcount = psf->fread(ubuf.scbuf, sizeof(signed char), bufferlen);
         dsc2s_array(pxi, ubuf.scbuf, readcount, ptr + total);
         total += readcount;
         if (readcount < bufferlen)
@@ -572,7 +572,7 @@ static size_t dpcm_read_dsc2i(SF_PRIVATE *psf, int *ptr, size_t len)
     {
         if (len < bufferlen)
             bufferlen = len;
-        readcount = psf_fread(ubuf.scbuf, sizeof(signed char), bufferlen, psf);
+        readcount = psf->fread(ubuf.scbuf, sizeof(signed char), bufferlen);
         dsc2i_array(pxi, ubuf.scbuf, readcount, ptr + total);
         total += readcount;
         if (readcount < bufferlen)
@@ -602,7 +602,7 @@ static size_t dpcm_read_dsc2f(SF_PRIVATE *psf, float *ptr, size_t len)
     {
         if (len < bufferlen)
             bufferlen = len;
-        readcount = psf_fread(ubuf.scbuf, sizeof(signed char), bufferlen, psf);
+        readcount = psf->fread(ubuf.scbuf, sizeof(signed char), bufferlen);
         dsc2f_array(pxi, ubuf.scbuf, readcount, ptr + total, normfact);
         total += readcount;
         if (readcount < bufferlen)
@@ -632,7 +632,7 @@ static size_t dpcm_read_dsc2d(SF_PRIVATE *psf, double *ptr, size_t len)
     {
         if (len < bufferlen)
             bufferlen = len;
-        readcount = psf_fread(ubuf.scbuf, sizeof(signed char), bufferlen, psf);
+        readcount = psf->fread(ubuf.scbuf, sizeof(signed char), bufferlen);
         dsc2d_array(pxi, ubuf.scbuf, readcount, ptr + total, normfact);
         total += readcount;
         if (readcount < bufferlen)
@@ -659,7 +659,7 @@ static size_t dpcm_read_dles2s(SF_PRIVATE *psf, short *ptr, size_t len)
     {
         if (len < bufferlen)
             bufferlen = len;
-        readcount = psf_fread(ubuf.sbuf, sizeof(short), bufferlen, psf);
+        readcount = psf->fread(ubuf.sbuf, sizeof(short), bufferlen);
         dles2s_array(pxi, ubuf.sbuf, readcount, ptr + total);
         total += readcount;
         if (readcount < bufferlen)
@@ -686,7 +686,7 @@ static size_t dpcm_read_dles2i(SF_PRIVATE *psf, int *ptr, size_t len)
     {
         if (len < bufferlen)
             bufferlen = len;
-        readcount = psf_fread(ubuf.sbuf, sizeof(short), bufferlen, psf);
+        readcount = psf->fread(ubuf.sbuf, sizeof(short), bufferlen);
         dles2i_array(pxi, ubuf.sbuf, readcount, ptr + total);
         total += readcount;
         if (readcount < bufferlen)
@@ -716,7 +716,7 @@ static size_t dpcm_read_dles2f(SF_PRIVATE *psf, float *ptr, size_t len)
     {
         if (len < bufferlen)
             bufferlen = len;
-        readcount = psf_fread(ubuf.sbuf, sizeof(short), bufferlen, psf);
+        readcount = psf->fread(ubuf.sbuf, sizeof(short), bufferlen);
         dles2f_array(pxi, ubuf.sbuf, readcount, ptr + total, normfact);
         total += readcount;
         if (readcount < bufferlen)
@@ -746,7 +746,7 @@ static size_t dpcm_read_dles2d(SF_PRIVATE *psf, double *ptr, size_t len)
     {
         if (len < bufferlen)
             bufferlen = len;
-        readcount = psf_fread(ubuf.sbuf, sizeof(short), bufferlen, psf);
+        readcount = psf->fread(ubuf.sbuf, sizeof(short), bufferlen);
         dles2d_array(pxi, ubuf.sbuf, readcount, ptr + total, normfact);
         total += readcount;
         if (readcount < bufferlen)
@@ -788,7 +788,7 @@ static size_t dpcm_write_s2dsc(SF_PRIVATE *psf, const short *ptr, size_t len)
         if (len < bufferlen)
             bufferlen = (int)len;
         s2dsc_array(pxi, ptr + total, ubuf.scbuf, bufferlen);
-        writecount = psf_fwrite(ubuf.scbuf, sizeof(signed char), bufferlen, psf);
+        writecount = psf->fwrite(ubuf.scbuf, sizeof(signed char), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
             break;
@@ -815,7 +815,7 @@ static size_t dpcm_write_i2dsc(SF_PRIVATE *psf, const int *ptr, size_t len)
         if (len < bufferlen)
             bufferlen = len;
         i2dsc_array(pxi, ptr + total, ubuf.scbuf, bufferlen);
-        writecount = psf_fwrite(ubuf.scbuf, sizeof(signed char), bufferlen, psf);
+        writecount = psf->fwrite(ubuf.scbuf, sizeof(signed char), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
             break;
@@ -845,7 +845,7 @@ static size_t dpcm_write_f2dsc(SF_PRIVATE *psf, const float *ptr, size_t len)
         if (len < bufferlen)
             bufferlen = len;
         f2dsc_array(pxi, ptr + total, ubuf.scbuf, bufferlen, normfact);
-        writecount = psf_fwrite(ubuf.scbuf, sizeof(signed char), bufferlen, psf);
+        writecount = psf->fwrite(ubuf.scbuf, sizeof(signed char), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
             break;
@@ -875,7 +875,7 @@ static size_t dpcm_write_d2dsc(SF_PRIVATE *psf, const double *ptr, size_t len)
         if (len < bufferlen)
             bufferlen = len;
         d2dsc_array(pxi, ptr + total, ubuf.scbuf, bufferlen, normfact);
-        writecount = psf_fwrite(ubuf.scbuf, sizeof(signed char), bufferlen, psf);
+        writecount = psf->fwrite(ubuf.scbuf, sizeof(signed char), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
             break;
@@ -902,7 +902,7 @@ static size_t dpcm_write_s2dles(SF_PRIVATE *psf, const short *ptr, size_t len)
         if (len < bufferlen)
             bufferlen = len;
         s2dles_array(pxi, ptr + total, ubuf.sbuf, bufferlen);
-        writecount = psf_fwrite(ubuf.sbuf, sizeof(short), bufferlen, psf);
+        writecount = psf->fwrite(ubuf.sbuf, sizeof(short), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
             break;
@@ -929,7 +929,7 @@ static size_t dpcm_write_i2dles(SF_PRIVATE *psf, const int *ptr, size_t len)
         if (len < bufferlen)
             bufferlen = len;
         i2dles_array(pxi, ptr + total, ubuf.sbuf, bufferlen);
-        writecount = psf_fwrite(ubuf.sbuf, sizeof(short), bufferlen, psf);
+        writecount = psf->fwrite(ubuf.sbuf, sizeof(short), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
             break;
@@ -959,7 +959,7 @@ static size_t dpcm_write_f2dles(SF_PRIVATE *psf, const float *ptr, size_t len)
         if (len < bufferlen)
             bufferlen = len;
         f2dles_array(pxi, ptr + total, ubuf.sbuf, bufferlen, normfact);
-        writecount = psf_fwrite(ubuf.sbuf, sizeof(short), bufferlen, psf);
+        writecount = psf->fwrite(ubuf.sbuf, sizeof(short), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
             break;
@@ -989,7 +989,7 @@ static size_t dpcm_write_d2dles(SF_PRIVATE *psf, const double *ptr, size_t len)
         if (len < bufferlen)
             bufferlen = len;
         d2dles_array(pxi, ptr + total, ubuf.sbuf, bufferlen, normfact);
-        writecount = psf_fwrite(ubuf.sbuf, sizeof(short), bufferlen, psf);
+        writecount = psf->fwrite(ubuf.sbuf, sizeof(short), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
             break;

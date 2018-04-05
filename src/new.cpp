@@ -82,19 +82,19 @@ static int new_read_header(SF_PRIVATE *psf)
     int marker;
 
     /* Set position to start of file to begin reading header. */
-    psf_binheader_readf(psf, "pm", 0, &marker);
+    psf->binheader_readf("pm", 0, &marker);
     if (marker != ALAW_MARKER)
         return SFE_WVE_NOT_WVE;
 
-    psf_binheader_readf(psf, "m", &marker);
+    psf->binheader_readf("m", &marker);
     if (marker != SOUN_MARKER)
         return SFE_WVE_NOT_WVE;
 
-    psf_binheader_readf(psf, "m", &marker);
+    psf->binheader_readf("m", &marker);
     if (marker != DFIL_MARKER)
         return SFE_WVE_NOT_WVE;
 
-    psf_log_printf(psf, "Read only : Psion Alaw\n"
+    psf->log_printf("Read only : Psion Alaw\n"
                         "  Sample Rate : 8000\n"
                         "  Channels    : 1\n"
                         "  Encoding    : A-law\n");

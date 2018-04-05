@@ -282,16 +282,16 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
     int parsestage = 0, error, format = 0;
 
     if (psf->file.is_pipe == 0 && psf->filelength > INT64_C(0xffffffff))
-        psf_log_printf(psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n");
+        psf->log_printf("Warning : filelength > 0xffffffff. This is bad!!!!\n");
 
     if ((wpriv = (WAVLIKE_PRIVATE *)psf->container_data) == NULL)
         return SFE_INTERNAL;
     wav_fmt = &wpriv->wav_fmt;
 
     /* Set position to start of file to begin reading header. */
-	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-    psf_binheader_readf(psf, "m", &marker);
-	psf_binheader_seekf(psf, -4, SF_SEEK_CUR);
+	psf->binheader_seekf(0, SF_SEEK_SET);
+    psf->binheader_readf("m", &marker);
+	psf->binheader_seekf(-4, SF_SEEK_CUR);
     psf->header.indx = 0;
 
     /*
@@ -306,16 +306,16 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
         size_t jump = chunk_size & 1;
 
         marker = chunk_size = 0;
-		psf_binheader_seekf(psf, jump, SF_SEEK_CUR);
-        psf_binheader_readf(psf, "m4", &marker, &chunk_size);
+		psf->binheader_seekf(jump, SF_SEEK_CUR);
+        psf->binheader_readf("m4", &marker, &chunk_size);
         if (marker == 0)
         {
-            sf_count_t pos = psf_ftell(psf);
-            psf_log_printf(psf, "Have 0 marker at position %D (0x%x).\n", pos, pos);
+            sf_count_t pos = psf->ftell();
+            psf->log_printf("Have 0 marker at position %D (0x%x).\n", pos, pos);
             break;
         };
 
-        psf_store_read_chunk_u32(&psf->rchunks, marker, psf_ftell(psf), chunk_size);
+        psf_store_read_chunk_u32(&psf->rchunks, marker, psf->ftell(), chunk_size);
 
         switch (marker)
         {
@@ -333,17 +333,17 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
                 /* Set file length. */
                 psf->filelength = RIFFsize + 8;
                 if (marker == RIFF_MARKER)
-                    psf_log_printf(psf, "RIFF : %u\n", RIFFsize);
+                    psf->log_printf("RIFF : %u\n", RIFFsize);
                 else
-                    psf_log_printf(psf, "RIFX : %u\n", RIFFsize);
+                    psf->log_printf("RIFX : %u\n", RIFFsize);
             }
             else if (psf->filelength < RIFFsize + 2 * SIGNED_SIZEOF(marker))
             {
                 if (marker == RIFF_MARKER)
-                    psf_log_printf(psf, "RIFF : %u (should be %D)\n", RIFFsize,
+                    psf->log_printf("RIFF : %u (should be %D)\n", RIFFsize,
                                    psf->filelength - 2 * SIGNED_SIZEOF(marker));
                 else
-                    psf_log_printf(psf, "RIFX : %u (should be %D)\n", RIFFsize,
+                    psf->log_printf("RIFX : %u (should be %D)\n", RIFFsize,
                                    psf->filelength - 2 * SIGNED_SIZEOF(marker));
 
                 RIFFsize = psf->filelength - 2 * SIGNED_SIZEOF(RIFFsize);
@@ -351,16 +351,16 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
             else
             {
                 if (marker == RIFF_MARKER)
-                    psf_log_printf(psf, "RIFF : %u\n", RIFFsize);
+                    psf->log_printf("RIFF : %u\n", RIFFsize);
                 else
-                    psf_log_printf(psf, "RIFX : %u\n", RIFFsize);
+                    psf->log_printf("RIFX : %u\n", RIFFsize);
             };
 
-            psf_binheader_readf(psf, "m", &marker);
+            psf->binheader_readf("m", &marker);
             if (marker != WAVE_MARKER)
                 return SFE_WAV_NO_WAVE;
             parsestage |= HAVE_WAVE;
-            psf_log_printf(psf, "WAVE\n");
+            psf->log_printf("WAVE\n");
             chunk_size = 0;
             break;
 
@@ -374,7 +374,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
 
             parsestage |= HAVE_fmt;
 
-            psf_log_printf(psf, "fmt  : %d\n", chunk_size);
+            psf->log_printf("fmt  : %d\n", chunk_size);
 
             if ((error = wavlike_read_fmt_chunk(psf, chunk_size)))
                 return error;
@@ -394,28 +394,28 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
 
             psf->datalength = chunk_size;
             if (psf->datalength & 1)
-                psf_log_printf(psf, "*** 'data' chunk should be an even number "
+                psf->log_printf("*** 'data' chunk should be an even number "
                                     "of bytes in length.\n");
 
-            psf->dataoffset = psf_ftell(psf);
+            psf->dataoffset = psf->ftell();
 
             if (psf->dataoffset > 0)
             {
                 if (chunk_size == 0 && RIFFsize == 8 && psf->filelength > 44)
                 {
-                    psf_log_printf(psf, "*** Looks like a WAV file which "
+                    psf->log_printf("*** Looks like a WAV file which "
                                         "wasn't closed properly. Fixing it.\n");
                     psf->datalength = psf->filelength - psf->dataoffset;
                 };
 
                 if (psf->datalength > psf->filelength - psf->dataoffset)
                 {
-                    psf_log_printf(psf, "data : %D (should be %D)\n", psf->datalength,
+                    psf->log_printf("data : %D (should be %D)\n", psf->datalength,
                                    psf->filelength - psf->dataoffset);
                     psf->datalength = psf->filelength - psf->dataoffset;
                 }
                 else
-                    psf_log_printf(psf, "data : %D\n", psf->datalength);
+                    psf->log_printf("data : %D\n", psf->datalength);
 
                 /* Only set dataend if there really is data at the end. */
                 if (psf->datalength + psf->dataoffset < psf->filelength)
@@ -429,10 +429,10 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
                 break;
 
             /* Seek past data and continue reading header. */
-            psf_fseek(psf, psf->datalength, SEEK_CUR);
+            psf->fseek(psf->datalength, SEEK_CUR);
 
-            if (psf_ftell(psf) != psf->datalength + psf->dataoffset)
-                psf_log_printf(psf, "*** psf_fseek past end error ***\n");
+            if (psf->ftell() != psf->datalength + psf->dataoffset)
+                psf->log_printf("*** psf_fseek past end error ***\n");
             break;
 
         case fact_MARKER:
@@ -442,19 +442,19 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
             parsestage |= HAVE_fact;
 
             if ((parsestage & HAVE_fmt) != HAVE_fmt)
-                psf_log_printf(psf, "*** Should have 'fmt ' chunk before 'fact'\n");
+                psf->log_printf("*** Should have 'fmt ' chunk before 'fact'\n");
 
-            psf_binheader_readf(psf, "4", &(fact_chunk.frames));
+            psf->binheader_readf("4", &(fact_chunk.frames));
 
             if (chunk_size > SIGNED_SIZEOF(fact_chunk))
-				psf_binheader_seekf(psf, chunk_size - sizeof(fact_chunk), SF_SEEK_CUR);
+				psf->binheader_seekf(chunk_size - sizeof(fact_chunk), SF_SEEK_CUR);
 
             if (chunk_size)
-                psf_log_printf(psf, "%M : %u\n", marker, chunk_size);
+                psf->log_printf("%M : %u\n", marker, chunk_size);
             else
-                psf_log_printf(psf, "%M : %u (should not be zero)\n", marker, chunk_size);
+                psf->log_printf("%M : %u (should not be zero)\n", marker, chunk_size);
 
-            psf_log_printf(psf, "  frames  : %d\n", fact_chunk.frames);
+            psf->log_printf("  frames  : %d\n", fact_chunk.frames);
             break;
 
         case PEAK_MARKER:
@@ -464,7 +464,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
 
             parsestage |= HAVE_PEAK;
 
-            psf_log_printf(psf, "%M : %u\n", marker, chunk_size);
+            psf->log_printf("%M : %u\n", marker, chunk_size);
             if ((error = wavlike_read_peak_chunk(psf, chunk_size)) != 0)
                 return error;
             psf->peak_info->peak_loc =
@@ -478,29 +478,29 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
                 uint32_t thisread, bytesread, cue_count, position, offset;
                 int id, chunk_id, chunk_start, block_start, cue_index;
 
-                bytesread = psf_binheader_readf(psf, "4", &cue_count);
-                psf_log_printf(psf, "%M : %u\n", marker, chunk_size);
+                bytesread = psf->binheader_readf("4", &cue_count);
+                psf->log_printf("%M : %u\n", marker, chunk_size);
 
                 if (cue_count > 1000)
                 {
-                    psf_log_printf(psf, "  Count : %u (skipping)\n", cue_count);
-					psf_binheader_seekf(psf, (cue_count > 20 ? 20 : cue_count) * 24, SF_SEEK_CUR);
+                    psf->log_printf("  Count : %u (skipping)\n", cue_count);
+					psf->binheader_seekf((cue_count > 20 ? 20 : cue_count) * 24, SF_SEEK_CUR);
                     break;
                 };
 
-                psf_log_printf(psf, "  Count : %d\n", cue_count);
+                psf->log_printf("  Count : %d\n", cue_count);
 
 				psf->cues.resize(static_cast<size_t>(cue_count));
                 cue_index = 0;
 
                 while (cue_count)
                 {
-                    if ((thisread = psf_binheader_readf(psf, "e44m444", &id, &position, &chunk_id,
+                    if ((thisread = psf->binheader_readf("e44m444", &id, &position, &chunk_id,
                                                         &chunk_start, &block_start, &offset)) == 0)
                         break;
                     bytesread += thisread;
 
-                    psf_log_printf(psf,
+                    psf->log_printf(
                                    "   Cue ID : %2d"
                                    "  Pos : %5u  Chunk : %M"
                                    "  Chk Start : %d  Blk Start : %d"
@@ -519,9 +519,9 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
 
                 if (bytesread != chunk_size)
                 {
-                    psf_log_printf(psf, "**** Chunk size weirdness (%d != %d)\n", chunk_size,
+                    psf->log_printf("**** Chunk size weirdness (%d != %d)\n", chunk_size,
                                    bytesread);
-					psf_binheader_seekf(psf, chunk_size - bytesread, SF_SEEK_CUR);
+					psf->binheader_seekf(chunk_size - bytesread, SF_SEEK_CUR);
                 };
             };
             break;
@@ -529,7 +529,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
         case smpl_MARKER:
             parsestage |= HAVE_other;
 
-            psf_log_printf(psf, "smpl : %u\n", chunk_size);
+            psf->log_printf("smpl : %u\n", chunk_size);
 
             if ((error = wav_read_smpl_chunk(psf, chunk_size)))
                 return error;
@@ -538,7 +538,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
         case acid_MARKER:
             parsestage |= HAVE_other;
 
-            psf_log_printf(psf, "acid : %u\n", chunk_size);
+            psf->log_printf("acid : %u\n", chunk_size);
 
             if ((error = wav_read_acid_chunk(psf, chunk_size)))
                 return error;
@@ -557,8 +557,8 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
 			 * We can eat into a 'PAD ' chunk if we need to.
 			 * parsestage |= HAVE_other ;
 			 */
-            psf_log_printf(psf, "%M : %u\n", marker, chunk_size);
-			psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
+            psf->log_printf("%M : %u\n", marker, chunk_size);
+			psf->binheader_seekf(chunk_size, SF_SEEK_CUR);
             break;
 
         case cart_MARKER:
@@ -584,48 +584,48 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
         case MEXT_MARKER:
         case FLLR_MARKER:
         case bext_MARKER:
-            psf_log_printf(psf, "%M : %u\n", marker, chunk_size);
-			psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
+            psf->log_printf("%M : %u\n", marker, chunk_size);
+			psf->binheader_seekf(chunk_size, SF_SEEK_CUR);
             break;
 
         default:
             if (chunk_size >= 0xffff0000)
             {
                 done = SF_TRUE;
-                psf_log_printf(psf,
+                psf->log_printf(
                                "*** Unknown chunk marker (%X) at position "
                                "%D with length %u. Exiting parser.\n",
-                               marker, psf_ftell(psf) - 8, chunk_size);
+                               marker, psf->ftell() - 8, chunk_size);
                 break;
             };
 
             if (psf_isprint((marker >> 24) & 0xFF) && psf_isprint((marker >> 16) & 0xFF) &&
                 psf_isprint((marker >> 8) & 0xFF) && psf_isprint(marker & 0xFF))
             {
-                psf_log_printf(psf, "*** %M : %u (unknown marker)\n", marker, chunk_size);
-				psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
+                psf->log_printf("*** %M : %u (unknown marker)\n", marker, chunk_size);
+				psf->binheader_seekf(chunk_size, SF_SEEK_CUR);
                 break;
             };
-            if (psf_ftell(psf) & 0x03)
+            if (psf->ftell() & 0x03)
             {
-                psf_log_printf(psf, "  Unknown chunk marker at position %D. Resynching.\n",
-                               psf_ftell(psf) - 8);
-				psf_binheader_seekf(psf, -3, SF_SEEK_CUR);
+                psf->log_printf("  Unknown chunk marker at position %D. Resynching.\n",
+                               psf->ftell() - 8);
+				psf->binheader_seekf(-3, SF_SEEK_CUR);
                 /* File is too messed up so we prevent editing in RDWR mode here. */
                 parsestage |= HAVE_other;
                 break;
             };
-            psf_log_printf(psf,
+            psf->log_printf(
                            "*** Unknown chunk marker (%X) at position %D. "
                            "Exiting parser.\n",
-                           marker, psf_ftell(psf) - 8);
+                           marker, psf->ftell() - 8);
             done = SF_TRUE;
             break;
         };
 
         if (chunk_size >= psf->filelength)
         {
-            psf_log_printf(psf, "*** Chunk size %u > file length %D. Exiting parser.\n", chunk_size,
+            psf->log_printf("*** Chunk size %u > file length %D. Exiting parser.\n", chunk_size,
                            psf->filelength);
             break;
         };
@@ -633,9 +633,9 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
         if (!psf->sf.seekable && (parsestage & HAVE_data))
             break;
 
-        if (psf_ftell(psf) >= psf->filelength - SIGNED_SIZEOF(chunk_size))
+        if (psf->ftell() >= psf->filelength - SIGNED_SIZEOF(chunk_size))
         {
-            psf_log_printf(psf, "End\n");
+            psf->log_printf("End\n");
             break;
         };
     }; /* while (1) */
@@ -650,12 +650,12 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
         return SFE_CHANNEL_COUNT;
 
     if (format != WAVE_FORMAT_PCM && (parsestage & HAVE_fact) == 0)
-        psf_log_printf(psf, "**** All non-PCM format files should have a 'fact' chunk.\n");
+        psf->log_printf("**** All non-PCM format files should have a 'fact' chunk.\n");
 
     /* WAVs can be little or big endian */
     psf->endian = psf->rwf_endian;
 
-    psf_fseek(psf, psf->dataoffset, SEEK_SET);
+    psf->fseek(psf->dataoffset, SEEK_SET);
 
     if (psf->file.is_pipe == SF_FALSE)
     {
@@ -663,13 +663,13 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
 		 * Check for 'wvpk' at the start of the DATA section. Not able to
 		 * handle this.
 		 */
-        psf_binheader_readf(psf, "4", &marker);
+        psf->binheader_readf("4", &marker);
         if (marker == wvpk_MARKER || marker == OggS_MARKER)
             return SFE_WAV_WVPK_DATA;
     };
 
     /* Seek to start of DATA section. */
-    psf_fseek(psf, psf->dataoffset, SEEK_SET);
+    psf->fseek(psf->dataoffset, SEEK_SET);
 
     if (psf->blockwidth)
     {
@@ -777,13 +777,13 @@ static int wav_write_fmt_chunk(SF_PRIVATE *psf)
         fmt_size = 2 + 2 + 4 + 4 + 2 + 2;
 
         /* fmt : format, channels, samplerate */
-        psf_binheader_writef(psf, "4224", BHW4(fmt_size), BHW2(WAVE_FORMAT_PCM),
+        psf->binheader_writef("4224", BHW4(fmt_size), BHW2(WAVE_FORMAT_PCM),
                              BHW2(psf->sf.channels), BHW4(psf->sf.samplerate));
         /*  fmt : bytespersec */
-        psf_binheader_writef(psf, "4",
+        psf->binheader_writef("4",
                              BHW4(psf->sf.samplerate * psf->bytewidth * psf->sf.channels));
         /*  fmt : blockalign, bitwidth */
-        psf_binheader_writef(psf, "22", BHW2(psf->bytewidth * psf->sf.channels),
+        psf->binheader_writef("22", BHW2(psf->bytewidth * psf->sf.channels),
                              BHW2(psf->bytewidth * 8));
         break;
 
@@ -792,13 +792,13 @@ static int wav_write_fmt_chunk(SF_PRIVATE *psf)
         fmt_size = 2 + 2 + 4 + 4 + 2 + 2;
 
         /* fmt : format, channels, samplerate */
-        psf_binheader_writef(psf, "4224", BHW4(fmt_size), BHW2(WAVE_FORMAT_IEEE_FLOAT),
+        psf->binheader_writef("4224", BHW4(fmt_size), BHW2(WAVE_FORMAT_IEEE_FLOAT),
                              BHW2(psf->sf.channels), BHW4(psf->sf.samplerate));
         /*  fmt : bytespersec */
-        psf_binheader_writef(psf, "4",
+        psf->binheader_writef("4",
                              BHW4(psf->sf.samplerate * psf->bytewidth * psf->sf.channels));
         /*  fmt : blockalign, bitwidth */
-        psf_binheader_writef(psf, "22", BHW2(psf->bytewidth * psf->sf.channels),
+        psf->binheader_writef("22", BHW2(psf->bytewidth * psf->sf.channels),
                              BHW2(psf->bytewidth * 8));
 
         add_fact_chunk = SF_TRUE;
@@ -808,13 +808,13 @@ static int wav_write_fmt_chunk(SF_PRIVATE *psf)
         fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2;
 
         /* fmt : format, channels, samplerate */
-        psf_binheader_writef(psf, "4224", BHW4(fmt_size), BHW2(WAVE_FORMAT_MULAW),
+        psf->binheader_writef("4224", BHW4(fmt_size), BHW2(WAVE_FORMAT_MULAW),
                              BHW2(psf->sf.channels), BHW4(psf->sf.samplerate));
         /*  fmt : bytespersec */
-        psf_binheader_writef(psf, "4",
+        psf->binheader_writef("4",
                              BHW4(psf->sf.samplerate * psf->bytewidth * psf->sf.channels));
         /*  fmt : blockalign, bitwidth, extrabytes */
-        psf_binheader_writef(psf, "222", BHW2(psf->bytewidth * psf->sf.channels), BHW2(8), BHW2(0));
+        psf->binheader_writef("222", BHW2(psf->bytewidth * psf->sf.channels), BHW2(8), BHW2(0));
 
         add_fact_chunk = SF_TRUE;
         break;
@@ -823,13 +823,13 @@ static int wav_write_fmt_chunk(SF_PRIVATE *psf)
         fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2;
 
         /* fmt : format, channels, samplerate */
-        psf_binheader_writef(psf, "4224", BHW4(fmt_size), BHW2(WAVE_FORMAT_ALAW),
+        psf->binheader_writef("4224", BHW4(fmt_size), BHW2(WAVE_FORMAT_ALAW),
                              BHW2(psf->sf.channels), BHW4(psf->sf.samplerate));
         /*  fmt : bytespersec */
-        psf_binheader_writef(psf, "4",
+        psf->binheader_writef("4",
                              BHW4(psf->sf.samplerate * psf->bytewidth * psf->sf.channels));
         /*  fmt : blockalign, bitwidth, extrabytes */
-        psf_binheader_writef(psf, "222", BHW2(psf->bytewidth * psf->sf.channels), BHW2(8), BHW2(0));
+        psf->binheader_writef("222", BHW2(psf->bytewidth * psf->sf.channels), BHW2(8), BHW2(0));
 
         add_fact_chunk = SF_TRUE;
         break;
@@ -846,11 +846,11 @@ static int wav_write_fmt_chunk(SF_PRIVATE *psf)
         fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2;
 
         /* fmt : size, WAV format type, channels, samplerate, bytespersec */
-        psf_binheader_writef(psf, "42244", BHW4(fmt_size), BHW2(WAVE_FORMAT_IMA_ADPCM),
+        psf->binheader_writef("42244", BHW4(fmt_size), BHW2(WAVE_FORMAT_IMA_ADPCM),
                              BHW2(psf->sf.channels), BHW4(psf->sf.samplerate), BHW4(bytespersec));
 
         /* fmt : blockalign, bitwidth, extrabytes, framesperblock. */
-        psf_binheader_writef(psf, "2222", BHW2(blockalign), BHW2(4), BHW2(2), BHW2(framesperblock));
+        psf->binheader_writef("2222", BHW2(blockalign), BHW2(4), BHW2(2), BHW2(framesperblock));
     };
 
         add_fact_chunk = SF_TRUE;
@@ -869,14 +869,14 @@ static int wav_write_fmt_chunk(SF_PRIVATE *psf)
         fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 + extrabytes;
 
         /* fmt : size, WAV format type, channels. */
-        psf_binheader_writef(psf, "422", BHW4(fmt_size), BHW2(WAVE_FORMAT_MS_ADPCM),
+        psf->binheader_writef("422", BHW4(fmt_size), BHW2(WAVE_FORMAT_MS_ADPCM),
                              BHW2(psf->sf.channels));
 
         /* fmt : samplerate, bytespersec. */
-        psf_binheader_writef(psf, "44", BHW4(psf->sf.samplerate), BHW4(bytespersec));
+        psf->binheader_writef("44", BHW4(psf->sf.samplerate), BHW4(bytespersec));
 
         /* fmt : blockalign, bitwidth, extrabytes, framesperblock. */
-        psf_binheader_writef(psf, "22222", BHW2(blockalign), BHW2(4), BHW2(extrabytes),
+        psf->binheader_writef("22222", BHW2(blockalign), BHW2(4), BHW2(extrabytes),
                              BHW2(framesperblock), BHW2(7));
 
         wavlike_msadpcm_write_adapt_coeffs(psf);
@@ -890,12 +890,12 @@ static int wav_write_fmt_chunk(SF_PRIVATE *psf)
         fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2;
 
         /* fmt : size, WAV format type, channels, samplerate, bytespersec */
-        psf_binheader_writef(psf, "42244", BHW4(fmt_size), BHW2(WAVE_FORMAT_G721_ADPCM),
+        psf->binheader_writef("42244", BHW4(fmt_size), BHW2(WAVE_FORMAT_G721_ADPCM),
                              BHW2(psf->sf.channels), BHW4(psf->sf.samplerate),
                              BHW4(psf->sf.samplerate * psf->sf.channels / 2));
 
         /* fmt : blockalign, bitwidth, extrabytes, auxblocksize. */
-        psf_binheader_writef(psf, "2222", BHW2(64), BHW2(4), BHW2(2), BHW2(0));
+        psf->binheader_writef("2222", BHW2(64), BHW2(4), BHW2(2), BHW2(0));
 
         add_fact_chunk = SF_TRUE;
         break;
@@ -914,9 +914,9 @@ static int wav_write_fmt_chunk(SF_PRIVATE *psf)
         fmt_size = 2 + 2 + 4 + 4 + 2 + 2;
 
         /* fmt : format, channels, samplerate */
-        psf_binheader_writef(psf, "4224", BHW4(fmt_size), BHW2(WAVE_FORMAT_NMS_VBXADPCM), BHW2(psf->sf.channels), BHW4(psf->sf.samplerate));
+        psf->binheader_writef("4224", BHW4(fmt_size), BHW2(WAVE_FORMAT_NMS_VBXADPCM), BHW2(psf->sf.channels), BHW4(psf->sf.samplerate));
         /*  fmt : bytespersec, blockalign, bitwidth */
-        psf_binheader_writef(psf, "422", BHW4(bytespersec), BHW2(blockalign), BHW2(bitwidth));
+        psf->binheader_writef("422", BHW4(bytespersec), BHW2(blockalign), BHW2(bitwidth));
 
         add_fact_chunk = SF_TRUE;
         break;
@@ -934,14 +934,14 @@ static int wav_write_fmt_chunk(SF_PRIVATE *psf)
         fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2;
 
         /* fmt : size, WAV format type, channels. */
-        psf_binheader_writef(psf, "422", BHW4(fmt_size), BHW2(WAVE_FORMAT_GSM610),
+        psf->binheader_writef("422", BHW4(fmt_size), BHW2(WAVE_FORMAT_GSM610),
                              BHW2(psf->sf.channels));
 
         /* fmt : samplerate, bytespersec. */
-        psf_binheader_writef(psf, "44", BHW4(psf->sf.samplerate), BHW4(bytespersec));
+        psf->binheader_writef("44", BHW4(psf->sf.samplerate), BHW4(bytespersec));
 
         /* fmt : blockalign, bitwidth, extrabytes, framesperblock. */
-        psf_binheader_writef(psf, "2222", BHW2(blockalign), BHW2(0), BHW2(2), BHW2(framesperblock));
+        psf->binheader_writef("2222", BHW2(blockalign), BHW2(0), BHW2(2), BHW2(framesperblock));
     };
 
         add_fact_chunk = SF_TRUE;
@@ -952,7 +952,7 @@ static int wav_write_fmt_chunk(SF_PRIVATE *psf)
     };
 
     if (add_fact_chunk)
-        psf_binheader_writef(psf, "tm48", BHWm(fact_MARKER), BHW4(4), BHW8(psf->sf.frames));
+        psf->binheader_writef("tm48", BHWm(fact_MARKER), BHW4(4), BHW8(psf->sf.frames));
 
     return 0;
 }
@@ -981,29 +981,29 @@ static int wavex_write_fmt_chunk(SF_PRIVATE *psf)
         fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 + 4 + 4 + 2 + 2 + 8;
 
         /* fmt : format, channels, samplerate */
-        psf_binheader_writef(psf, "4224", BHW4(fmt_size), BHW2(WAVE_FORMAT_EXTENSIBLE),
+        psf->binheader_writef("4224", BHW4(fmt_size), BHW2(WAVE_FORMAT_EXTENSIBLE),
                              BHW2(psf->sf.channels), BHW4(psf->sf.samplerate));
         /*  fmt : bytespersec */
-        psf_binheader_writef(psf, "4",
+        psf->binheader_writef("4",
                              BHW4(psf->sf.samplerate * psf->bytewidth * psf->sf.channels));
         /*  fmt : blockalign, bitwidth */
-        psf_binheader_writef(psf, "22", BHW2(psf->bytewidth * psf->sf.channels),
+        psf->binheader_writef("22", BHW2(psf->bytewidth * psf->sf.channels),
                              BHW2(psf->bytewidth * 8));
 
         /* cbSize 22 is sizeof (WAVEFORMATEXTENSIBLE) - sizeof (WAVEFORMATEX) */
-        psf_binheader_writef(psf, "2", BHW2(22));
+        psf->binheader_writef("2", BHW2(22));
 
         /* wValidBitsPerSample, for our use same as bitwidth as we use it fully */
-        psf_binheader_writef(psf, "2", BHW2(psf->bytewidth * 8));
+        psf->binheader_writef("2", BHW2(psf->bytewidth * 8));
 
         /*
 		 * For an Ambisonic file set the channel mask to zero.
 		 * Otherwise use a default based on the channel count.
 		 */
         if (wpriv->wavex_ambisonic != SF_AMBISONIC_NONE)
-            psf_binheader_writef(psf, "4", BHW4(0));
+            psf->binheader_writef("4", BHW4(0));
         else if (wpriv->wavex_channelmask != 0)
-            psf_binheader_writef(psf, "4", BHW4(wpriv->wavex_channelmask));
+            psf->binheader_writef("4", BHW4(wpriv->wavex_channelmask));
         else
         {
             /*
@@ -1014,28 +1014,28 @@ static int wavex_write_fmt_chunk(SF_PRIVATE *psf)
             switch (psf->sf.channels)
             {
             case 1: /* center channel mono */
-                psf_binheader_writef(psf, "4", BHW4(0x4));
+                psf->binheader_writef("4", BHW4(0x4));
                 break;
 
             case 2: /* front left and right */
-                psf_binheader_writef(psf, "4", BHW4(0x1 | 0x2));
+                psf->binheader_writef("4", BHW4(0x1 | 0x2));
                 break;
 
             case 4: /* Quad */
-                psf_binheader_writef(psf, "4", BHW4(0x1 | 0x2 | 0x10 | 0x20));
+                psf->binheader_writef("4", BHW4(0x1 | 0x2 | 0x10 | 0x20));
                 break;
 
             case 6: /* 5.1 */
-                psf_binheader_writef(psf, "4", BHW4(0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20));
+                psf->binheader_writef("4", BHW4(0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20));
                 break;
 
             case 8: /* 7.1 */
-                psf_binheader_writef(psf, "4",
+                psf->binheader_writef("4",
                                      BHW4(0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20 | 0x40 | 0x80));
                 break;
 
             default: /* 0 when in doubt , use direct out, ie NO mapping*/
-                psf_binheader_writef(psf, "4", BHW4(0x0));
+                psf->binheader_writef("4", BHW4(0x0));
                 break;
             };
         };
@@ -1086,7 +1086,7 @@ static int wavex_write_fmt_chunk(SF_PRIVATE *psf)
         return SFE_UNIMPLEMENTED;
     };
 
-    psf_binheader_writef(psf, "tm48", BHWm(fact_MARKER), BHW4(4), BHW8(psf->sf.frames));
+    psf->binheader_writef("tm48", BHWm(fact_MARKER), BHW4(4), BHW8(psf->sf.frames));
 
     return 0;
 }
@@ -1096,14 +1096,14 @@ static int wav_write_header(SF_PRIVATE *psf, int calc_length)
     sf_count_t current;
     int error, has_data = SF_FALSE;
 
-    current = psf_ftell(psf);
+    current = psf->ftell();
 
     if (current > psf->dataoffset)
         has_data = SF_TRUE;
 
     if (calc_length)
     {
-        psf->filelength = psf_get_filelen(psf);
+        psf->filelength = psf->get_filelen();
 
         psf->datalength = psf->filelength - psf->dataoffset;
 
@@ -1116,7 +1116,7 @@ static int wav_write_header(SF_PRIVATE *psf, int calc_length)
     /* Reset the current header length to zero. */
     psf->header.ptr[0] = 0;
     psf->header.indx = 0;
-    psf_fseek(psf, 0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
 
     /*
 	 * RIFX signifies big-endian format for all header and data.
@@ -1127,14 +1127,14 @@ static int wav_write_header(SF_PRIVATE *psf, int calc_length)
     /* RIFF/RIFX marker, length, WAVE and 'fmt ' markers. */
 
     if (psf->endian == SF_ENDIAN_LITTLE)
-        psf_binheader_writef(psf, "etm8", BHWm(RIFF_MARKER),
+        psf->binheader_writef("etm8", BHWm(RIFF_MARKER),
                              BHW8((psf->filelength < 8) ? 8 : psf->filelength - 8));
     else
-        psf_binheader_writef(psf, "Etm8", BHWm(RIFX_MARKER),
+        psf->binheader_writef("Etm8", BHWm(RIFX_MARKER),
                              BHW8((psf->filelength < 8) ? 8 : psf->filelength - 8));
 
     /* WAVE and 'fmt ' markers. */
-    psf_binheader_writef(psf, "mm", BHWm(WAVE_MARKER), BHWm(fmt_MARKER));
+    psf->binheader_writef("mm", BHWm(WAVE_MARKER), BHWm(fmt_MARKER));
 
     /* Write the 'fmt ' chunk. */
     switch (SF_CONTAINER(psf->sf.format))
@@ -1162,11 +1162,11 @@ static int wav_write_header(SF_PRIVATE *psf, int calc_length)
 
     if (!psf->cues.empty())
     {
-        psf_binheader_writef(psf, "em44", BHWm(cue_MARKER), BHW4(4 + psf->cues.size() * 6 * 4),
+        psf->binheader_writef("em44", BHWm(cue_MARKER), BHW4(4 + psf->cues.size() * 6 * 4),
                              BHW4(psf->cues.size()));
 
 		for (auto &cue: psf->cues) {
-			psf_binheader_writef(psf, "e44m444", BHW4(cue.indx),
+			psf->binheader_writef("e44m444", BHW4(cue.indx),
 								 BHW4(cue.position),
 								 BHWm(cue.fcc_chunk),
 								 BHW4(cue.chunk_start),
@@ -1180,15 +1180,15 @@ static int wav_write_header(SF_PRIVATE *psf, int calc_length)
         int tmp;
         double dtune = (double)(0x40000000) / 25.0;
 
-        psf_binheader_writef(psf, "m4", BHWm(smpl_MARKER),
+        psf->binheader_writef("m4", BHWm(smpl_MARKER),
                              BHW4(9 * 4 + psf->instrument->loop_count * 6 * 4));
-        psf_binheader_writef(psf, "44", BHW4(0), BHW4(0)); /* Manufacturer zero is everyone */
+        psf->binheader_writef("44", BHW4(0), BHW4(0)); /* Manufacturer zero is everyone */
         tmp = (int)(1.0e9 / psf->sf.samplerate); /* Sample period in nano seconds */
-        psf_binheader_writef(psf, "44", BHW4(tmp), BHW4(psf->instrument->basenote));
+        psf->binheader_writef("44", BHW4(tmp), BHW4(psf->instrument->basenote));
         tmp = (uint32_t)(psf->instrument->detune * dtune + 0.5);
-        psf_binheader_writef(psf, "4", BHW4(tmp));
-        psf_binheader_writef(psf, "44", BHW4(0), BHW4(0)); /* SMTPE format */
-        psf_binheader_writef(psf, "44", BHW4(psf->instrument->loop_count), BHW4(0));
+        psf->binheader_writef("4", BHW4(tmp));
+        psf->binheader_writef("44", BHW4(0), BHW4(0)); /* SMTPE format */
+        psf->binheader_writef("44", BHW4(psf->instrument->loop_count), BHW4(0));
 
         for (tmp = 0; tmp < psf->instrument->loop_count; tmp++)
         {
@@ -1199,10 +1199,10 @@ static int wav_write_header(SF_PRIVATE *psf, int calc_length)
                         ? 0
                         : type == SF_LOOP_BACKWARD ? 2 : type == SF_LOOP_ALTERNATING ? 1 : 32);
 
-            psf_binheader_writef(psf, "44", BHW4(tmp), BHW4(type));
-            psf_binheader_writef(psf, "44", BHW4(psf->instrument->loops[tmp].start),
+            psf->binheader_writef("44", BHW4(tmp), BHW4(type));
+            psf->binheader_writef("44", BHW4(psf->instrument->loops[tmp].start),
                                  BHW4(psf->instrument->loops[tmp].end - 1));
-            psf_binheader_writef(psf, "44", BHW4(0), BHW4(psf->instrument->loops[tmp].count));
+            psf->binheader_writef("44", BHW4(0), BHW4(psf->instrument->loops[tmp].count));
         };
     };
 
@@ -1214,26 +1214,26 @@ static int wav_write_header(SF_PRIVATE *psf, int calc_length)
     {
         /* Add PAD data if necessary. */
         size_t k = psf->dataoffset - (psf->header.indx + 16);
-        psf_binheader_writef(psf, "m4z", BHWm(PAD_MARKER), BHW4(k), BHWz(k));
+        psf->binheader_writef("m4z", BHWm(PAD_MARKER), BHW4(k), BHWz(k));
     };
 
-    psf_binheader_writef(psf, "tm8", BHWm(data_MARKER), BHW8(psf->datalength));
-    psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+    psf->binheader_writef("tm8", BHWm(data_MARKER), BHW8(psf->datalength));
+    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
     if (psf->error)
         return psf->error;
 
     if (has_data && psf->dataoffset != psf->header.indx)
     {
-        psf_log_printf(psf, "Oooops : has_data && psf->dataoffset != psf->header.indx\n");
+        psf->log_printf("Oooops : has_data && psf->dataoffset != psf->header.indx\n");
         return psf->error = SFE_INTERNAL;
     };
 
     psf->dataoffset = psf->header.indx;
 
     if (!has_data)
-        psf_fseek(psf, psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->dataoffset, SEEK_SET);
     else if (current > 0)
-        psf_fseek(psf, current, SEEK_SET);
+        psf->fseek(current, SEEK_SET);
 
     return psf->error;
 }
@@ -1251,12 +1251,12 @@ static int wav_write_tailer(SF_PRIVATE *psf)
     };
 
     if (psf->dataend > 0)
-        psf_fseek(psf, psf->dataend, SEEK_SET);
+        psf->fseek(psf->dataend, SEEK_SET);
     else
-        psf->dataend = psf_fseek(psf, 0, SEEK_END);
+        psf->dataend = psf->fseek(0, SEEK_END);
 
     if (psf->dataend & 1)
-        psf_binheader_writef(psf, "z", BHWz(1));
+        psf->binheader_writef("z", BHWz(1));
 
     /* Add a PEAK chunk if requested. */
     if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_END)
@@ -1267,7 +1267,7 @@ static int wav_write_tailer(SF_PRIVATE *psf)
 
     /* Write the tailer. */
     if (psf->header.indx > 0)
-        psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+        psf->fwrite(psf->header.ptr, psf->header.indx, 1);
 
     return 0;
 }
@@ -1280,7 +1280,7 @@ static int wav_close(SF_PRIVATE *psf)
 
         if (psf->file.mode == SFM_RDWR)
         {
-            sf_count_t current = psf_ftell(psf);
+            sf_count_t current = psf->ftell();
 
             /*
 			**	If the mode is RDWR and the current position is less than the
@@ -1289,7 +1289,7 @@ static int wav_close(SF_PRIVATE *psf)
 
             if (current < psf->filelength)
             {
-                psf_ftruncate(psf, current);
+                psf->ftruncate(current);
                 psf->filelength = current;
             };
         };
@@ -1344,37 +1344,37 @@ static int wav_read_smpl_chunk(SF_PRIVATE *psf, uint32_t chunklen)
 
     chunklen += (chunklen & 1);
 
-    bytesread += psf_binheader_readf(psf, "4", &dword);
-    psf_log_printf(psf, "  Manufacturer : %X\n", dword);
+    bytesread += psf->binheader_readf("4", &dword);
+    psf->log_printf("  Manufacturer : %X\n", dword);
 
-    bytesread += psf_binheader_readf(psf, "4", &dword);
-    psf_log_printf(psf, "  Product      : %u\n", dword);
+    bytesread += psf->binheader_readf("4", &dword);
+    psf->log_printf("  Product      : %u\n", dword);
 
-    bytesread += psf_binheader_readf(psf, "4", &dword);
-    psf_log_printf(psf, "  Period       : %u nsec\n", dword);
+    bytesread += psf->binheader_readf("4", &dword);
+    psf->log_printf("  Period       : %u nsec\n", dword);
 
-    bytesread += psf_binheader_readf(psf, "4", &note);
-    psf_log_printf(psf, "  Midi Note    : %u\n", note);
+    bytesread += psf->binheader_readf("4", &note);
+    psf->log_printf("  Midi Note    : %u\n", note);
 
-    bytesread += psf_binheader_readf(psf, "4", &dword);
+    bytesread += psf->binheader_readf("4", &dword);
     if (dword != 0)
     {
         snprintf(buffer, sizeof(buffer), "%f", (1.0 * 0x80000000) / ((uint32_t)dword));
-        psf_log_printf(psf, "  Pitch Fract. : %s\n", buffer);
+        psf->log_printf("  Pitch Fract. : %s\n", buffer);
     }
     else
-        psf_log_printf(psf, "  Pitch Fract. : 0\n");
+        psf->log_printf("  Pitch Fract. : 0\n");
 
-    bytesread += psf_binheader_readf(psf, "4", &dword);
-    psf_log_printf(psf, "  SMPTE Format : %u\n", dword);
+    bytesread += psf->binheader_readf("4", &dword);
+    psf->log_printf("  SMPTE Format : %u\n", dword);
 
-    bytesread += psf_binheader_readf(psf, "4", &dword);
+    bytesread += psf->binheader_readf("4", &dword);
     snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d %02d", (dword >> 24) & 0x7F,
              (dword >> 16) & 0x7F, (dword >> 8) & 0x7F, dword & 0x7F);
-    psf_log_printf(psf, "  SMPTE Offset : %s\n", buffer);
+    psf->log_printf("  SMPTE Offset : %s\n", buffer);
 
-    bytesread += psf_binheader_readf(psf, "4", &loop_count);
-    psf_log_printf(psf, "  Loop Count   : %u\n", loop_count);
+    bytesread += psf->binheader_readf("4", &loop_count);
+    psf->log_printf("  Loop Count   : %u\n", loop_count);
 
     if (loop_count == 0 && chunklen == bytesread)
         return 0;
@@ -1383,7 +1383,7 @@ static int wav_read_smpl_chunk(SF_PRIVATE *psf, uint32_t chunklen)
 	 * Sampler Data holds the number of data bytes after the CUE chunks which
 	 * is not actually CUE data. Display value after CUE data.
 	 */
-    bytesread += psf_binheader_readf(psf, "4", &sampler_data);
+    bytesread += psf->binheader_readf("4", &sampler_data);
 
     if ((psf->instrument = psf_instrument_alloc()) == NULL)
         return SFE_MALLOC_FAILED;
@@ -1392,25 +1392,25 @@ static int wav_read_smpl_chunk(SF_PRIVATE *psf, uint32_t chunklen)
 
     for (j = 0; loop_count > 0 && chunklen - bytesread >= 24; j++)
     {
-        if ((thisread = psf_binheader_readf(psf, "4", &dword)) == 0)
+        if ((thisread = psf->binheader_readf("4", &dword)) == 0)
             break;
         bytesread += thisread;
-        psf_log_printf(psf, "    Cue ID : %2u", dword);
+        psf->log_printf("    Cue ID : %2u", dword);
 
-        bytesread += psf_binheader_readf(psf, "4", &type);
-        psf_log_printf(psf, "  Type : %2u", type);
+        bytesread += psf->binheader_readf("4", &type);
+        psf->log_printf("  Type : %2u", type);
 
-        bytesread += psf_binheader_readf(psf, "4", &start);
-        psf_log_printf(psf, "  Start : %5u", start);
+        bytesread += psf->binheader_readf("4", &start);
+        psf->log_printf("  Start : %5u", start);
 
-        bytesread += psf_binheader_readf(psf, "4", &end);
-        psf_log_printf(psf, "  End : %5u", end);
+        bytesread += psf->binheader_readf("4", &end);
+        psf->log_printf("  End : %5u", end);
 
-        bytesread += psf_binheader_readf(psf, "4", &dword);
-        psf_log_printf(psf, "  Fraction : %5u", dword);
+        bytesread += psf->binheader_readf("4", &dword);
+        psf->log_printf("  Fraction : %5u", dword);
 
-        bytesread += psf_binheader_readf(psf, "4", &count);
-        psf_log_printf(psf, "  Count : %5u\n", count);
+        bytesread += psf->binheader_readf("4", &count);
+        psf->log_printf("  Count : %5u\n", count);
 
         if (j < ARRAY_LEN(psf->instrument->loops))
         {
@@ -1441,38 +1441,38 @@ static int wav_read_smpl_chunk(SF_PRIVATE *psf, uint32_t chunklen)
     if (chunklen - bytesread == 0)
     {
         if (sampler_data != 0)
-            psf_log_printf(psf, "  Sampler Data : %u (should be 0)\n", sampler_data);
+            psf->log_printf("  Sampler Data : %u (should be 0)\n", sampler_data);
         else
-            psf_log_printf(psf, "  Sampler Data : %u\n", sampler_data);
+            psf->log_printf("  Sampler Data : %u\n", sampler_data);
     }
     else
     {
         if (sampler_data != chunklen - bytesread)
         {
-            psf_log_printf(psf, "  Sampler Data : %u (should have been %u)\n", sampler_data,
+            psf->log_printf("  Sampler Data : %u (should have been %u)\n", sampler_data,
                            chunklen - bytesread);
             sampler_data = chunklen - bytesread;
         }
         else
         {
-            psf_log_printf(psf, "  Sampler Data : %u\n", sampler_data);
+            psf->log_printf("  Sampler Data : %u\n", sampler_data);
         }
 
-        psf_log_printf(psf, "      ");
+        psf->log_printf("      ");
         for (k = 0; k < (int)sampler_data; k++)
         {
             char ch;
 
             if (k > 0 && (k % 20) == 0)
-                psf_log_printf(psf, "\n      ");
+                psf->log_printf("\n      ");
 
-            if ((thisread = psf_binheader_readf(psf, "1", &ch)) == 0)
+            if ((thisread = psf->binheader_readf("1", &ch)) == 0)
                 break;
             bytesread += thisread;
-            psf_log_printf(psf, "%02X ", ch & 0xFF);
+            psf->log_printf("%02X ", ch & 0xFF);
         };
 
-        psf_log_printf(psf, "\n");
+        psf->log_printf("\n");
     };
 
     psf->instrument->basenote = note;
@@ -1524,25 +1524,25 @@ static int wav_read_acid_chunk(SF_PRIVATE *psf, uint32_t chunklen)
 
     chunklen += (chunklen & 1);
 
-    bytesread += psf_binheader_readf(psf, "422f", &flags, &rootnote, &q1, &q2);
+    bytesread += psf->binheader_readf("422f", &flags, &rootnote, &q1, &q2);
 
     snprintf(buffer, sizeof(buffer), "%f", q2);
 
-    psf_log_printf(psf, "  Flags     : 0x%04x (%s,%s,%s,%s,%s)\n", flags,
+    psf->log_printf("  Flags     : 0x%04x (%s,%s,%s,%s,%s)\n", flags,
                    (flags & 0x01) ? "OneShot" : "Loop",
                    (flags & 0x02) ? "RootNoteValid" : "RootNoteInvalid",
                    (flags & 0x04) ? "StretchOn" : "StretchOff",
                    (flags & 0x08) ? "DiskBased" : "RAMBased", (flags & 0x10) ? "??On" : "??Off");
 
-    psf_log_printf(psf, "  Root note : 0x%x\n  ????      : 0x%04x\n  ????      : %s\n", rootnote,
+    psf->log_printf("  Root note : 0x%x\n  ????      : 0x%04x\n  ????      : %s\n", rootnote,
                    q1, buffer);
 
-    bytesread += psf_binheader_readf(psf, "422f", &beats, &meter_denom, &meter_numer, &tempo);
+    bytesread += psf->binheader_readf("422f", &beats, &meter_denom, &meter_numer, &tempo);
     snprintf(buffer, sizeof(buffer), "%f", tempo);
-    psf_log_printf(psf, "  Beats     : %d\n  Meter     : %d/%d\n  Tempo     : %s\n", beats,
+    psf->log_printf("  Beats     : %d\n  Meter     : %d/%d\n  Tempo     : %s\n", beats,
                    meter_numer, meter_denom, buffer);
 
-	psf_binheader_seekf(psf, chunklen - bytesread, SF_SEEK_CUR);
+	psf->binheader_seekf(chunklen - bytesread, SF_SEEK_CUR);
 
     if ((psf->loop_info = (SF_LOOP_INFO *)calloc(1, sizeof(SF_LOOP_INFO))) == NULL)
         return SFE_MALLOC_FAILED;
@@ -1596,10 +1596,10 @@ static int wav_get_chunk_data(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator
     memcpy(chunk_info->id, psf->rchunks.chunks[indx].id,
            sizeof(chunk_info->id) / sizeof(*chunk_info->id));
 
-    pos = psf_ftell(psf);
-    psf_fseek(psf, psf->rchunks.chunks[indx].offset, SEEK_SET);
-    psf_fread(chunk_info->data, std::min(chunk_info->datalen, psf->rchunks.chunks[indx].len), 1, psf);
-    psf_fseek(psf, pos, SEEK_SET);
+    pos = psf->ftell();
+    psf->fseek(psf->rchunks.chunks[indx].offset, SEEK_SET);
+    psf->fread(chunk_info->data, std::min(chunk_info->datalen, psf->rchunks.chunks[indx].len), 1);
+    psf->fseek(pos, SEEK_SET);
 
     return SFE_NO_ERROR;
 }

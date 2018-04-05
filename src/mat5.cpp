@@ -148,13 +148,13 @@ static int mat5_write_header(SF_PRIVATE *psf, int calc_length)
     sf_count_t current, datasize;
     int encoding;
 
-    current = psf_ftell(psf);
+    current = psf->ftell();
 
     if (calc_length)
     {
-        psf_fseek(psf, 0, SEEK_END);
-        psf->filelength = psf_ftell(psf);
-        psf_fseek(psf, 0, SEEK_SET);
+        psf->fseek(0, SEEK_END);
+        psf->filelength = psf->ftell();
+        psf->fseek(0, SEEK_SET);
 
         psf->datalength = psf->filelength - psf->dataoffset;
         if (psf->dataend)
@@ -192,56 +192,56 @@ static int mat5_write_header(SF_PRIVATE *psf, int calc_length)
     /* Reset the current header length to zero. */
     psf->header.ptr[0] = 0;
     psf->header.indx = 0;
-    psf_fseek(psf, 0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
 
     psf_get_date_str(buffer, sizeof(buffer));
-    psf_binheader_writef(psf, "bb", BHWv(filename), BHWz(strlen(filename)), BHWv(buffer),
+    psf->binheader_writef("bb", BHWv(filename), BHWz(strlen(filename)), BHWv(buffer),
                          BHWz(strlen(buffer) + 1));
 
     memset(buffer, ' ', 124 - psf->header.indx);
-    psf_binheader_writef(psf, "b", BHWv(buffer), BHWz(124 - psf->header.indx));
+    psf->binheader_writef("b", BHWv(buffer), BHWz(124 - psf->header.indx));
 
     psf->rwf_endian = psf->endian;
 
     if (psf->rwf_endian == SF_ENDIAN_BIG)
-        psf_binheader_writef(psf, "2b", BHW2(0x0100), BHWv("MI"), BHWz(2));
+        psf->binheader_writef("2b", BHW2(0x0100), BHWv("MI"), BHWz(2));
     else
-        psf_binheader_writef(psf, "2b", BHW2(0x0100), BHWv("IM"), BHWz(2));
+        psf->binheader_writef("2b", BHW2(0x0100), BHWv("IM"), BHWz(2));
 
-    psf_binheader_writef(psf, "444444", BHW4(MAT5_TYPE_ARRAY), BHW4(64), BHW4(MAT5_TYPE_UINT32),
+    psf->binheader_writef("444444", BHW4(MAT5_TYPE_ARRAY), BHW4(64), BHW4(MAT5_TYPE_UINT32),
                          BHW4(8), BHW4(6), BHW4(0));
-    psf_binheader_writef(psf, "4444", BHW4(MAT5_TYPE_INT32), BHW4(8), BHW4(1), BHW4(1));
-    psf_binheader_writef(psf, "44b", BHW4(MAT5_TYPE_SCHAR), BHW4(strlen(sr_name)), BHWv(sr_name),
+    psf->binheader_writef("4444", BHW4(MAT5_TYPE_INT32), BHW4(8), BHW4(1), BHW4(1));
+    psf->binheader_writef("44b", BHW4(MAT5_TYPE_SCHAR), BHW4(strlen(sr_name)), BHWv(sr_name),
                          BHWz(16));
 
     if (psf->sf.samplerate > 0xFFFF)
     {
-        psf_binheader_writef(psf, "44", BHW4(MAT5_TYPE_COMP_UINT), BHW4(psf->sf.samplerate));
+        psf->binheader_writef("44", BHW4(MAT5_TYPE_COMP_UINT), BHW4(psf->sf.samplerate));
     }
     else
     {
         unsigned short samplerate = psf->sf.samplerate;
 
-        psf_binheader_writef(psf, "422", BHW4(MAT5_TYPE_COMP_USHORT), BHW2(samplerate), BHW2(0));
+        psf->binheader_writef("422", BHW4(MAT5_TYPE_COMP_USHORT), BHW2(samplerate), BHW2(0));
     };
 
     datasize = psf->sf.frames * psf->sf.channels * psf->bytewidth;
 
-    psf_binheader_writef(psf, "t484444", BHW4(MAT5_TYPE_ARRAY), BHW8(datasize + 64),
+    psf->binheader_writef("t484444", BHW4(MAT5_TYPE_ARRAY), BHW8(datasize + 64),
                          BHW4(MAT5_TYPE_UINT32), BHW4(8), BHW4(6), BHW4(0));
-    psf_binheader_writef(psf, "t4448", BHW4(MAT5_TYPE_INT32), BHW4(8), BHW4(psf->sf.channels),
+    psf->binheader_writef("t4448", BHW4(MAT5_TYPE_INT32), BHW4(8), BHW4(psf->sf.channels),
                          BHW8(psf->sf.frames));
-    psf_binheader_writef(psf, "44b", BHW4(MAT5_TYPE_SCHAR), BHW4(strlen(wd_name)), BHWv(wd_name),
+    psf->binheader_writef("44b", BHW4(MAT5_TYPE_SCHAR), BHW4(strlen(wd_name)), BHWv(wd_name),
                          BHWz(strlen(wd_name)));
 
     datasize = psf->sf.frames * psf->sf.channels * psf->bytewidth;
     if (datasize > 0x7FFFFFFF)
         datasize = 0x7FFFFFFF;
 
-    psf_binheader_writef(psf, "t48", BHW4(encoding), BHW8(datasize));
+    psf->binheader_writef("t48", BHW4(encoding), BHW8(datasize));
 
     /* Header construction complete so write it out. */
-    psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
 
     if (psf->error)
         return psf->error;
@@ -249,7 +249,7 @@ static int mat5_write_header(SF_PRIVATE *psf, int calc_length)
     psf->dataoffset = psf->header.indx;
 
     if (current > 0)
-        psf_fseek(psf, current, SEEK_SET);
+        psf->fseek(current, SEEK_SET);
 
     return psf->error;
 } /* mat5_write_header */
@@ -262,8 +262,8 @@ static int mat5_read_header(SF_PRIVATE *psf)
     unsigned size;
     int have_samplerate = 1;
 
-	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-    psf_binheader_readf(psf, "b", buffer, 124);
+	psf->binheader_seekf(0, SF_SEEK_SET);
+    psf->binheader_readf("b", buffer, 124);
 
     buffer[125] = 0;
 
@@ -271,9 +271,9 @@ static int mat5_read_header(SF_PRIVATE *psf)
         return SFE_UNIMPLEMENTED;
 
     if (strstr(buffer, "MATLAB 5.0 MAT-file") == buffer)
-        psf_log_printf(psf, "%s\n", buffer);
+        psf->log_printf("%s\n", buffer);
 
-    psf_binheader_readf(psf, "E22", &version, &endian);
+    psf->binheader_readf("E22", &version, &endian);
 
     if (endian == MI_MARKER)
     {
@@ -293,34 +293,34 @@ static int mat5_read_header(SF_PRIVATE *psf)
     if ((CPU_IS_LITTLE_ENDIAN && endian == IM_MARKER) || (CPU_IS_BIG_ENDIAN && endian == MI_MARKER))
         version = ENDSWAP_16(version);
 
-    psf_log_printf(psf, "Version : 0x%04X\n", version);
-    psf_log_printf(psf, "Endian  : 0x%04X => %s\n", endian,
+    psf->log_printf("Version : 0x%04X\n", version);
+    psf->log_printf("Endian  : 0x%04X => %s\n", endian,
                    (psf->endian == SF_ENDIAN_LITTLE) ? "Little" : "Big");
 
     /*========================================================*/
-    psf_binheader_readf(psf, "44", &type, &size);
-    psf_log_printf(psf, "Block\n Type : %X    Size : %d\n", type, size);
+    psf->binheader_readf("44", &type, &size);
+    psf->log_printf("Block\n Type : %X    Size : %d\n", type, size);
 
     if (type != MAT5_TYPE_ARRAY)
         return SFE_MAT5_NO_BLOCK;
 
-    psf_binheader_readf(psf, "44", &type, &size);
-    psf_log_printf(psf, "    Type : %X    Size : %d\n", type, size);
+    psf->binheader_readf("44", &type, &size);
+    psf->log_printf("    Type : %X    Size : %d\n", type, size);
 
     if (type != MAT5_TYPE_UINT32)
         return SFE_MAT5_NO_BLOCK;
 
-    psf_binheader_readf(psf, "44", &flags1, &flags2);
-    psf_log_printf(psf, "    Flg1 : %X    Flg2 : %d\n", flags1, flags2);
+    psf->binheader_readf("44", &flags1, &flags2);
+    psf->log_printf("    Flg1 : %X    Flg2 : %d\n", flags1, flags2);
 
-    psf_binheader_readf(psf, "44", &type, &size);
-    psf_log_printf(psf, "    Type : %X    Size : %d\n", type, size);
+    psf->binheader_readf("44", &type, &size);
+    psf->log_printf("    Type : %X    Size : %d\n", type, size);
 
     if (type != MAT5_TYPE_INT32)
         return SFE_MAT5_NO_BLOCK;
 
-    psf_binheader_readf(psf, "44", &rows, &cols);
-    psf_log_printf(psf, "    Rows : %d    Cols : %d\n", rows, cols);
+    psf->binheader_readf("44", &rows, &cols);
+    psf->log_printf("    Rows : %d    Cols : %d\n", rows, cols);
 
     if (rows != 1 || cols != 1)
     {
@@ -328,43 +328,43 @@ static int mat5_read_header(SF_PRIVATE *psf)
             psf->sf.samplerate = 44100;
         have_samplerate = 0;
     }
-    psf_binheader_readf(psf, "4", &type);
+    psf->binheader_readf("4", &type);
 
     if (type == MAT5_TYPE_SCHAR)
     {
-        psf_binheader_readf(psf, "4", &size);
-        psf_log_printf(psf, "    Type : %X    Size : %d\n", type, size);
+        psf->binheader_readf("4", &size);
+        psf->log_printf("    Type : %X    Size : %d\n", type, size);
         if (size > SIGNED_SIZEOF(name) - 1)
         {
-            psf_log_printf(psf, "Error : Bad name length.\n");
+            psf->log_printf("Error : Bad name length.\n");
             return SFE_MAT5_NO_BLOCK;
         };
 
-        psf_binheader_readf(psf, "b", name, size);
+        psf->binheader_readf("b", name, size);
 		name[size] = 0;
-		psf_binheader_seekf(psf, (8 - (size % 8)) % 8, SF_SEEK_CUR);
+		psf->binheader_seekf((8 - (size % 8)) % 8, SF_SEEK_CUR);
     }
     else if ((type & 0xFFFF) == MAT5_TYPE_SCHAR)
     {
         size = type >> 16;
         if (size > 4)
         {
-            psf_log_printf(psf, "Error : Bad name length.\n");
+            psf->log_printf("Error : Bad name length.\n");
             return SFE_MAT5_NO_BLOCK;
         };
 
-        psf_log_printf(psf, "    Type : %X\n", type);
-        psf_binheader_readf(psf, "4", &name);
+        psf->log_printf("    Type : %X\n", type);
+        psf->binheader_readf("4", &name);
         name[size] = 0;
     }
     else
         return SFE_MAT5_NO_BLOCK;
 
-    psf_log_printf(psf, "    Name : %s\n", name);
+    psf->log_printf("    Name : %s\n", name);
 
     /*-----------------------------------------*/
 
-    psf_binheader_readf(psf, "44", &type, &size);
+    psf->binheader_readf("44", &type, &size);
 
     if (!have_samplerate)
         goto skip_samplerate;
@@ -375,9 +375,9 @@ static int mat5_read_header(SF_PRIVATE *psf)
     {
         double samplerate;
 
-        psf_binheader_readf(psf, "d", &samplerate);
+        psf->binheader_readf("d", &samplerate);
         snprintf(name, sizeof(name), "%f\n", samplerate);
-        psf_log_printf(psf, "    Val  : %s\n", name);
+        psf->log_printf("    Val  : %s\n", name);
 
         psf->sf.samplerate = lrint(samplerate);
     };
@@ -387,64 +387,64 @@ static int mat5_read_header(SF_PRIVATE *psf)
     {
         unsigned short samplerate;
 
-		psf_binheader_seekf(psf, -4, SF_SEEK_CUR);
-        psf_binheader_readf(psf, "2", &samplerate);
-		psf_binheader_seekf(psf, 2, SF_SEEK_CUR);
-        psf_log_printf(psf, "    Val  : %u\n", samplerate);
+		psf->binheader_seekf(-4, SF_SEEK_CUR);
+        psf->binheader_readf("2", &samplerate);
+		psf->binheader_seekf(2, SF_SEEK_CUR);
+        psf->log_printf("    Val  : %u\n", samplerate);
         psf->sf.samplerate = samplerate;
     }
     break;
 
     case MAT5_TYPE_COMP_UINT:
-        psf_log_printf(psf, "    Val  : %u\n", size);
+        psf->log_printf("    Val  : %u\n", size);
         psf->sf.samplerate = size;
         break;
 
     default:
-        psf_log_printf(psf, "    Type : %X    Size : %d  ***\n", type, size);
+        psf->log_printf("    Type : %X    Size : %d  ***\n", type, size);
         return SFE_MAT5_SAMPLE_RATE;
     };
 
     /*-----------------------------------------*/
 
-    psf_binheader_readf(psf, "44", &type, &size);
-    psf_log_printf(psf, " Type : %X    Size : %d\n", type, size);
+    psf->binheader_readf("44", &type, &size);
+    psf->log_printf(" Type : %X    Size : %d\n", type, size);
 
     if (type != MAT5_TYPE_ARRAY)
         return SFE_MAT5_NO_BLOCK;
 
-    psf_binheader_readf(psf, "44", &type, &size);
-    psf_log_printf(psf, "    Type : %X    Size : %d\n", type, size);
+    psf->binheader_readf("44", &type, &size);
+    psf->log_printf("    Type : %X    Size : %d\n", type, size);
 
     if (type != MAT5_TYPE_UINT32)
         return SFE_MAT5_NO_BLOCK;
 
-    psf_binheader_readf(psf, "44", &flags1, &flags2);
-    psf_log_printf(psf, "    Flg1 : %X    Flg2 : %d\n", flags1, flags2);
+    psf->binheader_readf("44", &flags1, &flags2);
+    psf->log_printf("    Flg1 : %X    Flg2 : %d\n", flags1, flags2);
 
-    psf_binheader_readf(psf, "44", &type, &size);
-    psf_log_printf(psf, "    Type : %X    Size : %d\n", type, size);
+    psf->binheader_readf("44", &type, &size);
+    psf->log_printf("    Type : %X    Size : %d\n", type, size);
 
     if (type != MAT5_TYPE_INT32)
         return SFE_MAT5_NO_BLOCK;
 
-    psf_binheader_readf(psf, "44", &rows, &cols);
-    psf_log_printf(psf, "    Rows : %X    Cols : %d\n", rows, cols);
+    psf->binheader_readf("44", &rows, &cols);
+    psf->log_printf("    Rows : %X    Cols : %d\n", rows, cols);
 
-    psf_binheader_readf(psf, "4", &type);
+    psf->binheader_readf("4", &type);
 
     if (type == MAT5_TYPE_SCHAR)
     {
-        psf_binheader_readf(psf, "4", &size);
-        psf_log_printf(psf, "    Type : %X    Size : %d\n", type, size);
+        psf->binheader_readf("4", &size);
+        psf->log_printf("    Type : %X    Size : %d\n", type, size);
         if (size > SIGNED_SIZEOF(name) - 1)
         {
-            psf_log_printf(psf, "Error : Bad name length.\n");
+            psf->log_printf("Error : Bad name length.\n");
             return SFE_MAT5_NO_BLOCK;
         };
 
-        psf_binheader_readf(psf, "b", name, size);
-		psf_binheader_seekf(psf, (8 - (size % 8)) % 8, SF_SEEK_CUR);
+        psf->binheader_readf("b", name, size);
+		psf->binheader_seekf((8 - (size % 8)) % 8, SF_SEEK_CUR);
         name[size] = 0;
     }
     else if ((type & 0xFFFF) == MAT5_TYPE_SCHAR)
@@ -452,28 +452,28 @@ static int mat5_read_header(SF_PRIVATE *psf)
         size = type >> 16;
         if (size > 4)
         {
-            psf_log_printf(psf, "Error : Bad name length.\n");
+            psf->log_printf("Error : Bad name length.\n");
             return SFE_MAT5_NO_BLOCK;
         };
 
-        psf_log_printf(psf, "    Type : %X\n", type);
-        psf_binheader_readf(psf, "4", &name);
+        psf->log_printf("    Type : %X\n", type);
+        psf->binheader_readf("4", &name);
         name[size] = 0;
     }
     else
         return SFE_MAT5_NO_BLOCK;
 
-    psf_log_printf(psf, "    Name : %s\n", name);
+    psf->log_printf("    Name : %s\n", name);
 
-    psf_binheader_readf(psf, "44", &type, &size);
-    psf_log_printf(psf, "    Type : %X    Size : %d\n", type, size);
+    psf->binheader_readf("44", &type, &size);
+    psf->log_printf("    Type : %X    Size : %d\n", type, size);
 
 skip_samplerate:
     /*++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
     if (rows == 0 && cols == 0)
     {
-        psf_log_printf(psf, "*** Error : zero channel count.\n");
+        psf->log_printf("*** Error : zero channel count.\n");
         return SFE_CHANNEL_COUNT_ZERO;
     };
 
@@ -485,41 +485,41 @@ skip_samplerate:
     switch (type)
     {
     case MAT5_TYPE_DOUBLE:
-        psf_log_printf(psf, "Data type : double\n");
+        psf->log_printf("Data type : double\n");
         psf->sf.format |= SF_FORMAT_DOUBLE;
         psf->bytewidth = 8;
         break;
 
     case MAT5_TYPE_FLOAT:
-        psf_log_printf(psf, "Data type : float\n");
+        psf->log_printf("Data type : float\n");
         psf->sf.format |= SF_FORMAT_FLOAT;
         psf->bytewidth = 4;
         break;
 
     case MAT5_TYPE_INT32:
-        psf_log_printf(psf, "Data type : 32 bit PCM\n");
+        psf->log_printf("Data type : 32 bit PCM\n");
         psf->sf.format |= SF_FORMAT_PCM_32;
         psf->bytewidth = 4;
         break;
 
     case MAT5_TYPE_INT16:
-        psf_log_printf(psf, "Data type : 16 bit PCM\n");
+        psf->log_printf("Data type : 16 bit PCM\n");
         psf->sf.format |= SF_FORMAT_PCM_16;
         psf->bytewidth = 2;
         break;
 
     case MAT5_TYPE_UCHAR:
-        psf_log_printf(psf, "Data type : unsigned 8 bit PCM\n");
+        psf->log_printf("Data type : unsigned 8 bit PCM\n");
         psf->sf.format |= SF_FORMAT_PCM_U8;
         psf->bytewidth = 1;
         break;
 
     default:
-        psf_log_printf(psf, "*** Error : Bad marker %08X\n", type);
+        psf->log_printf("*** Error : Bad marker %08X\n", type);
         return SFE_UNIMPLEMENTED;
     };
 
-    psf->dataoffset = psf_ftell(psf);
+    psf->dataoffset = psf->ftell();
     psf->datalength = psf->filelength - psf->dataoffset;
 
     return 0;

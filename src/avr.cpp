@@ -130,20 +130,20 @@ static int avr_read_header(SF_PRIVATE *psf)
 
     memset(&hdr, 0, sizeof(hdr));
 
-	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-    psf_binheader_readf(psf, "mb", &hdr.marker, &hdr.name, sizeof(hdr.name));
-    psf_log_printf(psf, "%M\n", hdr.marker);
+	psf->binheader_seekf(0, SF_SEEK_SET);
+    psf->binheader_readf("mb", &hdr.marker, &hdr.name, sizeof(hdr.name));
+    psf->log_printf("%M\n", hdr.marker);
 
     if (hdr.marker != TWOBIT_MARKER)
         return SFE_AVR_X;
 
-    psf_log_printf(psf, "  Name        : %s\n", hdr.name);
+    psf->log_printf("  Name        : %s\n", hdr.name);
 
-    psf_binheader_readf(psf, "E22222", &hdr.mono, &hdr.rez, &hdr.sign, &hdr.loop, &hdr.midi);
+    psf->binheader_readf("E22222", &hdr.mono, &hdr.rez, &hdr.sign, &hdr.loop, &hdr.midi);
 
     psf->sf.channels = (hdr.mono & 1) + 1;
 
-    psf_log_printf(psf, "  Channels    : %d\n  Bit width   : %d\n  Signed      : %s\n",
+    psf->log_printf("  Channels    : %d\n  Bit width   : %d\n  Signed      : %s\n",
                    (hdr.mono & 1) + 1, hdr.rez, hdr.sign ? "yes" : "no");
 
     switch ((hdr.rez << 16) + (hdr.sign & 1))
@@ -164,22 +164,22 @@ static int avr_read_header(SF_PRIVATE *psf)
         break;
 
     default:
-        psf_log_printf(psf, "Error : bad rez/sign combination.\n");
+        psf->log_printf("Error : bad rez/sign combination.\n");
         return SFE_AVR_X;
     };
 
-    psf_binheader_readf(psf, "E4444", &hdr.srate, &hdr.frames, &hdr.lbeg, &hdr.lend);
+    psf->binheader_readf("E4444", &hdr.srate, &hdr.frames, &hdr.lbeg, &hdr.lend);
 
     psf->sf.frames = hdr.frames;
     psf->sf.samplerate = hdr.srate;
 
-    psf_log_printf(psf, "  Frames      : %D\n", psf->sf.frames);
-    psf_log_printf(psf, "  Sample rate : %d\n", psf->sf.samplerate);
+    psf->log_printf("  Frames      : %D\n", psf->sf.frames);
+    psf->log_printf("  Sample rate : %d\n", psf->sf.samplerate);
 
-    psf_binheader_readf(psf, "E222", &hdr.res1, &hdr.res2, &hdr.res3);
-    psf_binheader_readf(psf, "bb", hdr.ext, sizeof(hdr.ext), hdr.user, sizeof(hdr.user));
+    psf->binheader_readf("E222", &hdr.res1, &hdr.res2, &hdr.res3);
+    psf->binheader_readf("bb", hdr.ext, sizeof(hdr.ext), hdr.user, sizeof(hdr.user));
 
-    psf_log_printf(psf, "  Ext         : %s\n  User        : %s\n", hdr.ext, hdr.user);
+    psf->log_printf("  Ext         : %s\n  User        : %s\n", hdr.ext, hdr.user);
 
     psf->endian = SF_ENDIAN_BIG;
 
@@ -189,8 +189,8 @@ static int avr_read_header(SF_PRIVATE *psf)
     if (psf->fileoffset > 0)
         psf->filelength = AVR_HDR_SIZE + psf->datalength;
 
-	if (psf_ftell(psf) != psf->dataoffset)
-		psf_binheader_seekf(psf, psf->dataoffset - psf_ftell(psf), SF_SEEK_CUR);
+	if (psf->ftell() != psf->dataoffset)
+		psf->binheader_seekf(psf->dataoffset - psf->ftell(), SF_SEEK_CUR);
 
     psf->blockwidth = psf->sf.channels * psf->bytewidth;
 
@@ -208,11 +208,11 @@ static int avr_write_header(SF_PRIVATE *psf, int calc_length)
     if (psf->file.pipeoffset > 0)
         return 0;
 
-    current = psf_ftell(psf);
+    current = psf->ftell();
 
     if (calc_length)
     {
-        psf->filelength = psf_get_filelen(psf);
+        psf->filelength = psf->get_filelen();
 
         psf->datalength = psf->filelength - psf->dataoffset;
         if (psf->dataend)
@@ -230,21 +230,21 @@ static int avr_write_header(SF_PRIVATE *psf, int calc_length)
      * writing to a pipe we shouldn't be here anyway.
      */
     if (psf->file.is_pipe == SF_FALSE)
-        psf_fseek(psf, 0, SEEK_SET);
+        psf->fseek(0, SEEK_SET);
 
-    psf_binheader_writef(psf, "Emz22", BHWm(TWOBIT_MARKER), BHWz(8),
+    psf->binheader_writef("Emz22", BHWm(TWOBIT_MARKER), BHWz(8),
                          BHW2(psf->sf.channels == 2 ? 0xFFFF : 0), BHW2(psf->bytewidth * 8));
 
     sign = ((SF_CODEC(psf->sf.format)) == SF_FORMAT_PCM_U8) ? 0 : 0xFFFF;
 
-    psf_binheader_writef(psf, "E222", BHW2(sign), BHW2(0), BHW2(0xFFFF));
-    psf_binheader_writef(psf, "E4444", BHW4(psf->sf.samplerate), BHW4(psf->sf.frames), BHW4(0),
+    psf->binheader_writef("E222", BHW2(sign), BHW2(0), BHW2(0xFFFF));
+    psf->binheader_writef("E4444", BHW4(psf->sf.samplerate), BHW4(psf->sf.frames), BHW4(0),
                          BHW4(0));
 
-    psf_binheader_writef(psf, "E222zz", BHW2(0), BHW2(0), BHW2(0), BHWz(20), BHWz(64));
+    psf->binheader_writef("E222zz", BHW2(0), BHW2(0), BHW2(0), BHWz(20), BHWz(64));
 
     /* Header construction complete so write it out. */
-    psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
 
     if (psf->error)
         return psf->error;
@@ -252,7 +252,7 @@ static int avr_write_header(SF_PRIVATE *psf, int calc_length)
     psf->dataoffset = psf->header.indx;
 
     if (current > 0)
-        psf_fseek(psf, current, SEEK_SET);
+        psf->fseek(current, SEEK_SET);
 
     return psf->error;
 }

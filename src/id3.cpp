@@ -32,8 +32,8 @@ int id3_skip(SF_PRIVATE *psf)
     unsigned char buf[10];
 
     memset(buf, 0, sizeof(buf));
-	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-    psf_binheader_readf(psf, "b", buf, 10);
+	psf->binheader_seekf(0, SF_SEEK_SET);
+    psf->binheader_readf("b", buf, 10);
 
     if (buf[0] == 'I' && buf[1] == 'D' && buf[2] == '3')
     {
@@ -42,7 +42,7 @@ int id3_skip(SF_PRIVATE *psf)
         offset = (offset << 7) | (buf[8] & 0x7f);
         offset = (offset << 7) | (buf[9] & 0x7f);
 
-        psf_log_printf(psf, "ID3 length : %d\n--------------------\n", offset);
+        psf->log_printf("ID3 length : %d\n--------------------\n", offset);
 
         /* Never want to jump backwards in a file. */
         if (offset < 0)
@@ -53,7 +53,7 @@ int id3_skip(SF_PRIVATE *psf)
 
         if (psf->fileoffset < psf->filelength)
         {
-			psf_binheader_seekf(psf, psf->fileoffset, SF_SEEK_SET);
+			psf->binheader_seekf(psf->fileoffset, SF_SEEK_SET);
             return 1;
         };
     };

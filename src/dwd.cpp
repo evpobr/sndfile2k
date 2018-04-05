@@ -125,34 +125,34 @@ static int dwd_read_header(SF_PRIVATE *psf)
 
     memset(ubuf.cbuf, 0, sizeof(ubuf.cbuf));
     /* Set position to start of file to begin reading header. */
-    psf_binheader_readf(psf, "pb", 0, ubuf.cbuf, DWD_IDENTIFIER_LEN);
+    psf->binheader_readf("pb", 0, ubuf.cbuf, DWD_IDENTIFIER_LEN);
 
     if (memcmp(ubuf.cbuf, DWD_IDENTIFIER, DWD_IDENTIFIER_LEN) != 0)
         return SFE_DWD_NO_DWD;
 
-    psf_log_printf(psf, "Read only : DiamondWare Digitized (.dwd)\n", ubuf.cbuf);
+    psf->log_printf("Read only : DiamondWare Digitized (.dwd)\n", ubuf.cbuf);
 
-    psf_binheader_readf(psf, "11", &dwdh.major, &dwdh.minor);
-    psf_binheader_readf(psf, "e4j1", &dwdh.id, 1, &dwdh.compression);
-    psf_binheader_readf(psf, "e211", &dwdh.srate, &dwdh.channels, &dwdh.bitwidth);
-    psf_binheader_readf(psf, "e24", &dwdh.maxval, &dwdh.datalen);
-    psf_binheader_readf(psf, "e44", &dwdh.frames, &dwdh.offset);
+    psf->binheader_readf("11", &dwdh.major, &dwdh.minor);
+    psf->binheader_readf("e4j1", &dwdh.id, 1, &dwdh.compression);
+    psf->binheader_readf("e211", &dwdh.srate, &dwdh.channels, &dwdh.bitwidth);
+    psf->binheader_readf("e24", &dwdh.maxval, &dwdh.datalen);
+    psf->binheader_readf("e44", &dwdh.frames, &dwdh.offset);
 
-    psf_log_printf(psf, "  Version Major : %d\n  Version Minor : %d\n  Unique ID     : %08X\n",
+    psf->log_printf("  Version Major : %d\n  Version Minor : %d\n  Unique ID     : %08X\n",
                    dwdh.major, dwdh.minor, dwdh.id);
-    psf_log_printf(psf, "  Compression   : %d => ", dwdh.compression);
+    psf->log_printf("  Compression   : %d => ", dwdh.compression);
 
     if (dwdh.compression != 0)
     {
-        psf_log_printf(psf, "Unsupported compression\n");
+        psf->log_printf("Unsupported compression\n");
         return SFE_DWD_COMPRESSION;
     }
     else
     {
-        psf_log_printf(psf, "None\n");
+        psf->log_printf("None\n");
     }
 
-    psf_log_printf(psf,
+    psf->log_printf(
                    "  Sample Rate   : %d\n  Channels      : %d\n"
                    "  Bit Width     : %d\n",
                    dwdh.srate, dwdh.channels, dwdh.bitwidth);
@@ -170,22 +170,22 @@ static int dwd_read_header(SF_PRIVATE *psf)
         break;
 
     default:
-        psf_log_printf(psf, "*** Bad bit width %d\n", dwdh.bitwidth);
+        psf->log_printf("*** Bad bit width %d\n", dwdh.bitwidth);
         return SFE_DWD_BAND_BIT_WIDTH;
     };
 
     if (psf->filelength != dwdh.offset + dwdh.datalen)
     {
-        psf_log_printf(psf, "  Data Length   : %d (should be %D)\n", dwdh.datalen,
+        psf->log_printf("  Data Length   : %d (should be %D)\n", dwdh.datalen,
                        psf->filelength - dwdh.offset);
         dwdh.datalen = (unsigned int)(psf->filelength - dwdh.offset);
     }
     else
-        psf_log_printf(psf, "  Data Length   : %d\n", dwdh.datalen);
+        psf->log_printf("  Data Length   : %d\n", dwdh.datalen);
 
-    psf_log_printf(psf, "  Max Value     : %d\n", dwdh.maxval);
-    psf_log_printf(psf, "  Frames        : %d\n", dwdh.frames);
-    psf_log_printf(psf, "  Data Offset   : %d\n", dwdh.offset);
+    psf->log_printf("  Max Value     : %d\n", dwdh.maxval);
+    psf->log_printf("  Frames        : %d\n", dwdh.frames);
+    psf->log_printf("  Data Offset   : %d\n", dwdh.offset);
 
     psf->datalength = dwdh.datalen;
     psf->dataoffset = dwdh.offset;

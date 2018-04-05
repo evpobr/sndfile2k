@@ -35,7 +35,7 @@ do                                                                       \
 {                                                                       \
         psf->parselog.indx = 0;                                              \
         snprintf(buffer, sizeof(buffer), (fmt));                             \
-        psf_log_printf(psf, (fmt));                                          \
+        psf->log_printf((fmt));                                          \
         err += compare_strings_or_die(line, fmt, buffer, psf->parselog.buf); \
     \
 }                                                                       \
@@ -49,7 +49,7 @@ do                                                                       \
 {                                                                       \
         psf->parselog.indx = 0;                                              \
         snprintf(buffer, sizeof(buffer), (fmt), (a), (a));                   \
-        psf_log_printf(psf, (fmt), (a), (a));                                \
+        psf->log_printf((fmt), (a), (a));                                \
         err += compare_strings_or_die(line, fmt, buffer, psf->parselog.buf); \
     \
 }                                                                       \
@@ -63,7 +63,7 @@ do                                                                       \
 {                                                                       \
         psf->parselog.indx = 0;                                              \
         snprintf(buffer, sizeof(buffer), (fmt), (a), (a), (a), (a));         \
-        psf_log_printf(psf, (fmt), (a), (a), (a), (a));                      \
+        psf->log_printf((fmt), (a), (a), (a), (a));                      \
         err += compare_strings_or_die(line, fmt, buffer, psf->parselog.buf); \
     \
 }                                                                       \
@@ -78,7 +78,7 @@ do                                                                       \
                                                                              \
         psf->parselog.indx = 0;                                              \
         snprintf(buffer, sizeof(buffer), (fmt), (a), (a), (a), (a), (a));    \
-        psf_log_printf(psf, (fmt), (a), (a), (a), (a), (a));                 \
+        psf->log_printf((fmt), (a), (a), (a), (a), (a));                 \
         err += compare_strings_or_die(line, fmt, buffer, psf->parselog.buf); \
     \
 }                                                                       \
@@ -92,7 +92,7 @@ do                                                                         \
 {                                                                         \
         psf->parselog.indx = 0;                                                \
         snprintf(buffer, sizeof(buffer), (fmt), (a), (a), (a), (a), (a), (a)); \
-        psf_log_printf(psf, (fmt), (a), (a), (a), (a), (a), (a));              \
+        psf->log_printf((fmt), (a), (a), (a), (a), (a), (a));              \
         err += compare_strings_or_die(line, fmt, buffer, psf->parselog.buf);   \
     \
 }                                                                         \

@@ -38,13 +38,13 @@ int macos_guess_file_type(SF_PRIVATE *psf, const char *filename)
     /* If there is no resource fork, just return. */
     if (stat(rsrc_name, &statbuf) != 0)
     {
-        psf_log_printf(psf, "No resource fork.\n");
+        psf->log_printf("No resource fork.\n");
         return 0;
     };
 
     if (statbuf.st_size == 0)
     {
-        psf_log_printf(psf, "Have zero size resource fork.\n");
+        psf->log_printf("Have zero size resource fork.\n");
         return 0;
     };
 

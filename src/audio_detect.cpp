@@ -50,13 +50,12 @@ int audio_detect(SF_PRIVATE *psf, struct AUDIO_DETECT *ad, const unsigned char *
 
     vote_for_format(&vote, data, datalen);
 
-    psf_log_printf(psf,
-                   "audio_detect :\n"
-                   "    le_float     : %d\n"
-                   "    be_float     : %d\n"
-                   "    le_int_24_32 : %d\n"
-                   "    be_int_24_32 : %d\n",
-                   vote.le_float, vote.be_float, vote.le_int_24_32, vote.be_int_24_32);
+    psf->log_printf("audio_detect :\n"
+                    "    le_float     : %d\n"
+                    "    be_float     : %d\n"
+                    "    le_int_24_32 : %d\n"
+                    "    be_int_24_32 : %d\n",
+                    vote.le_float, vote.be_float, vote.le_int_24_32, vote.be_int_24_32);
 
     if (0)
         puts(psf->parselog.buf);

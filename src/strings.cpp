@@ -76,13 +76,13 @@ int psf_store_string(SF_PRIVATE *psf, int str_type, const char *str)
 
     if (k == 0 && psf->strings.storage_used != 0)
     {
-        psf_log_printf(psf, "SFE_STR_WEIRD : k == 0 && psf->strings.storage_used != 0\n");
+        psf->log_printf("SFE_STR_WEIRD : k == 0 && psf->strings.storage_used != 0\n");
         return SFE_STR_WEIRD;
     };
 
     if (k != 0 && psf->strings.storage_used == 0)
     {
-        psf_log_printf(psf, "SFE_STR_WEIRD : k != 0 && psf->strings.storage_used == 0\n");
+        psf->log_printf("SFE_STR_WEIRD : k != 0 && psf->strings.storage_used == 0\n");
         return SFE_STR_WEIRD;
     };
 
@@ -127,7 +127,7 @@ int psf_store_string(SF_PRIVATE *psf, int str_type, const char *str)
         break;
 
     default:
-        psf_log_printf(psf, "%s : SFE_STR_BAD_TYPE\n", __func__);
+        psf->log_printf("%s : SFE_STR_BAD_TYPE\n", __func__);
         return SFE_STR_BAD_TYPE;
     };
 

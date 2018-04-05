@@ -54,7 +54,7 @@ int ogg_pcm_open(SF_PRIVATE *psf)
 
     if (odata == NULL)
     {
-        psf_log_printf(psf, "%s : odata is NULL???\n", __func__);
+        psf->log_printf("%s : odata is NULL???\n", __func__);
         return SFE_INTERNAL;
     };
 
@@ -134,7 +134,7 @@ static int opcm_close(SF_PRIVATE *UNUSED(psf))
 
 int ogg_pcm_open(SF_PRIVATE *psf)
 {
-    psf_log_printf(psf, "This version of libsndfile was compiled without Ogg/Speex support.\n");
+    psf->log_printf("This version of libsndfile was compiled without Ogg/Speex support.\n");
     return SFE_UNIMPLEMENTED;
 }
 

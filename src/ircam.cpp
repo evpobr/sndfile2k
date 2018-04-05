@@ -123,13 +123,13 @@ static int ircam_read_header(SF_PRIVATE *psf)
     float samplerate;
     int error = SFE_NO_ERROR;
 
-	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-    psf_binheader_readf(psf, "emf44", &marker, &samplerate, &(psf->sf.channels), &encoding);
+	psf->binheader_seekf(0, SF_SEEK_SET);
+    psf->binheader_readf("emf44", &marker, &samplerate, &(psf->sf.channels), &encoding);
 
     if (((marker & IRCAM_BE_MASK) != IRCAM_BE_MARKER) &&
         ((marker & IRCAM_LE_MASK) != IRCAM_LE_MARKER))
     {
-        psf_log_printf(psf, "marker: 0x%X\n", marker);
+        psf->log_printf("marker: 0x%X\n", marker);
         return SFE_IRCAM_NO_MARKER;
     };
 
@@ -137,24 +137,24 @@ static int ircam_read_header(SF_PRIVATE *psf)
 
     if (psf->sf.channels > SF_MAX_CHANNELS)
     {
-		psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-        psf_binheader_readf(psf, "Emf44", &marker, &samplerate, &(psf->sf.channels), &encoding);
+		psf->binheader_seekf(0, SF_SEEK_SET);
+        psf->binheader_readf("Emf44", &marker, &samplerate, &(psf->sf.channels), &encoding);
 
         /* Sanity checking for endian-ness detection. */
         if (psf->sf.channels > SF_MAX_CHANNELS)
         {
-            psf_log_printf(psf, "marker: 0x%X\n", marker);
+            psf->log_printf("marker: 0x%X\n", marker);
             return SFE_IRCAM_BAD_CHANNELS;
         };
 
         psf->endian = SF_ENDIAN_BIG;
     };
 
-    psf_log_printf(psf, "marker: 0x%X\n", marker);
+    psf->log_printf("marker: 0x%X\n", marker);
 
     psf->sf.samplerate = (int)samplerate;
 
-    psf_log_printf(psf,
+    psf->log_printf(
                    "  Sample Rate : %d\n"
                    "  Channels    : %d\n"
                    "  Encoding    : %X => %s\n",
@@ -216,16 +216,16 @@ static int ircam_read_header(SF_PRIVATE *psf)
     if (psf->sf.frames == 0 && psf->blockwidth)
         psf->sf.frames = psf->datalength / psf->blockwidth;
 
-    psf_log_printf(psf, "  Samples     : %d\n", psf->sf.frames);
+    psf->log_printf("  Samples     : %d\n", psf->sf.frames);
 
-	psf_binheader_seekf(psf, IRCAM_DATA_OFFSET, SF_SEEK_SET);
+	psf->binheader_seekf(IRCAM_DATA_OFFSET, SF_SEEK_SET);
 
     return 0;
 }
 
 static int ircam_close(SF_PRIVATE *psf)
 {
-    psf_log_printf(psf, "close\n");
+    psf->log_printf("close\n");
 
     return 0;
 }
@@ -239,7 +239,7 @@ static int ircam_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     if (psf->file.pipeoffset > 0)
         return 0;
 
-    current = psf_ftell(psf);
+    current = psf->ftell();
 
     /* This also sets psf->endian. */
     encoding = get_encoding(SF_CODEC(psf->sf.format));
@@ -252,36 +252,36 @@ static int ircam_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     psf->header.indx = 0;
 
     if (psf->file.is_pipe == SF_FALSE)
-        psf_fseek(psf, 0, SEEK_SET);
+        psf->fseek(0, SEEK_SET);
 
     samplerate = (float)psf->sf.samplerate;
 
     switch (psf->endian)
     {
     case SF_ENDIAN_BIG:
-        psf_binheader_writef(psf, "Emf", BHWm(IRCAM_02B_MARKER), BHWf(samplerate));
-        psf_binheader_writef(psf, "E44", BHW4(psf->sf.channels), BHW4(encoding));
+        psf->binheader_writef("Emf", BHWm(IRCAM_02B_MARKER), BHWf(samplerate));
+        psf->binheader_writef("E44", BHW4(psf->sf.channels), BHW4(encoding));
         break;
 
     case SF_ENDIAN_LITTLE:
-        psf_binheader_writef(psf, "emf", BHWm(IRCAM_03L_MARKER), BHWf(samplerate));
-        psf_binheader_writef(psf, "e44", BHW4(psf->sf.channels), BHW4(encoding));
+        psf->binheader_writef("emf", BHWm(IRCAM_03L_MARKER), BHWf(samplerate));
+        psf->binheader_writef("e44", BHW4(psf->sf.channels), BHW4(encoding));
         break;
 
     default:
         return SFE_BAD_OPEN_FORMAT;
     };
 
-    psf_binheader_writef(psf, "z", BHWz((size_t)(IRCAM_DATA_OFFSET - psf->header.indx)));
+    psf->binheader_writef("z", BHWz((size_t)(IRCAM_DATA_OFFSET - psf->header.indx)));
 
     /* Header construction complete so write it out. */
-    psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
 
     if (psf->error)
         return psf->error;
 
     if (current > 0)
-        psf_fseek(psf, current, SEEK_SET);
+        psf->fseek(current, SEEK_SET);
 
     return psf->error;
 }

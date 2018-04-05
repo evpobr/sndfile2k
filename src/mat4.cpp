@@ -136,11 +136,11 @@ static int mat4_write_header(SF_PRIVATE *psf, int calc_length)
     int encoding;
     double samplerate;
 
-    current = psf_ftell(psf);
+    current = psf->ftell();
 
     if (calc_length)
     {
-        psf->filelength = psf_get_filelen(psf);
+        psf->filelength = psf->get_filelen();
 
         psf->datalength = psf->filelength - psf->dataoffset;
         if (psf->dataend)
@@ -157,32 +157,32 @@ static int mat4_write_header(SF_PRIVATE *psf, int calc_length)
     /* Reset the current header length to zero. */
     psf->header.ptr[0] = 0;
     psf->header.indx = 0;
-    psf_fseek(psf, 0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
 
     /* Need sample rate as a double for writing to the header. */
     samplerate = psf->sf.samplerate;
 
     if (psf->endian == SF_ENDIAN_BIG)
     {
-        psf_binheader_writef(psf, "Em444", BHWm(MAT4_BE_DOUBLE), BHW4(1), BHW4(1), BHW4(0));
-        psf_binheader_writef(psf, "E4bd", BHW4(11), BHWv("samplerate"), BHWz(11), BHWd(samplerate));
-        psf_binheader_writef(psf, "tEm484", BHWm(encoding), BHW4(psf->sf.channels),
+        psf->binheader_writef("Em444", BHWm(MAT4_BE_DOUBLE), BHW4(1), BHW4(1), BHW4(0));
+        psf->binheader_writef("E4bd", BHW4(11), BHWv("samplerate"), BHWz(11), BHWd(samplerate));
+        psf->binheader_writef("tEm484", BHWm(encoding), BHW4(psf->sf.channels),
                              BHW8(psf->sf.frames), BHW4(0));
-        psf_binheader_writef(psf, "E4b", BHW4(9), BHWv("wavedata"), BHWz(9));
+        psf->binheader_writef("E4b", BHW4(9), BHWv("wavedata"), BHWz(9));
     }
     else if (psf->endian == SF_ENDIAN_LITTLE)
     {
-        psf_binheader_writef(psf, "em444", BHWm(MAT4_LE_DOUBLE), BHW4(1), BHW4(1), BHW4(0));
-        psf_binheader_writef(psf, "e4bd", BHW4(11), BHWv("samplerate"), BHWz(11), BHWd(samplerate));
-        psf_binheader_writef(psf, "tem484", BHWm(encoding), BHW4(psf->sf.channels),
+        psf->binheader_writef("em444", BHWm(MAT4_LE_DOUBLE), BHW4(1), BHW4(1), BHW4(0));
+        psf->binheader_writef("e4bd", BHW4(11), BHWv("samplerate"), BHWz(11), BHWd(samplerate));
+        psf->binheader_writef("tem484", BHWm(encoding), BHW4(psf->sf.channels),
                              BHW8(psf->sf.frames), BHW4(0));
-        psf_binheader_writef(psf, "e4b", BHW4(9), BHWv("wavedata"), BHWz(9));
+        psf->binheader_writef("e4b", BHW4(9), BHWv("wavedata"), BHWz(9));
     }
     else
         return SFE_BAD_OPEN_FORMAT;
 
     /* Header construction complete so write it out. */
-    psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
 
     if (psf->error)
         return psf->error;
@@ -190,7 +190,7 @@ static int mat4_write_header(SF_PRIVATE *psf, int calc_length)
     psf->dataoffset = psf->header.indx;
 
     if (current > 0)
-        psf_fseek(psf, current, SEEK_SET);
+        psf->fseek(current, SEEK_SET);
 
     return psf->error;
 }
@@ -204,8 +204,8 @@ static int mat4_read_header(SF_PRIVATE *psf)
     const char *marker_str;
     char name[64];
 
-	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-    psf_binheader_readf(psf, "m", &marker);
+	psf->binheader_seekf(0, SF_SEEK_SET);
+    psf->binheader_readf("m", &marker);
 
     /* MAT4 file must start with a double for the samplerate. */
     if (marker == MAT4_BE_DOUBLE)
@@ -223,27 +223,27 @@ static int mat4_read_header(SF_PRIVATE *psf)
         return SFE_UNIMPLEMENTED;
     }
 
-    psf_log_printf(psf, "GNU Octave 2.0 / MATLAB v4.2 format\nMarker : %s\n", marker_str);
+    psf->log_printf("GNU Octave 2.0 / MATLAB v4.2 format\nMarker : %s\n", marker_str);
 
-    psf_binheader_readf(psf, "444", &rows, &cols, &imag);
+    psf->binheader_readf("444", &rows, &cols, &imag);
 
-    psf_log_printf(psf, " Rows  : %d\n Cols  : %d\n Imag  : %s\n", rows, cols,
+    psf->log_printf(" Rows  : %d\n Cols  : %d\n Imag  : %s\n", rows, cols,
                    imag ? "True" : "False");
 
-    psf_binheader_readf(psf, "4", &namesize);
+    psf->binheader_readf("4", &namesize);
 
     if (namesize >= SIGNED_SIZEOF(name))
         return SFE_MAT4_BAD_NAME;
 
-    psf_binheader_readf(psf, "b", name, namesize);
+    psf->binheader_readf("b", name, namesize);
     name[namesize] = 0;
 
-    psf_log_printf(psf, " Name  : %s\n", name);
+    psf->log_printf(" Name  : %s\n", name);
 
-    psf_binheader_readf(psf, "d", &value);
+    psf->binheader_readf("d", &value);
 
     snprintf(buffer, sizeof(buffer), " Value : %f\n", value);
-    psf_log_printf(psf, buffer);
+    psf->log_printf(buffer);
 
     if ((rows != 1) || (cols != 1))
         return SFE_MAT4_NO_SAMPLERATE;
@@ -252,35 +252,35 @@ static int mat4_read_header(SF_PRIVATE *psf)
 
     /* Now write out the audio data. */
 
-    psf_binheader_readf(psf, "m", &marker);
+    psf->binheader_readf("m", &marker);
 
-    psf_log_printf(psf, "Marker : %s\n", mat4_marker_to_str(marker));
+    psf->log_printf("Marker : %s\n", mat4_marker_to_str(marker));
 
-    psf_binheader_readf(psf, "444", &rows, &cols, &imag);
+    psf->binheader_readf("444", &rows, &cols, &imag);
 
-    psf_log_printf(psf, " Rows  : %d\n Cols  : %d\n Imag  : %s\n", rows, cols,
+    psf->log_printf(" Rows  : %d\n Cols  : %d\n Imag  : %s\n", rows, cols,
                    imag ? "True" : "False");
 
-    psf_binheader_readf(psf, "4", &namesize);
+    psf->binheader_readf("4", &namesize);
 
     if (namesize >= SIGNED_SIZEOF(name))
         return SFE_MAT4_BAD_NAME;
 
-    psf_binheader_readf(psf, "b", name, namesize);
+    psf->binheader_readf("b", name, namesize);
     name[namesize] = 0;
 
-    psf_log_printf(psf, " Name  : %s\n", name);
+    psf->log_printf(" Name  : %s\n", name);
 
-    psf->dataoffset = psf_ftell(psf);
+    psf->dataoffset = psf->ftell();
 
     if (rows == 0)
     {
-        psf_log_printf(psf, "*** Error : zero channel count.\n");
+        psf->log_printf("*** Error : zero channel count.\n");
         return SFE_CHANNEL_COUNT_ZERO;
     }
     else if (rows > SF_MAX_CHANNELS)
     {
-        psf_log_printf(psf, "*** Error : channel count %d > SF_MAX_CHANNELS.\n", rows);
+        psf->log_printf("*** Error : channel count %d > SF_MAX_CHANNELS.\n", rows);
         return SFE_CHANNEL_COUNT;
     };
 
@@ -315,13 +315,13 @@ static int mat4_read_header(SF_PRIVATE *psf)
         break;
 
     default:
-        psf_log_printf(psf, "*** Error : Bad marker %08X\n", marker);
+        psf->log_printf("*** Error : Bad marker %08X\n", marker);
         return SFE_UNIMPLEMENTED;
     };
 
     if ((psf->filelength - psf->dataoffset) < psf->sf.channels * psf->sf.frames * psf->bytewidth)
     {
-        psf_log_printf(psf, "*** File seems to be truncated. %D <--> %D\n",
+        psf->log_printf("*** File seems to be truncated. %D <--> %D\n",
                        psf->filelength - psf->dataoffset,
                        psf->sf.channels * psf->sf.frames * psf->bytewidth);
     }

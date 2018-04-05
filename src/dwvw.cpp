@@ -81,7 +81,7 @@ int dwvw_init(SF_PRIVATE *psf, int bitwidth)
 
     if (psf->codec_data != NULL)
     {
-        psf_log_printf(psf, "*** psf->codec_data is not NULL.\n");
+        psf->log_printf("*** psf->codec_data is not NULL.\n");
         return SFE_INTERNAL;
     };
 
@@ -143,7 +143,7 @@ static int dwvw_close(SF_PRIVATE *psf)
         dwvw_encode_data(psf, pdwvw, last_values, 12);
 
         /* Write the last buffer worth of data to disk. */
-        psf_fwrite(pdwvw->b.buffer, 1, pdwvw->b.index, psf);
+        psf->fwrite(pdwvw->b.buffer, 1, pdwvw->b.index);
 
         if (psf->write_header)
             psf->write_header(psf, SF_TRUE);
@@ -166,7 +166,7 @@ static sf_count_t dwvw_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offset
 
     if (offset == 0)
     {
-        psf_fseek(psf, psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->dataoffset, SEEK_SET);
         dwvw_read_reset(pdwvw);
         return 0;
     };
@@ -386,7 +386,7 @@ static int dwvw_decode_load_bits(SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int bit_c
     {
         if (pdwvw->b.index >= pdwvw->b.end)
         {
-            pdwvw->b.end = psf_fread(pdwvw->b.buffer, 1, sizeof(pdwvw->b.buffer), psf);
+            pdwvw->b.end = psf->fread(pdwvw->b.buffer, 1, sizeof(pdwvw->b.buffer));
             pdwvw->b.index = 0;
         };
 
@@ -456,7 +456,7 @@ static void dwvw_encode_store_bits(SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int dat
 
     if (pdwvw->b.index > SIGNED_SIZEOF(pdwvw->b.buffer) - 4)
     {
-        psf_fwrite(pdwvw->b.buffer, 1, pdwvw->b.index, psf);
+        psf->fwrite(pdwvw->b.buffer, 1, pdwvw->b.index);
         pdwvw->b.index = 0;
     };
 

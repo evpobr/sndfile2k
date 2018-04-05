@@ -103,12 +103,12 @@ int sd2_open(SF_PRIVATE *psf)
 
     if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->rsrclength > 0))
     {
-        psf_use_rsrc(psf, SF_TRUE);
-        valid = psf_file_valid(psf);
-        psf_use_rsrc(psf, SF_FALSE);
+        psf->use_rsrc(SF_TRUE);
+        valid = psf->file_valid();
+        psf->use_rsrc(SF_FALSE);
         if (!valid)
         {
-            psf_log_printf(psf, "sd2_open : psf->rsrc.filedes < 0\n");
+            psf->log_printf("sd2_open : psf->rsrc.filedes < 0\n");
             return SFE_SD2_BAD_RSRC;
         };
 
@@ -131,7 +131,7 @@ int sd2_open(SF_PRIVATE *psf)
     if (psf->file.mode == SFM_WRITE || (psf->file.mode == SFM_RDWR && psf->rsrclength == 0))
     {
         psf->rsrc.mode = psf->file.mode;
-        psf_open_rsrc(psf);
+        psf->open_rsrc();
 
         error = sd2_write_rsrc_fork(psf, SF_FALSE);
 
@@ -160,12 +160,12 @@ int sd2_open(SF_PRIVATE *psf)
         break;
     };
 
-    psf_fseek(psf, psf->dataoffset, SEEK_SET);
+    psf->fseek(psf->dataoffset, SEEK_SET);
 
 error_cleanup:
 
     /* Close the resource fork regardless. We won't need it again. */
-    psf_close_rsrc(psf);
+    psf->close_rsrc();
 
     return error;
 }
@@ -193,7 +193,7 @@ static int sd2_write_rsrc_fork(SF_PRIVATE *psf, int UNUSED(calc_length))
 
     int k, str_offset, data_offset, next_str;
 
-    psf_use_rsrc(psf, SF_TRUE);
+    psf->use_rsrc(SF_TRUE);
 
     memset(&rsrc, 0, sizeof(rsrc));
 
@@ -234,77 +234,77 @@ static int sd2_write_rsrc_fork(SF_PRIVATE *psf, int UNUSED(calc_length))
     rsrc.map_offset = rsrc.data_offset + rsrc.data_length;
 
     /* Very start of resource fork. */
-    psf_binheader_writef(psf, "E444", BHW4(rsrc.data_offset), BHW4(rsrc.map_offset),
+    psf->binheader_writef("E444", BHW4(rsrc.data_offset), BHW4(rsrc.map_offset),
                          BHW4(rsrc.data_length));
 
-    psf_binheader_writef(psf, "Eop", BHWo(0x30), BHWp(psf->file.name.c));
-    psf_binheader_writef(psf, "Eo2mm", BHWo(0x50), BHW2(0), BHWm(Sd2f_MARKER), BHWm(lsf1_MARKER));
+    psf->binheader_writef("Eop", BHWo(0x30), BHWp(psf->file.name.c));
+    psf->binheader_writef("Eo2mm", BHWo(0x50), BHW2(0), BHWm(Sd2f_MARKER), BHWm(lsf1_MARKER));
 
     /* Very start of resource map. */
-    psf_binheader_writef(psf, "E4444", BHW4(rsrc.map_offset), BHW4(rsrc.data_offset),
+    psf->binheader_writef("E4444", BHW4(rsrc.map_offset), BHW4(rsrc.data_offset),
                          BHW4(rsrc.map_offset), BHW4(rsrc.data_length));
 
     /* These I don't currently understand. */
     if (1)
     {
-        psf_binheader_writef(psf, "Eo1422", BHWo(rsrc.map_offset + 16), BHW1(1), BHW4(0x12345678),
+        psf->binheader_writef("Eo1422", BHWo(rsrc.map_offset + 16), BHW1(1), BHW4(0x12345678),
                              BHW2(0xabcd), BHW2(0));
     };
 
     /* Resource type offset. */
     rsrc.type_offset = rsrc.map_offset + 30;
-    psf_binheader_writef(psf, "Eo2", BHWo(rsrc.map_offset + 24),
+    psf->binheader_writef("Eo2", BHWo(rsrc.map_offset + 24),
                          BHW2(rsrc.type_offset - rsrc.map_offset - 2));
 
     /* Type index max. */
     rsrc.type_count = 2;
-    psf_binheader_writef(psf, "Eo2", BHWo(rsrc.map_offset + 28), BHW2(rsrc.type_count - 1));
+    psf->binheader_writef("Eo2", BHWo(rsrc.map_offset + 28), BHW2(rsrc.type_count - 1));
 
     rsrc.item_offset = rsrc.type_offset + rsrc.type_count * 8;
 
     rsrc.str_count = ARRAY_LEN(str_rsrc);
     rsrc.string_offset = rsrc.item_offset + (rsrc.str_count + 1) * 12 - rsrc.map_offset;
-    psf_binheader_writef(psf, "Eo2", BHWo(rsrc.map_offset + 26), BHW2(rsrc.string_offset));
+    psf->binheader_writef("Eo2", BHWo(rsrc.map_offset + 26), BHW2(rsrc.string_offset));
 
     /* Write 'STR ' resource type. */
     rsrc.str_count = 3;
-    psf_binheader_writef(psf, "Eom22", BHWo(rsrc.type_offset), BHWm(STR_MARKER),
+    psf->binheader_writef("Eom22", BHWo(rsrc.type_offset), BHWm(STR_MARKER),
                          BHW2(rsrc.str_count - 1), BHW2(0x12));
 
     /* Write 'sdML' resource type. */
-    psf_binheader_writef(psf, "Em22", BHWm(sdML_MARKER), BHW2(0), BHW2(0x36));
+    psf->binheader_writef("Em22", BHWm(sdML_MARKER), BHW2(0), BHW2(0x36));
 
     str_offset = rsrc.map_offset + rsrc.string_offset;
     next_str = 0;
     data_offset = rsrc.data_offset;
     for (k = 0; k < ARRAY_LEN(str_rsrc); k++)
     {
-        psf_binheader_writef(psf, "Eop", BHWo(str_offset), BHWp(str_rsrc[k].name));
-        psf_binheader_writef(psf, "Eo22", BHWo(rsrc.item_offset + k * 12), BHW2(str_rsrc[k].id),
+        psf->binheader_writef("Eop", BHWo(str_offset), BHWp(str_rsrc[k].name));
+        psf->binheader_writef("Eo22", BHWo(rsrc.item_offset + k * 12), BHW2(str_rsrc[k].id),
                              BHW2(next_str));
 
         str_offset += strlen(str_rsrc[k].name);
         next_str += strlen(str_rsrc[k].name);
 
-        psf_binheader_writef(psf, "Eo4", BHWo(rsrc.item_offset + k * 12 + 4),
+        psf->binheader_writef("Eo4", BHWo(rsrc.item_offset + k * 12 + 4),
                              BHW4(data_offset - rsrc.data_offset));
-        psf_binheader_writef(psf, "Eo4", BHWo(data_offset), BHW4(str_rsrc[k].value_len));
+        psf->binheader_writef("Eo4", BHWo(data_offset), BHW4(str_rsrc[k].value_len));
 
-        psf_binheader_writef(psf, "Eob", BHWo(data_offset + 4), BHWv(str_rsrc[k].value),
+        psf->binheader_writef("Eob", BHWo(data_offset + 4), BHWv(str_rsrc[k].value),
                              BHWz(str_rsrc[k].value_len));
         data_offset += 4 + str_rsrc[k].value_len;
     };
 
     /* Finally, calculate and set map length. */
     rsrc.map_length = str_offset - rsrc.map_offset;
-    psf_binheader_writef(psf, "Eo4o4", BHWo(12), BHW4(rsrc.map_length), BHWo(rsrc.map_offset + 12),
+    psf->binheader_writef("Eo4o4", BHWo(12), BHW4(rsrc.map_length), BHWo(rsrc.map_offset + 12),
                          BHW4(rsrc.map_length));
 
     psf->header.indx = rsrc.map_offset + rsrc.map_length;
 
-    psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
 
-    psf_use_rsrc(psf, SF_FALSE);
+    psf->use_rsrc(SF_FALSE);
 
     if (psf->error)
         return psf->error;
@@ -378,12 +378,12 @@ static int sd2_parse_rsrc_fork(SF_PRIVATE *psf)
     SD2_RSRC rsrc;
     int k, marker, error = 0;
 
-    psf_use_rsrc(psf, SF_TRUE);
+    psf->use_rsrc(SF_TRUE);
 
     memset(&rsrc, 0, sizeof(rsrc));
 
-    rsrc.rsrc_len = psf_get_filelen(psf);
-    psf_log_printf(psf, "Resource length : %d (0x%04X)\n", rsrc.rsrc_len, rsrc.rsrc_len);
+    rsrc.rsrc_len = psf->get_filelen();
+    psf->log_printf("Resource length : %d (0x%04X)\n", rsrc.rsrc_len, rsrc.rsrc_len);
 
     if (rsrc.rsrc_len > psf->header.len)
     {
@@ -398,7 +398,7 @@ static int sd2_parse_rsrc_fork(SF_PRIVATE *psf)
     };
 
     /* Read in the whole lot. */
-    psf_fread(rsrc.rsrc_data, rsrc.rsrc_len, 1, psf);
+    psf->fread(rsrc.rsrc_data, rsrc.rsrc_len, 1);
 
     /* Reset the header storage because we have changed to the rsrcdes. */
     psf->header.indx = psf->header.end = rsrc.rsrc_len;
@@ -410,21 +410,21 @@ static int sd2_parse_rsrc_fork(SF_PRIVATE *psf)
 
     if (rsrc.data_offset == 0x51607 && rsrc.map_offset == 0x20000)
     {
-        psf_log_printf(psf, "Trying offset of 0x52 bytes.\n");
+        psf->log_printf("Trying offset of 0x52 bytes.\n");
         rsrc.data_offset = read_rsrc_int(&rsrc, 0x52 + 0) + 0x52;
         rsrc.map_offset = read_rsrc_int(&rsrc, 0x52 + 4) + 0x52;
         rsrc.data_length = read_rsrc_int(&rsrc, 0x52 + 8);
         rsrc.map_length = read_rsrc_int(&rsrc, 0x52 + 12);
     };
 
-    psf_log_printf(psf,
+    psf->log_printf(
                    "  data offset : 0x%04X\n  map  offset : 0x%04X\n"
                    "  data length : 0x%04X\n  map  length : 0x%04X\n",
                    rsrc.data_offset, rsrc.map_offset, rsrc.data_length, rsrc.map_length);
 
     if (rsrc.data_offset > rsrc.rsrc_len)
     {
-        psf_log_printf(psf, "Error : rsrc.data_offset (%d, 0x%x) > len\n", rsrc.data_offset,
+        psf->log_printf("Error : rsrc.data_offset (%d, 0x%x) > len\n", rsrc.data_offset,
                        rsrc.data_offset);
         error = SFE_SD2_BAD_DATA_OFFSET;
         goto parse_rsrc_fork_cleanup;
@@ -432,21 +432,21 @@ static int sd2_parse_rsrc_fork(SF_PRIVATE *psf)
 
     if (rsrc.map_offset > rsrc.rsrc_len)
     {
-        psf_log_printf(psf, "Error : rsrc.map_offset > len\n");
+        psf->log_printf("Error : rsrc.map_offset > len\n");
         error = SFE_SD2_BAD_MAP_OFFSET;
         goto parse_rsrc_fork_cleanup;
     };
 
     if (rsrc.data_length > rsrc.rsrc_len)
     {
-        psf_log_printf(psf, "Error : rsrc.data_length > len\n");
+        psf->log_printf("Error : rsrc.data_length > len\n");
         error = SFE_SD2_BAD_DATA_LENGTH;
         goto parse_rsrc_fork_cleanup;
     };
 
     if (rsrc.map_length > rsrc.rsrc_len)
     {
-        psf_log_printf(psf, "Error : rsrc.map_length > len\n");
+        psf->log_printf("Error : rsrc.map_length > len\n");
         error = SFE_SD2_BAD_MAP_LENGTH;
         goto parse_rsrc_fork_cleanup;
     };
@@ -454,14 +454,14 @@ static int sd2_parse_rsrc_fork(SF_PRIVATE *psf)
     if (rsrc.data_offset + rsrc.data_length != rsrc.map_offset ||
         rsrc.map_offset + rsrc.map_length != rsrc.rsrc_len)
     {
-        psf_log_printf(psf, "Error : This does not look like a MacOSX resource fork.\n");
+        psf->log_printf("Error : This does not look like a MacOSX resource fork.\n");
         error = SFE_SD2_BAD_RSRC;
         goto parse_rsrc_fork_cleanup;
     };
 
     if (rsrc.map_offset + 28 >= rsrc.rsrc_len)
     {
-        psf_log_printf(psf, "Bad map offset (%d + 28 > %d).\n", rsrc.map_offset, rsrc.rsrc_len);
+        psf->log_printf("Bad map offset (%d + 28 > %d).\n", rsrc.map_offset, rsrc.rsrc_len);
         error = SFE_SD2_BAD_RSRC;
         goto parse_rsrc_fork_cleanup;
     };
@@ -469,7 +469,7 @@ static int sd2_parse_rsrc_fork(SF_PRIVATE *psf)
     rsrc.string_offset = rsrc.map_offset + read_rsrc_short(&rsrc, rsrc.map_offset + 26);
     if (rsrc.string_offset > rsrc.rsrc_len)
     {
-        psf_log_printf(psf, "Bad string offset (%d).\n", rsrc.string_offset);
+        psf->log_printf("Bad string offset (%d).\n", rsrc.string_offset);
         error = SFE_SD2_BAD_RSRC;
         goto parse_rsrc_fork_cleanup;
     };
@@ -478,14 +478,14 @@ static int sd2_parse_rsrc_fork(SF_PRIVATE *psf)
 
     if (rsrc.map_offset + 28 > rsrc.rsrc_len)
     {
-        psf_log_printf(psf, "Bad map offset.\n");
+        psf->log_printf("Bad map offset.\n");
         goto parse_rsrc_fork_cleanup;
     };
 
     rsrc.type_count = read_rsrc_short(&rsrc, rsrc.map_offset + 28) + 1;
     if (rsrc.type_count < 1)
     {
-        psf_log_printf(psf, "Bad type count.\n");
+        psf->log_printf("Bad type count.\n");
         error = SFE_SD2_BAD_RSRC;
         goto parse_rsrc_fork_cleanup;
     };
@@ -493,7 +493,7 @@ static int sd2_parse_rsrc_fork(SF_PRIVATE *psf)
     rsrc.item_offset = rsrc.type_offset + rsrc.type_count * 8;
     if (rsrc.item_offset < 0 || rsrc.item_offset > rsrc.rsrc_len)
     {
-        psf_log_printf(psf, "Bad item offset (%d).\n", rsrc.item_offset);
+        psf->log_printf("Bad item offset (%d).\n", rsrc.item_offset);
         error = SFE_SD2_BAD_RSRC;
         goto parse_rsrc_fork_cleanup;
     };
@@ -503,7 +503,7 @@ static int sd2_parse_rsrc_fork(SF_PRIVATE *psf)
     {
         if (rsrc.type_offset + k * 8 > rsrc.rsrc_len)
         {
-            psf_log_printf(psf, "Bad rsrc marker.\n");
+            psf->log_printf("Bad rsrc marker.\n");
             goto parse_rsrc_fork_cleanup;
         };
 
@@ -518,12 +518,12 @@ static int sd2_parse_rsrc_fork(SF_PRIVATE *psf)
         };
     };
 
-    psf_log_printf(psf, "No 'STR ' resource.\n");
+    psf->log_printf("No 'STR ' resource.\n");
     error = SFE_SD2_BAD_RSRC;
 
 parse_rsrc_fork_cleanup:
 
-    psf_use_rsrc(psf, SF_FALSE);
+    psf->use_rsrc(SF_FALSE);
 
     if (rsrc.need_to_free_rsrc_data)
         free(rsrc.rsrc_data);
@@ -536,10 +536,10 @@ static int parse_str_rsrc(SF_PRIVATE *psf, SD2_RSRC *rsrc)
     char name[32], value[32];
     int k, str_offset, rsrc_id, data_offset = 0, data_len = 0;
 
-    psf_log_printf(psf, "Finding parameters :\n");
+    psf->log_printf("Finding parameters :\n");
 
     str_offset = rsrc->string_offset;
-    psf_log_printf(psf, "  Offset    RsrcId    dlen    slen    Value\n");
+    psf->log_printf("  Offset    RsrcId    dlen    slen    Value\n");
 
     for (k = 0; data_offset + data_len < rsrc->rsrc_len; k++)
     {
@@ -554,21 +554,21 @@ static int parse_str_rsrc(SF_PRIVATE *psf, SD2_RSRC *rsrc)
         data_offset = rsrc->data_offset + read_rsrc_int(rsrc, rsrc->item_offset + k * 12 + 4);
         if (data_offset < 0 || data_offset > rsrc->rsrc_len)
         {
-            psf_log_printf(psf, "Exiting parser on data offset of %d.\n", data_offset);
+            psf->log_printf("Exiting parser on data offset of %d.\n", data_offset);
             break;
         };
 
         data_len = read_rsrc_int(rsrc, data_offset);
         if (data_len < 0 || data_len > rsrc->rsrc_len)
         {
-            psf_log_printf(psf, "Exiting parser on data length of %d.\n", data_len);
+            psf->log_printf("Exiting parser on data length of %d.\n", data_len);
             break;
         };
 
         slen = read_rsrc_char(rsrc, data_offset + 4);
         read_rsrc_str(rsrc, data_offset + 5, value, std::min(SIGNED_SIZEOF(value), slen + 1));
 
-        psf_log_printf(psf, "  0x%04x     %4d     %4d     %3d    '%s'\n", data_offset, rsrc_id,
+        psf->log_printf("  0x%04x     %4d     %4d     %3d    '%s'\n", data_offset, rsrc_id,
                        data_len, slen, value);
 
         if (rsrc_id == 1000 && rsrc->sample_size == 0)
@@ -579,16 +579,16 @@ static int parse_str_rsrc(SF_PRIVATE *psf, SD2_RSRC *rsrc)
             rsrc->channels = strtol(value, NULL, 10);
     };
 
-    psf_log_printf(psf, "Found Parameters :\n");
-    psf_log_printf(psf, "  sample-size : %d\n", rsrc->sample_size);
-    psf_log_printf(psf, "  sample-rate : %d\n", rsrc->sample_rate);
-    psf_log_printf(psf, "  channels    : %d\n", rsrc->channels);
+    psf->log_printf("Found Parameters :\n");
+    psf->log_printf("  sample-size : %d\n", rsrc->sample_size);
+    psf->log_printf("  sample-rate : %d\n", rsrc->sample_rate);
+    psf->log_printf("  channels    : %d\n", rsrc->channels);
 
     if (rsrc->sample_rate <= 4 && rsrc->sample_size > 4)
     {
         int temp;
 
-        psf_log_printf(psf, "Geez!! Looks like sample rate and sample size got "
+        psf->log_printf("Geez!! Looks like sample rate and sample size got "
                             "switched.\nCorrecting this screw up.\n");
         temp = rsrc->sample_rate;
         rsrc->sample_rate = rsrc->sample_size;
@@ -597,13 +597,13 @@ static int parse_str_rsrc(SF_PRIVATE *psf, SD2_RSRC *rsrc)
 
     if (rsrc->sample_rate < 0)
     {
-        psf_log_printf(psf, "Bad sample rate (%d)\n", rsrc->sample_rate);
+        psf->log_printf("Bad sample rate (%d)\n", rsrc->sample_rate);
         return SFE_SD2_BAD_RSRC;
     };
 
     if (rsrc->channels < 0)
     {
-        psf_log_printf(psf, "Bad channel count (%d)\n", rsrc->channels);
+        psf->log_printf("Bad channel count (%d)\n", rsrc->channels);
         return SFE_SD2_BAD_RSRC;
     };
 
@@ -630,11 +630,11 @@ static int parse_str_rsrc(SF_PRIVATE *psf, SD2_RSRC *rsrc)
         break;
 
     default:
-        psf_log_printf(psf, "Bad sample size (%d)\n", rsrc->sample_size);
+        psf->log_printf("Bad sample size (%d)\n", rsrc->sample_size);
         return SFE_SD2_BAD_SAMPLE_SIZE;
     };
 
-    psf_log_printf(psf, "ok\n");
+    psf->log_printf("ok\n");
 
     return 0;
 }

@@ -113,8 +113,8 @@ static int nist_read_header(SF_PRIVATE *psf)
     long samples;
 
     /* Go to start of file and read in the whole header. */
-	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-    psf_binheader_readf(psf, "b", psf_header, NIST_HEADER_LENGTH);
+	psf->binheader_seekf(0, SF_SEEK_SET);
+    psf->binheader_readf("b", psf_header, NIST_HEADER_LENGTH);
 
     /* Header is a string, so make sure it is null terminated. */
     psf_header[NIST_HEADER_LENGTH] = 0;
@@ -132,7 +132,7 @@ static int nist_read_header(SF_PRIVATE *psf)
     /* Make sure its a NIST file. */
     if (strstr(psf_header, "NIST_1A\n") != psf_header)
     {
-        psf_log_printf(psf, "Not a NIST file.\n");
+        psf->log_printf("Not a NIST file.\n");
         return SFE_NIST_BAD_HEADER;
     };
 
@@ -140,7 +140,7 @@ static int nist_read_header(SF_PRIVATE *psf)
         psf->dataoffset = count;
     else
     {
-        psf_log_printf(psf, "*** Suspicious header length.\n");
+        psf->log_printf("*** Suspicious header length.\n");
         psf->dataoffset = NIST_HEADER_LENGTH;
     };
 
@@ -165,7 +165,7 @@ static int nist_read_header(SF_PRIVATE *psf)
         }
         else
         {
-            psf_log_printf(psf, "*** Unknown encoding : %s\n", str);
+            psf->log_printf("*** Unknown encoding : %s\n", str);
             encoding = 0;
         };
     };
@@ -193,7 +193,7 @@ static int nist_read_header(SF_PRIVATE *psf)
         sscanf(cptr, "sample_byte_format -s%u %8s", &bytes, str) == 2)
     {
         if (bytes != strlen(str))
-            psf_log_printf(psf, "Weird sample_byte_format : strlen '%s' != %d\n", str, bytes);
+            psf->log_printf("Weird sample_byte_format : strlen '%s' != %d\n", str, bytes);
 
         if (bytes > 1)
         {
@@ -201,7 +201,7 @@ static int nist_read_header(SF_PRIVATE *psf)
                 psf->bytewidth = bytes;
             else if (psf->bytewidth - bytes != 0)
             {
-                psf_log_printf(psf, "psf->bytewidth (%d) != bytes (%d)\n", psf->bytewidth, bytes);
+                psf->log_printf("psf->bytewidth (%d) != bytes (%d)\n", psf->bytewidth, bytes);
                 return SFE_NIST_BAD_ENCODING;
             };
 
@@ -211,7 +211,7 @@ static int nist_read_header(SF_PRIVATE *psf)
                 psf->endian = SF_ENDIAN_BIG;
             else
             {
-                psf_log_printf(psf, "Weird endian-ness : %s\n", str);
+                psf->log_printf("Weird endian-ness : %s\n", str);
                 return SFE_NIST_BAD_ENCODING;
             };
         };
@@ -224,14 +224,14 @@ static int nist_read_header(SF_PRIVATE *psf)
 
     if (strstr(psf_header, "channels_interleaved -s5 FALSE"))
     {
-        psf_log_printf(psf, "Non-interleaved data unsupported.\n", str);
+        psf->log_printf("Non-interleaved data unsupported.\n", str);
         return SFE_NIST_BAD_ENCODING;
     };
 
     psf->blockwidth = psf->sf.channels * psf->bytewidth;
     psf->datalength = psf->filelength - psf->dataoffset;
 
-    psf_fseek(psf, psf->dataoffset, SEEK_SET);
+    psf->fseek(psf->dataoffset, SEEK_SET);
 
     if (encoding == SF_FORMAT_PCM_U8)
     {
@@ -293,11 +293,11 @@ static int nist_write_header(SF_PRIVATE *psf, int calc_length)
     long samples;
     sf_count_t current;
 
-    current = psf_ftell(psf);
+    current = psf->ftell();
 
     if (calc_length)
     {
-        psf->filelength = psf_get_filelen(psf);
+        psf->filelength = psf->get_filelen();
 
         psf->datalength = psf->filelength - psf->dataoffset;
 
@@ -319,39 +319,38 @@ static int nist_write_header(SF_PRIVATE *psf, int calc_length)
     memset(psf->header.ptr, 0, psf->header.len);
     psf->header.indx = 0;
 
-    psf_fseek(psf, 0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
 
-    psf_asciiheader_printf(psf, "NIST_1A\n   1024\n");
-    psf_asciiheader_printf(psf, "channel_count -i %d\n", psf->sf.channels);
-    psf_asciiheader_printf(psf, "sample_rate -i %d\n", psf->sf.samplerate);
+    psf->asciiheader_printf("NIST_1A\n   1024\n");
+    psf->asciiheader_printf("channel_count -i %d\n", psf->sf.channels);
+    psf->asciiheader_printf("sample_rate -i %d\n", psf->sf.samplerate);
 
     switch (SF_CODEC(psf->sf.format))
     {
     case SF_FORMAT_PCM_S8:
-        psf_asciiheader_printf(psf, "sample_coding -s3 pcm\n");
-        psf_asciiheader_printf(psf, "sample_n_bytes -i 1\n"
+        psf->asciiheader_printf("sample_coding -s3 pcm\n");
+        psf->asciiheader_printf("sample_n_bytes -i 1\n"
                                     "sample_sig_bits -i 8\n");
         break;
 
     case SF_FORMAT_PCM_16:
     case SF_FORMAT_PCM_24:
     case SF_FORMAT_PCM_32:
-        psf_asciiheader_printf(psf, "sample_n_bytes -i %d\n", psf->bytewidth);
-        psf_asciiheader_printf(psf, "sample_sig_bits -i %d\n", psf->bytewidth * 8);
-        psf_asciiheader_printf(psf,
-                               "sample_coding -s3 pcm\n"
-                               "sample_byte_format -s%d %s\n",
-                               psf->bytewidth, end_str);
+        psf->asciiheader_printf("sample_n_bytes -i %d\n", psf->bytewidth);
+        psf->asciiheader_printf("sample_sig_bits -i %d\n", psf->bytewidth * 8);
+        psf->asciiheader_printf("sample_coding -s3 pcm\n"
+                                "sample_byte_format -s%d %s\n",
+                                psf->bytewidth, end_str);
         break;
 
     case SF_FORMAT_ALAW:
-        psf_asciiheader_printf(psf, "sample_coding -s4 alaw\n");
-        psf_asciiheader_printf(psf, "sample_n_bytes -s1 1\n");
+        psf->asciiheader_printf("sample_coding -s4 alaw\n");
+        psf->asciiheader_printf("sample_n_bytes -s1 1\n");
         break;
 
     case SF_FORMAT_ULAW:
-        psf_asciiheader_printf(psf, "sample_coding -s4 ulaw\n");
-        psf_asciiheader_printf(psf, "sample_n_bytes -s1 1\n");
+        psf->asciiheader_printf("sample_coding -s4 ulaw\n");
+        psf->asciiheader_printf("sample_n_bytes -s1 1\n");
         break;
 
     default:
@@ -362,19 +361,19 @@ static int nist_write_header(SF_PRIVATE *psf, int calc_length)
 
     /* Fix this */
     samples = psf->sf.frames;
-    psf_asciiheader_printf(psf, "sample_count -i %ld\n", samples);
-    psf_asciiheader_printf(psf, "end_head\n");
+    psf->asciiheader_printf("sample_count -i %ld\n", samples);
+    psf->asciiheader_printf("end_head\n");
 
     /* Zero fill to dataoffset. */
-    psf_binheader_writef(psf, "z", BHWz((size_t)(NIST_HEADER_LENGTH - psf->header.indx)));
+    psf->binheader_writef("z", BHWz((size_t)(NIST_HEADER_LENGTH - psf->header.indx)));
 
-    psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
 
     if (psf->error)
         return psf->error;
 
     if (current > 0)
-        psf_fseek(psf, current, SEEK_SET);
+        psf->fseek(current, SEEK_SET);
 
     return psf->error;
 }

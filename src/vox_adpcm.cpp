@@ -59,7 +59,7 @@ static int codec_close(SF_PRIVATE *psf)
     IMA_OKI_ADPCM *p = (IMA_OKI_ADPCM *)psf->codec_data;
 
     if (p->errors)
-        psf_log_printf(psf, "*** Warning : ADPCM state errors: %d\n", p->errors);
+        psf->log_printf("*** Warning : ADPCM state errors: %d\n", p->errors);
     return p->errors;
 }
 
@@ -88,8 +88,8 @@ int vox_adpcm_init(SF_PRIVATE *psf)
     }
     else
     {
-        psf_log_printf(psf, "Header-less OKI Dialogic ADPCM encoded file.\n");
-        psf_log_printf(psf, "Setting up for 8kHz, mono, Vox ADPCM.\n");
+        psf->log_printf("Header-less OKI Dialogic ADPCM encoded file.\n");
+        psf->log_printf("Setting up for 8kHz, mono, Vox ADPCM.\n");
 
         psf->read_short = vox_read_s;
         psf->read_int = vox_read_i;
@@ -108,7 +108,7 @@ int vox_adpcm_init(SF_PRIVATE *psf)
     psf->codec_close = codec_close;
 
     /* Seek back to start of data. */
-    if (psf_fseek(psf, 0, SEEK_SET) == -1)
+    if (psf->fseek(0, SEEK_SET) == -1)
         return SFE_BAD_SEEK;
 
     ima_oki_adpcm_init(pvox, IMA_OKI_ADPCM_TYPE_OKI);
@@ -125,10 +125,10 @@ static size_t vox_read_block(SF_PRIVATE *psf, IMA_OKI_ADPCM *pvox, short *ptr, s
         pvox->code_count =
             (len - indx > IMA_OKI_ADPCM_PCM_LEN) ? IMA_OKI_ADPCM_CODE_LEN : (len - indx + 1) / 2;
 
-        if ((k = psf_fread(pvox->codes, 1, pvox->code_count, psf)) != pvox->code_count)
+        if ((k = psf->fread(pvox->codes, 1, pvox->code_count)) != pvox->code_count)
         {
-            if (psf_ftell(psf) != psf->filelength)
-                psf_log_printf(psf, "*** Warning : short read (%d != %d).\n", k, pvox->code_count);
+            if (psf->ftell() != psf->filelength)
+                psf->log_printf("*** Warning : short read (%d != %d).\n", k, pvox->code_count);
             if (k == 0)
                 break;
         };
@@ -274,8 +274,8 @@ static size_t vox_write_block(SF_PRIVATE *psf, IMA_OKI_ADPCM *pvox, const short 
 
         ima_oki_adpcm_encode_block(pvox);
 
-        if ((k = psf_fwrite(pvox->codes, 1, pvox->code_count, psf)) != pvox->code_count)
-            psf_log_printf(psf, "*** Warning : short write (%d != %d).\n", k, pvox->code_count);
+        if ((k = psf->fwrite(pvox->codes, 1, pvox->code_count)) != pvox->code_count)
+            psf->log_printf("*** Warning : short write (%d != %d).\n", k, pvox->code_count);
 
         indx += pvox->pcm_count;
     };

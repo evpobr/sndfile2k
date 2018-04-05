@@ -86,7 +86,7 @@ int svx_open(SF_PRIVATE *psf)
         if (psf->blockwidth)
             psf->sf.frames = psf->datalength / psf->blockwidth;
 
-        psf_fseek(psf, psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->dataoffset, SEEK_SET);
     };
 
     if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
@@ -128,10 +128,10 @@ static int svx_read_header(SF_PRIVATE *psf)
     int bytecount = 0, channels;
 
     if (psf->filelength > INT64_C(0xffffffff))
-        psf_log_printf(psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n");
+        psf->log_printf("Warning : filelength > 0xffffffff. This is bad!!!!\n");
 
     memset(&vhdr, 0, sizeof(vhdr));
-	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
+	psf->binheader_seekf(0, SF_SEEK_SET);
 
     /* Set default number of channels. Modify later if necessary */
     psf->sf.channels = 1;
@@ -140,7 +140,7 @@ static int svx_read_header(SF_PRIVATE *psf)
 
     while (!done)
     {
-        psf_binheader_readf(psf, "Em4", &marker, &chunk_size);
+        psf->binheader_readf("Em4", &marker, &chunk_size);
 
         switch (marker)
         {
@@ -149,16 +149,16 @@ static int svx_read_header(SF_PRIVATE *psf)
                 return SFE_SVX_NO_FORM;
 
             if (chunk_size != psf->filelength - 2 * sizeof(chunk_size))
-                psf_log_printf(psf, "FORM : %u (should be %u)\n", chunk_size,
+                psf->log_printf("FORM : %u (should be %u)\n", chunk_size,
                                (uint32_t)psf->filelength - 2 * sizeof(chunk_size));
             else
-                psf_log_printf(psf, "FORM : %u\n", chunk_size);
+                psf->log_printf("FORM : %u\n", chunk_size);
             parsestage |= HAVE_FORM;
 
-            psf_binheader_readf(psf, "m", &marker);
+            psf->binheader_readf("m", &marker);
 
             filetype = marker;
-            psf_log_printf(psf, " %M\n", marker);
+            psf->log_printf(" %M\n", marker);
             parsestage |= HAVE_SVX;
             break;
 
@@ -166,34 +166,34 @@ static int svx_read_header(SF_PRIVATE *psf)
             if (!(parsestage & (HAVE_FORM | HAVE_SVX)))
                 return SFE_SVX_NO_FORM;
 
-            psf_log_printf(psf, " VHDR : %d\n", chunk_size);
+            psf->log_printf(" VHDR : %d\n", chunk_size);
 
-            psf_binheader_readf(psf, "E4442114", &(vhdr.oneShotHiSamples), &(vhdr.repeatHiSamples),
+            psf->binheader_readf("E4442114", &(vhdr.oneShotHiSamples), &(vhdr.repeatHiSamples),
                                 &(vhdr.samplesPerHiCycle), &(vhdr.samplesPerSec), &(vhdr.octave),
                                 &(vhdr.compression), &(vhdr.volume));
 
-            psf_log_printf(psf, "  OneShotHiSamples  : %d\n", vhdr.oneShotHiSamples);
-            psf_log_printf(psf, "  RepeatHiSamples   : %d\n", vhdr.repeatHiSamples);
-            psf_log_printf(psf, "  samplesPerHiCycle : %d\n", vhdr.samplesPerHiCycle);
-            psf_log_printf(psf, "  Sample Rate       : %d\n", vhdr.samplesPerSec);
-            psf_log_printf(psf, "  Octave            : %d\n", vhdr.octave);
+            psf->log_printf("  OneShotHiSamples  : %d\n", vhdr.oneShotHiSamples);
+            psf->log_printf("  RepeatHiSamples   : %d\n", vhdr.repeatHiSamples);
+            psf->log_printf("  samplesPerHiCycle : %d\n", vhdr.samplesPerHiCycle);
+            psf->log_printf("  Sample Rate       : %d\n", vhdr.samplesPerSec);
+            psf->log_printf("  Octave            : %d\n", vhdr.octave);
 
-            psf_log_printf(psf, "  Compression       : %d => ", vhdr.compression);
+            psf->log_printf("  Compression       : %d => ", vhdr.compression);
 
             switch (vhdr.compression)
             {
             case 0:
-                psf_log_printf(psf, "None.\n");
+                psf->log_printf("None.\n");
                 break;
             case 1:
-                psf_log_printf(psf, "Fibonacci delta\n");
+                psf->log_printf("Fibonacci delta\n");
                 break;
             case 2:
-                psf_log_printf(psf, "Exponential delta\n");
+                psf->log_printf("Exponential delta\n");
                 break;
             };
 
-            psf_log_printf(psf, "  Volume            : %d\n", vhdr.volume);
+            psf->log_printf("  Volume            : %d\n", vhdr.volume);
 
             psf->sf.samplerate = vhdr.samplesPerSec;
 
@@ -217,73 +217,73 @@ static int svx_read_header(SF_PRIVATE *psf)
 
             psf->datalength = chunk_size;
 
-            psf->dataoffset = psf_ftell(psf);
+            psf->dataoffset = psf->ftell();
             if (psf->dataoffset < 0)
                 return SFE_SVX_NO_BODY;
 
             if (psf->datalength > psf->filelength - psf->dataoffset)
             {
-                psf_log_printf(psf, " BODY : %D (should be %D)\n", psf->datalength,
+                psf->log_printf(" BODY : %D (should be %D)\n", psf->datalength,
                                psf->filelength - psf->dataoffset);
                 psf->datalength = psf->filelength - psf->dataoffset;
             }
             else
-                psf_log_printf(psf, " BODY : %D\n", psf->datalength);
+                psf->log_printf(" BODY : %D\n", psf->datalength);
 
             parsestage |= HAVE_BODY;
 
             if (!psf->sf.seekable)
                 break;
 
-            psf_fseek(psf, psf->datalength, SEEK_CUR);
+            psf->fseek(psf->datalength, SEEK_CUR);
             break;
 
         case NAME_MARKER:
             if (!(parsestage & HAVE_SVX))
                 return SFE_SVX_NO_FORM;
 
-            psf_log_printf(psf, " %M : %u\n", marker, chunk_size);
+            psf->log_printf(" %M : %u\n", marker, chunk_size);
 
             if (strlen(psf->file.name.c) != chunk_size)
             {
                 if (chunk_size > sizeof(psf->file.name.c) - 1)
                     return SFE_SVX_BAD_NAME_LENGTH;
 
-                psf_binheader_readf(psf, "b", psf->file.name.c, chunk_size);
+                psf->binheader_readf("b", psf->file.name.c, chunk_size);
                 psf->file.name.c[chunk_size] = 0;
             }
             else
-				psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
+				psf->binheader_seekf(chunk_size, SF_SEEK_CUR);
             break;
 
         case ANNO_MARKER:
             if (!(parsestage & HAVE_SVX))
                 return SFE_SVX_NO_FORM;
 
-            psf_log_printf(psf, " %M : %u\n", marker, chunk_size);
+            psf->log_printf(" %M : %u\n", marker, chunk_size);
 
-			psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
+			psf->binheader_seekf(chunk_size, SF_SEEK_CUR);
             break;
 
         case CHAN_MARKER:
             if (!(parsestage & HAVE_SVX))
                 return SFE_SVX_NO_FORM;
 
-            psf_log_printf(psf, " %M : %u\n", marker, chunk_size);
+            psf->log_printf(" %M : %u\n", marker, chunk_size);
 
-            bytecount += psf_binheader_readf(psf, "E4", &channels);
+            bytecount += psf->binheader_readf("E4", &channels);
 
             if (channels == 2 || channels == 4)
-                psf_log_printf(psf, "  Channels : %d => mono\n", channels);
+                psf->log_printf("  Channels : %d => mono\n", channels);
             else if (channels == 6)
             {
                 psf->sf.channels = 2;
-                psf_log_printf(psf, "  Channels : %d => stereo\n", channels);
+                psf->log_printf("  Channels : %d => stereo\n", channels);
             }
             else
-                psf_log_printf(psf, "  Channels : %d *** assuming mono\n", channels);
+                psf->log_printf("  Channels : %d *** assuming mono\n", channels);
 
-			psf_binheader_seekf(psf, chunk_size - bytecount, SF_SEEK_CUR);
+			psf->binheader_seekf(chunk_size - bytecount, SF_SEEK_CUR);
             break;
 
         case AUTH_MARKER:
@@ -291,48 +291,48 @@ static int svx_read_header(SF_PRIVATE *psf)
             if (!(parsestage & HAVE_SVX))
                 return SFE_SVX_NO_FORM;
 
-            psf_log_printf(psf, " %M : %u\n", marker, chunk_size);
+            psf->log_printf(" %M : %u\n", marker, chunk_size);
 
-			psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
+			psf->binheader_seekf(chunk_size, SF_SEEK_CUR);
             break;
 
         default:
             if (chunk_size >= 0xffff0000)
             {
                 done = SF_TRUE;
-                psf_log_printf(psf,
+                psf->log_printf(
                                "*** Unknown chunk marker (%X) at position "
                                "%D with length %u. Exiting parser.\n",
-                               marker, psf_ftell(psf) - 8, chunk_size);
+                               marker, psf->ftell() - 8, chunk_size);
                 break;
             };
 
             if (psf_isprint((marker >> 24) & 0xFF) && psf_isprint((marker >> 16) & 0xFF) &&
                 psf_isprint((marker >> 8) & 0xFF) && psf_isprint(marker & 0xFF))
             {
-                psf_log_printf(psf, "%M : %u (unknown marker)\n", marker, chunk_size);
-				psf_binheader_seekf(psf, chunk_size, SF_SEEK_CUR);
+                psf->log_printf("%M : %u (unknown marker)\n", marker, chunk_size);
+				psf->binheader_seekf(chunk_size, SF_SEEK_CUR);
                 break;
             };
-            if ((chunk_size = psf_ftell(psf)) & 0x03)
+            if ((chunk_size = psf->ftell()) & 0x03)
             {
-                psf_log_printf(psf, "  Unknown chunk marker at position %d. Resynching.\n",
+                psf->log_printf("  Unknown chunk marker at position %d. Resynching.\n",
                                chunk_size - 4);
 
-				psf_binheader_seekf(psf, -3, SF_SEEK_CUR);
+				psf->binheader_seekf(-3, SF_SEEK_CUR);
                 break;
             };
-            psf_log_printf(psf,
+            psf->log_printf(
                            "*** Unknown chunk marker (%X) at position %D. "
                            "Exiting parser.\n",
-                           marker, psf_ftell(psf) - 8);
+                           marker, psf->ftell() - 8);
             done = SF_TRUE;
         };
 
         if (!psf->sf.seekable && (parsestage & HAVE_BODY))
             break;
 
-        if (psf_ftell(psf) >= psf->filelength - SIGNED_SIZEOF(chunk_size))
+        if (psf->ftell() >= psf->filelength - SIGNED_SIZEOF(chunk_size))
             break;
     }; /* while (1) */
 
@@ -358,11 +358,11 @@ static int svx_write_header(SF_PRIVATE *psf, int calc_length)
     static char annotation[] = "libsndfile by Erik de Castro Lopo\0\0\0";
     sf_count_t current;
 
-    current = psf_ftell(psf);
+    current = psf->ftell();
 
     if (calc_length)
     {
-        psf->filelength = psf_get_filelen(psf);
+        psf->filelength = psf->get_filelen();
 
         psf->datalength = psf->filelength - psf->dataoffset;
 
@@ -374,35 +374,35 @@ static int svx_write_header(SF_PRIVATE *psf, int calc_length)
 
     psf->header.ptr[0] = 0;
     psf->header.indx = 0;
-    psf_fseek(psf, 0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
 
     /* FORM marker and FORM size. */
-    psf_binheader_writef(psf, "Etm8", BHWm(FORM_MARKER),
+    psf->binheader_writef("Etm8", BHWm(FORM_MARKER),
                          BHW8((psf->filelength < 8) ? psf->filelength * 0 : psf->filelength - 8));
 
-    psf_binheader_writef(psf, "m", BHWm((psf->bytewidth == 1) ? SVX8_MARKER : SV16_MARKER));
+    psf->binheader_writef("m", BHWm((psf->bytewidth == 1) ? SVX8_MARKER : SV16_MARKER));
 
     /* VHDR chunk. */
-    psf_binheader_writef(psf, "Em4", BHWm(VHDR_MARKER), BHW4(sizeof(VHDR_CHUNK)));
+    psf->binheader_writef("Em4", BHWm(VHDR_MARKER), BHW4(sizeof(VHDR_CHUNK)));
     /* VHDR : oneShotHiSamples, repeatHiSamples, samplesPerHiCycle */
-    psf_binheader_writef(psf, "E444", BHW4(psf->sf.frames), BHW4(0), BHW4(0));
+    psf->binheader_writef("E444", BHW4(psf->sf.frames), BHW4(0), BHW4(0));
     /* VHDR : samplesPerSec, octave, compression */
-    psf_binheader_writef(psf, "E211", BHW2(psf->sf.samplerate), BHW1(1), BHW1(0));
+    psf->binheader_writef("E211", BHW2(psf->sf.samplerate), BHW1(1), BHW1(0));
     /* VHDR : volume */
-    psf_binheader_writef(psf, "E4", BHW4((psf->bytewidth == 1) ? 0xFF : 0xFFFF));
+    psf->binheader_writef("E4", BHW4((psf->bytewidth == 1) ? 0xFF : 0xFFFF));
 
     if (psf->sf.channels == 2)
-        psf_binheader_writef(psf, "Em44", BHWm(CHAN_MARKER), BHW4(4), BHW4(6));
+        psf->binheader_writef("Em44", BHWm(CHAN_MARKER), BHW4(4), BHW4(6));
 
     /* Filename and annotation strings. */
-    psf_binheader_writef(psf, "Emsms", BHWm(NAME_MARKER), BHWs(psf->file.name.c), BHWm(ANNO_MARKER),
+    psf->binheader_writef("Emsms", BHWm(NAME_MARKER), BHWs(psf->file.name.c), BHWm(ANNO_MARKER),
                          BHWs(annotation));
 
     /* BODY marker and size. */
-    psf_binheader_writef(psf, "Etm8", BHWm(BODY_MARKER),
+    psf->binheader_writef("Etm8", BHWm(BODY_MARKER),
                          BHW8((psf->datalength < 0) ? psf->datalength * 0 : psf->datalength));
 
-    psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
 
     if (psf->error)
         return psf->error;
@@ -410,7 +410,7 @@ static int svx_write_header(SF_PRIVATE *psf, int calc_length)
     psf->dataoffset = psf->header.indx;
 
     if (current > 0)
-        psf_fseek(psf, current, SEEK_SET);
+        psf->fseek(current, SEEK_SET);
 
     return psf->error;
 }

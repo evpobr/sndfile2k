@@ -73,7 +73,7 @@ int ogg_speex_open(SF_PRIVATE *psf)
 
     if (odata == NULL)
     {
-        psf_log_printf(psf, "%s : odata is NULL???\n", __func__);
+        psf->log_printf("%s : odata is NULL???\n", __func__);
         return SFE_INTERNAL;
     };
 
@@ -160,7 +160,7 @@ static int spx_read_header(SF_PRIVATE *psf)
 
     printf("%s %d\n", __func__, __LINE__);
 
-    psf_log_printf(psf, "Speex header\n");
+    psf->log_printf("Speex header\n");
     odata->eos = 0;
 
     /* Reset ogg stuff which has already been used in src/ogg.c. */
@@ -168,7 +168,7 @@ static int spx_read_header(SF_PRIVATE *psf)
     ogg_sync_reset(&odata->osync);
 
     /* Seek to start of stream. */
-    psf_fseek(psf, 0, SEEK_SET);
+    psf->fseek(0, SEEK_SET);
 
     /* Initialize. */
     ogg_sync_init(&odata->osync);
@@ -181,7 +181,7 @@ static int spx_read_header(SF_PRIVATE *psf)
 
     /* Get a pointer to the ogg buffer and read data into it. */
     data = ogg_sync_buffer(&odata->osync, OGG_SPX_READ_SIZE);
-    nb_read = psf_fread(data, 1, OGG_SPX_READ_SIZE, psf);
+    nb_read = psf->fread(data, 1, OGG_SPX_READ_SIZE);
     ogg_sync_wrote(&odata->osync, nb_read);
 
     /* Now we chew on Ogg packets. */
@@ -237,11 +237,11 @@ static int spx_read_header(SF_PRIVATE *psf)
         };
     };
 
-    psf_log_printf(psf, "End\n");
+    psf->log_printf("End\n");
 
-    psf_log_printf(psf, "packet_count %d\n", packet_count);
-    psf_log_printf(psf, "page_nb_packets %d\n", page_nb_packets);
-    psf_log_printf(psf, "page_granule %lld\n", page_granule);
+    psf->log_printf("packet_count %d\n", packet_count);
+    psf->log_printf("page_nb_packets %d\n", page_nb_packets);
+    psf->log_printf("page_granule %lld\n", page_granule);
 
     return 0;
 }
@@ -272,7 +272,7 @@ static void *spx_header_read(SF_PRIVATE *psf, ogg_packet *op, spx_int32_t enh_en
     tmp_header = speex_packet_to_header((char *)op->packet, op->bytes);
     if (tmp_header == NULL)
     {
-        psf_log_printf(psf, "Cannot read Speex header\n");
+        psf->log_printf("Cannot read Speex header\n");
         return NULL;
     };
 
@@ -282,7 +282,7 @@ static void *spx_header_read(SF_PRIVATE *psf, ogg_packet *op, spx_int32_t enh_en
 
     if (spx->header.mode >= SPEEX_NB_MODES || spx->header.mode < 0)
     {
-        psf_log_printf(psf, "Mode number %d does not (yet/any longer) exist in this version\n",
+        psf->log_printf("Mode number %d does not (yet/any longer) exist in this version\n",
                        spx->header.mode);
         return NULL;
     };
@@ -295,7 +295,7 @@ static void *spx_header_read(SF_PRIVATE *psf, ogg_packet *op, spx_int32_t enh_en
 
     if (spx->header.speex_version_id > 1)
     {
-        psf_log_printf(psf,
+        psf->log_printf(
                        "This file was encoded with Speex bit-stream "
                        "version %d, which I don't know how to decode\n",
                        spx->header.speex_version_id);
@@ -304,7 +304,7 @@ static void *spx_header_read(SF_PRIVATE *psf, ogg_packet *op, spx_int32_t enh_en
 
     if (mode->bitstream_version < spx->header.mode_bitstream_version)
     {
-        psf_log_printf(psf, "The file was encoded with a newer version of "
+        psf->log_printf("The file was encoded with a newer version of "
                             "Speex. You need to upgrade in order to play "
                             "it.\n");
         return NULL;
@@ -312,7 +312,7 @@ static void *spx_header_read(SF_PRIVATE *psf, ogg_packet *op, spx_int32_t enh_en
 
     if (mode->bitstream_version > spx->header.mode_bitstream_version)
     {
-        psf_log_printf(psf, "The file was encoded with an older version of "
+        psf->log_printf("The file was encoded with an older version of "
                             "Speex. You would need to downgrade the version in "
                             "order to play it.\n");
         return NULL;
@@ -321,7 +321,7 @@ static void *spx_header_read(SF_PRIVATE *psf, ogg_packet *op, spx_int32_t enh_en
     st = speex_decoder_init(mode);
     if (!st)
     {
-        psf_log_printf(psf, "Decoder initialization failed.\n");
+        psf->log_printf("Decoder initialization failed.\n");
         return NULL;
     };
 
@@ -364,19 +364,19 @@ static void *spx_header_read(SF_PRIVATE *psf, ogg_packet *op, spx_int32_t enh_en
 
     spx->header.speex_version[sizeof(spx->header.speex_version) - 1] = 0;
 
-    psf_log_printf(psf, "  Encoder ver   : %s\n  Frames/packet : %d\n", spx->header.speex_version,
+    psf->log_printf("  Encoder ver   : %s\n  Frames/packet : %d\n", spx->header.speex_version,
                    spx->header.frames_per_packet);
 
     if (spx->header.bitrate > 0)
-        psf_log_printf(psf, "  Bit rate	  : %d\n", spx->header.bitrate);
+        psf->log_printf("  Bit rate	  : %d\n", spx->header.bitrate);
 
-    psf_log_printf(psf,
+    psf->log_printf(
                    "  Sample rate   : %d\n  Mode		  : %s\n  VBR		   : "
                    "%s\n  Channels	  : %d\n",
                    psf->sf.samplerate, mode->modeName, (spx->header.vbr ? "yes" : "no"),
                    psf->sf.channels);
 
-    psf_log_printf(psf, "  Extra headers : %d\n", spx->header.extra_headers);
+    psf->log_printf("  Extra headers : %d\n", spx->header.extra_headers);
 
     return st;
 }
@@ -449,7 +449,7 @@ duration = audio_samples / rate
 
 int ogg_speex_open(SF_PRIVATE *psf)
 {
-    psf_log_printf(psf, "This version of libsndfile was compiled without Ogg/Speex support.\n");
+    psf->log_printf("This version of libsndfile was compiled without Ogg/Speex support.\n");
     return SFE_UNIMPLEMENTED;
 }
 

@@ -62,96 +62,96 @@ SF_VIRTUAL_IO *psf_get_vio()
 	return &vio;
 }
 
-int psf_fopen(SF_PRIVATE *psf)
+int SF_PRIVATE::fopen()
 {
-	psf->error = 0;
-	psf->file.filedes = psf_open_fd(&psf->file);
+	error = 0;
+	file.filedes = psf_open_fd(&file);
 
-	if (psf->file.filedes == -SFE_BAD_OPEN_MODE)
+	if (file.filedes == -SFE_BAD_OPEN_MODE)
 	{
-		psf->error = SFE_BAD_OPEN_MODE;
-		psf->file.filedes = -1;
-		return psf->error;
+		error = SFE_BAD_OPEN_MODE;
+		file.filedes = -1;
+		return error;
 	};
 
-	if (psf->file.filedes == -1)
+	if (file.filedes == -1)
 	{
-		psf_log_syserr(psf, errno);
+		psf_log_syserr(this, errno);
 	}
 	else
 	{
-		psf->file.virtual_io = SF_TRUE;
-		psf->file.vio = *psf_get_vio();
-		psf->file.vio_user_data = psf;
-		psf->file.use_new_vio = SF_TRUE;
-		psf->file.vio.ref(psf);
+		file.virtual_io = SF_TRUE;
+		file.vio = *psf_get_vio();
+		file.vio_user_data = this;
+		file.use_new_vio = SF_TRUE;
+		file.vio.ref(this);
 	}
 
-	return psf->error;
+	return error;
 }
 
-int psf_fclose(SF_PRIVATE *psf)
+int SF_PRIVATE::fclose()
 {
 	int retval = 0;
 
-	if (psf->file.virtual_io)
+	if (file.virtual_io)
 	{
-		if (psf->file.use_new_vio && psf->file.vio.ref && psf->file.vio.unref)
+		if (file.use_new_vio && file.vio.ref && file.vio.unref)
 		{
-			psf->file.vio.unref(psf);
-			retval = psf->error;
+			file.vio.unref(this);
+			retval = error;
 		}
 	}
 	else
 	{
-		if (psf->file.do_not_close_descriptor)
+		if (file.do_not_close_descriptor)
 		{
-			psf->file.filedes = -1;
+			file.filedes = -1;
 			return 0;
 		};
 
-		if ((retval = psf_close_fd(psf->file.filedes)) == -1)
-			psf_log_syserr(psf, errno);
+		if ((retval = psf_close_fd(file.filedes)) == -1)
+			psf_log_syserr(this, errno);
 
-		psf->file.filedes = -1;
+		file.filedes = -1;
 	}
 
 	return retval;
 }
 
-int psf_open_rsrc(SF_PRIVATE *psf)
+int SF_PRIVATE::open_rsrc()
 {
-	if (psf->rsrc.filedes > 0)
+	if (rsrc.filedes > 0)
 		return 0;
 
 	/* Test for MacOSX style resource fork on HPFS or HPFS+ filesystems. */
-	snprintf(psf->rsrc.path.c, sizeof(psf->rsrc.path.c), "%s/..namedfork/rsrc", psf->file.path.c);
-	psf->error = SFE_NO_ERROR;
-	if ((psf->rsrc.filedes = psf_open_fd(&psf->rsrc)) >= 0)
+	snprintf(rsrc.path.c, sizeof(rsrc.path.c), "%s/..namedfork/rsrc", file.path.c);
+	error = SFE_NO_ERROR;
+	if ((rsrc.filedes = psf_open_fd(&rsrc)) >= 0)
 	{
-		psf->rsrclength = psf_get_filelen_fd(psf->rsrc.filedes);
-		if (psf->rsrclength > 0 || (psf->rsrc.mode & SFM_WRITE))
+		rsrclength = psf_get_filelen_fd(rsrc.filedes);
+		if (rsrclength > 0 || (rsrc.mode & SFM_WRITE))
 			return SFE_NO_ERROR;
-		psf_close_fd(psf->rsrc.filedes);
-		psf->rsrc.filedes = -1;
+		psf_close_fd(rsrc.filedes);
+		rsrc.filedes = -1;
 	};
 
-	if (psf->rsrc.filedes == -SFE_BAD_OPEN_MODE)
+	if (rsrc.filedes == -SFE_BAD_OPEN_MODE)
 	{
-		psf->error = SFE_BAD_OPEN_MODE;
-		return psf->error;
+		error = SFE_BAD_OPEN_MODE;
+		return error;
 	};
 
 	/*
 	** Now try for a resource fork stored as a separate file in the same
 	** directory, but preceded with a dot underscore.
 	*/
-	snprintf(psf->rsrc.path.c, sizeof(psf->rsrc.path.c), "%s._%s", psf->file.dir.c,
-			 psf->file.name.c);
-	psf->error = SFE_NO_ERROR;
-	if ((psf->rsrc.filedes = psf_open_fd(&psf->rsrc)) >= 0)
+	snprintf(rsrc.path.c, sizeof(rsrc.path.c), "%s._%s", file.dir.c,
+			 file.name.c);
+	error = SFE_NO_ERROR;
+	if ((rsrc.filedes = psf_open_fd(&rsrc)) >= 0)
 	{
-		psf->rsrclength = psf_get_filelen_fd(psf->rsrc.filedes);
+		rsrclength = psf_get_filelen_fd(rsrc.filedes);
 		return SFE_NO_ERROR;
 	};
 
@@ -159,61 +159,60 @@ int psf_open_rsrc(SF_PRIVATE *psf)
 	** Now try for a resource fork stored in a separate file in the
 	** .AppleDouble/ directory.
 	*/
-	snprintf(psf->rsrc.path.c, sizeof(psf->rsrc.path.c), "%s.AppleDouble/%s", psf->file.dir.c,
-			 psf->file.name.c);
-	psf->error = SFE_NO_ERROR;
-	if ((psf->rsrc.filedes = psf_open_fd(&psf->rsrc)) >= 0)
+	snprintf(rsrc.path.c, sizeof(rsrc.path.c), "%s.AppleDouble/%s", file.dir.c, file.name.c);
+	error = SFE_NO_ERROR;
+	if ((rsrc.filedes = psf_open_fd(&rsrc)) >= 0)
 	{
-		psf->rsrclength = psf_get_filelen_fd(psf->rsrc.filedes);
+		rsrclength = psf_get_filelen_fd(rsrc.filedes);
 		return SFE_NO_ERROR;
 	};
 
 	/* No resource file found. */
-	if (psf->rsrc.filedes == -1)
-		psf_log_syserr(psf, errno);
+	if (rsrc.filedes == -1)
+		psf_log_syserr(this, errno);
 
-	psf->rsrc.filedes = -1;
+	rsrc.filedes = -1;
 
-	return psf->error;
+	return error;
 }
 
-sf_count_t psf_get_filelen(SF_PRIVATE *psf)
+sf_count_t SF_PRIVATE::get_filelen()
 {
 	sf_count_t filelen;
 
-	if (psf->file.virtual_io)
+	if (file.virtual_io)
 	{
-		if (psf->file.use_new_vio)
+		if (file.use_new_vio)
 		{
-			filelen = psf->file.vio.get_filelen(psf->file.vio_user_data);
+			filelen = file.vio.get_filelen(file.vio_user_data);
 		}
 		else
 		{
-			return psf->file.vio.get_filelen(psf->file.vio_user_data);
+			return file.vio.get_filelen(file.vio_user_data);
 		}
 	}
 
 	if (filelen == -1)
 	{
-		psf_log_syserr(psf, errno);
+		psf_log_syserr(this, errno);
 		return (sf_count_t)-1;
 	};
 
 	if (filelen == -SFE_BAD_STAT_SIZE)
 	{
-		psf->error = SFE_BAD_STAT_SIZE;
+		error = SFE_BAD_STAT_SIZE;
 		return (sf_count_t)-1;
 	};
 
-	switch (psf->file.mode)
+	switch (file.mode)
 	{
 	case SFM_WRITE:
-		filelen = filelen - psf->fileoffset;
+		filelen = filelen - fileoffset;
 		break;
 
 	case SFM_READ:
-		if (psf->fileoffset > 0 && psf->filelength > 0)
-			filelen = psf->filelength;
+		if (fileoffset > 0 && filelength > 0)
+			filelen = filelength;
 		break;
 
 	case SFM_RDWR:
@@ -232,70 +231,70 @@ sf_count_t psf_get_filelen(SF_PRIVATE *psf)
 	return filelen;
 }
 
-int psf_close_rsrc(SF_PRIVATE *psf)
+int SF_PRIVATE::close_rsrc()
 {
-	psf_close_fd(psf->rsrc.filedes);
-	psf->rsrc.filedes = -1;
+	psf_close_fd(rsrc.filedes);
+	rsrc.filedes = -1;
 	return 0;
 }
 
-int psf_set_stdio(SF_PRIVATE *psf)
+int SF_PRIVATE::set_stdio()
 {
 	int error = 0;
 
-	switch (psf->file.mode)
+	switch (file.mode)
 	{
 	case SFM_RDWR:
 		error = SFE_OPEN_PIPE_RDWR;
 		break;
 
 	case SFM_READ:
-		psf->file.filedes = 0;
+		file.filedes = 0;
 		break;
 
 	case SFM_WRITE:
-		psf->file.filedes = 1;
+		file.filedes = 1;
 		break;
 
 	default:
 		error = SFE_BAD_OPEN_MODE;
 		break;
 	};
-	psf->filelength = 0;
+	filelength = 0;
 
 	return error;
 }
 
-void psf_set_file(SF_PRIVATE *psf, int fd)
+void SF_PRIVATE::set_file(int fd)
 {
-	psf->file.filedes = fd;
+	file.filedes = fd;
 }
 
-int psf_file_valid(SF_PRIVATE *psf)
+int SF_PRIVATE::file_valid()
 {
-	return (psf->file.filedes >= 0) ? SF_TRUE : SF_FALSE;
+	return (file.filedes >= 0) ? SF_TRUE : SF_FALSE;
 }
 
-sf_count_t psf_fseek(SF_PRIVATE *psf, sf_count_t offset, int whence)
+sf_count_t SF_PRIVATE::fseek(sf_count_t offset, int whence)
 {
 	sf_count_t absolute_position;
 
-	if (psf->file.virtual_io && !psf->file.use_new_vio)
-		return psf->file.vio.seek(offset, whence, psf->file.vio_user_data);
+	if (file.virtual_io && !file.use_new_vio)
+		return file.vio.seek(offset, whence, file.vio_user_data);
 
 	/* When decoding from pipes sometimes see seeks to the pipeoffset, which
 	appears to mean do nothing. */
-	if (psf->file.is_pipe)
+	if (file.is_pipe)
 	{
-		if (whence != SEEK_SET || offset != psf->file.pipeoffset)
-			psf_log_printf(psf, "psf_fseek : pipe seek to value other than pipeoffset\n");
+		if (whence != SEEK_SET || offset != file.pipeoffset)
+			log_printf("psf_fseek : pipe seek to value other than pipeoffset\n");
 		return offset;
 	}
 
 	switch (whence)
 	{
 	case SEEK_SET:
-		offset += psf->fileoffset;
+		offset += fileoffset;
 		break;
 
 	case SEEK_END:
@@ -306,25 +305,25 @@ sf_count_t psf_fseek(SF_PRIVATE *psf, sf_count_t offset, int whence)
 
 	default:
 		/* We really should not be here. */
-		psf_log_printf(psf, "psf_fseek : whence is %d *****.\n", whence);
+		log_printf("psf_fseek : whence is %d *****.\n", whence);
 		return 0;
 	};
 
-	absolute_position = psf->file.vio.seek(offset, whence, psf->file.vio_user_data);
+	absolute_position = file.vio.seek(offset, whence, file.vio_user_data);
 
 	if (absolute_position < 0)
-		psf_log_syserr(psf, errno);
+		psf_log_syserr(this, errno);
 
-	return absolute_position - psf->fileoffset;
+	return absolute_position - fileoffset;
 }
 
-size_t psf_fread(void *ptr, size_t bytes, size_t items, SF_PRIVATE *psf)
+size_t SF_PRIVATE::fread(void *ptr, size_t bytes, size_t items)
 {
 	sf_count_t total = 0;
 	ssize_t count;
 
-	if (psf->file.virtual_io && !psf->file.use_new_vio)
-		return psf->file.vio.read(ptr, bytes * items, psf->file.vio_user_data) / bytes;
+	if (file.virtual_io && !file.use_new_vio)
+		return file.vio.read(ptr, bytes * items, file.vio_user_data) / bytes;
 
 	items *= bytes;
 
@@ -337,14 +336,14 @@ size_t psf_fread(void *ptr, size_t bytes, size_t items, SF_PRIVATE *psf)
 		/* Break the read down to a sensible size. */
 		count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : (ssize_t)items;
 
-		count = psf->file.vio.read(((char *)ptr) + total, (size_t)count, psf->file.vio_user_data);
+		count = file.vio.read(((char *)ptr) + total, (size_t)count, file.vio_user_data);
 
 		if (count == -1)
 		{
 			if (errno == EINTR)
 				continue;
 
-			psf_log_syserr(psf, errno);
+			psf_log_syserr(this, errno);
 			break;
 		};
 
@@ -355,13 +354,13 @@ size_t psf_fread(void *ptr, size_t bytes, size_t items, SF_PRIVATE *psf)
 		items -= count;
 	};
 
-	if (psf->file.is_pipe)
-		psf->file.pipeoffset += total;
+	if (file.is_pipe)
+		file.pipeoffset += total;
 
 	return total / bytes;
 }
 
-size_t psf_fwrite(const void *ptr, size_t bytes, size_t items, SF_PRIVATE *psf)
+size_t SF_PRIVATE::fwrite(const void *ptr, size_t bytes, size_t items)
 {
 	sf_count_t total = 0;
 	ssize_t count;
@@ -369,8 +368,8 @@ size_t psf_fwrite(const void *ptr, size_t bytes, size_t items, SF_PRIVATE *psf)
 	if (bytes == 0 || items == 0)
 		return 0;
 
-	if (psf->file.virtual_io && !psf->file.use_new_vio)
-		return psf->file.vio.write(ptr, bytes * items, psf->file.vio_user_data) / bytes;
+	if (file.virtual_io && !file.use_new_vio)
+		return file.vio.write(ptr, bytes * items, file.vio_user_data) / bytes;
 
 	items *= bytes;
 
@@ -383,14 +382,14 @@ size_t psf_fwrite(const void *ptr, size_t bytes, size_t items, SF_PRIVATE *psf)
 		/* Break the writes down to a sensible size. */
 		count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : items;
 
-		count = psf->file.vio.write(((const char *)ptr) + total, count, psf->file.vio_user_data);
+		count = file.vio.write(((const char *)ptr) + total, count, file.vio_user_data);
 
 		if (count == -1)
 		{
 			if (errno == EINTR)
 				continue;
 
-			psf_log_syserr(psf, errno);
+			psf_log_syserr(this, errno);
 			break;
 		};
 
@@ -401,31 +400,31 @@ size_t psf_fwrite(const void *ptr, size_t bytes, size_t items, SF_PRIVATE *psf)
 		items -= count;
 	};
 
-	if (psf->file.is_pipe)
-		psf->file.pipeoffset += total;
+	if (file.is_pipe)
+		file.pipeoffset += total;
 
 	return total / bytes;
 }
 
-sf_count_t psf_ftell(SF_PRIVATE *psf)
+sf_count_t SF_PRIVATE::ftell()
 {
 	sf_count_t pos;
 
-	if (psf->file.virtual_io && !psf->file.use_new_vio)
-		return psf->file.vio.tell(psf->file.vio_user_data);
+	if (file.virtual_io && !file.use_new_vio)
+		return file.vio.tell(file.vio_user_data);
 
-	if (psf->file.is_pipe)
-		return psf->file.pipeoffset;
+	if (file.is_pipe)
+		return file.pipeoffset;
 
-	pos = psf->file.vio.tell(psf->file.vio_user_data);
+	pos = file.vio.tell(file.vio_user_data);
 
 	if (pos == ((sf_count_t)-1))
 	{
-		psf_log_syserr(psf, errno);
+		psf_log_syserr(this, errno);
 		return -1;
 	};
 
-	return pos - psf->fileoffset;
+	return pos - fileoffset;
 }
 
 SF_BOOL vfis_pipe(void * user_data)
@@ -499,21 +498,21 @@ static int psf_close_fd(int fd)
 	return retval;
 }
 
-sf_count_t psf_fgets(char *buffer, size_t bufsize, SF_PRIVATE *psf)
+sf_count_t SF_PRIVATE::fgets(char *buffer, size_t bufsize)
 {
 	sf_count_t k = 0;
 	sf_count_t count;
 
 	while (k < bufsize - 1)
 	{
-		count = read(psf->file.filedes, &(buffer[k]), 1);
+		count = read(file.filedes, &(buffer[k]), 1);
 
 		if (count == -1)
 		{
 			if (errno == EINTR)
 				continue;
 
-			psf_log_syserr(psf, errno);
+			psf_log_syserr(this, errno);
 			break;
 		};
 
@@ -526,16 +525,16 @@ sf_count_t psf_fgets(char *buffer, size_t bufsize, SF_PRIVATE *psf)
 	return k;
 }
 
-SF_BOOL psf_is_pipe(SF_PRIVATE *psf)
+SF_BOOL SF_PRIVATE::is_pipe()
 {
 	struct stat statbuf;
 
-	if (psf->file.virtual_io && !psf->file.use_new_vio)
+	if (file.virtual_io && !file.use_new_vio)
 		return SF_FALSE;
 
-	if (fstat(psf->file.filedes, &statbuf) == -1)
+	if (fstat(file.filedes, &statbuf) == -1)
 	{
-		psf_log_syserr(psf, errno);
+		psf_log_syserr(this, errno);
 		/* Default to maximum safety. */
 		return SF_TRUE;
 	};
@@ -565,10 +564,10 @@ static sf_count_t psf_get_filelen_fd(int fd)
 #endif
 }
 
-int psf_ftruncate(SF_PRIVATE *psf, sf_count_t len)
+int SF_PRIVATE::ftruncate(sf_count_t len)
 {
-	if (psf->file.virtual_io && psf->file.use_new_vio && psf->file.vio.set_filelen)
-		return psf->file.vio.set_filelen(psf, len);
+	if (file.virtual_io && file.use_new_vio && file.vio.set_filelen)
+		return file.vio.set_filelen(this, len);
 
 	int retval;
 
@@ -580,37 +579,37 @@ int psf_ftruncate(SF_PRIVATE *psf, sf_count_t len)
 		return -1;
 
 #ifdef _WIN32
-	retval = _chsize_s(psf->file.filedes, len);
+	retval = _chsize_s(file.filedes, len);
 #else
-	retval = ftruncate(psf->file.filedes, len);
+	retval = ::ftruncate(file.filedes, len);
 #endif
 
 	if (retval != 0)
-		psf_log_syserr(psf, errno);
+		psf_log_syserr(this, errno);
 
 	return retval;
 }
 
-void psf_init_files(SF_PRIVATE *psf)
+void SF_PRIVATE::init_files()
 {
-	psf->file.filedes = -1;
-	psf->rsrc.filedes = -1;
-	psf->file.savedes = -1;
+	file.filedes = -1;
+	rsrc.filedes = -1;
+	file.savedes = -1;
 }
 
-void psf_use_rsrc(SF_PRIVATE *psf, int on_off)
+void SF_PRIVATE::use_rsrc(int on_off)
 {
 	if (on_off)
 	{
-		if (psf->file.filedes != psf->rsrc.filedes)
+		if (file.filedes != rsrc.filedes)
 		{
-			psf->file.savedes = psf->file.filedes;
-			psf->file.filedes = psf->rsrc.filedes;
+			file.savedes = file.filedes;
+			file.filedes = rsrc.filedes;
 		};
 	}
-	else if (psf->file.filedes == psf->rsrc.filedes)
+	else if (file.filedes == rsrc.filedes)
 	{
-		psf->file.filedes = psf->file.savedes;
+		file.filedes = file.savedes;
 	}
 
 	return;
@@ -692,13 +691,13 @@ static void psf_log_syserr(SF_PRIVATE *psf, int error)
 	return;
 }
 
-void psf_fsync(SF_PRIVATE *psf)
+void SF_PRIVATE::fsync()
 {
-	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+	if (file.mode == SFM_WRITE || file.mode == SFM_RDWR)
 #ifdef HAVE_FSYNC
-		fsync(psf->file.filedes);
+		::fsync(file.filedes);
 #elif _WIN32
-		_commit(psf->file.filedes);
+		_commit(file.filedes);
 #else
 	psf = NULL;
 #endif
@@ -747,7 +746,7 @@ static void vfflush(void *user_data)
 	SF_PRIVATE *psf = (SF_PRIVATE *)user_data;
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 #ifdef HAVE_FSYNC
-		fsync(psf->file.filedes);
+		::fsync(psf->file.filedes);
 #elif _WIN32
 		_commit(psf->file.filedes);
 #endif
@@ -769,7 +768,7 @@ int vfset_filelen(void * user_data, sf_count_t len)
 #ifdef _WIN32
 	retval = _chsize_s(psf->file.filedes, len);
 #else
-	retval = ftruncate(psf->file.filedes, len);
+	retval = ::ftruncate(psf->file.filedes, len);
 #endif
 
 	if (retval != 0)

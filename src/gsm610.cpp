@@ -86,7 +86,7 @@ int gsm610_init(SF_PRIVATE *psf)
 
     if (psf->codec_data != NULL)
     {
-        psf_log_printf(psf, "*** psf->codec_data is not NULL.\n");
+        psf->log_printf("*** psf->codec_data is not NULL.\n");
         return SFE_INTERNAL;
     };
 
@@ -157,13 +157,13 @@ int gsm610_init(SF_PRIVATE *psf)
         }
         else
         {
-            psf_log_printf(psf, "*** Warning : data chunk seems to be truncated.\n");
+            psf->log_printf("*** Warning : data chunk seems to be truncated.\n");
             pgsm610->blocks = psf->datalength / pgsm610->blocksize + 1;
         };
 
         psf->sf.frames = pgsm610->samplesperblock * pgsm610->blocks;
 
-        psf_fseek(psf, psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->dataoffset, SEEK_SET);
 
         pgsm610->decode_block(psf, pgsm610); /* Read first block. */
 
@@ -188,7 +188,7 @@ int gsm610_init(SF_PRIVATE *psf)
 
     psf->seek = gsm610_seek;
 
-    psf->filelength = psf_get_filelen(psf);
+    psf->filelength = psf->get_filelen();
     psf->datalength = psf->filelength - psf->dataoffset;
 
     return 0;
@@ -207,20 +207,20 @@ static int gsm610_wav_decode_block(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
         return 1;
     };
 
-    if ((k = psf_fread(pgsm610->block, 1, WAVLIKE_GSM610_BLOCKSIZE, psf)) !=
+    if ((k = psf->fread(pgsm610->block, 1, WAVLIKE_GSM610_BLOCKSIZE)) !=
         WAVLIKE_GSM610_BLOCKSIZE)
-        psf_log_printf(psf, "*** Warning : short read (%d != %d).\n", k, WAVLIKE_GSM610_BLOCKSIZE);
+        psf->log_printf("*** Warning : short read (%d != %d).\n", k, WAVLIKE_GSM610_BLOCKSIZE);
 
     if (gsm_decode(pgsm610->gsm_data, pgsm610->block, pgsm610->samples) < 0)
     {
-        psf_log_printf(psf, "Error from WAV gsm_decode() on frame : %d\n", pgsm610->blockcount);
+        psf->log_printf("Error from WAV gsm_decode() on frame : %d\n", pgsm610->blockcount);
         return 0;
     };
 
     if (gsm_decode(pgsm610->gsm_data, pgsm610->block + (WAVLIKE_GSM610_BLOCKSIZE + 1) / 2,
                    pgsm610->samples + WAVLIKE_GSM610_SAMPLES / 2) < 0)
     {
-        psf_log_printf(psf, "Error from WAV gsm_decode() on frame : %d.5\n", pgsm610->blockcount);
+        psf->log_printf("Error from WAV gsm_decode() on frame : %d.5\n", pgsm610->blockcount);
         return 0;
     };
 
@@ -240,12 +240,12 @@ static int gsm610_decode_block(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
         return 1;
     };
 
-    if ((k = psf_fread(pgsm610->block, 1, GSM610_BLOCKSIZE, psf)) != GSM610_BLOCKSIZE)
-        psf_log_printf(psf, "*** Warning : short read (%d != %d).\n", k, GSM610_BLOCKSIZE);
+    if ((k = psf->fread(pgsm610->block, 1, GSM610_BLOCKSIZE)) != GSM610_BLOCKSIZE)
+        psf->log_printf("*** Warning : short read (%d != %d).\n", k, GSM610_BLOCKSIZE);
 
     if (gsm_decode(pgsm610->gsm_data, pgsm610->block, pgsm610->samples) < 0)
     {
-        psf_log_printf(psf, "Error from standard gsm_decode() on frame : %d\n",
+        psf->log_printf("Error from standard gsm_decode() on frame : %d\n",
                        pgsm610->blockcount);
         return 0;
     };
@@ -413,7 +413,7 @@ static sf_count_t gsm610_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offs
     {
         int true_flag = 1;
 
-        psf_fseek(psf, psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->dataoffset, SEEK_SET);
         pgsm610->blockcount = 0;
 
         gsm_init(pgsm610->gsm_data);
@@ -439,7 +439,7 @@ static sf_count_t gsm610_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offs
     {
         if (psf->read_current != newblock * pgsm610->samplesperblock + newsample)
         {
-            psf_fseek(psf, psf->dataoffset + newblock * pgsm610->samplesperblock, SEEK_SET);
+            psf->fseek(psf->dataoffset + newblock * pgsm610->samplesperblock, SEEK_SET);
             pgsm610->blockcount = newblock;
             pgsm610->decode_block(psf, pgsm610);
             pgsm610->samplecount = newsample;
@@ -461,8 +461,8 @@ static int gsm610_encode_block(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
     gsm_encode(pgsm610->gsm_data, pgsm610->samples, pgsm610->block);
 
     /* Write the block to disk. */
-    if ((k = psf_fwrite(pgsm610->block, 1, GSM610_BLOCKSIZE, psf)) != GSM610_BLOCKSIZE)
-        psf_log_printf(psf, "*** Warning : short write (%d != %d).\n", k, GSM610_BLOCKSIZE);
+    if ((k = psf->fwrite(pgsm610->block, 1, GSM610_BLOCKSIZE)) != GSM610_BLOCKSIZE)
+        psf->log_printf("*** Warning : short write (%d != %d).\n", k, GSM610_BLOCKSIZE);
 
     pgsm610->samplecount = 0;
     pgsm610->blockcount++;
@@ -483,9 +483,9 @@ static int gsm610_wav_encode_block(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
                pgsm610->block + WAVLIKE_GSM610_BLOCKSIZE / 2);
 
     /* Write the block to disk. */
-    if ((k = psf_fwrite(pgsm610->block, 1, WAVLIKE_GSM610_BLOCKSIZE, psf)) !=
+    if ((k = psf->fwrite(pgsm610->block, 1, WAVLIKE_GSM610_BLOCKSIZE)) !=
         WAVLIKE_GSM610_BLOCKSIZE)
-        psf_log_printf(psf, "*** Warning : short write (%d != %d).\n", k, WAVLIKE_GSM610_BLOCKSIZE);
+        psf->log_printf("*** Warning : short write (%d != %d).\n", k, WAVLIKE_GSM610_BLOCKSIZE);
 
     pgsm610->samplecount = 0;
     pgsm610->blockcount++;

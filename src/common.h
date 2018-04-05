@@ -511,6 +511,64 @@ struct SF_PRIVATE
                           SF_CHUNK_INFO *chunk_info);
     int (*get_chunk_data)(struct SF_PRIVATE *, const SF_CHUNK_ITERATOR *iterator,
                           SF_CHUNK_INFO *chunk_info);
+
+    /* Functions for writing to the internal logging buffer. */
+
+    void log_putchar(char ch);
+    void log_printf(const char *format, ...);
+    void log_SF_INFO();
+
+    /* Functions used when writing file headers. */
+
+    int binheader_writef(const char *format, ...);
+    void asciiheader_printf(const char *format, ...);
+
+    /* Functions used when reading file headers. */
+
+    int bump_header_allocation(sf_count_t needed);
+    void binheader_seekf(sf_count_t position, SF_SEEK_MODE whence);
+    int binheader_readf(char const *format, ...);
+
+    size_t header_read(void *ptr, size_t bytes);
+    int header_gets(char *ptr, int bufsize);
+    void header_put_byte(char x);
+    void header_put_marker(int x);
+    void header_put_be_short(int x);
+    void header_put_le_short(int x);
+    void header_put_be_3byte(int x);
+    void header_put_le_3byte(int x);
+    void header_put_be_int(int x);
+    void header_put_le_int(int x);
+    void header_put_be_8byte(sf_count_t x);
+    void header_put_le_8byte(sf_count_t x);
+
+    int fopen();
+    int set_stdio();
+    int file_valid();
+    void set_file(int fd);
+    void init_files();
+    void use_rsrc(int on_off);
+
+    SNDFILE *open_file(SF_INFO *sfinfo);
+
+    /* Open and close the resource fork of a file. */
+    int open_rsrc();
+    int close_rsrc();
+    int close();
+
+    sf_count_t fseek(sf_count_t offset, int whence);
+    size_t fread(void *ptr, size_t bytes, size_t count);
+    size_t fwrite(const void *ptr, size_t bytes, size_t count);
+    sf_count_t fgets(char *buffer, size_t bufsize);
+    sf_count_t ftell();
+    sf_count_t get_filelen();
+
+    void fsync();
+
+    SF_BOOL is_pipe();
+
+    int ftruncate(sf_count_t len);
+    int fclose();
 };
 
 enum
@@ -725,10 +783,6 @@ enum
     SFE_MAX_ERROR /* This must be last in list. */
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Allocate and initialize the SF_PRIVATE struct. */
 SF_PRIVATE *psf_allocate(void);
 
@@ -749,27 +803,12 @@ double double64_le_read(const unsigned char *cptr);
 void double64_be_write(double in, unsigned char *out);
 void double64_le_write(double in, unsigned char *out);
 
-/* Functions for writing to the internal logging buffer. */
-
-void psf_log_printf(SF_PRIVATE *psf, const char *format, ...);
-void psf_log_SF_INFO(SF_PRIVATE *psf);
-
 int32_t psf_rand_int32(void);
 
 void append_snprintf(char *dest, size_t maxlen, const char *fmt, ...);
 void psf_strlcpy_crlf(char *dest, const char *src, size_t destmax, size_t srcmax);
 
 sf_count_t psf_decode_frame_count(SF_PRIVATE *psf);
-
-/* Functions used when writing file headers. */
-
-int psf_binheader_writef(SF_PRIVATE *psf, const char *format, ...);
-void psf_asciiheader_printf(SF_PRIVATE *psf, const char *format, ...);
-
-/* Functions used when reading file headers. */
-
-void psf_binheader_seekf(SF_PRIVATE *psf, sf_count_t position, SF_SEEK_MODE whence);
-int psf_binheader_readf(SF_PRIVATE *psf, char const *format, ...);
 
 /* Functions used in the write function for updating the peak chunk. */
 
@@ -820,33 +859,6 @@ int macos_guess_file_type(SF_PRIVATE *psf, const char *filename);
 static void psf_log_syserr(SF_PRIVATE *psf, int error);
 
 SF_VIRTUAL_IO *psf_get_vio();
-
-int psf_fopen(SF_PRIVATE *psf);
-int psf_set_stdio(SF_PRIVATE *psf);
-int psf_file_valid(SF_PRIVATE *psf);
-void psf_set_file(SF_PRIVATE *psf, int fd);
-void psf_init_files(SF_PRIVATE *psf);
-void psf_use_rsrc(SF_PRIVATE *psf, int on_off);
-
-SNDFILE *psf_open_file(SF_PRIVATE *psf, SF_INFO *sfinfo);
-
-sf_count_t psf_fseek(SF_PRIVATE *psf, sf_count_t offset, int whence);
-size_t psf_fread(void *ptr, size_t bytes, size_t count, SF_PRIVATE *psf);
-size_t psf_fwrite(const void *ptr, size_t bytes, size_t count, SF_PRIVATE *psf);
-sf_count_t psf_fgets(char *buffer, size_t bufsize, SF_PRIVATE *psf);
-sf_count_t psf_ftell(SF_PRIVATE *psf);
-sf_count_t psf_get_filelen(SF_PRIVATE *psf);
-
-void psf_fsync(SF_PRIVATE *psf);
-
-SF_BOOL psf_is_pipe(SF_PRIVATE *psf);
-
-int psf_ftruncate(SF_PRIVATE *psf, sf_count_t len);
-int psf_fclose(SF_PRIVATE *psf);
-
-/* Open and close the resource fork of a file. */
-int psf_open_rsrc(SF_PRIVATE *psf);
-int psf_close_rsrc(SF_PRIVATE *psf);
 
 /*
 void psf_fclearerr (SF_PRIVATE *psf) ;
@@ -1055,7 +1067,3 @@ void psf_f2i_clip_array(const float *src, int *dest, size_t count, int normalize
 
 void psf_d2i_array(const double *src, int *dest, size_t count, int normalize);
 void psf_d2i_clip_array(const double *src, int *dest, size_t count, int normalize);
-
-#ifdef __cplusplus
-}
-#endif

@@ -99,11 +99,11 @@ static int mpc2k_write_header(SF_PRIVATE *psf, int calc_length)
     if (psf->file.pipeoffset > 0)
         return 0;
 
-    current = psf_ftell(psf);
+    current = psf->ftell();
 
     if (calc_length)
     {
-        psf->filelength = psf_get_filelen(psf);
+        psf->filelength = psf->get_filelen();
 
         psf->dataoffset = HEADER_LENGTH;
         psf->datalength = psf->filelength - psf->dataoffset;
@@ -120,21 +120,21 @@ static int mpc2k_write_header(SF_PRIVATE *psf, int calc_length)
 	** writing to a pipe we shouldn't be here anyway.
 	*/
     if (psf->file.is_pipe == SF_FALSE)
-        psf_fseek(psf, 0, SEEK_SET);
+        psf->fseek(0, SEEK_SET);
 
     snprintf(sample_name, sizeof(sample_name), "%s                    ", psf->file.name.c);
 
-    psf_binheader_writef(psf, "e11b", BHW1(1), BHW1(4), BHWv(sample_name), BHWz(HEADER_NAME_LEN));
-    psf_binheader_writef(psf, "e111", BHW1(100), BHW1(0), BHW1((psf->sf.channels - 1) & 1));
-    psf_binheader_writef(psf, "et4888", BHW4(0), BHW8(psf->sf.frames), BHW8(psf->sf.frames),
+    psf->binheader_writef("e11b", BHW1(1), BHW1(4), BHWv(sample_name), BHWz(HEADER_NAME_LEN));
+    psf->binheader_writef("e111", BHW1(100), BHW1(0), BHW1((psf->sf.channels - 1) & 1));
+    psf->binheader_writef("et4888", BHW4(0), BHW8(psf->sf.frames), BHW8(psf->sf.frames),
                          BHW8(psf->sf.frames));
-    psf_binheader_writef(psf, "e112", BHW1(0), BHW1(1), BHW2((uint16_t)psf->sf.samplerate));
+    psf->binheader_writef("e112", BHW1(0), BHW1(1), BHW2((uint16_t)psf->sf.samplerate));
 
     /* Always 16 bit little endian data. */
     psf->bytewidth = 2;
     psf->endian = SF_ENDIAN_LITTLE;
 
-    psf_fwrite(psf->header.ptr, psf->header.indx, 1, psf);
+    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
 
     if (psf->error)
         return psf->error;
@@ -142,7 +142,7 @@ static int mpc2k_write_header(SF_PRIVATE *psf, int calc_length)
     psf->dataoffset = psf->header.indx;
 
     if (current > 0)
-        psf_fseek(psf, current, SEEK_SET);
+        psf->fseek(current, SEEK_SET);
 
     return psf->error;
 }
@@ -154,39 +154,39 @@ static int mpc2k_read_header(SF_PRIVATE *psf)
     uint32_t sample_start, loop_end, sample_frames, loop_length;
     uint16_t sample_rate;
 
-	psf_binheader_seekf(psf, 0, SF_SEEK_SET);
-    psf_binheader_readf(psf, "ebb", bytes, 2, sample_name, make_size_t(HEADER_NAME_LEN));
+	psf->binheader_seekf(0, SF_SEEK_SET);
+    psf->binheader_readf("ebb", bytes, 2, sample_name, make_size_t(HEADER_NAME_LEN));
 
     if (bytes[0] != 1 || bytes[1] != 4)
         return SFE_MPC_NO_MARKER;
 
     sample_name[HEADER_NAME_LEN] = 0;
 
-    psf_log_printf(psf, "MPC2000\n  Name         : %s\n", sample_name);
+    psf->log_printf("MPC2000\n  Name         : %s\n", sample_name);
 
-    psf_binheader_readf(psf, "eb4444", bytes, 3, &sample_start, &loop_end, &sample_frames,
+    psf->binheader_readf("eb4444", bytes, 3, &sample_start, &loop_end, &sample_frames,
                         &loop_length);
 
     psf->sf.channels = bytes[2] ? 2 : 1;
 
-    psf_log_printf(psf, "  Level        : %d\n  Tune         : %d\n  Stereo       : %s\n", bytes[0],
+    psf->log_printf("  Level        : %d\n  Tune         : %d\n  Stereo       : %s\n", bytes[0],
                    bytes[1], bytes[2] ? "Yes" : "No");
 
-    psf_log_printf(psf,
+    psf->log_printf(
                    "  Sample start : %d\n  Loop end     : %d\n  Frames    "
                    "   : %d\n  Length       : %d\n",
                    sample_start, loop_end, sample_frames, loop_length);
 
-    psf_binheader_readf(psf, "eb2", bytes, 2, &sample_rate);
+    psf->binheader_readf("eb2", bytes, 2, &sample_rate);
 
-    psf_log_printf(psf, "  Loop mode    : %s\n  Beats        : %d\n  Sample rate  : %d\nEnd\n",
+    psf->log_printf("  Loop mode    : %s\n  Beats        : %d\n  Sample rate  : %d\nEnd\n",
                    bytes[0] ? "None" : "Fwd", bytes[1], sample_rate);
 
     psf->sf.samplerate = sample_rate;
 
     psf->sf.format = SF_FORMAT_MPC2K | SF_FORMAT_PCM_16;
 
-    psf->dataoffset = psf_ftell(psf);
+    psf->dataoffset = psf->ftell();
 
     /* Always 16 bit little endian data. */
     psf->bytewidth = 2;
