@@ -96,8 +96,6 @@ typedef enum SF_FORMAT
     SF_FORMAT_AVR = 0x120000,
     //! MS WAVE with WAVEFORMATEX
     SF_FORMAT_WAVEX = 0x130000,
-    //! Sound Designer 2
-    SF_FORMAT_SD2 = 0x160000,
     //! FLAC lossless file format
     SF_FORMAT_FLAC = 0x170000,
     //! Core Audio File format

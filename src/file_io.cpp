@@ -119,63 +119,6 @@ int SF_PRIVATE::fclose()
 	return retval;
 }
 
-int SF_PRIVATE::open_rsrc()
-{
-	if (rsrc.filedes > 0)
-		return 0;
-
-	/* Test for MacOSX style resource fork on HPFS or HPFS+ filesystems. */
-	snprintf(rsrc.path.c, sizeof(rsrc.path.c), "%s/..namedfork/rsrc", file.path.c);
-	error = SFE_NO_ERROR;
-	if ((rsrc.filedes = psf_open_fd(&rsrc)) >= 0)
-	{
-		rsrclength = psf_get_filelen_fd(rsrc.filedes);
-		if (rsrclength > 0 || (rsrc.mode & SFM_WRITE))
-			return SFE_NO_ERROR;
-		psf_close_fd(rsrc.filedes);
-		rsrc.filedes = -1;
-	};
-
-	if (rsrc.filedes == -SFE_BAD_OPEN_MODE)
-	{
-		error = SFE_BAD_OPEN_MODE;
-		return error;
-	};
-
-	/*
-	** Now try for a resource fork stored as a separate file in the same
-	** directory, but preceded with a dot underscore.
-	*/
-	snprintf(rsrc.path.c, sizeof(rsrc.path.c), "%s._%s", file.dir.c,
-			 file.name.c);
-	error = SFE_NO_ERROR;
-	if ((rsrc.filedes = psf_open_fd(&rsrc)) >= 0)
-	{
-		rsrclength = psf_get_filelen_fd(rsrc.filedes);
-		return SFE_NO_ERROR;
-	};
-
-	/*
-	** Now try for a resource fork stored in a separate file in the
-	** .AppleDouble/ directory.
-	*/
-	snprintf(rsrc.path.c, sizeof(rsrc.path.c), "%s.AppleDouble/%s", file.dir.c, file.name.c);
-	error = SFE_NO_ERROR;
-	if ((rsrc.filedes = psf_open_fd(&rsrc)) >= 0)
-	{
-		rsrclength = psf_get_filelen_fd(rsrc.filedes);
-		return SFE_NO_ERROR;
-	};
-
-	/* No resource file found. */
-	if (rsrc.filedes == -1)
-		psf_log_syserr(this, errno);
-
-	rsrc.filedes = -1;
-
-	return error;
-}
-
 sf_count_t SF_PRIVATE::get_filelen()
 {
 	sf_count_t filelen;
@@ -229,13 +172,6 @@ sf_count_t SF_PRIVATE::get_filelen()
 	};
 
 	return filelen;
-}
-
-int SF_PRIVATE::close_rsrc()
-{
-	psf_close_fd(rsrc.filedes);
-	rsrc.filedes = -1;
-	return 0;
 }
 
 int SF_PRIVATE::set_stdio()
@@ -593,26 +529,7 @@ int SF_PRIVATE::ftruncate(sf_count_t len)
 void SF_PRIVATE::init_files()
 {
 	file.filedes = -1;
-	rsrc.filedes = -1;
 	file.savedes = -1;
-}
-
-void SF_PRIVATE::use_rsrc(int on_off)
-{
-	if (on_off)
-	{
-		if (file.filedes != rsrc.filedes)
-		{
-			file.savedes = file.filedes;
-			file.filedes = rsrc.filedes;
-		};
-	}
-	else if (file.filedes == rsrc.filedes)
-	{
-		file.filedes = file.savedes;
-	}
-
-	return;
 }
 
 static int psf_open_fd(PSF_FILE *pfile)

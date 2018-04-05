@@ -365,7 +365,7 @@ struct SF_PRIVATE
         char c[16];
     } _canary;
 
-    PSF_FILE file, rsrc;
+    PSF_FILE file;
 
     char syserr[SF_SYSERR_LEN];
 
@@ -437,8 +437,6 @@ struct SF_PRIVATE
 
     sf_count_t filelength; /* Overall length of (embedded) file. */
     sf_count_t fileoffset; /* Offset in number of bytes from beginning of file. */
-
-    sf_count_t rsrclength; /* Length of the resource fork (if it exists). */
 
     sf_count_t dataoffset; /* Offset in number of bytes from beginning of file. */
     sf_count_t datalength; /* Length in bytes of the audio data. */
@@ -547,13 +545,9 @@ struct SF_PRIVATE
     int file_valid();
     void set_file(int fd);
     void init_files();
-    void use_rsrc(int on_off);
 
     SNDFILE *open_file(SF_INFO *sfinfo);
 
-    /* Open and close the resource fork of a file. */
-    int open_rsrc();
-    int close_rsrc();
     int close();
 
     sf_count_t fseek(sf_count_t offset, int whence);
@@ -746,14 +740,6 @@ enum
     SFE_SDS_NOT_SDS,
     SFE_SDS_BAD_BIT_WIDTH,
 
-    SFE_SD2_FD_DISALLOWED,
-    SFE_SD2_BAD_DATA_OFFSET,
-    SFE_SD2_BAD_MAP_OFFSET,
-    SFE_SD2_BAD_DATA_LENGTH,
-    SFE_SD2_BAD_MAP_LENGTH,
-    SFE_SD2_BAD_RSRC,
-    SFE_SD2_BAD_SAMPLE_SIZE,
-
     SFE_FLAC_BAD_HEADER,
     SFE_FLAC_NEW_DECODER,
     SFE_FLAC_INIT_DECODER,
@@ -880,7 +866,6 @@ int nist_open(SF_PRIVATE *psf);
 int paf_open(SF_PRIVATE *psf);
 int pvf_open(SF_PRIVATE *psf);
 int raw_open(SF_PRIVATE *psf);
-int sd2_open(SF_PRIVATE *psf);
 int sds_open(SF_PRIVATE *psf);
 int svx_open(SF_PRIVATE *psf);
 int voc_open(SF_PRIVATE *psf);

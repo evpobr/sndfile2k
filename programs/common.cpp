@@ -219,7 +219,6 @@ static OUTPUT_FORMAT_MAP format_map[] = {
     {"sds", 0, SF_FORMAT_SDS},
     {"avr", 0, SF_FORMAT_AVR},
     {"wavex", 0, SF_FORMAT_WAVEX},
-    {"sd2", 0, SF_FORMAT_SD2},
     {"flac", 0, SF_FORMAT_FLAC},
     {"caf", 0, SF_FORMAT_CAF},
     {"wve", 0, SF_FORMAT_WVE},
@@ -351,8 +350,6 @@ const char *sfe_container_name(int format)
         return "AVR";
     case SF_FORMAT_WAVEX:
         return "WAVEX";
-    case SF_FORMAT_SD2:
-        return "SD2";
     case SF_FORMAT_FLAC:
         return "FLAC";
     case SF_FORMAT_CAF:

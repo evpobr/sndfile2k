@@ -63,7 +63,6 @@ set(FILESPECIFIC
   g72x.cpp
   htk.cpp
   ircam.cpp
-  macos.cpp
   mat4.cpp
   mat5.cpp
   nist.cpp
@@ -71,7 +70,6 @@ set(FILESPECIFIC
   pvf.cpp
   raw.cpp
   rx2.cpp
-  sd2.cpp
   sds.cpp
   svx.cpp
   txw.cpp

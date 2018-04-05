@@ -590,10 +590,6 @@ add_test(NAME write_read_test_sds COMMAND $<TARGET_FILE:write_read_test> sds)
 add_test(NAME header_test_sds COMMAND $<TARGET_FILE:header_test> sds)
 add_test(NAME misc_test_sds COMMAND $<TARGET_FILE:misc_test> sds)
 
-### sd2-tests
-
-add_test(NAME write_read_test_sd2 COMMAND $<TARGET_FILE:write_read_test> sd2)
-
 ### wve-tests
 
 add_test(NAME lossy_comp_test_wve COMMAND $<TARGET_FILE:lossy_comp_test> wve)

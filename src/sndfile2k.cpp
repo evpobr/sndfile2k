@@ -239,14 +239,6 @@ static ErrorStruct SndfileErrors[] = {
     {SFE_SDS_NOT_SDS, "Error : not an SDS file."},
     {SFE_SDS_BAD_BIT_WIDTH, "Error : bad bit width for SDS file."},
 
-    {SFE_SD2_FD_DISALLOWED, "Error : cannot open SD2 file without a file name."},
-    {SFE_SD2_BAD_DATA_OFFSET, "Error : bad data offset."},
-    {SFE_SD2_BAD_MAP_OFFSET, "Error : bad map offset."},
-    {SFE_SD2_BAD_DATA_LENGTH, "Error : bad data length."},
-    {SFE_SD2_BAD_MAP_LENGTH, "Error : bad map length."},
-    {SFE_SD2_BAD_RSRC, "Error : bad resource fork."},
-    {SFE_SD2_BAD_SAMPLE_SIZE, "Error : bad sample size."},
-
     {SFE_FLAC_BAD_HEADER, "Error : bad flac header."},
     {SFE_FLAC_NEW_DECODER, "Error : problem while creating flac decoder."},
     {SFE_FLAC_INIT_DECODER, "Error : problem with initialization of the flac decoder."},
@@ -292,7 +284,6 @@ static int validate_sfinfo(SF_INFO *sfinfo);
 static int validate_psf(SF_PRIVATE *psf);
 static void save_header_info(SF_PRIVATE *psf);
 static int copy_filename(SF_PRIVATE *psf, const char *path);
-static int try_resource_fork(SF_PRIVATE *psf);
 
 /*------------------------------------------------------------------------------
 ** Private (static) variables.
@@ -378,12 +369,6 @@ SNDFILE *sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo)
 SNDFILE *sf_open_fd(int fd, SF_FILEMODE mode, SF_INFO *sfinfo, int close_desc)
 {
     SF_PRIVATE *psf;
-
-    if ((SF_CONTAINER(sfinfo->format)) == SF_FORMAT_SD2)
-    {
-        sf_errno = SFE_SD2_FD_DISALLOWED;
-        return NULL;
-    };
 
     if ((psf = psf_allocate()) == NULL)
     {
@@ -951,15 +936,6 @@ int sf_format_check(const SF_INFO *info)
             return 0;
         if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16 ||
             subformat == SF_FORMAT_PCM_24)
-            return 1;
-        break;
-
-    case SF_FORMAT_SD2:
-        /* SD2 is strictly big endian. */
-        if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
-            return 0;
-        if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16 ||
-            subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
             return 1;
         break;
 
@@ -2760,24 +2736,6 @@ sf_count_t sf_writef_double(SNDFILE *sndfile, const double *ptr, sf_count_t fram
     return count / sndfile->sf.channels;
 }
 
-static int try_resource_fork(SF_PRIVATE *psf)
-{
-    int old_error = psf->error;
-
-    /* Set READ mode now, to see if resource fork exists. */
-    psf->rsrc.mode = SFM_READ;
-    if (psf->open_rsrc() != 0)
-    {
-        psf->error = old_error;
-        return 0;
-    };
-
-    /* More checking here. */
-    psf->log_printf("Resource fork : %s\n", psf->rsrc.path.c);
-
-    return SF_FORMAT_SD2;
-}
-
 static int format_from_extension(SF_PRIVATE *psf)
 {
     char *cptr;
@@ -2981,10 +2939,6 @@ static int guess_file_type(SF_PRIVATE *psf)
     if (buffer[0] == MAKE_MARKER('a', 'j', 'k', 'g'))
         return 0 /*-SF_FORMAT_SHN-*/;
 
-    /* This must be the last one. */
-    if (psf->filelength > 0 && (format = try_resource_fork(psf)) != 0)
-        return format;
-
     return 0;
 }
 
@@ -3076,7 +3030,6 @@ int SF_PRIVATE::close()
         _error = container_close(this);
 
     _error = fclose();
-    close_rsrc();
 
     /* For an ISO C compliant implementation it is ok to free a NULL pointer. */
     free(header.ptr);
@@ -3363,10 +3316,6 @@ SNDFILE *SF_PRIVATE::open_file(SF_INFO *sfinfo)
 
     case SF_FORMAT_HTK:
         _error = htk_open(this);
-        break;
-
-    case SF_FORMAT_SD2:
-        _error = sd2_open(this);
         break;
 
     case SF_FORMAT_REX2:

@@ -298,8 +298,6 @@ static int major_format_of_hash(const std::string &str)
         return SF_FORMAT_AVR;
     case 0x11d0: /* 'wavx' */
         return SF_FORMAT_WAVEX;
-    case 0x569: /* 'sd2' */
-        return SF_FORMAT_SD2;
     case 0x1014: /* 'flac' */
         return SF_FORMAT_FLAC;
     case 0x504: /* 'caf' */
@@ -400,8 +398,6 @@ static const char *string_of_major_format(int format)
         return "avr";
     case SF_FORMAT_WAVEX:
         return "wavx";
-    case SF_FORMAT_SD2:
-        return "sd2";
     case SF_FORMAT_FLAC:
         return "flac";
     case SF_FORMAT_CAF:

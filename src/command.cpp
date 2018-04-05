@@ -107,7 +107,6 @@ static SF_FORMAT_INFO const major_formats[] = {
     {SF_FORMAT_PVF, "PVF (Portable Voice Format)", "pvf"},
     {SF_FORMAT_RAW, "RAW (header-less)", "raw"},
     {SF_FORMAT_RF64, "RF64 (RIFF 64)", "rf64"},
-    {SF_FORMAT_SD2, "SD2 (Sound Designer II)", "sd2"},
     {SF_FORMAT_SDS, "SDS (Midi Sample Dump Standard)", "sds"},
     {SF_FORMAT_IRCAM, "SF (Berkeley/IRCAM/CARL)", "sf"},
     {SF_FORMAT_VOC, "VOC (Creative Labs)", "voc"},

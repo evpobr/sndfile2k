@@ -1012,35 +1012,6 @@ void compare_double_or_die(const double *expected, const double *actual, unsigne
     return;
 }
 
-void delete_file(int format, const char *filename)
-{
-    char rsrc_name[512], *fname;
-
-    unlink(filename);
-
-    if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_SD2)
-        return;
-
-    /*
-	** Now try for a resource fork stored as a separate file.
-	** Grab the un-adulterated filename again.
-	*/
-    snprintf(rsrc_name, sizeof(rsrc_name), "%s", filename);
-
-    if ((fname = strrchr(rsrc_name, '/')) != NULL)
-        fname++;
-    else if ((fname = strrchr(rsrc_name, '\\')) != NULL)
-        fname++;
-    else
-        fname = rsrc_name;
-
-    memmove(fname + 2, fname, strlen(fname) + 1);
-    fname[0] = '.';
-    fname[1] = '_';
-
-    unlink(rsrc_name);
-}
-
 int truncate_file_to_zero(const char *fname)
 {
     FILE *file;

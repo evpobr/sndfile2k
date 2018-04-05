@@ -1517,7 +1517,6 @@ const char *str_of_major_format(int format)
         CASE_NAME(SF_FORMAT_SDS);
         CASE_NAME(SF_FORMAT_AVR);
         CASE_NAME(SF_FORMAT_WAVEX);
-        CASE_NAME(SF_FORMAT_SD2);
         CASE_NAME(SF_FORMAT_FLAC);
         CASE_NAME(SF_FORMAT_CAF);
         CASE_NAME(SF_FORMAT_WVE);

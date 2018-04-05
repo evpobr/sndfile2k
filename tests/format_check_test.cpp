@@ -110,12 +110,6 @@ static void format_combo_test(void)
             sf_close(sndfile);
             unlink(filename);
 
-            if (major_fmt_info.extension != NULL && strcmp(major_fmt_info.extension, "sd2") == 0)
-            {
-                snprintf(filename, sizeof(filename), "._format-check.%s", major_fmt_info.extension);
-                unlink(filename);
-            };
-
             exit_if_true(sndfile && !(check_is_valid),
                          "\n\nError : Format was not valid but file opened correctly.\n"
                          "    Container : %s\n"

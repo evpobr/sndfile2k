@@ -539,15 +539,6 @@ int main(int argc, char **argv)
         test_count++;
     };
 
-    if (do_all || !strcmp(argv[1], "sd2"))
-    {
-        pcm_test_char("char.sd2", SF_FORMAT_SD2 | SF_FORMAT_PCM_S8, SF_TRUE);
-        pcm_test_short("short.sd2", SF_FORMAT_SD2 | SF_FORMAT_PCM_16, SF_TRUE);
-        pcm_test_24bit("24bit.sd2", SF_FORMAT_SD2 | SF_FORMAT_PCM_24, SF_TRUE);
-        pcm_test_int("32bit.sd2", SF_FORMAT_SD2 | SF_FORMAT_PCM_32, SF_TRUE);
-        test_count++;
-    };
-
     if (do_all || !strcmp(argv[1], "flac"))
     {
 #ifdef HAVE_XIPH_CODECS
@@ -640,9 +631,7 @@ static void pcm_test_char(const char *filename, int format, int long_file_ok)
     short *orig;
     int k, allow_fd;
 
-    /* Sd2 files cannot be opened from an existing file descriptor. */
-    allow_fd =
-        ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2) ? SF_FALSE : SF_TRUE;
+    allow_fd = true;
 
     print_test_name("pcm_test_char", filename);
 
@@ -703,7 +692,7 @@ static void pcm_test_char(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
         new_rdwr_char_test(filename, format, allow_fd);
 
-    delete_file(format, filename);
+    unlink(filename);
 
     puts("ok");
     return;
@@ -1123,8 +1112,7 @@ static void mono_rdwr_char_test(const char *filename, int format,
     sfinfo.format = format;
 
     if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW ||
-        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_AU ||
-        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2)
+        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_AU)
         unlink(filename);
     else
     {
@@ -1326,9 +1314,7 @@ static void pcm_test_short(const char *filename, int format, int long_file_ok)
     short *orig;
     int k, allow_fd;
 
-    /* Sd2 files cannot be opened from an existing file descriptor. */
-    allow_fd =
-        ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2) ? SF_FALSE : SF_TRUE;
+    allow_fd = true;
 
     print_test_name("pcm_test_short", filename);
 
@@ -1389,7 +1375,7 @@ static void pcm_test_short(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
         new_rdwr_short_test(filename, format, allow_fd);
 
-    delete_file(format, filename);
+    unlink(filename);
 
     puts("ok");
     return;
@@ -1809,8 +1795,7 @@ static void mono_rdwr_short_test(const char *filename, int format,
     sfinfo.format = format;
 
     if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW ||
-        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_AU ||
-        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2)
+        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_AU)
         unlink(filename);
     else
     {
@@ -2012,9 +1997,7 @@ static void pcm_test_20bit(const char *filename, int format, int long_file_ok)
     int *orig;
     int k, allow_fd;
 
-    /* Sd2 files cannot be opened from an existing file descriptor. */
-    allow_fd =
-        ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2) ? SF_FALSE : SF_TRUE;
+    allow_fd = false;
 
     print_test_name("pcm_test_20bit", filename);
 
@@ -2075,7 +2058,7 @@ static void pcm_test_20bit(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
         new_rdwr_20bit_test(filename, format, allow_fd);
 
-    delete_file(format, filename);
+    unlink(filename);
 
     puts("ok");
     return;
@@ -2495,8 +2478,7 @@ static void mono_rdwr_20bit_test(const char *filename, int format,
     sfinfo.format = format;
 
     if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW ||
-        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_AU ||
-        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2)
+        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_AU)
         unlink(filename);
     else
     {
@@ -2698,9 +2680,7 @@ static void pcm_test_24bit(const char *filename, int format, int long_file_ok)
     int *orig;
     int k, allow_fd;
 
-    /* Sd2 files cannot be opened from an existing file descriptor. */
-    allow_fd =
-        ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2) ? SF_FALSE : SF_TRUE;
+    allow_fd = true;
 
     print_test_name("pcm_test_24bit", filename);
 
@@ -2761,7 +2741,7 @@ static void pcm_test_24bit(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
         new_rdwr_24bit_test(filename, format, allow_fd);
 
-    delete_file(format, filename);
+    unlink(filename);
 
     puts("ok");
     return;
@@ -3181,8 +3161,7 @@ static void mono_rdwr_24bit_test(const char *filename, int format,
     sfinfo.format = format;
 
     if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW ||
-        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_AU ||
-        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2)
+        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_AU)
         unlink(filename);
     else
     {
@@ -3384,9 +3363,7 @@ static void pcm_test_int(const char *filename, int format, int long_file_ok)
     int *orig;
     int k, allow_fd;
 
-    /* Sd2 files cannot be opened from an existing file descriptor. */
-    allow_fd =
-        ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2) ? SF_FALSE : SF_TRUE;
+    allow_fd = true;
 
     print_test_name("pcm_test_int", filename);
 
@@ -3447,7 +3424,7 @@ static void pcm_test_int(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
         new_rdwr_int_test(filename, format, allow_fd);
 
-    delete_file(format, filename);
+    unlink(filename);
 
     puts("ok");
     return;
@@ -3867,8 +3844,7 @@ static void mono_rdwr_int_test(const char *filename, int format,
     sfinfo.format = format;
 
     if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW ||
-        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_AU ||
-        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2)
+        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_AU)
         unlink(filename);
     else
     {
@@ -4070,9 +4046,7 @@ static void pcm_test_float(const char *filename, int format, int long_file_ok)
     float *orig;
     int k, allow_fd;
 
-    /* Sd2 files cannot be opened from an existing file descriptor. */
-    allow_fd =
-        ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2) ? SF_FALSE : SF_TRUE;
+    allow_fd = true;
 
     print_test_name("pcm_test_float", filename);
 
@@ -4133,7 +4107,7 @@ static void pcm_test_float(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
         new_rdwr_float_test(filename, format, allow_fd);
 
-    delete_file(format, filename);
+    unlink(filename);
 
     puts("ok");
     return;
@@ -4552,8 +4526,7 @@ static void mono_rdwr_float_test(const char *filename, int format,
     sfinfo.format = format;
 
     if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW ||
-        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_AU ||
-        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2)
+        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_AU)
         unlink(filename);
     else
     {
@@ -4756,9 +4729,7 @@ static void pcm_test_double(const char *filename, int format, int long_file_ok)
     double *orig;
     int k, allow_fd;
 
-    /* Sd2 files cannot be opened from an existing file descriptor. */
-    allow_fd =
-        ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2) ? SF_FALSE : SF_TRUE;
+    allow_fd = true;
 
     print_test_name("pcm_test_double", filename);
 
@@ -4819,7 +4790,7 @@ static void pcm_test_double(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
         new_rdwr_double_test(filename, format, allow_fd);
 
-    delete_file(format, filename);
+    unlink(filename);
 
     puts("ok");
     return;
@@ -5238,8 +5209,7 @@ static void mono_rdwr_double_test(const char *filename, int format,
     sfinfo.format = format;
 
     if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW ||
-        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_AU ||
-        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2)
+        (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_AU)
         unlink(filename);
     else
     {
@@ -5431,9 +5401,7 @@ static void empty_file_test(const char *filename, int format)
     SF_INFO info;
     int allow_fd;
 
-    /* Sd2 files cannot be opened from an existing file descriptor. */
-    allow_fd =
-        ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2) ? SF_FALSE : SF_TRUE;
+    allow_fd = true;
 
     print_test_name("empty_file_test", filename);
 
