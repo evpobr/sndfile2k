@@ -359,18 +359,7 @@ static int au_read_header(SF_PRIVATE *psf)
 
     psf->log_printf("  Data Offset : %d\n", au_fmt.dataoffset);
 
-    if (psf->fileoffset > 0 && au_fmt.datasize == -1)
-    {
-        psf->log_printf("  Data Size   : -1\n");
-        return SFE_AU_EMBED_BAD_LEN;
-    };
-
-    if (psf->fileoffset > 0)
-    {
-        psf->filelength = au_fmt.dataoffset + au_fmt.datasize;
-        psf->log_printf("  Data Size   : %d\n", au_fmt.datasize);
-    }
-    else if (au_fmt.datasize == -1 || au_fmt.dataoffset + au_fmt.datasize == psf->filelength)
+    if (au_fmt.datasize == -1 || au_fmt.dataoffset + au_fmt.datasize == psf->filelength)
     {
         psf->log_printf("  Data Size   : %d\n", au_fmt.datasize);
     }

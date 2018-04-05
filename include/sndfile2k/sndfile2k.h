@@ -627,17 +627,6 @@ typedef enum SF_COMMAND
      */
     SFC_GET_DITHER_INFO = 0x10A3,
 
-    /** Gets the file offset and file length of a file enbedded within another
-     * larger file
-     *
-     * @param[in] sndfile a valid ::SNDFILE* pointer
-     * @param[in] data  a pointer to an  ::SF_EMBED_FILE_INFO struct
-     * @param[in] datasize sizeof(SF_EMBED_FILE_INFO)
-     *
-     * @return ::SF_ERR_NO_ERROR on succes, negative error code otherwise.
-     */
-    SFC_GET_EMBED_FILE_INFO = 0x10B0,
-
     /** Turns on/off automatic clipping when doing floating point to integer
      * conversion
      *
@@ -1076,18 +1065,6 @@ typedef struct SF_DITHER_INFO
     const char *name;
 } SF_DITHER_INFO;
 
-/** Contains information about embedded file
- *
- * @sa ::SFC_GET_EMBED_FILE_INFO.
- */
-typedef struct SF_EMBED_FILE_INFO
-{
-    //! Embedded file offset from start of container
-    sf_count_t offset;
-    //! Length of embedded file
-    sf_count_t length;
-} SF_EMBED_FILE_INFO;
-
 /** Contains CUE marker information
  */
 typedef struct SF_CUE_POINT
@@ -1347,7 +1324,6 @@ SNDFILE2K_EXPORT SNDFILE *sf_open(const char *path, SF_FILEMODE mode, SF_INFO *s
  * which is then passed to sndfile2k.
  * - Opening files with file names using OS specific character encodings and then
  * passing the file descriptor to sf_open_fd().
- * - Opening \ref md_docs_embedded_files "sound files embedded within larger files".
  *
  * When sf_close() is called, the file descriptor is only closed if the
  * @c close_desc parameter was ::SF_TRUE when the sf_open_fd()

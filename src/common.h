@@ -430,8 +430,7 @@ struct SF_PRIVATE
     /* Channel map data (if present) : an array of ints. */
     int *channel_map;
 
-    sf_count_t filelength; /* Overall length of (embedded) file. */
-    sf_count_t fileoffset; /* Offset in number of bytes from beginning of file. */
+    sf_count_t filelength; /* Overall length of file. */
 
     sf_count_t dataoffset; /* Offset in number of bytes from beginning of file. */
     sf_count_t datalength; /* Length in bytes of the audio data. */
@@ -586,8 +585,6 @@ enum
     SFE_BAD_MODE_RW,
     SFE_BAD_SF_INFO,
     SFE_BAD_OFFSET,
-    SFE_NO_EMBED_SUPPORT,
-    SFE_NO_EMBEDDED_RDWR,
 
     SFE_INTERNAL,
     SFE_BAD_COMMAND_PARAM,
@@ -661,7 +658,6 @@ enum
 
     SFE_AU_UNKNOWN_FORMAT,
     SFE_AU_NO_DOTSND,
-    SFE_AU_EMBED_BAD_LEN,
 
     SFE_RAW_READ_BAD_SPEC,
     SFE_RAW_BAD_BITWIDTH,

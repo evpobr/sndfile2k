@@ -297,15 +297,6 @@ target_link_libraries(string_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 
-add_executable(multi_file_test multi_file_test.cpp utils.cpp utils.h)
-target_include_directories(multi_file_test
-  PRIVATE
-    ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_BINARY_DIR}/src)
-target_link_libraries(multi_file_test PRIVATE
-  sndfile2k
-  $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
-
 add_executable(aiff_rw_test aiff_rw_test.cpp utils.cpp utils.h)
 target_include_directories(aiff_rw_test
   PRIVATE
@@ -399,7 +390,6 @@ add_test(NAME peak_chunk_test_aiff COMMAND $<TARGET_FILE:peak_chunk_test> aiff)
 add_test(NAME header_test_aiff COMMAND $<TARGET_FILE:header_test> aiff)
 add_test(NAME misc_test_aiff COMMAND $<TARGET_FILE:misc_test> aiff)
 add_test(NAME string_test_aiff COMMAND $<TARGET_FILE:string_test> aiff)
-add_test(NAME multi_file_test_aiff COMMAND $<TARGET_FILE:multi_file_test> aiff)
 add_test(NAME aiff_rw_test COMMAND $<TARGET_FILE:aiff_rw_test>)
 
 ### au-tests
@@ -411,7 +401,6 @@ add_test(NAME lossy_comp_test_au_g721 COMMAND $<TARGET_FILE:lossy_comp_test> au_
 add_test(NAME lossy_comp_test_au_g723 COMMAND $<TARGET_FILE:lossy_comp_test> au_g723)
 add_test(NAME header_test_au COMMAND $<TARGET_FILE:header_test> au)
 add_test(NAME misc_test_au COMMAND $<TARGET_FILE:misc_test> au)
-add_test(NAME multi_file_test_au COMMAND $<TARGET_FILE:multi_file_test> au)
 
 ### caf-tests
 
@@ -440,7 +429,6 @@ add_test(NAME peak_chunk_test_wav COMMAND $<TARGET_FILE:peak_chunk_test> wav)
 add_test(NAME header_test_wav COMMAND $<TARGET_FILE:header_test> wav)
 add_test(NAME misc_test_wav COMMAND $<TARGET_FILE:misc_test> wav)
 add_test(NAME string_test_wav COMMAND $<TARGET_FILE:string_test> wav)
-add_test(NAME multi_file_test_wav COMMAND $<TARGET_FILE:multi_file_test> wav)
 add_test(NAME chunk_test_wav COMMAND $<TARGET_FILE:chunk_test> wav)
 
 ### w64-tests
@@ -600,7 +588,6 @@ set(SNDFILE_TEST_TARGETS
   header_test
   misc_test
   string_test
-  multi_file_test
   aiff_rw_test
   chunk_test
   long_read_write_test

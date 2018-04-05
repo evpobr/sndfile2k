@@ -8,7 +8,7 @@ doxygen_add_docs(docs
   ${PROJECT_SOURCE_DIR}/include/sndfile2k/sndfile2k.h
   ${PROJECT_SOURCE_DIR}/include/sndfile2k/sndfile2k.hpp
   INDEX.md
-  embedded_files.md)
+)
 
 install(
   DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html

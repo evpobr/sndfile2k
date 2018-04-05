@@ -213,60 +213,6 @@ static void file_read_write_test(const char *filename)
 
     test_close_or_die(psf, __LINE__);
     puts("ok");
-
-    /*
-	 * Now test operations with a non-zero psf->fileoffset field. This field
-	 * sets an artificial file start positions so that a seek to the start of
-	 * the file will actually be a seek to the value given by psf->fileoffset.
-	 */
-
-    print_test_name("Testing file offset");
-
-    /* Test file open in read/write mode. */
-    psf->file.mode = SFM_RDWR;
-    psf->fileoffset = sizeof(data_out[0]) * ARRAY_LEN(data_out);
-    test_open_or_die(psf, __LINE__);
-
-    if ((retval = psf->get_filelen()) != 3 * sizeof(data_out))
-    {
-        printf("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %zd)\n\n", __LINE__, retval,
-               3 * sizeof(data_out));
-        exit(1);
-    };
-
-    test_seek_or_die(psf, SIGNED_SIZEOF(data_out), SEEK_SET, SIGNED_SIZEOF(data_out), __LINE__);
-    make_data(data_out, ARRAY_LEN(data_out), 5);
-    test_write_or_die(psf, data_out, sizeof(data_out[0]), ARRAY_LEN(data_out), 2 * sizeof(data_out), __LINE__);
-    test_close_or_die(psf, __LINE__);
-
-    /* final test with psf->fileoffset == 0. */
-
-    psf->file.mode = SFM_RDWR;
-    psf->fileoffset = 0;
-    test_open_or_die(psf, __LINE__);
-
-    if ((retval = psf->get_filelen()) != 3 * sizeof(data_out))
-    {
-        printf("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %zd)\n\n", __LINE__, retval,
-               3 * sizeof(data_out));
-        exit(1);
-    };
-
-    make_data(data_out, ARRAY_LEN(data_out), 1);
-    test_read_or_die(psf, data_in, 1, sizeof(data_in), sizeof(data_in), __LINE__);
-    test_equal_or_die(data_out, data_in, ARRAY_LEN(data_out), __LINE__);
-
-    make_data(data_out, ARRAY_LEN(data_out), 2);
-    test_read_or_die(psf, data_in, 1, sizeof(data_in), 2 * sizeof(data_in), __LINE__);
-    test_equal_or_die(data_out, data_in, ARRAY_LEN(data_out), __LINE__);
-
-    make_data(data_out, ARRAY_LEN(data_out), 5);
-    test_read_or_die(psf, data_in, 1, sizeof(data_in), 3 * sizeof(data_in), __LINE__);
-    test_equal_or_die(data_out, data_in, ARRAY_LEN(data_out), __LINE__);
-
-    test_close_or_die(psf, __LINE__);
-
-    puts("ok");
 }
 
 static void file_truncate_test(const char *filename)
@@ -328,42 +274,6 @@ static void file_truncate_test(const char *filename)
     psf->file.mode = SFM_READ;
     test_open_or_die(psf, __LINE__);
     test_seek_or_die(psf, 0, SEEK_END, SIGNED_SIZEOF(buffer) / 4, __LINE__);
-    test_close_or_die(psf, __LINE__);
-
-    puts("ok");
-}
-
-static void file_seek_with_offset_test(const char *filename)
-{
-    SF_PRIVATE sf_data, *psf;
-    sf_count_t real_end;
-    const size_t fileoffset = 64;
-
-    print_test_name("Testing seek with offset");
-
-    /* Open the file created by the previous test for reading. */
-    memset(&sf_data, 0, sizeof(sf_data));
-    psf = &sf_data;
-    psf->file.mode = SFM_READ;
-    snprintf(psf->file.path.c, sizeof(psf->file.path.c), "%s", filename);
-    test_open_or_die(psf, __LINE__);
-
-    /* Gather basic info before setting offset. */
-    real_end = psf->fseek(0, SEEK_END);
-    test_tell_or_die(psf, real_end, __LINE__);
-
-    /* Set the fileoffset (usually in a real system this is due to an id3 tag). */
-    psf->fileoffset = fileoffset;
-
-    /* Check tell respects offset. */
-    test_tell_or_die(psf, real_end - fileoffset, __LINE__);
-
-    /* Check seeking works as expected. */
-    test_seek_or_die(psf, 0, SEEK_SET, 0, __LINE__);
-    test_seek_or_die(psf, 0, SEEK_CUR, 0, __LINE__);
-    test_seek_or_die(psf, 0, SEEK_CUR, 0, __LINE__);
-    test_seek_or_die(psf, 0, SEEK_END, real_end - fileoffset, __LINE__);
-
     test_close_or_die(psf, __LINE__);
 
     puts("ok");
@@ -489,7 +399,6 @@ void test_file_io(void)
 
     file_open_test(filename);
     file_read_write_test(filename);
-    file_seek_with_offset_test(filename);
     file_truncate_test(filename);
 
     unlink(filename);

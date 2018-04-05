@@ -89,8 +89,6 @@ static ErrorStruct SndfileErrors[] = {
     {SFE_BAD_MODE_RW, "Error : This file format does not support read/write mode."},
     {SFE_BAD_SF_INFO, "Internal error : SF_INFO struct incomplete."},
     {SFE_BAD_OFFSET, "Error : supplied offset beyond end of file."},
-    {SFE_NO_EMBED_SUPPORT, "Error : embedding not supported for this file format."},
-    {SFE_NO_EMBEDDED_RDWR, "Error : cannot open embedded file read/write."},
     {SFE_BAD_VIRTUAL_IO, "Error : bad pointer on SF_VIRTUAL_IO struct."},
     {SFE_BAD_BROADCAST_INFO_SIZE, "Error : bad coding_history_size in SF_BROADCAST_INFO struct."},
     {SFE_BAD_BROADCAST_INFO_TOO_BIG, "Error : SF_BROADCAST_INFO struct too large."},
@@ -167,7 +165,6 @@ static ErrorStruct SndfileErrors[] = {
 
     {SFE_AU_UNKNOWN_FORMAT, "Error in AU file, unknown format."},
     {SFE_AU_NO_DOTSND, "Error in AU file, missing '.snd' or 'dns.' marker."},
-    {SFE_AU_EMBED_BAD_LEN, "Embedded AU file with unknown length."},
 
     {SFE_RAW_READ_BAD_SPEC, "Error while opening RAW file for read. Must "
                             "specify format and channels.\n"
@@ -379,8 +376,6 @@ SNDFILE *sf_open_fd(int fd, SF_FILEMODE mode, SF_INFO *sfinfo, int close_desc)
     psf->file.vio.ref(psf);
     if (!close_desc)
         psf->file.vio.ref(psf);
-
-    psf->fileoffset = psf->ftell();
 
     if (!close_desc)
         psf->file.do_not_close_descriptor = SF_TRUE;
@@ -1252,14 +1247,6 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
 
         sndfile->dataoffset = *((sf_count_t *)data);
         sf_seek(sndfile, 0, SEEK_CUR);
-        break;
-
-    case SFC_GET_EMBED_FILE_INFO:
-        if (data == NULL || datasize != sizeof(SF_EMBED_FILE_INFO))
-            return (sndfile->error = SFE_BAD_COMMAND_PARAM);
-
-        ((SF_EMBED_FILE_INFO *)data)->offset = sndfile->fileoffset;
-        ((SF_EMBED_FILE_INFO *)data)->length = sndfile->filelength;
         break;
 
     /* Lite remove start */
@@ -2905,14 +2892,6 @@ static int guess_file_type(SF_PRIVATE *psf)
         buffer[2] == MAKE_MARKER('W', 'A', 'V', 'E'))
         return SF_FORMAT_RF64;
 
-    if (buffer[0] == MAKE_MARKER('I', 'D', '3', 3))
-    {
-        psf->log_printf("Found 'ID3' marker.\n");
-        if (id3_skip(psf))
-            return guess_file_type(psf);
-        return 0;
-    };
-
     /* Turtle Beach SMP 16-bit */
     if (buffer[0] == MAKE_MARKER('S', 'O', 'U', 'N') &&
         buffer[1] == MAKE_MARKER('D', ' ', 'S', 'A'))
@@ -3110,33 +3089,6 @@ SNDFILE *SF_PRIVATE::open_file(SF_INFO *sfinfo)
         /* File is open, so get the length. */
     filelength = get_filelen();
 
-    if (fileoffset > 0)
-    {
-        switch (file.mode)
-        {
-        case SFM_READ:
-            if (filelength < 44)
-            {
-                log_printf("Short filelength: %D (fileoffset: %D)\n", filelength, fileoffset);
-                _error = SFE_BAD_OFFSET;
-                goto error_exit;
-            };
-            break;
-
-        case SFM_WRITE:
-            fileoffset = 0;
-            fseek(0, SEEK_END);
-            fileoffset = ftell();
-            break;
-
-        case SFM_RDWR:
-            _error = SFE_NO_EMBEDDED_RDWR;
-            goto error_exit;
-        };
-
-        log_printf("Embedded file offset : %D\n", fileoffset);
-    };
-
     if (filelength == SF_COUNT_MAX)
         log_printf("Length : unknown\n");
     else
@@ -3323,32 +3275,6 @@ SNDFILE *SF_PRIVATE::open_file(SF_INFO *sfinfo)
 
     if (_error)
         goto error_exit;
-
-    /* For now, check whether embedding is supported. */
-    format = SF_CONTAINER(sf.format);
-    if (fileoffset > 0)
-    {
-        switch (format)
-        {
-        case SF_FORMAT_WAV:
-        case SF_FORMAT_WAVEX:
-        case SF_FORMAT_AIFF:
-        case SF_FORMAT_AU:
-            /* Actual embedded files. */
-            break;
-
-        case SF_FORMAT_FLAC:
-            /* Flac with an ID3v2 header? */
-            break;
-
-        default:
-            _error = SFE_NO_EMBED_SUPPORT;
-            goto error_exit;
-        };
-    };
-
-    if (fileoffset > 0)
-        log_printf("Embedded file length : %D\n", filelength);
 
     if (file.mode == SFM_RDWR && sf_format_check(&sf) == 0)
     {

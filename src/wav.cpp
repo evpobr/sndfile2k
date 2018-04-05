@@ -325,16 +325,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
 
             RIFFsize = chunk_size;
 
-            if (psf->fileoffset > 0 && psf->filelength > RIFFsize + 8)
-            {
-                /* Set file length. */
-                psf->filelength = RIFFsize + 8;
-                if (marker == RIFF_MARKER)
-                    psf->log_printf("RIFF : %u\n", RIFFsize);
-                else
-                    psf->log_printf("RIFX : %u\n", RIFFsize);
-            }
-            else if (psf->filelength < RIFFsize + 2 * SIGNED_SIZEOF(marker))
+            if (psf->filelength < RIFFsize + 2 * SIGNED_SIZEOF(marker))
             {
                 if (marker == RIFF_MARKER)
                     psf->log_printf("RIFF : %u (should be %D)\n", RIFFsize,

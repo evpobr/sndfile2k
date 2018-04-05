@@ -45,7 +45,6 @@ set(COMMON
   ogg.cpp
   chanmap.cpp
   file_io.cpp
-  id3.cpp
 )
 if(WIN32 OR CYGWIN)
   list(APPEND COMMON windows.cpp)

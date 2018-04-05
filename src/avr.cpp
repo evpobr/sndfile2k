@@ -186,9 +186,6 @@ static int avr_read_header(SF_PRIVATE *psf)
     psf->dataoffset = AVR_HDR_SIZE;
     psf->datalength = hdr.frames * (hdr.rez / 8);
 
-    if (psf->fileoffset > 0)
-        psf->filelength = AVR_HDR_SIZE + psf->datalength;
-
 	if (psf->ftell() != psf->dataoffset)
 		psf->binheader_seekf(psf->dataoffset - psf->ftell(), SF_SEEK_CUR);
 

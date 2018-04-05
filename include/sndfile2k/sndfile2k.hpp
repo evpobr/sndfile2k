@@ -148,7 +148,6 @@ public:
 	 * which is then passed to sndfile2k.
 	 * - Opening files with file names using OS specific character encodings and then
 	 * passing the file descriptor to sf_open_fd().
-	 * - Opening \ref md_docs_embedded_files "sound files embedded within larger files".
 	 *
 	 * When destructor is called, the file descriptor is only closed if the
 	 * @p close_desc parameter is set ::SF_TRUE.

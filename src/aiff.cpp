@@ -484,13 +484,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
                 break;
             };
 
-            if (psf->fileoffset > 0 && psf->filelength > FORMsize + 8)
-            {
-                /* Set file length. */
-                psf->filelength = FORMsize + 8;
-                psf->log_printf("FORM : %u\n %M\n", FORMsize, marker);
-            }
-            else if (FORMsize != psf->filelength - 2 * SIGNED_SIZEOF(chunk_size))
+            if (FORMsize != psf->filelength - 2 * SIGNED_SIZEOF(chunk_size))
             {
                 chunk_size = (uint32_t)(psf->filelength - 2 * sizeof(chunk_size));
                 psf->log_printf("FORM : %u (should be %u)\n %M\n", FORMsize, chunk_size,

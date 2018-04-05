@@ -145,30 +145,6 @@ sf_count_t SF_PRIVATE::get_filelen()
 		return (sf_count_t)-1;
 	};
 
-	switch (file.mode)
-	{
-	case SFM_WRITE:
-		filelen = filelen - fileoffset;
-		break;
-
-	case SFM_READ:
-		if (fileoffset > 0 && filelength > 0)
-			filelen = filelength;
-		break;
-
-	case SFM_RDWR:
-		/*
-		** Cannot open embedded files SFM_RDWR so we don't need to
-		** subtract psf->fileoffset. We already have the answer we
-		** need.
-		*/
-		break;
-
-	default:
-		/* Shouldn't be here, so return error. */
-		filelen = -1;
-	};
-
 	return filelen;
 }
 
@@ -189,30 +165,12 @@ sf_count_t SF_PRIVATE::fseek(sf_count_t offset, int whence)
 	if (file.virtual_io && !file.use_new_vio)
 		return file.vio.seek(offset, whence, file.vio_user_data);
 
-	switch (whence)
-	{
-	case SEEK_SET:
-		offset += fileoffset;
-		break;
-
-	case SEEK_END:
-		break;
-
-	case SEEK_CUR:
-		break;
-
-	default:
-		/* We really should not be here. */
-		log_printf("psf_fseek : whence is %d *****.\n", whence);
-		return 0;
-	};
-
 	absolute_position = file.vio.seek(offset, whence, file.vio_user_data);
 
 	if (absolute_position < 0)
 		psf_log_syserr(this, errno);
 
-	return absolute_position - fileoffset;
+	return absolute_position;
 }
 
 size_t SF_PRIVATE::fread(void *ptr, size_t bytes, size_t items)
@@ -313,7 +271,7 @@ sf_count_t SF_PRIVATE::ftell()
 		return -1;
 	};
 
-	return pos - fileoffset;
+	return pos;
 }
 
 unsigned long vfref(void * user_data)
