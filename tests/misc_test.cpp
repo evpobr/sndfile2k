@@ -258,13 +258,13 @@ static void zero_data_test(const char *filename, int format)
     sfinfo.channels = 1;
     sfinfo.frames = 0;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_close(file);
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     sf_close(file);
 
@@ -426,14 +426,14 @@ static void wavex_amb_test(const char *filename)
 
     frames = ARRAY_LEN(buffer) / sfinfo.channels;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_command(file, SFC_WAVEX_SET_AMBISONIC, NULL, SF_AMBISONIC_B_FORMAT);
     test_writef_short_or_die(file, 0, buffer, frames, __LINE__);
     sf_close(file);
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     exit_if_true(sf_command(file, SFC_WAVEX_GET_AMBISONIC, NULL, 0) != SF_AMBISONIC_B_FORMAT,
                  "\n\nLine %d : Error, this file should be in Ambisonic B format.\n", __LINE__);
@@ -462,7 +462,7 @@ static void rf64_downgrade_test(const char *filename)
     sfinfo.channels = 1;
     sfinfo.format = SF_FORMAT_RF64 | SF_FORMAT_PCM_16;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     exit_if_true(sf_command(file, SFC_RF64_AUTO_DOWNGRADE, NULL, SF_FALSE) != SF_FALSE, "\n\nLine %d: sf_command failed.\n",
                  __LINE__);
@@ -481,7 +481,7 @@ static void rf64_downgrade_test(const char *filename)
     memset(input, 0, sizeof(input));
     sf_info_clear(&sfinfo);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     exit_if_true(sfinfo.format != (SF_FORMAT_WAVEX | SF_FORMAT_PCM_16), "\n\nLine %d: RF64 to WAV downgrade failed.\n", __LINE__);
     exit_if_true(sfinfo.frames != ARRAY_LEN(output),
@@ -526,7 +526,7 @@ static void rf64_long_file_downgrade_test(const char *filename)
     sfinfo.channels = 1;
     sfinfo.format = SF_FORMAT_RF64 | SF_FORMAT_PCM_32;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     exit_if_true(sf_command(file, SFC_RF64_AUTO_DOWNGRADE, NULL, SF_TRUE) != SF_TRUE, "\n\nLine %d: sf_command failed.\n",
                  __LINE__);
@@ -541,7 +541,7 @@ static void rf64_long_file_downgrade_test(const char *filename)
 
     sf_info_clear(&sfinfo);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     exit_if_true(sfinfo.format != (SF_FORMAT_RF64 | SF_FORMAT_PCM_32), "\n\nLine %d: RF64 to WAV downgrade should have failed.\n",
                  __LINE__);

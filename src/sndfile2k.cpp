@@ -353,36 +353,6 @@ SNDFILE *sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo)
     return psf->open_file(sfinfo);
 } /* sf_open */
 
-SNDFILE *sf_open_fd(int fd, SF_FILEMODE mode, SF_INFO *sfinfo, int close_desc)
-{
-    SF_PRIVATE *psf;
-
-    if ((psf = psf_allocate()) == NULL)
-    {
-        sf_errno = SFE_MALLOC_FAILED;
-        return NULL;
-    };
-
-    psf->init_files();
-    copy_filename(psf, "");
-
-    psf->file.mode = mode;
-    psf->set_file(fd);
-
-	psf->file.virtual_io = SF_TRUE;
-	psf->file.vio = *psf_get_vio();
-	psf->file.vio_user_data = psf;
-	psf->file.use_new_vio = SF_TRUE;
-    psf->file.vio.ref(psf);
-    if (!close_desc)
-        psf->file.vio.ref(psf);
-
-    if (!close_desc)
-        psf->file.do_not_close_descriptor = SF_TRUE;
-
-    return psf->open_file(sfinfo);
-} /* sf_open_fd */
-
 SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data)
 {
     SF_PRIVATE *psf;

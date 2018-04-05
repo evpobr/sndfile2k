@@ -107,24 +107,14 @@ static void chunk_test_helper(const char *filename, int format, const char *test
     SF_CHUNK_INFO chunk_info;
     SF_CHUNK_ITERATOR *iterator;
     uint32_t length_before;
-    int err, allow_fd;
-
-    switch (format & SF_FORMAT_SUBMASK)
-    {
-    case SF_FORMAT_ALAC_16:
-        allow_fd = SF_FALSE;
-        break;
-    default:
-        allow_fd = SF_TRUE;
-        break;
-    };
+    int err;
 
     sfinfo.samplerate = 44100;
     sfinfo.channels = 1;
     sfinfo.frames = 0;
     sfinfo.format = format;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     /* Set up the chunk to write. */
     memset(&chunk_info, 0, sizeof(chunk_info));
@@ -144,7 +134,7 @@ static void chunk_test_helper(const char *filename, int format, const char *test
 
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     memset(&chunk_info, 0, sizeof(chunk_info));
     snprintf(chunk_info.id, sizeof(chunk_info.id), "Test");
@@ -180,7 +170,7 @@ static void multichunk_test_helper(const char *filename, int format, const char 
     SF_CHUNK_INFO chunk_info;
     SF_CHUNK_ITERATOR *iterator;
     uint32_t length_before[16];
-    int err, allow_fd;
+    int err;
     size_t i;
 
     exit_if_true(ARRAY_LEN(length_before) < testdata_len, "\n\nLine %d : Bad array length.\n\n", __LINE__);
@@ -190,17 +180,7 @@ static void multichunk_test_helper(const char *filename, int format, const char 
     sfinfo.frames = 0;
     sfinfo.format = format;
 
-    switch (format & SF_FORMAT_SUBMASK)
-    {
-    case SF_FORMAT_ALAC_16:
-        allow_fd = SF_FALSE;
-        break;
-    default:
-        allow_fd = SF_TRUE;
-        break;
-    };
-
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     /* Set up the chunk to write. */
     for (i = 0; i < testdata_len; i++)
@@ -224,7 +204,7 @@ static void multichunk_test_helper(const char *filename, int format, const char 
 
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     memset(&chunk_info, 0, sizeof(chunk_info));
     snprintf(chunk_info.id, sizeof(chunk_info.id), "Test");
@@ -316,7 +296,7 @@ static void wav_subchunk_test(size_t chunk_size)
     sfinfo.frames = 0;
     sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     /* Set up the chunk to write. */
     memset(&chunk_info, 0, sizeof(chunk_info));
@@ -337,7 +317,7 @@ static void wav_subchunk_test(size_t chunk_size)
 
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     exit_if_true(sfinfo.frames != ARRAY_LEN(audio), "\n\nLine %d : Incorrect sample count (%d should be %zu)\n", __LINE__,
                  (int)sfinfo.frames, ARRAY_LEN(audio));
@@ -372,7 +352,7 @@ static void large_free_test(const char *filename, int format, size_t chunk_size)
     sfinfo.frames = 0;
     sfinfo.format = format;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     /* Set up the chunk to write. */
     memset(&chunk_info, 0, sizeof(chunk_info));
@@ -393,7 +373,7 @@ static void large_free_test(const char *filename, int format, size_t chunk_size)
 
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     exit_if_true(sfinfo.frames != ARRAY_LEN(audio), "\n\nLine %d : Incorrect sample count (%d should be %zu)\n", __LINE__,
                  (int)sfinfo.frames, (int)ARRAY_LEN(audio));

@@ -134,11 +134,11 @@ static void locale_test(const LOCALE_DATA *ldata)
     sfinfo.channels = 1;
     sfinfo.samplerate = 44100;
 
-    file = test_open_file_or_die(ldata->filename, SFM_WRITE, &sfinfo, 0, __LINE__);
+    file = test_open_file_or_die(ldata->filename, SFM_WRITE, &sfinfo, __LINE__);
     test_write_short_or_die(file, 0, wdata, ARRAY_LEN(wdata), __LINE__);
     sf_close(file);
 
-    file = test_open_file_or_die(ldata->filename, SFM_READ, &sfinfo, 0, __LINE__);
+    file = test_open_file_or_die(ldata->filename, SFM_READ, &sfinfo, __LINE__);
     test_read_short_or_die(file, 0, rdata, ARRAY_LEN(rdata), __LINE__);
     sf_close(file);
 

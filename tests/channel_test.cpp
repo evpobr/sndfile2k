@@ -75,12 +75,12 @@ static void channel_test(void)
         sf_info_clear(&rsfinfo);
 
         /* Write the test file. */
-        file = test_open_file_or_die(filename, SFM_WRITE, &wsfinfo, SF_FALSE, __LINE__);
+        file = test_open_file_or_die(filename, SFM_WRITE, &wsfinfo, __LINE__);
         test_writef_float_or_die(file, 0, float_data, wframes, __LINE__);
         sf_close(file);
 
         /* Read it as float and test. */
-        file = test_open_file_or_die(filename, SFM_READ, &rsfinfo, SF_FALSE, __LINE__);
+        file = test_open_file_or_die(filename, SFM_READ, &rsfinfo, __LINE__);
         exit_if_true(rsfinfo.frames == 0, "\n\nLine %d : Frames in file %" PRId64 ".\n\n", __LINE__, rsfinfo.frames);
         exit_if_true(wframes != rsfinfo.frames, "\n\nLine %d : Wrote %" PRId64 ", read %" PRId64 " frames.\n\n", __LINE__, wframes,
                      rsfinfo.frames);

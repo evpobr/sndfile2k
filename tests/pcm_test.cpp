@@ -154,7 +154,7 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     test_write_short_or_die(file, 0, short_out, items, __LINE__);
 
@@ -162,7 +162,7 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
 
     memset(short_in, 0, items * sizeof(short));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -221,7 +221,7 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     test_write_int_or_die(file, 0, int_out, items, __LINE__);
 
@@ -229,7 +229,7 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
 
     memset(int_in, 0, items * sizeof(int));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -285,7 +285,7 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_command(file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE);
 
@@ -295,7 +295,7 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
 
     memset(float_in, 0, items * sizeof(float));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -354,7 +354,7 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_command(file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
 
@@ -364,7 +364,7 @@ static void pcm_test_bits_8(const char *filename, int filetype, uint64_t hash)
 
     memset(double_in, 0, items * sizeof(double));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -438,7 +438,7 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     test_write_short_or_die(file, 0, short_out, items, __LINE__);
 
@@ -446,7 +446,7 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
 
     memset(short_in, 0, items * sizeof(short));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -505,7 +505,7 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     test_write_int_or_die(file, 0, int_out, items, __LINE__);
 
@@ -513,7 +513,7 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
 
     memset(int_in, 0, items * sizeof(int));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -569,7 +569,7 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_command(file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE);
 
@@ -579,7 +579,7 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
 
     memset(float_in, 0, items * sizeof(float));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -638,7 +638,7 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_command(file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
 
@@ -648,7 +648,7 @@ static void pcm_test_bits_16(const char *filename, int filetype, uint64_t hash)
 
     memset(double_in, 0, items * sizeof(double));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -722,7 +722,7 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     test_write_short_or_die(file, 0, short_out, items, __LINE__);
 
@@ -730,7 +730,7 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
 
     memset(short_in, 0, items * sizeof(short));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -789,7 +789,7 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     test_write_int_or_die(file, 0, int_out, items, __LINE__);
 
@@ -797,7 +797,7 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
 
     memset(int_in, 0, items * sizeof(int));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -853,7 +853,7 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_command(file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE);
 
@@ -863,7 +863,7 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
 
     memset(float_in, 0, items * sizeof(float));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -922,7 +922,7 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_command(file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
 
@@ -932,7 +932,7 @@ static void pcm_test_bits_24(const char *filename, int filetype, uint64_t hash)
 
     memset(double_in, 0, items * sizeof(double));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -1006,7 +1006,7 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     test_write_short_or_die(file, 0, short_out, items, __LINE__);
 
@@ -1014,7 +1014,7 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
 
     memset(short_in, 0, items * sizeof(short));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -1073,7 +1073,7 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     test_write_int_or_die(file, 0, int_out, items, __LINE__);
 
@@ -1081,7 +1081,7 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
 
     memset(int_in, 0, items * sizeof(int));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -1137,7 +1137,7 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_command(file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE);
 
@@ -1147,7 +1147,7 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
 
     memset(float_in, 0, items * sizeof(float));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -1206,7 +1206,7 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_command(file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
 
@@ -1216,7 +1216,7 @@ static void pcm_test_bits_32(const char *filename, int filetype, uint64_t hash)
 
     memset(double_in, 0, items * sizeof(double));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -1279,7 +1279,7 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash, in
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
     if (replace_float && string_in_log_buffer(file, "Using IEEE replacement") == 0)
     {
@@ -1299,7 +1299,7 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash, in
     if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
     if (replace_float && string_in_log_buffer(file, "Using IEEE replacement") == 0)
     {
@@ -1431,7 +1431,7 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash, in
 
     frames = items / sfinfo.channels;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
     if (replace_float && string_in_log_buffer(file, "Using IEEE replacement") == 0)
     {
@@ -1451,7 +1451,7 @@ static void pcm_test_float(const char *filename, int filetype, uint64_t hash, in
     if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
     if (replace_float && string_in_log_buffer(file, "Using IEEE replacement") == 0)
     {
@@ -1595,7 +1595,7 @@ static void pcm_test_double(const char *filename, int filetype, uint64_t hash, i
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
     if (replace_float && string_in_log_buffer(file, "Using IEEE replacement") == 0)
     {
@@ -1623,7 +1623,7 @@ static void pcm_test_double(const char *filename, int filetype, uint64_t hash, i
     if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
     if (replace_float && string_in_log_buffer(file, "Using IEEE replacement") == 0)
     {
@@ -1755,7 +1755,7 @@ static void pcm_test_double(const char *filename, int filetype, uint64_t hash, i
 
     frames = items / sfinfo.channels;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
     if (replace_float && string_in_log_buffer(file, "Using IEEE replacement") == 0)
     {
@@ -1783,7 +1783,7 @@ static void pcm_test_double(const char *filename, int filetype, uint64_t hash, i
     if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
     if (replace_float && string_in_log_buffer(file, "Using IEEE replacement") == 0)
     {

@@ -615,13 +615,10 @@ static void create_short_file(const char *filename);
 /*======================================================================================
 */
 
-static void mono_char_test(const char *filename, int format, int long_file_ok,
-                           int allow_fd);
-static void stereo_char_test(const char *filename, int format, int long_file_ok,
-                             int allow_fd);
-static void mono_rdwr_char_test(const char *filename, int format,
-                                int long_file_ok, int allow_fd);
-static void new_rdwr_char_test(const char *filename, int format, int allow_fd);
+static void mono_char_test(const char *filename, int format, int long_file_ok);
+static void stereo_char_test(const char *filename, int format, int long_file_ok);
+static void mono_rdwr_char_test(const char *filename, int format, int long_file_ok);
+static void new_rdwr_char_test(const char *filename, int format);
 static void multi_seek_test(const char *filename, int format);
 static void write_seek_extend_test(const char *filename, int format);
 
@@ -629,9 +626,7 @@ static void pcm_test_char(const char *filename, int format, int long_file_ok)
 {
     SF_INFO sfinfo;
     short *orig;
-    int k, allow_fd;
-
-    allow_fd = true;
+    int k;
 
     print_test_name("pcm_test_char", filename);
 
@@ -652,7 +647,7 @@ static void pcm_test_char(const char *filename, int format, int long_file_ok)
 
     /* Some test broken out here. */
 
-    mono_char_test(filename, format, long_file_ok, allow_fd);
+    mono_char_test(filename, format, long_file_ok);
 
     /* Sub format DWVW does not allow seeking. */
     if ((format & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_16 ||
@@ -668,7 +663,7 @@ static void pcm_test_char(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
-        mono_rdwr_char_test(filename, format, long_file_ok, allow_fd);
+        mono_rdwr_char_test(filename, format, long_file_ok);
 
     /* If the format doesn't support stereo we're done. */
     sfinfo.channels = 2;
@@ -679,7 +674,7 @@ static void pcm_test_char(const char *filename, int format, int long_file_ok)
         return;
     };
 
-    stereo_char_test(filename, format, long_file_ok, allow_fd);
+    stereo_char_test(filename, format, long_file_ok);
 
     /* New read/write test. Not sure if this is needed yet. */
 
@@ -690,7 +685,7 @@ static void pcm_test_char(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
-        new_rdwr_char_test(filename, format, allow_fd);
+        new_rdwr_char_test(filename, format);
 
     unlink(filename);
 
@@ -698,8 +693,7 @@ static void pcm_test_char(const char *filename, int format, int long_file_ok)
     return;
 } /* pcm_test_char */
 
-static void mono_char_test(const char *filename, int format, int long_file_ok,
-                           int allow_fd)
+static void mono_char_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -718,8 +712,7 @@ static void mono_char_test(const char *filename, int format, int long_file_ok,
 
     items = DATA_LENGTH;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     if (sfinfo.frames || sfinfo.sections || sfinfo.seekable)
     {
@@ -744,8 +737,7 @@ static void mono_char_test(const char *filename, int format, int long_file_ok,
     if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -918,8 +910,7 @@ static void mono_char_test(const char *filename, int format, int long_file_ok,
 
 } /* mono_char_test */
 
-static void stereo_char_test(const char *filename, int format, int long_file_ok,
-                             int allow_fd)
+static void stereo_char_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -943,8 +934,7 @@ static void stereo_char_test(const char *filename, int format, int long_file_ok,
     items = DATA_LENGTH;
     frames = items / sfinfo.channels;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_set_string(file, SF_STR_ARTIST, "Your name here");
 
@@ -959,8 +949,7 @@ static void stereo_char_test(const char *filename, int format, int long_file_ok,
     if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -1082,26 +1071,12 @@ static void stereo_char_test(const char *filename, int format, int long_file_ok,
     sf_close(file);
 } /* stereo_char_test */
 
-static void mono_rdwr_char_test(const char *filename, int format,
-                                int long_file_ok, int allow_fd)
+static void mono_rdwr_char_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
     short *orig, *test;
     int k, pass;
-
-    switch (format & SF_FORMAT_SUBMASK)
-    {
-    case SF_FORMAT_ALAC_16:
-    case SF_FORMAT_ALAC_20:
-    case SF_FORMAT_ALAC_24:
-    case SF_FORMAT_ALAC_32:
-        allow_fd = 0;
-        break;
-
-    default:
-        break;
-    };
 
     orig = orig_data.s;
     test = test_data.s;
@@ -1148,8 +1123,7 @@ static void mono_rdwr_char_test(const char *filename, int format,
     sfinfo.channels = 1;
     sfinfo.format = format;
 
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     /* Do 3 writes followed by reads. After each, check the data and the current
 	** read and write offsets.
@@ -1185,8 +1159,7 @@ static void mono_rdwr_char_test(const char *filename, int format,
     sf_close(file);
 
     /* Open the file again to check the data. */
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -1249,7 +1222,7 @@ static void mono_rdwr_char_test(const char *filename, int format,
     sf_close(file);
 } /* mono_rdwr_short_test */
 
-static void new_rdwr_char_test(const char *filename, int format, int allow_fd)
+static void new_rdwr_char_test(const char *filename, int format)
 {
     SNDFILE *wfile, *rwfile;
     SF_INFO sfinfo;
@@ -1268,16 +1241,14 @@ static void new_rdwr_char_test(const char *filename, int format, int allow_fd)
     items = DATA_LENGTH;
     frames = items / sfinfo.channels;
 
-    wfile =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    wfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_command(wfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE);
     test_writef_short_or_die(wfile, 1, orig, frames, __LINE__);
     sf_write_sync(wfile);
     test_writef_short_or_die(wfile, 2, orig, frames, __LINE__);
     sf_write_sync(wfile);
 
-    rwfile =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    rwfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
     if (sfinfo.frames != 2 * frames)
     {
         printf("\n\nLine %d : incorrect number of frames in file (%" PRId64
@@ -1298,13 +1269,10 @@ static void new_rdwr_char_test(const char *filename, int format, int allow_fd)
 /*======================================================================================
 */
 
-static void mono_short_test(const char *filename, int format, int long_file_ok,
-                            int allow_fd);
-static void stereo_short_test(const char *filename, int format,
-                              int long_file_ok, int allow_fd);
-static void mono_rdwr_short_test(const char *filename, int format,
-                                 int long_file_ok, int allow_fd);
-static void new_rdwr_short_test(const char *filename, int format, int allow_fd);
+static void mono_short_test(const char *filename, int format, int long_file_ok);
+static void stereo_short_test(const char *filename, int format, int long_file_ok);
+static void mono_rdwr_short_test(const char *filename, int format, int long_file_ok);
+static void new_rdwr_short_test(const char *filename, int format);
 static void multi_seek_test(const char *filename, int format);
 static void write_seek_extend_test(const char *filename, int format);
 
@@ -1312,9 +1280,7 @@ static void pcm_test_short(const char *filename, int format, int long_file_ok)
 {
     SF_INFO sfinfo;
     short *orig;
-    int k, allow_fd;
-
-    allow_fd = true;
+    int k;
 
     print_test_name("pcm_test_short", filename);
 
@@ -1335,7 +1301,7 @@ static void pcm_test_short(const char *filename, int format, int long_file_ok)
 
     /* Some test broken out here. */
 
-    mono_short_test(filename, format, long_file_ok, allow_fd);
+    mono_short_test(filename, format, long_file_ok);
 
     /* Sub format DWVW does not allow seeking. */
     if ((format & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_16 ||
@@ -1351,7 +1317,7 @@ static void pcm_test_short(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
-        mono_rdwr_short_test(filename, format, long_file_ok, allow_fd);
+        mono_rdwr_short_test(filename, format, long_file_ok);
 
     /* If the format doesn't support stereo we're done. */
     sfinfo.channels = 2;
@@ -1362,7 +1328,7 @@ static void pcm_test_short(const char *filename, int format, int long_file_ok)
         return;
     };
 
-    stereo_short_test(filename, format, long_file_ok, allow_fd);
+    stereo_short_test(filename, format, long_file_ok);
 
     /* New read/write test. Not sure if this is needed yet. */
 
@@ -1373,7 +1339,7 @@ static void pcm_test_short(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
-        new_rdwr_short_test(filename, format, allow_fd);
+        new_rdwr_short_test(filename, format);
 
     unlink(filename);
 
@@ -1381,8 +1347,7 @@ static void pcm_test_short(const char *filename, int format, int long_file_ok)
     return;
 } /* pcm_test_short */
 
-static void mono_short_test(const char *filename, int format, int long_file_ok,
-                            int allow_fd)
+static void mono_short_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -1401,8 +1366,7 @@ static void mono_short_test(const char *filename, int format, int long_file_ok,
 
     items = DATA_LENGTH;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     if (sfinfo.frames || sfinfo.sections || sfinfo.seekable)
     {
@@ -1427,8 +1391,7 @@ static void mono_short_test(const char *filename, int format, int long_file_ok,
     if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -1601,8 +1564,7 @@ static void mono_short_test(const char *filename, int format, int long_file_ok,
 
 } /* mono_short_test */
 
-static void stereo_short_test(const char *filename, int format,
-                              int long_file_ok, int allow_fd)
+static void stereo_short_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -1626,8 +1588,7 @@ static void stereo_short_test(const char *filename, int format,
     items = DATA_LENGTH;
     frames = items / sfinfo.channels;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_set_string(file, SF_STR_ARTIST, "Your name here");
 
@@ -1642,8 +1603,7 @@ static void stereo_short_test(const char *filename, int format,
     if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -1765,26 +1725,12 @@ static void stereo_short_test(const char *filename, int format,
     sf_close(file);
 } /* stereo_short_test */
 
-static void mono_rdwr_short_test(const char *filename, int format,
-                                 int long_file_ok, int allow_fd)
+static void mono_rdwr_short_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
     short *orig, *test;
     int k, pass;
-
-    switch (format & SF_FORMAT_SUBMASK)
-    {
-    case SF_FORMAT_ALAC_16:
-    case SF_FORMAT_ALAC_20:
-    case SF_FORMAT_ALAC_24:
-    case SF_FORMAT_ALAC_32:
-        allow_fd = 0;
-        break;
-
-    default:
-        break;
-    };
 
     orig = orig_data.s;
     test = test_data.s;
@@ -1831,8 +1777,7 @@ static void mono_rdwr_short_test(const char *filename, int format,
     sfinfo.channels = 1;
     sfinfo.format = format;
 
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     /* Do 3 writes followed by reads. After each, check the data and the current
 	** read and write offsets.
@@ -1868,8 +1813,7 @@ static void mono_rdwr_short_test(const char *filename, int format,
     sf_close(file);
 
     /* Open the file again to check the data. */
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -1932,7 +1876,7 @@ static void mono_rdwr_short_test(const char *filename, int format,
     sf_close(file);
 } /* mono_rdwr_short_test */
 
-static void new_rdwr_short_test(const char *filename, int format, int allow_fd)
+static void new_rdwr_short_test(const char *filename, int format)
 {
     SNDFILE *wfile, *rwfile;
     SF_INFO sfinfo;
@@ -1951,16 +1895,14 @@ static void new_rdwr_short_test(const char *filename, int format, int allow_fd)
     items = DATA_LENGTH;
     frames = items / sfinfo.channels;
 
-    wfile =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    wfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_command(wfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE);
     test_writef_short_or_die(wfile, 1, orig, frames, __LINE__);
     sf_write_sync(wfile);
     test_writef_short_or_die(wfile, 2, orig, frames, __LINE__);
     sf_write_sync(wfile);
 
-    rwfile =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    rwfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
     if (sfinfo.frames != 2 * frames)
     {
         printf("\n\nLine %d : incorrect number of frames in file (%" PRId64
@@ -1981,13 +1923,10 @@ static void new_rdwr_short_test(const char *filename, int format, int allow_fd)
 /*======================================================================================
 */
 
-static void mono_20bit_test(const char *filename, int format, int long_file_ok,
-                            int allow_fd);
-static void stereo_20bit_test(const char *filename, int format,
-                              int long_file_ok, int allow_fd);
-static void mono_rdwr_20bit_test(const char *filename, int format,
-                                 int long_file_ok, int allow_fd);
-static void new_rdwr_20bit_test(const char *filename, int format, int allow_fd);
+static void mono_20bit_test(const char *filename, int format, int long_file_ok);
+static void stereo_20bit_test(const char *filename, int format, int long_file_ok);
+static void mono_rdwr_20bit_test(const char *filename, int format, int long_file_ok);
+static void new_rdwr_20bit_test(const char *filename, int format);
 static void multi_seek_test(const char *filename, int format);
 static void write_seek_extend_test(const char *filename, int format);
 
@@ -1995,9 +1934,7 @@ static void pcm_test_20bit(const char *filename, int format, int long_file_ok)
 {
     SF_INFO sfinfo;
     int *orig;
-    int k, allow_fd;
-
-    allow_fd = false;
+    int k;
 
     print_test_name("pcm_test_20bit", filename);
 
@@ -2018,7 +1955,7 @@ static void pcm_test_20bit(const char *filename, int format, int long_file_ok)
 
     /* Some test broken out here. */
 
-    mono_20bit_test(filename, format, long_file_ok, allow_fd);
+    mono_20bit_test(filename, format, long_file_ok);
 
     /* Sub format DWVW does not allow seeking. */
     if ((format & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_16 ||
@@ -2034,7 +1971,7 @@ static void pcm_test_20bit(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
-        mono_rdwr_20bit_test(filename, format, long_file_ok, allow_fd);
+        mono_rdwr_20bit_test(filename, format, long_file_ok);
 
     /* If the format doesn't support stereo we're done. */
     sfinfo.channels = 2;
@@ -2045,7 +1982,7 @@ static void pcm_test_20bit(const char *filename, int format, int long_file_ok)
         return;
     };
 
-    stereo_20bit_test(filename, format, long_file_ok, allow_fd);
+    stereo_20bit_test(filename, format, long_file_ok);
 
     /* New read/write test. Not sure if this is needed yet. */
 
@@ -2056,7 +1993,7 @@ static void pcm_test_20bit(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
-        new_rdwr_20bit_test(filename, format, allow_fd);
+        new_rdwr_20bit_test(filename, format);
 
     unlink(filename);
 
@@ -2064,8 +2001,7 @@ static void pcm_test_20bit(const char *filename, int format, int long_file_ok)
     return;
 } /* pcm_test_20bit */
 
-static void mono_20bit_test(const char *filename, int format, int long_file_ok,
-                            int allow_fd)
+static void mono_20bit_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -2084,8 +2020,7 @@ static void mono_20bit_test(const char *filename, int format, int long_file_ok,
 
     items = DATA_LENGTH;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     if (sfinfo.frames || sfinfo.sections || sfinfo.seekable)
     {
@@ -2110,8 +2045,7 @@ static void mono_20bit_test(const char *filename, int format, int long_file_ok,
     if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -2284,8 +2218,7 @@ static void mono_20bit_test(const char *filename, int format, int long_file_ok,
 
 } /* mono_20bit_test */
 
-static void stereo_20bit_test(const char *filename, int format,
-                              int long_file_ok, int allow_fd)
+static void stereo_20bit_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -2309,8 +2242,7 @@ static void stereo_20bit_test(const char *filename, int format,
     items = DATA_LENGTH;
     frames = items / sfinfo.channels;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_set_string(file, SF_STR_ARTIST, "Your name here");
 
@@ -2325,8 +2257,7 @@ static void stereo_20bit_test(const char *filename, int format,
     if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -2448,26 +2379,12 @@ static void stereo_20bit_test(const char *filename, int format,
     sf_close(file);
 } /* stereo_20bit_test */
 
-static void mono_rdwr_20bit_test(const char *filename, int format,
-                                 int long_file_ok, int allow_fd)
+static void mono_rdwr_20bit_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
     int *orig, *test;
     int k, pass;
-
-    switch (format & SF_FORMAT_SUBMASK)
-    {
-    case SF_FORMAT_ALAC_16:
-    case SF_FORMAT_ALAC_20:
-    case SF_FORMAT_ALAC_24:
-    case SF_FORMAT_ALAC_32:
-        allow_fd = 0;
-        break;
-
-    default:
-        break;
-    };
 
     orig = orig_data.i;
     test = test_data.i;
@@ -2514,8 +2431,7 @@ static void mono_rdwr_20bit_test(const char *filename, int format,
     sfinfo.channels = 1;
     sfinfo.format = format;
 
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     /* Do 3 writes followed by reads. After each, check the data and the current
 	** read and write offsets.
@@ -2551,8 +2467,7 @@ static void mono_rdwr_20bit_test(const char *filename, int format,
     sf_close(file);
 
     /* Open the file again to check the data. */
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -2615,7 +2530,7 @@ static void mono_rdwr_20bit_test(const char *filename, int format,
     sf_close(file);
 } /* mono_rdwr_int_test */
 
-static void new_rdwr_20bit_test(const char *filename, int format, int allow_fd)
+static void new_rdwr_20bit_test(const char *filename, int format)
 {
     SNDFILE *wfile, *rwfile;
     SF_INFO sfinfo;
@@ -2634,16 +2549,14 @@ static void new_rdwr_20bit_test(const char *filename, int format, int allow_fd)
     items = DATA_LENGTH;
     frames = items / sfinfo.channels;
 
-    wfile =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    wfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_command(wfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE);
     test_writef_int_or_die(wfile, 1, orig, frames, __LINE__);
     sf_write_sync(wfile);
     test_writef_int_or_die(wfile, 2, orig, frames, __LINE__);
     sf_write_sync(wfile);
 
-    rwfile =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    rwfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
     if (sfinfo.frames != 2 * frames)
     {
         printf("\n\nLine %d : incorrect number of frames in file (%" PRId64
@@ -2664,13 +2577,10 @@ static void new_rdwr_20bit_test(const char *filename, int format, int allow_fd)
 /*======================================================================================
 */
 
-static void mono_24bit_test(const char *filename, int format, int long_file_ok,
-                            int allow_fd);
-static void stereo_24bit_test(const char *filename, int format,
-                              int long_file_ok, int allow_fd);
-static void mono_rdwr_24bit_test(const char *filename, int format,
-                                 int long_file_ok, int allow_fd);
-static void new_rdwr_24bit_test(const char *filename, int format, int allow_fd);
+static void mono_24bit_test(const char *filename, int format, int long_file_ok);
+static void stereo_24bit_test(const char *filename, int format, int long_file_ok);
+static void mono_rdwr_24bit_test(const char *filename, int format, int long_file_ok);
+static void new_rdwr_24bit_test(const char *filename, int format);
 static void multi_seek_test(const char *filename, int format);
 static void write_seek_extend_test(const char *filename, int format);
 
@@ -2678,9 +2588,7 @@ static void pcm_test_24bit(const char *filename, int format, int long_file_ok)
 {
     SF_INFO sfinfo;
     int *orig;
-    int k, allow_fd;
-
-    allow_fd = true;
+    int k;
 
     print_test_name("pcm_test_24bit", filename);
 
@@ -2701,7 +2609,7 @@ static void pcm_test_24bit(const char *filename, int format, int long_file_ok)
 
     /* Some test broken out here. */
 
-    mono_24bit_test(filename, format, long_file_ok, allow_fd);
+    mono_24bit_test(filename, format, long_file_ok);
 
     /* Sub format DWVW does not allow seeking. */
     if ((format & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_16 ||
@@ -2717,7 +2625,7 @@ static void pcm_test_24bit(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
-        mono_rdwr_24bit_test(filename, format, long_file_ok, allow_fd);
+        mono_rdwr_24bit_test(filename, format, long_file_ok);
 
     /* If the format doesn't support stereo we're done. */
     sfinfo.channels = 2;
@@ -2728,7 +2636,7 @@ static void pcm_test_24bit(const char *filename, int format, int long_file_ok)
         return;
     };
 
-    stereo_24bit_test(filename, format, long_file_ok, allow_fd);
+    stereo_24bit_test(filename, format, long_file_ok);
 
     /* New read/write test. Not sure if this is needed yet. */
 
@@ -2739,7 +2647,7 @@ static void pcm_test_24bit(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
-        new_rdwr_24bit_test(filename, format, allow_fd);
+        new_rdwr_24bit_test(filename, format);
 
     unlink(filename);
 
@@ -2747,8 +2655,7 @@ static void pcm_test_24bit(const char *filename, int format, int long_file_ok)
     return;
 } /* pcm_test_24bit */
 
-static void mono_24bit_test(const char *filename, int format, int long_file_ok,
-                            int allow_fd)
+static void mono_24bit_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -2767,8 +2674,7 @@ static void mono_24bit_test(const char *filename, int format, int long_file_ok,
 
     items = DATA_LENGTH;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     if (sfinfo.frames || sfinfo.sections || sfinfo.seekable)
     {
@@ -2793,8 +2699,7 @@ static void mono_24bit_test(const char *filename, int format, int long_file_ok,
     if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -2967,8 +2872,7 @@ static void mono_24bit_test(const char *filename, int format, int long_file_ok,
 
 } /* mono_24bit_test */
 
-static void stereo_24bit_test(const char *filename, int format,
-                              int long_file_ok, int allow_fd)
+static void stereo_24bit_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -2992,8 +2896,7 @@ static void stereo_24bit_test(const char *filename, int format,
     items = DATA_LENGTH;
     frames = items / sfinfo.channels;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_set_string(file, SF_STR_ARTIST, "Your name here");
 
@@ -3008,8 +2911,7 @@ static void stereo_24bit_test(const char *filename, int format,
     if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -3131,26 +3033,12 @@ static void stereo_24bit_test(const char *filename, int format,
     sf_close(file);
 } /* stereo_24bit_test */
 
-static void mono_rdwr_24bit_test(const char *filename, int format,
-                                 int long_file_ok, int allow_fd)
+static void mono_rdwr_24bit_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
     int *orig, *test;
     int k, pass;
-
-    switch (format & SF_FORMAT_SUBMASK)
-    {
-    case SF_FORMAT_ALAC_16:
-    case SF_FORMAT_ALAC_20:
-    case SF_FORMAT_ALAC_24:
-    case SF_FORMAT_ALAC_32:
-        allow_fd = 0;
-        break;
-
-    default:
-        break;
-    };
 
     orig = orig_data.i;
     test = test_data.i;
@@ -3197,8 +3085,7 @@ static void mono_rdwr_24bit_test(const char *filename, int format,
     sfinfo.channels = 1;
     sfinfo.format = format;
 
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     /* Do 3 writes followed by reads. After each, check the data and the current
 	** read and write offsets.
@@ -3234,8 +3121,7 @@ static void mono_rdwr_24bit_test(const char *filename, int format,
     sf_close(file);
 
     /* Open the file again to check the data. */
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -3298,7 +3184,7 @@ static void mono_rdwr_24bit_test(const char *filename, int format,
     sf_close(file);
 } /* mono_rdwr_int_test */
 
-static void new_rdwr_24bit_test(const char *filename, int format, int allow_fd)
+static void new_rdwr_24bit_test(const char *filename, int format)
 {
     SNDFILE *wfile, *rwfile;
     SF_INFO sfinfo;
@@ -3317,16 +3203,14 @@ static void new_rdwr_24bit_test(const char *filename, int format, int allow_fd)
     items = DATA_LENGTH;
     frames = items / sfinfo.channels;
 
-    wfile =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    wfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_command(wfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE);
     test_writef_int_or_die(wfile, 1, orig, frames, __LINE__);
     sf_write_sync(wfile);
     test_writef_int_or_die(wfile, 2, orig, frames, __LINE__);
     sf_write_sync(wfile);
 
-    rwfile =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    rwfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
     if (sfinfo.frames != 2 * frames)
     {
         printf("\n\nLine %d : incorrect number of frames in file (%" PRId64
@@ -3347,13 +3231,10 @@ static void new_rdwr_24bit_test(const char *filename, int format, int allow_fd)
 /*======================================================================================
 */
 
-static void mono_int_test(const char *filename, int format, int long_file_ok,
-                          int allow_fd);
-static void stereo_int_test(const char *filename, int format, int long_file_ok,
-                            int allow_fd);
-static void mono_rdwr_int_test(const char *filename, int format,
-                               int long_file_ok, int allow_fd);
-static void new_rdwr_int_test(const char *filename, int format, int allow_fd);
+static void mono_int_test(const char *filename, int format, int long_file_ok);
+static void stereo_int_test(const char *filename, int format, int long_file_ok);
+static void mono_rdwr_int_test(const char *filename, int format, int long_file_ok);
+static void new_rdwr_int_test(const char *filename, int format);
 static void multi_seek_test(const char *filename, int format);
 static void write_seek_extend_test(const char *filename, int format);
 
@@ -3361,9 +3242,7 @@ static void pcm_test_int(const char *filename, int format, int long_file_ok)
 {
     SF_INFO sfinfo;
     int *orig;
-    int k, allow_fd;
-
-    allow_fd = true;
+    int k;
 
     print_test_name("pcm_test_int", filename);
 
@@ -3384,7 +3263,7 @@ static void pcm_test_int(const char *filename, int format, int long_file_ok)
 
     /* Some test broken out here. */
 
-    mono_int_test(filename, format, long_file_ok, allow_fd);
+    mono_int_test(filename, format, long_file_ok);
 
     /* Sub format DWVW does not allow seeking. */
     if ((format & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_16 ||
@@ -3400,7 +3279,7 @@ static void pcm_test_int(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
-        mono_rdwr_int_test(filename, format, long_file_ok, allow_fd);
+        mono_rdwr_int_test(filename, format, long_file_ok);
 
     /* If the format doesn't support stereo we're done. */
     sfinfo.channels = 2;
@@ -3411,7 +3290,7 @@ static void pcm_test_int(const char *filename, int format, int long_file_ok)
         return;
     };
 
-    stereo_int_test(filename, format, long_file_ok, allow_fd);
+    stereo_int_test(filename, format, long_file_ok);
 
     /* New read/write test. Not sure if this is needed yet. */
 
@@ -3422,7 +3301,7 @@ static void pcm_test_int(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
-        new_rdwr_int_test(filename, format, allow_fd);
+        new_rdwr_int_test(filename, format);
 
     unlink(filename);
 
@@ -3430,8 +3309,7 @@ static void pcm_test_int(const char *filename, int format, int long_file_ok)
     return;
 } /* pcm_test_int */
 
-static void mono_int_test(const char *filename, int format, int long_file_ok,
-                          int allow_fd)
+static void mono_int_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -3450,8 +3328,7 @@ static void mono_int_test(const char *filename, int format, int long_file_ok,
 
     items = DATA_LENGTH;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     if (sfinfo.frames || sfinfo.sections || sfinfo.seekable)
     {
@@ -3476,8 +3353,7 @@ static void mono_int_test(const char *filename, int format, int long_file_ok,
     if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -3650,8 +3526,7 @@ static void mono_int_test(const char *filename, int format, int long_file_ok,
 
 } /* mono_int_test */
 
-static void stereo_int_test(const char *filename, int format, int long_file_ok,
-                            int allow_fd)
+static void stereo_int_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -3675,8 +3550,7 @@ static void stereo_int_test(const char *filename, int format, int long_file_ok,
     items = DATA_LENGTH;
     frames = items / sfinfo.channels;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_set_string(file, SF_STR_ARTIST, "Your name here");
 
@@ -3691,8 +3565,7 @@ static void stereo_int_test(const char *filename, int format, int long_file_ok,
     if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -3814,26 +3687,12 @@ static void stereo_int_test(const char *filename, int format, int long_file_ok,
     sf_close(file);
 } /* stereo_int_test */
 
-static void mono_rdwr_int_test(const char *filename, int format,
-                               int long_file_ok, int allow_fd)
+static void mono_rdwr_int_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
     int *orig, *test;
     int k, pass;
-
-    switch (format & SF_FORMAT_SUBMASK)
-    {
-    case SF_FORMAT_ALAC_16:
-    case SF_FORMAT_ALAC_20:
-    case SF_FORMAT_ALAC_24:
-    case SF_FORMAT_ALAC_32:
-        allow_fd = 0;
-        break;
-
-    default:
-        break;
-    };
 
     orig = orig_data.i;
     test = test_data.i;
@@ -3880,8 +3739,7 @@ static void mono_rdwr_int_test(const char *filename, int format,
     sfinfo.channels = 1;
     sfinfo.format = format;
 
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     /* Do 3 writes followed by reads. After each, check the data and the current
 	** read and write offsets.
@@ -3917,8 +3775,7 @@ static void mono_rdwr_int_test(const char *filename, int format,
     sf_close(file);
 
     /* Open the file again to check the data. */
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -3981,7 +3838,7 @@ static void mono_rdwr_int_test(const char *filename, int format,
     sf_close(file);
 } /* mono_rdwr_int_test */
 
-static void new_rdwr_int_test(const char *filename, int format, int allow_fd)
+static void new_rdwr_int_test(const char *filename, int format)
 {
     SNDFILE *wfile, *rwfile;
     SF_INFO sfinfo;
@@ -4000,16 +3857,14 @@ static void new_rdwr_int_test(const char *filename, int format, int allow_fd)
     items = DATA_LENGTH;
     frames = items / sfinfo.channels;
 
-    wfile =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    wfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_command(wfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE);
     test_writef_int_or_die(wfile, 1, orig, frames, __LINE__);
     sf_write_sync(wfile);
     test_writef_int_or_die(wfile, 2, orig, frames, __LINE__);
     sf_write_sync(wfile);
 
-    rwfile =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    rwfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
     if (sfinfo.frames != 2 * frames)
     {
         printf("\n\nLine %d : incorrect number of frames in file (%" PRId64
@@ -4030,13 +3885,10 @@ static void new_rdwr_int_test(const char *filename, int format, int allow_fd)
 /*======================================================================================
 */
 
-static void mono_float_test(const char *filename, int format, int long_file_ok,
-                            int allow_fd);
-static void stereo_float_test(const char *filename, int format,
-                              int long_file_ok, int allow_fd);
-static void mono_rdwr_float_test(const char *filename, int format,
-                                 int long_file_ok, int allow_fd);
-static void new_rdwr_float_test(const char *filename, int format, int allow_fd);
+static void mono_float_test(const char *filename, int format, int long_file_ok);
+static void stereo_float_test(const char *filename, int format, int long_file_ok);
+static void mono_rdwr_float_test(const char *filename, int format, int long_file_ok);
+static void new_rdwr_float_test(const char *filename, int format);
 static void multi_seek_test(const char *filename, int format);
 static void write_seek_extend_test(const char *filename, int format);
 
@@ -4044,9 +3896,7 @@ static void pcm_test_float(const char *filename, int format, int long_file_ok)
 {
     SF_INFO sfinfo;
     float *orig;
-    int k, allow_fd;
-
-    allow_fd = true;
+    int k;
 
     print_test_name("pcm_test_float", filename);
 
@@ -4067,7 +3917,7 @@ static void pcm_test_float(const char *filename, int format, int long_file_ok)
 
     /* Some test broken out here. */
 
-    mono_float_test(filename, format, long_file_ok, allow_fd);
+    mono_float_test(filename, format, long_file_ok);
 
     /* Sub format DWVW does not allow seeking. */
     if ((format & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_16 ||
@@ -4083,7 +3933,7 @@ static void pcm_test_float(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
-        mono_rdwr_float_test(filename, format, long_file_ok, allow_fd);
+        mono_rdwr_float_test(filename, format, long_file_ok);
 
     /* If the format doesn't support stereo we're done. */
     sfinfo.channels = 2;
@@ -4094,7 +3944,7 @@ static void pcm_test_float(const char *filename, int format, int long_file_ok)
         return;
     };
 
-    stereo_float_test(filename, format, long_file_ok, allow_fd);
+    stereo_float_test(filename, format, long_file_ok);
 
     /* New read/write test. Not sure if this is needed yet. */
 
@@ -4105,7 +3955,7 @@ static void pcm_test_float(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
-        new_rdwr_float_test(filename, format, allow_fd);
+        new_rdwr_float_test(filename, format);
 
     unlink(filename);
 
@@ -4113,8 +3963,7 @@ static void pcm_test_float(const char *filename, int format, int long_file_ok)
     return;
 } /* pcm_test_float */
 
-static void mono_float_test(const char *filename, int format, int long_file_ok,
-                            int allow_fd)
+static void mono_float_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -4133,8 +3982,7 @@ static void mono_float_test(const char *filename, int format, int long_file_ok,
 
     items = DATA_LENGTH;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     if (sfinfo.frames || sfinfo.sections || sfinfo.seekable)
     {
@@ -4159,8 +4007,7 @@ static void mono_float_test(const char *filename, int format, int long_file_ok,
     if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -4332,8 +4179,7 @@ static void mono_float_test(const char *filename, int format, int long_file_ok,
 
 } /* mono_float_test */
 
-static void stereo_float_test(const char *filename, int format,
-                              int long_file_ok, int allow_fd)
+static void stereo_float_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -4357,8 +4203,7 @@ static void stereo_float_test(const char *filename, int format,
     items = DATA_LENGTH;
     frames = items / sfinfo.channels;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_set_string(file, SF_STR_ARTIST, "Your name here");
 
@@ -4373,8 +4218,7 @@ static void stereo_float_test(const char *filename, int format,
     if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -4496,26 +4340,12 @@ static void stereo_float_test(const char *filename, int format,
     sf_close(file);
 } /* stereo_float_test */
 
-static void mono_rdwr_float_test(const char *filename, int format,
-                                 int long_file_ok, int allow_fd)
+static void mono_rdwr_float_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
     float *orig, *test;
     int k, pass;
-
-    switch (format & SF_FORMAT_SUBMASK)
-    {
-    case SF_FORMAT_ALAC_16:
-    case SF_FORMAT_ALAC_20:
-    case SF_FORMAT_ALAC_24:
-    case SF_FORMAT_ALAC_32:
-        allow_fd = 0;
-        break;
-
-    default:
-        break;
-    };
 
     orig = orig_data.f;
     test = test_data.f;
@@ -4562,8 +4392,7 @@ static void mono_rdwr_float_test(const char *filename, int format,
     sfinfo.channels = 1;
     sfinfo.format = format;
 
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     /* Do 3 writes followed by reads. After each, check the data and the current
 	** read and write offsets.
@@ -4599,8 +4428,7 @@ static void mono_rdwr_float_test(const char *filename, int format,
     sf_close(file);
 
     /* Open the file again to check the data. */
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -4663,7 +4491,7 @@ static void mono_rdwr_float_test(const char *filename, int format,
     sf_close(file);
 } /* mono_rdwr_float_test */
 
-static void new_rdwr_float_test(const char *filename, int format, int allow_fd)
+static void new_rdwr_float_test(const char *filename, int format)
 {
     SNDFILE *wfile, *rwfile;
     SF_INFO sfinfo;
@@ -4682,16 +4510,14 @@ static void new_rdwr_float_test(const char *filename, int format, int allow_fd)
     items = DATA_LENGTH;
     frames = items / sfinfo.channels;
 
-    wfile =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    wfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_command(wfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE);
     test_writef_float_or_die(wfile, 1, orig, frames, __LINE__);
     sf_write_sync(wfile);
     test_writef_float_or_die(wfile, 2, orig, frames, __LINE__);
     sf_write_sync(wfile);
 
-    rwfile =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    rwfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
     if (sfinfo.frames != 2 * frames)
     {
         printf("\n\nLine %d : incorrect number of frames in file (%" PRId64
@@ -4712,14 +4538,10 @@ static void new_rdwr_float_test(const char *filename, int format, int allow_fd)
 /*======================================================================================
 */
 
-static void mono_double_test(const char *filename, int format, int long_file_ok,
-                             int allow_fd);
-static void stereo_double_test(const char *filename, int format,
-                               int long_file_ok, int allow_fd);
-static void mono_rdwr_double_test(const char *filename, int format,
-                                  int long_file_ok, int allow_fd);
-static void new_rdwr_double_test(const char *filename, int format,
-                                 int allow_fd);
+static void mono_double_test(const char *filename, int format, int long_file_ok);
+static void stereo_double_test(const char *filename, int format, int long_file_ok);
+static void mono_rdwr_double_test(const char *filename, int format, int long_file_ok);
+static void new_rdwr_double_test(const char *filename, int format);
 static void multi_seek_test(const char *filename, int format);
 static void write_seek_extend_test(const char *filename, int format);
 
@@ -4727,9 +4549,7 @@ static void pcm_test_double(const char *filename, int format, int long_file_ok)
 {
     SF_INFO sfinfo;
     double *orig;
-    int k, allow_fd;
-
-    allow_fd = true;
+    int k;
 
     print_test_name("pcm_test_double", filename);
 
@@ -4750,7 +4570,7 @@ static void pcm_test_double(const char *filename, int format, int long_file_ok)
 
     /* Some test broken out here. */
 
-    mono_double_test(filename, format, long_file_ok, allow_fd);
+    mono_double_test(filename, format, long_file_ok);
 
     /* Sub format DWVW does not allow seeking. */
     if ((format & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_16 ||
@@ -4766,7 +4586,7 @@ static void pcm_test_double(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
-        mono_rdwr_double_test(filename, format, long_file_ok, allow_fd);
+        mono_rdwr_double_test(filename, format, long_file_ok);
 
     /* If the format doesn't support stereo we're done. */
     sfinfo.channels = 2;
@@ -4777,7 +4597,7 @@ static void pcm_test_double(const char *filename, int format, int long_file_ok)
         return;
     };
 
-    stereo_double_test(filename, format, long_file_ok, allow_fd);
+    stereo_double_test(filename, format, long_file_ok);
 
     /* New read/write test. Not sure if this is needed yet. */
 
@@ -4788,7 +4608,7 @@ static void pcm_test_double(const char *filename, int format, int long_file_ok)
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24 &&
         (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32)
-        new_rdwr_double_test(filename, format, allow_fd);
+        new_rdwr_double_test(filename, format);
 
     unlink(filename);
 
@@ -4796,8 +4616,7 @@ static void pcm_test_double(const char *filename, int format, int long_file_ok)
     return;
 } /* pcm_test_double */
 
-static void mono_double_test(const char *filename, int format, int long_file_ok,
-                             int allow_fd)
+static void mono_double_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -4816,8 +4635,7 @@ static void mono_double_test(const char *filename, int format, int long_file_ok,
 
     items = DATA_LENGTH;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     if (sfinfo.frames || sfinfo.sections || sfinfo.seekable)
     {
@@ -4842,8 +4660,7 @@ static void mono_double_test(const char *filename, int format, int long_file_ok,
     if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -5015,8 +4832,7 @@ static void mono_double_test(const char *filename, int format, int long_file_ok,
 
 } /* mono_double_test */
 
-static void stereo_double_test(const char *filename, int format,
-                               int long_file_ok, int allow_fd)
+static void stereo_double_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
@@ -5040,8 +4856,7 @@ static void stereo_double_test(const char *filename, int format,
     items = DATA_LENGTH;
     frames = items / sfinfo.channels;
 
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_set_string(file, SF_STR_ARTIST, "Your name here");
 
@@ -5056,8 +4871,7 @@ static void stereo_double_test(const char *filename, int format,
     if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
         memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -5179,26 +4993,12 @@ static void stereo_double_test(const char *filename, int format,
     sf_close(file);
 } /* stereo_double_test */
 
-static void mono_rdwr_double_test(const char *filename, int format,
-                                  int long_file_ok, int allow_fd)
+static void mono_rdwr_double_test(const char *filename, int format, int long_file_ok)
 {
     SNDFILE *file;
     SF_INFO sfinfo;
     double *orig, *test;
     int k, pass;
-
-    switch (format & SF_FORMAT_SUBMASK)
-    {
-    case SF_FORMAT_ALAC_16:
-    case SF_FORMAT_ALAC_20:
-    case SF_FORMAT_ALAC_24:
-    case SF_FORMAT_ALAC_32:
-        allow_fd = 0;
-        break;
-
-    default:
-        break;
-    };
 
     orig = orig_data.d;
     test = test_data.d;
@@ -5245,8 +5045,7 @@ static void mono_rdwr_double_test(const char *filename, int format,
     sfinfo.channels = 1;
     sfinfo.format = format;
 
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     /* Do 3 writes followed by reads. After each, check the data and the current
 	** read and write offsets.
@@ -5282,8 +5081,7 @@ static void mono_rdwr_double_test(const char *filename, int format,
     sf_close(file);
 
     /* Open the file again to check the data. */
-    file =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -5346,7 +5144,7 @@ static void mono_rdwr_double_test(const char *filename, int format,
     sf_close(file);
 } /* mono_rdwr_double_test */
 
-static void new_rdwr_double_test(const char *filename, int format, int allow_fd)
+static void new_rdwr_double_test(const char *filename, int format)
 {
     SNDFILE *wfile, *rwfile;
     SF_INFO sfinfo;
@@ -5365,16 +5163,14 @@ static void new_rdwr_double_test(const char *filename, int format, int allow_fd)
     items = DATA_LENGTH;
     frames = items / sfinfo.channels;
 
-    wfile =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__);
+    wfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_command(wfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE);
     test_writef_double_or_die(wfile, 1, orig, frames, __LINE__);
     sf_write_sync(wfile);
     test_writef_double_or_die(wfile, 2, orig, frames, __LINE__);
     sf_write_sync(wfile);
 
-    rwfile =
-        test_open_file_or_die(filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__);
+    rwfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
     if (sfinfo.frames != 2 * frames)
     {
         printf("\n\nLine %d : incorrect number of frames in file (%" PRId64
@@ -5399,9 +5195,6 @@ static void empty_file_test(const char *filename, int format)
 {
     SNDFILE *file;
     SF_INFO info;
-    int allow_fd;
-
-    allow_fd = true;
 
     print_test_name("empty_file_test", filename);
 
@@ -5423,12 +5216,11 @@ static void empty_file_test(const char *filename, int format)
     };
 
     /* Create an empty file. */
-    file =
-        test_open_file_or_die(filename, SFM_WRITE, &info, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &info, __LINE__);
     sf_close(file);
 
     /* Open for read and check the length. */
-    file = test_open_file_or_die(filename, SFM_READ, &info, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &info, __LINE__);
 
     if (info.frames != 0)
     {
@@ -5440,7 +5232,7 @@ static void empty_file_test(const char *filename, int format)
     sf_close(file);
 
     /* Open for read/write and check the length. */
-    file = test_open_file_or_die(filename, SFM_RDWR, &info, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &info, __LINE__);
 
     if (info.frames != 0)
     {
@@ -5452,7 +5244,7 @@ static void empty_file_test(const char *filename, int format)
     sf_close(file);
 
     /* Open for read and check the length. */
-    file = test_open_file_or_die(filename, SFM_READ, &info, allow_fd, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &info, __LINE__);
 
     if (info.frames != 0)
     {
@@ -5512,7 +5304,7 @@ static void multi_seek_test(const char *filename, int format)
 
     generate_file(filename, format, 88200);
 
-    file = test_open_file_or_die(filename, SFM_READ, &info, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &info, __LINE__);
 
     for (k = 0; k < 10; k++)
     {
@@ -5574,7 +5366,7 @@ static void write_seek_extend_test(const char *filename, int format)
         orig[k] = 0x3fff;
 
     file =
-        test_open_file_or_die(filename, SFM_WRITE, &info, SF_FALSE, __LINE__);
+        test_open_file_or_die(filename, SFM_WRITE, &info, __LINE__);
     test_write_short_or_die(file, 0, orig, items, __LINE__);
 
     /* Extend the file using a seek. */
@@ -5584,7 +5376,7 @@ static void write_seek_extend_test(const char *filename, int format)
     test_writef_short_or_die(file, 0, orig, items, __LINE__);
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &info, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &info, __LINE__);
     test_read_short_or_die(file, 0, test, 3 * items, __LINE__);
     sf_close(file);
 

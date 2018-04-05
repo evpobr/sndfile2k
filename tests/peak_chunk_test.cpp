@@ -138,7 +138,7 @@ static void test_float_peak(const char *filename, int filetype)
     data[4 * (frames / 2) + 3] = (frames / 2) * 0.01; /* Fourth channel */
 
     /* Write a file with PEAK chunks. */
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, 0, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     /* Try to confuse the header writer by adding a removing the PEAK chunk. */
     sf_command(file, SFC_SET_ADD_PEAK_CHUNK, NULL, SF_TRUE);
@@ -154,7 +154,7 @@ static void test_float_peak(const char *filename, int filetype)
 
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, 0, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {
@@ -218,7 +218,7 @@ static void test_float_peak(const char *filename, int filetype)
     sf_close(file);
 
     /* Write a file ***without*** PEAK chunks. */
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, 0, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     /* Try to confuse the header writer by adding a removing the PEAK chunk. */
     sf_command(file, SFC_SET_ADD_PEAK_CHUNK, NULL, SF_FALSE);
@@ -234,7 +234,7 @@ static void test_float_peak(const char *filename, int filetype)
 
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, 0, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     /* Check these two commands. */
     if (sf_command(file, SFC_GET_SIGNAL_MAX, data, sizeof(double)))
@@ -359,7 +359,7 @@ static void read_write_peak_test(const char *filename, int filetype)
     sfinfo.frames = 0;
 
     /* Open the file, add peak chunk and write samples with value 0.1. */
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_command(file, SFC_SET_ADD_PEAK_CHUNK, NULL, SF_TRUE);
 
@@ -368,7 +368,7 @@ static void read_write_peak_test(const char *filename, int filetype)
     sf_close(file);
 
     /* Open the fiel RDWR, write sample valied 1.25. */
-    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     for (k = 0; k < ARRAY_LEN(small_data); k++)
         small_data[k] = 1.0;
@@ -382,7 +382,7 @@ static void read_write_peak_test(const char *filename, int filetype)
     exit_if_true(max_peak < 0.1, "\n\nLine %d : max peak (%5.3f) should not be 0.1.\n\n", __LINE__, max_peak);
 
     /* Open the file and test the values written to the PEAK chunk. */
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     exit_if_true(sfinfo.channels * sfinfo.frames != 2 * ARRAY_LEN(small_data),
                  "Line %d : frame count is %" PRId64 ", should be %zd\n", __LINE__, sfinfo.frames, 2 * ARRAY_LEN(small_data));

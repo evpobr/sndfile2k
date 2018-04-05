@@ -274,7 +274,7 @@ static void update_header_sub(const char *filename, int typemajor, SF_FILEMODE w
     sfinfo.format = (typemajor | SF_FORMAT_PCM_16);
     sfinfo.channels = 1;
 
-    outfile = test_open_file_or_die(filename, write_mode, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, write_mode, &sfinfo, __LINE__);
 
     for (k = 0; k < BUFFER_LEN; k++)
         data_out[k] = k + 1;
@@ -283,7 +283,7 @@ static void update_header_sub(const char *filename, int typemajor, SF_FILEMODE w
     if (typemajor != SF_FORMAT_HTK)
     {
         /* The HTK header is not correct when the file is first written. */
-        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
         sf_close(infile);
     };
 
@@ -293,7 +293,7 @@ static void update_header_sub(const char *filename, int typemajor, SF_FILEMODE w
 	** Open file and check log buffer for an error. If header update failed
 	** the the log buffer will contain errors.
 	*/
-    infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     check_log_buffer_or_die(infile, __LINE__);
 
     if (sfinfo.frames < BUFFER_LEN || sfinfo.frames > BUFFER_LEN + 50)
@@ -319,7 +319,7 @@ static void update_header_sub(const char *filename, int typemajor, SF_FILEMODE w
     test_write_int_or_die(outfile, 0, data_out, BUFFER_LEN, __LINE__);
 
     /* Open file again and make sure no errors in log buffer. */
-    infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     check_log_buffer_or_die(infile, __LINE__);
 
     if (sfinfo.frames < 2 * BUFFER_LEN || sfinfo.frames > 2 * BUFFER_LEN + 50)
@@ -360,7 +360,7 @@ static void update_header_before_write_test(const char *filename, int typemajor)
     sfinfo.format = (typemajor | SF_FORMAT_PCM_16);
     sfinfo.channels = 1;
 
-    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     /* FLAC can only write the header once; if the first call to sf_write() will
 	** also attempt to write the header, it fails. FLAC-specific regression
@@ -397,11 +397,11 @@ static void update_seek_short_test(const char *filename, int filetype)
     if (sf_format_check(&sfinfo) == SF_FALSE)
         sfinfo.channels = 1;
 
-    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_close(outfile);
 
     /* Open again for read/write. */
-    outfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     /*
 	** In auto header update mode, seeking to the end of the file with
@@ -425,7 +425,7 @@ static void update_seek_short_test(const char *filename, int filetype)
         test_seek_or_die(outfile, 0, SEEK_END, k * frames, sfinfo.channels, __LINE__);
 
         /* Open file again and make sure no errors in log buffer. */
-        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
         check_log_buffer_or_die(infile, __LINE__);
         sf_close(infile);
 
@@ -471,11 +471,11 @@ static void update_seek_int_test(const char *filename, int filetype)
     if (sf_format_check(&sfinfo) == SF_FALSE)
         sfinfo.channels = 1;
 
-    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_close(outfile);
 
     /* Open again for read/write. */
-    outfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     /*
 	** In auto header update mode, seeking to the end of the file with
@@ -499,7 +499,7 @@ static void update_seek_int_test(const char *filename, int filetype)
         test_seek_or_die(outfile, 0, SEEK_END, k * frames, sfinfo.channels, __LINE__);
 
         /* Open file again and make sure no errors in log buffer. */
-        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
         check_log_buffer_or_die(infile, __LINE__);
         sf_close(infile);
 
@@ -545,11 +545,11 @@ static void update_seek_float_test(const char *filename, int filetype)
     if (sf_format_check(&sfinfo) == SF_FALSE)
         sfinfo.channels = 1;
 
-    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_close(outfile);
 
     /* Open again for read/write. */
-    outfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     /*
 	** In auto header update mode, seeking to the end of the file with
@@ -573,7 +573,7 @@ static void update_seek_float_test(const char *filename, int filetype)
         test_seek_or_die(outfile, 0, SEEK_END, k * frames, sfinfo.channels, __LINE__);
 
         /* Open file again and make sure no errors in log buffer. */
-        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
         check_log_buffer_or_die(infile, __LINE__);
         sf_close(infile);
 
@@ -619,11 +619,11 @@ static void update_seek_double_test(const char *filename, int filetype)
     if (sf_format_check(&sfinfo) == SF_FALSE)
         sfinfo.channels = 1;
 
-    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_close(outfile);
 
     /* Open again for read/write. */
-    outfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     /*
 	** In auto header update mode, seeking to the end of the file with
@@ -647,7 +647,7 @@ static void update_seek_double_test(const char *filename, int filetype)
         test_seek_or_die(outfile, 0, SEEK_END, k * frames, sfinfo.channels, __LINE__);
 
         /* Open file again and make sure no errors in log buffer. */
-        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+        infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
         check_log_buffer_or_die(infile, __LINE__);
         sf_close(infile);
 
@@ -692,7 +692,7 @@ static void header_shrink_test(const char *filename, int filetype)
     frames = ARRAY_LEN(buffer) / sfinfo.channels;
 
     /* Test the file with extra header data. */
-    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     sf_command(outfile, SFC_SET_ADD_PEAK_CHUNK, NULL, SF_TRUE);
     sf_command(outfile, SFC_UPDATE_HEADER_NOW, NULL, SF_FALSE);
@@ -702,7 +702,7 @@ static void header_shrink_test(const char *filename, int filetype)
     sf_close(outfile);
 
     /* Open again for read. */
-    infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    infile = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     test_readf_float_or_die(infile, 0, bufferin, frames, __LINE__);
     sf_close(infile);
@@ -735,7 +735,7 @@ static void extra_header_test(const char *filename, int filetype)
     frames = ARRAY_LEN(buffer) / sfinfo.channels;
 
     /* Test the file with extra header data. */
-    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, 503);
+    outfile = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, 503);
     sf_set_string(outfile, SF_STR_TITLE, filename);
     test_writef_short_or_die(outfile, k, buffer, frames, 505);
     sf_set_string(outfile, SF_STR_COPYRIGHT, "(c) 1980 Erik");

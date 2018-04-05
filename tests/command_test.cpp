@@ -577,13 +577,13 @@ static void calc_peak_test(int filetype, const char *filename, int channels)
     for (k = 0; k < buffer_len; k++)
         double_data[k] = (k + 1) / (2.0 * buffer_len);
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     test_writef_double_or_die(file, 0, double_data, frame_count, __LINE__);
 
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -630,13 +630,13 @@ static void calc_peak_test(int filetype, const char *filename, int channels)
     for (k = 0; k < buffer_len; k++)
         double_data[k] = (k + 1) / (2.0 * buffer_len);
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     test_writef_double_or_die(file, 0, double_data, frame_count, __LINE__);
 
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != format)
     {
@@ -690,7 +690,7 @@ static void truncate_test(const char *filename, int filetype)
     sfinfo.format = filetype;
     sfinfo.channels = 2;
 
-    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     test_write_int_or_die(file, 0, int_data, BUFFER_LEN, __LINE__);
 
@@ -717,7 +717,7 @@ static void instrumet_rw_test(const char *filename)
     SF_INSTRUMENT inst;
     memset(&sfinfo, 0, sizeof(SF_INFO));
 
-    sndfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__);
+    sndfile = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
 
     if (sf_command(sndfile, SFC_GET_INSTRUMENT, &inst, sizeof(inst)) == SF_TRUE)
     {
@@ -764,7 +764,7 @@ static void instrument_test(const char *filename, int filetype)
     sfinfo.format = filetype;
     sfinfo.channels = 1;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     if (sf_command(file, SFC_SET_INSTRUMENT, &write_inst, sizeof(write_inst)) == SF_FALSE)
     {
         printf("\n\nLine %d : sf_command (SFC_SET_INSTRUMENT) failed.\n\n", __LINE__);
@@ -775,7 +775,7 @@ static void instrument_test(const char *filename, int filetype)
 
     memset(&read_inst, 0, sizeof(read_inst));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     if (sf_command(file, SFC_GET_INSTRUMENT, &read_inst, sizeof(read_inst)) == SF_FALSE)
     {
         printf("\n\nLine %d : sf_command (SFC_GET_INSTRUMENT) failed.\n\n", __LINE__);
@@ -894,7 +894,7 @@ static void cue_points_test(const char *filename, int filetype)
     sfinfo.format = filetype;
     sfinfo.channels = 1;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     if (sf_command(file, SFC_SET_CUE_POINTS, write_cue, 2) == SF_FALSE)
     {
         printf("\n\nLine %d : sf_command (SFC_SET_CUE_POINTS) failed.\n\n", __LINE__);
@@ -904,7 +904,7 @@ static void cue_points_test(const char *filename, int filetype)
     sf_close(file);
 
     SF_CUE_POINT read_cue[2] = { 0 };
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     if (sf_command(file, SFC_GET_CUE_POINTS, read_cue, 2) == SF_FALSE)
     {
         printf("\n\nLine %d : sf_command (SFC_SET_CUE_POINTS) failed.\n\n", __LINE__);
@@ -975,7 +975,7 @@ static void current_sf_info_test(const char *filename)
     outinfo.channels = 1;
     outinfo.frames = 0;
 
-    outfile = test_open_file_or_die(filename, SFM_WRITE, &outinfo, SF_TRUE, __LINE__);
+    outfile = test_open_file_or_die(filename, SFM_WRITE, &outinfo, __LINE__);
     sf_command(outfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, 0);
 
     exit_if_true(outinfo.frames != 0, "\n\nLine %d : Initial sfinfo.frames is not zero.\n\n", __LINE__);
@@ -988,7 +988,7 @@ static void current_sf_info_test(const char *filename)
 
     /* Read file making sure no channel map exists. */
     memset(&ininfo, 0, sizeof(ininfo));
-    infile = test_open_file_or_die(filename, SFM_READ, &ininfo, SF_TRUE, __LINE__);
+    infile = test_open_file_or_die(filename, SFM_READ, &ininfo, __LINE__);
 
     test_write_double_or_die(outfile, 0, double_data, BUFFER_LEN, __LINE__);
 
@@ -1024,12 +1024,12 @@ static void channel_map_test(const char *filename, int filetype)
     case SF_FORMAT_WAVEX:
     case SF_FORMAT_RF64:
         /* Write file without channel map. */
-        file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+        file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
         test_write_double_or_die(file, 0, double_data, BUFFER_LEN, __LINE__);
         sf_close(file);
 
         /* Read file making default channel map exists. */
-        file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+        file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
         exit_if_true(sf_command(file, SFC_GET_CHANNEL_MAP_INFO, channel_map_read, sizeof(channel_map_read)) == SF_FALSE,
                      "\n\nLine %d : sf_command (SFC_GET_CHANNEL_MAP_INFO) should not have failed.\n\n",
                      __LINE__);
@@ -1042,14 +1042,14 @@ static void channel_map_test(const char *filename, int filetype)
     };
 
     /* Write file with a channel map. */
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     exit_if_true(sf_command(file, SFC_SET_CHANNEL_MAP_INFO, channel_map_write, sizeof(channel_map_write)) == SF_FALSE,
                  "\n\nLine %d : sf_command (SFC_SET_CHANNEL_MAP_INFO) failed.\n\n", __LINE__);
     test_write_double_or_die(file, 0, double_data, BUFFER_LEN, __LINE__);
     sf_close(file);
 
     /* Read file making sure no channel map exists. */
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     exit_if_true(sf_command(file, SFC_GET_CHANNEL_MAP_INFO, channel_map_read, sizeof(channel_map_read)) != SF_TRUE,
                  "\n\nLine %d : sf_command (SFC_GET_CHANNEL_MAP_INFO) failed.\n\n", __LINE__);
     check_log_buffer_or_die(file, __LINE__);
@@ -1091,12 +1091,12 @@ static void raw_needs_endswap_test(const char *filename, int filetype)
         sfinfo.format = filetype | subtypes[k];
         sfinfo.channels = 1;
 
-        file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+        file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
         test_write_double_or_die(file, 0, double_data, BUFFER_LEN, __LINE__);
         sf_close(file);
 
         memset(&sfinfo, 0, sizeof(sfinfo));
-        file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+        file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
         needs_endswap = sf_command(file, SFC_RAW_DATA_NEEDS_ENDSWAP, NULL, 0);
 

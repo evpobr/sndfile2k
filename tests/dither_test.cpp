@@ -155,7 +155,7 @@ static void dither_test(const char *filename, int filetype)
     sfinfo.frames = 0;
 
     file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     /* Check for old version of the dither API. */
     if (sf_command(file, SFC_SET_DITHER_ON_WRITE, NULL, SF_TRUE) == 0)
@@ -184,7 +184,7 @@ static void dither_test(const char *filename, int filetype)
     sf_close(file);
 
     file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+        test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.frames != BUFFER_LEN)
     {

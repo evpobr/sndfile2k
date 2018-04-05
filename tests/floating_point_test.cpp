@@ -213,7 +213,7 @@ static void float_scaled_test(const char *filename, int allow_exit, int replace_
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
 
     test_write_float_or_die(file, 0, float_data, DFT_DATA_LENGTH, __LINE__);
@@ -222,7 +222,7 @@ static void float_scaled_test(const char *filename, int allow_exit, int replace_
 
     memset(float_test, 0, sizeof(float_test));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
 
     exit_if_true(sfinfo.format != filetype, "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype,
@@ -269,7 +269,7 @@ static void double_scaled_test(const char *filename, int allow_exit, int replace
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
 
     test_write_double_or_die(file, 0, double_data, DFT_DATA_LENGTH, __LINE__);
@@ -278,7 +278,7 @@ static void double_scaled_test(const char *filename, int allow_exit, int replace
 
     memset(double_test, 0, sizeof(double_test));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     sf_command(file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float);
 
     exit_if_true(sfinfo.format != filetype, "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype,
@@ -325,11 +325,11 @@ static void float_short_little_test(const char *filename)
     sfinfo.channels = 1;
     sfinfo.format = SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_FLOAT;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     test_write_float_or_die(file, 0, float_data, ARRAY_LEN(float_data), __LINE__);
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.frames != ARRAY_LEN(float_data))
     {
@@ -382,11 +382,11 @@ static void float_short_big_test(const char *filename)
     sfinfo.channels = 1;
     sfinfo.format = SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_FLOAT;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     test_write_float_or_die(file, 0, float_data, ARRAY_LEN(float_data), __LINE__);
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.frames != ARRAY_LEN(float_data))
     {
@@ -439,11 +439,11 @@ static void float_int_little_test(const char *filename)
     sfinfo.channels = 1;
     sfinfo.format = SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_FLOAT;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     test_write_float_or_die(file, 0, float_data, ARRAY_LEN(float_data), __LINE__);
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.frames != ARRAY_LEN(float_data))
     {
@@ -496,11 +496,11 @@ static void float_int_big_test(const char *filename)
     sfinfo.channels = 1;
     sfinfo.format = SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_FLOAT;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     test_write_float_or_die(file, 0, float_data, ARRAY_LEN(float_data), __LINE__);
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.frames != ARRAY_LEN(float_data))
     {
@@ -553,11 +553,11 @@ static void double_short_little_test(const char *filename)
     sfinfo.channels = 1;
     sfinfo.format = SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_DOUBLE;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     test_write_double_or_die(file, 0, double_data, ARRAY_LEN(double_data), __LINE__);
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.frames != ARRAY_LEN(double_data))
     {
@@ -610,11 +610,11 @@ static void double_short_big_test(const char *filename)
     sfinfo.channels = 1;
     sfinfo.format = SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_DOUBLE;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     test_write_double_or_die(file, 0, double_data, ARRAY_LEN(double_data), __LINE__);
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.frames != ARRAY_LEN(double_data))
     {
@@ -667,11 +667,11 @@ static void double_int_little_test(const char *filename)
     sfinfo.channels = 1;
     sfinfo.format = SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_DOUBLE;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     test_write_double_or_die(file, 0, double_data, ARRAY_LEN(double_data), __LINE__);
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.frames != ARRAY_LEN(double_data))
     {
@@ -724,11 +724,11 @@ static void double_int_big_test(const char *filename)
     sfinfo.channels = 1;
     sfinfo.format = SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_DOUBLE;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     test_write_double_or_die(file, 0, double_data, ARRAY_LEN(double_data), __LINE__);
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.frames != ARRAY_LEN(double_data))
     {

@@ -82,7 +82,7 @@ static void vorbis_test(void)
         printf("\n                                  Sample rate -> 32kHz    ");
         sfinfo.samplerate = 32000;
 
-        file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+        file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     };
 
     test_write_float_or_die(file, 0, float_data, ARRAY_LEN(float_data), __LINE__);
@@ -92,7 +92,7 @@ static void vorbis_test(void)
 
     /* Read the file back in again. */
     memset(&sfinfo, 0, sizeof(sfinfo));
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     test_read_float_or_die(file, 0, float_data, ARRAY_LEN(float_data), __LINE__);
     sf_close(file);
 
@@ -135,8 +135,8 @@ static void compression_size_test(int format, const char *filename)
     sfinfo.samplerate = SAMPLE_RATE;
 
     /* Write the output file. */
-    q3_file = test_open_file_or_die(q3_fname, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
-    q6_file = test_open_file_or_die(q6_fname, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
+    q3_file = test_open_file_or_die(q3_fname, SFM_WRITE, &sfinfo, __LINE__);
+    q6_file = test_open_file_or_die(q6_fname, SFM_WRITE, &sfinfo, __LINE__);
 
     quality = 0.3;
     sf_command(q3_file, SFC_SET_VBR_ENCODING_QUALITY, &quality, sizeof(quality));

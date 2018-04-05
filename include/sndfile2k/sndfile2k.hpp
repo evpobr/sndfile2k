@@ -104,7 +104,7 @@ public:
 	 * When opening a file for write, the caller must fill @p samplerate,
 	 * @p channels, @p format.
 	 *
-	 * @sa sf_wchar_open(), sf_open_fd(), sf_open_virtual()
+	 * @sa sf_wchar_open(), sf_open_virtual()
 	 * @sa sf_close()
 	 */
 	SndfileHandle(const char *path, SF_FILEMODE mode = SFM_READ, int format = 0, int channels = 0,
@@ -121,45 +121,10 @@ public:
 	 * This constructor is similar to SndfileHandle(const char *, int, int, int),
 	 * but takes @c std::string as path.
 	 *
-	 * @sa sf_wchar_open(), sf_open_fd(), sf_open_virtual()
+	 * @sa sf_wchar_open(), sf_open_virtual()
 	 * @sa sf_close()
 	 */
 	SndfileHandle(std::string const &path, SF_FILEMODE mode = SFM_READ, int format = 0, int channels = 0,
-				  int samplerate = 0);
-
-	/** Opens file using @c POSIX file descriptor
-	 *
-	 * @param[in] fd File descriptor
-	 * @param[in] close_desc File descriptor close mode
-	 * @param[in] mode File open mode
-	 * @param[in] format Format
-	 * @param[in] channels Number of channels
-	 * @param[in] samplerate Samplerate
-	 *
-	 * This constructor is similar to SndfileHandle(const char *, int, int, int),
-	 * but takes @c POSIX file descriptor of already opened file instead of path.
-	 *
-	 * Care should be taken to ensure that the mode of the file represented by the
-	 * descriptor matches the @c mode argument.
-	 *
-	 * This function is useful in the following circumstances:
-	 * - Opening temporary files securely (ie use the @c tmpfile() to return a
-	 * @c FILE* pointer and then using @c fileno() to retrieve the file descriptor
-	 * which is then passed to sndfile2k.
-	 * - Opening files with file names using OS specific character encodings and then
-	 * passing the file descriptor to sf_open_fd().
-	 *
-	 * When destructor is called, the file descriptor is only closed if the
-	 * @p close_desc parameter is set ::SF_TRUE.
-	 *
-	 * @note On Microsoft Windows, this function does not work if the application
-	 * and the sndfile2k DLL are linked to different versions of the Microsoft C
-	 * runtime DLL.
-	 *
-	 * @sa sf_open(), sf_wchar_open(), sf_open_virtual()
-	 * @sa sf_close()
-	 */
-	SndfileHandle(int fd, bool close_desc, SF_FILEMODE mode = SFM_READ, int format = 0, int channels = 0,
 				  int samplerate = 0);
 
 	/** Opens sound file using Virtual I/O context
@@ -177,7 +142,7 @@ public:
 	 * Care should be taken to ensure that the mode of the file represented by
 	 * the descriptor matches the @p mode argument.
 	 *
-	 * @sa sf_open(), sf_wchar_open(), sf_open_fd()
+	 * @sa sf_open(), sf_wchar_open()
 	 * @sa sf_close()
 	 */
 	SndfileHandle(SF_VIRTUAL_IO &sfvirtual, void *user_data, SF_FILEMODE mode = SFM_READ, int format = 0,
@@ -198,7 +163,7 @@ public:
 	 *
 	 * @note This function is Windows-specific.
 	 *
-	 * @sa sf_open(), sf_open_fd(), sf_open_virtual()
+	 * @sa sf_open(), sf_open_virtual()
 	 * @sa sf_close()
 	 */
 	SndfileHandle(const wchar_t *wpath, SF_FILEMODE mode = SFM_READ, int format = 0, int channels = 0,
@@ -613,32 +578,6 @@ inline SndfileHandle::SndfileHandle(std::string const &path, SF_FILEMODE mode, i
 
 	return;
 } /* SndfileHandle std::string constructor */
-
-inline SndfileHandle::SndfileHandle(int fd, bool close_desc, SF_FILEMODE mode, int fmt, int chans,
-									int srate)
-	: p(NULL)
-{
-	if (fd < 0)
-		return;
-
-	p = new (std::nothrow) SNDFILE_ref();
-
-	if (p != NULL)
-	{
-		p->ref = 1;
-
-		p->sfinfo.frames = 0;
-		p->sfinfo.channels = chans;
-		p->sfinfo.format = fmt;
-		p->sfinfo.samplerate = srate;
-		p->sfinfo.sections = 0;
-		p->sfinfo.seekable = 0;
-
-		p->sf = sf_open_fd(fd, mode, &p->sfinfo, close_desc);
-	};
-
-	return;
-} /* SndfileHandle fd constructor */
 
 inline SndfileHandle::SndfileHandle(SF_VIRTUAL_IO &sfvirtual, void *user_data, SF_FILEMODE mode, int fmt,
 									int chans, int srate)

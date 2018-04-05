@@ -208,7 +208,7 @@ static void string_start_end_test(const char *filename, int typemajor)
     sfinfo.frames = 0;
     sfinfo.format = typemajor | SF_FORMAT_PCM_16;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     /* Write stuff at start of file. */
     sf_set_string(file, SF_STR_TITLE, filename);
@@ -230,7 +230,7 @@ static void string_start_end_test(const char *filename, int typemajor)
 
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     check_log_buffer_or_die(file, __LINE__);
 
@@ -381,7 +381,7 @@ static void string_start_test(const char *filename, int typemajor)
         break;
     };
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     /* Write stuff at start of file. */
     sf_set_string(file, SF_STR_TITLE, filename);
@@ -398,7 +398,7 @@ static void string_start_test(const char *filename, int typemajor)
 
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     check_log_buffer_or_die(file, __LINE__);
 
@@ -519,7 +519,7 @@ static void string_multi_set_test(const char *filename, int typemajor)
     sfinfo.channels = 1;
     sfinfo.frames = 0;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     /* Write stuff at start of file. */
     sf_set_string(file, SF_STR_TITLE, title);
@@ -548,7 +548,7 @@ static void string_multi_set_test(const char *filename, int typemajor)
 
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     sf_command(file, SFC_GET_LOG_INFO, buffer, sizeof(buffer));
     sf_close(file);
 
@@ -584,12 +584,12 @@ static void string_rdwr_test(const char *filename, int typemajor)
     create_short_sndfile(filename, typemajor | SF_FORMAT_PCM_16, 2);
 
     memset(&sfinfo, 0, sizeof(sfinfo));
-    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
     frames = sfinfo.frames;
     sf_set_string(file, SF_STR_TITLE, title);
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     exit_if_true(frames != sfinfo.frames, "\n\nLine %d : Frame count %" PRId64 " should be %" PRId64 ".\n", __LINE__, sfinfo.frames,
                  frames);
     str = sf_get_string(file, SF_STR_TITLE);
@@ -597,18 +597,18 @@ static void string_rdwr_test(const char *filename, int typemajor)
     exit_if_true(strcmp(str, title) != 0, "\n\nLine %d : SF_STR_TITLE doesn't match what was written.\n", __LINE__);
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
     frames = sfinfo.frames;
     sf_set_string(file, SF_STR_TITLE, title);
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
     str = sf_get_string(file, SF_STR_TITLE);
     exit_if_true(str == NULL, "\n\nLine %d : SF_STR_TITLE string is NULL.\n", __LINE__);
     sf_set_string(file, SF_STR_ARTIST, artist);
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     str = sf_get_string(file, SF_STR_ARTIST);
     exit_if_true(str == NULL, "\n\nLine %d : SF_STR_ARTIST string is NULL.\n", __LINE__);
@@ -642,7 +642,7 @@ static void string_short_rdwr_test(const char *filename, int typemajor)
     sfinfo.channels = 1;
     sfinfo.frames = 0;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     /* Write data to file. */
     test_write_short_or_die(file, 0, data_out, BUFFER_LEN, __LINE__);
@@ -652,7 +652,7 @@ static void string_short_rdwr_test(const char *filename, int typemajor)
     sf_close(file);
 
     /* Open the file RDWR. */
-    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
     exit_if_true(frames != sfinfo.frames, "\n\nLine %d : Frame count %" PRId64 " should be %" PRId64 ".\n", __LINE__, sfinfo.frames,
                  frames);
     str = sf_get_string(file, SF_STR_TITLE);
@@ -668,7 +668,7 @@ static void string_short_rdwr_test(const char *filename, int typemajor)
 
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     check_log_buffer_or_die(file, __LINE__);
 
@@ -715,7 +715,7 @@ static void software_string_test(const char *filename)
         SF_INFO info;
 
         sf_info_setup(&info, SF_FORMAT_WAV | SF_FORMAT_PCM_16, 44100, 1);
-        file = test_open_file_or_die(filename, SFM_WRITE, &info, SF_TRUE, __LINE__);
+        file = test_open_file_or_die(filename, SFM_WRITE, &info, __LINE__);
 
         snprintf(sfname, MIN(k, sizeof(sfname)), "%s", "abcdefghijklmnopqrestvwxyz0123456789abcdefghijklmnopqrestvwxyz");
 
@@ -726,7 +726,7 @@ static void software_string_test(const char *filename)
 
         sf_close(file);
 
-        file = test_open_file_or_die(filename, SFM_READ, &info, SF_TRUE, __LINE__);
+        file = test_open_file_or_die(filename, SFM_READ, &info, __LINE__);
         result = sf_get_string(file, SF_STR_SOFTWARE);
 
         exit_if_true(result == NULL,
@@ -765,7 +765,7 @@ static void string_rdwr_grow_test(const char *filename, int typemajor)
     sfinfo.frames = 0;
     sfinfo.format = typemajor | SF_FORMAT_PCM_16;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     /* Write data to file. */
     test_write_short_or_die(file, 0, data_out, BUFFER_LEN, __LINE__);
 
@@ -775,14 +775,14 @@ static void string_rdwr_grow_test(const char *filename, int typemajor)
     sf_close(file);
 
     /* Now open file again in SFM_RDWR mode and write more audio data to it. */
-    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
     /* Write more data to file.  */
     test_write_short_or_die(file, 0, data_out, BUFFER_LEN, __LINE__);
     sf_close(file);
 
     /* Now open file again. It should now contain two BUFFER_LEN's worth of frames and the strings. */
     frames = 2 * BUFFER_LEN / sfinfo.channels;
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     exit_if_true(frames != sfinfo.frames, "\n\nLine %d : Frame count %" PRId64 " should be %" PRId64 ".\n", __LINE__, sfinfo.frames,
                  frames);
 
@@ -818,13 +818,13 @@ static void string_header_update(const char *filename, int typemajor)
     sfinfo.frames = 0;
     sfinfo.format = typemajor | SF_FORMAT_PCM_16;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     test_write_short_or_die(file, 0, data_out, BUFFER_LEN, __LINE__);
     sf_set_string(file, SF_STR_TITLE, long_title);
     sf_close(file);
 
     /* Check that SFC_UPDATE_HEADER_NOW correctly calculates datalength. */
-    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
     /* Write a very small amount of new audio data that doesn't completely overwrite the existing header. */
     test_write_short_or_die(file, 0, data_out, GROW_BUFFER_AMOUNT, __LINE__);
 
@@ -834,7 +834,7 @@ static void string_header_update(const char *filename, int typemajor)
     /* The file should now contain BUFFER_LEN + GROW_BUFFER_AMOUNT frames.
 		Open a second handle to the file and check the reported length. */
     memset(&sfinfo1, 0, sizeof(sfinfo1));
-    file1 = test_open_file_or_die(filename, SFM_READ, &sfinfo1, SF_TRUE, __LINE__);
+    file1 = test_open_file_or_die(filename, SFM_READ, &sfinfo1, __LINE__);
 
     frames = (BUFFER_LEN + GROW_BUFFER_AMOUNT) / sfinfo.channels;
     exit_if_true(frames != sfinfo1.frames, "\n\nLine %d : Frame count %" PRId64 " should be %" PRId64 ".\n", __LINE__,
@@ -847,13 +847,13 @@ static void string_header_update(const char *filename, int typemajor)
     sf_close(file);
 
     /* Check that sf_close correctly calculates datalength. */
-    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_RDWR, &sfinfo, __LINE__);
     /* Write a very small amount of new audio data that doesn't completely overwrite the existing header. */
     test_write_short_or_die(file, 0, data_out, GROW_BUFFER_AMOUNT, __LINE__);
     sf_close(file);
 
     /* Open file again and verify data and string. */
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     frames = (BUFFER_LEN + 2 * GROW_BUFFER_AMOUNT) / sfinfo.channels;
     exit_if_true(frames != sfinfo.frames, "\n\nLine %d : Frame count %" PRId64 " should be %" PRId64 ".\n", __LINE__, sfinfo.frames,
                  frames);

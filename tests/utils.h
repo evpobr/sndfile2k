@@ -115,7 +115,7 @@ void hexdump_file(const char *filename, sf_count_t offset, sf_count_t length);
 
 void test_sf_format_or_die(const SF_INFO *info, int line_num);
 
-SNDFILE *test_open_file_or_die(const char *filename, SF_FILEMODE mode, SF_INFO *sfinfo, int allow_fd, int line_num);
+SNDFILE *test_open_file_or_die(const char *filename, SF_FILEMODE mode, SF_INFO *sfinfo, int line_num);
 
 void test_read_write_position_or_die(SNDFILE *file, int line_num, int pass, sf_count_t read_pos, sf_count_t write_pos);
 

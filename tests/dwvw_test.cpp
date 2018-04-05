@@ -65,7 +65,7 @@ static void dwvw_test(const char *filename, int format, int bit_width)
 
     sf_info_setup(&sfinfo, format, 44100, 1);
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     /* Generate random.frames. */
     for (k = 0; k < BUFFER_SIZE / 2; k++)
@@ -80,7 +80,7 @@ static void dwvw_test(const char *filename, int format, int bit_width)
     sf_write_int(file, write_buf, BUFFER_SIZE);
     sf_close(file);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if ((k = sf_read_int(file, read_buf, BUFFER_SIZE)) != BUFFER_SIZE)
     {

@@ -69,7 +69,7 @@ static void headerless_test(const char *filename, int format, int expected)
     sfinfo.channels = 1;
     sfinfo.format = SF_FORMAT_RAW | format;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     if ((k = sf_write_short(file, buffer, BUFFER_SIZE)) != BUFFER_SIZE)
     {
@@ -86,7 +86,7 @@ static void headerless_test(const char *filename, int format, int expected)
     /* We should be able to detect these so clear sfinfo. */
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != expected)
     {
@@ -134,7 +134,7 @@ static void old_test(void)
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     if ((k = sf_write_short(file, buffer, BUFFER_SIZE)) != BUFFER_SIZE)
     {
@@ -151,7 +151,7 @@ static void old_test(void)
     /* Read as RAW but get the bit width and endian-ness correct. */
     sfinfo.format = filetype = SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_PCM_16;
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if (sfinfo.format != filetype)
     {

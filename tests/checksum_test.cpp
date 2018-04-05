@@ -76,7 +76,7 @@ static void checksum_test(const CHECKSUM *cksum)
     info.channels = 1;
     info.samplerate = SAMPLE_RATE;
 
-    file = test_open_file_or_die(cksum->enc_name, SFM_WRITE, &info, 0, __LINE__);
+    file = test_open_file_or_die(cksum->enc_name, SFM_WRITE, &info, __LINE__);
     test_write_float_or_die(file, 0, orig, ARRAY_LEN(orig), __LINE__);
     sf_close(file);
 
@@ -91,7 +91,7 @@ static void checksum_test(const CHECKSUM *cksum)
     info.channels = 1;
     info.samplerate = SAMPLE_RATE;
 
-    file = test_open_file_or_die(cksum->enc_name, SFM_READ, &info, 0, __LINE__);
+    file = test_open_file_or_die(cksum->enc_name, SFM_READ, &info, __LINE__);
     test_read_short_or_die(file, 0, data, ARRAY_LEN(data), __LINE__);
     sf_close(file);
 
@@ -99,7 +99,7 @@ static void checksum_test(const CHECKSUM *cksum)
     info.channels = 1;
     info.samplerate = SAMPLE_RATE;
 
-    file = test_open_file_or_die(cksum->dec_name, SFM_WRITE, &info, 0, __LINE__);
+    file = test_open_file_or_die(cksum->dec_name, SFM_WRITE, &info, __LINE__);
     test_write_short_or_die(file, 0, data, ARRAY_LEN(data), __LINE__);
     sf_close(file);
 

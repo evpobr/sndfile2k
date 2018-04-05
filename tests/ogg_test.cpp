@@ -69,14 +69,14 @@ static void ogg_short_test(void)
     sfinfo.samplerate = SAMPLE_RATE;
 
     /* Write the output file. */
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     test_write_short_or_die(file, 0, data_out.s, ARRAY_LEN(data_out.s), __LINE__);
     sf_close(file);
 
     /* Read the file in again. */
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     test_read_short_or_die(file, 0, data_in.s, ARRAY_LEN(data_in.s), __LINE__);
     sf_close(file);
 
@@ -85,7 +85,7 @@ static void ogg_short_test(void)
     /* Test seeking. */
     print_test_name("ogg_seek_test", filename);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     test_seek_or_die(file, 10, SEEK_SET, 10, sfinfo.channels, __LINE__);
     test_read_short_or_die(file, 0, seek_data, ARRAY_LEN(seek_data), __LINE__);
@@ -127,14 +127,14 @@ static void ogg_int_test(void)
     sfinfo.samplerate = SAMPLE_RATE;
 
     /* Write the output file. */
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     test_write_int_or_die(file, 0, data_out.i, ARRAY_LEN(data_out.i), __LINE__);
     sf_close(file);
 
     /* Read the file in again. */
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     test_read_int_or_die(file, 0, data_in.i, ARRAY_LEN(data_in.i), __LINE__);
     sf_close(file);
 
@@ -143,7 +143,7 @@ static void ogg_int_test(void)
     /* Test seeking. */
     print_test_name("ogg_seek_test", filename);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     test_seek_or_die(file, 10, SEEK_SET, 10, sfinfo.channels, __LINE__);
     test_read_int_or_die(file, 0, seek_data, ARRAY_LEN(seek_data), __LINE__);
@@ -176,14 +176,14 @@ static void ogg_float_test(void)
     sfinfo.samplerate = SAMPLE_RATE;
 
     /* Write the output file. */
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     test_write_float_or_die(file, 0, data_out.f, ARRAY_LEN(data_out.f), __LINE__);
     sf_close(file);
 
     /* Read the file in again. */
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     test_read_float_or_die(file, 0, data_in.f, ARRAY_LEN(data_in.f), __LINE__);
     sf_close(file);
 
@@ -192,7 +192,7 @@ static void ogg_float_test(void)
     /* Test seeking. */
     print_test_name("ogg_seek_test", filename);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     test_seek_or_die(file, 10, SEEK_SET, 10, sfinfo.channels, __LINE__);
     test_read_float_or_die(file, 0, seek_data, ARRAY_LEN(seek_data), __LINE__);
@@ -225,14 +225,14 @@ static void ogg_double_test(void)
     sfinfo.samplerate = SAMPLE_RATE;
 
     /* Write the output file. */
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     test_write_double_or_die(file, 0, data_out.d, ARRAY_LEN(data_out.d), __LINE__);
     sf_close(file);
 
     /* Read the file in again. */
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
     test_read_double_or_die(file, 0, data_in.d, ARRAY_LEN(data_in.d), __LINE__);
     sf_close(file);
 
@@ -241,7 +241,7 @@ static void ogg_double_test(void)
     /* Test seeking. */
     print_test_name("ogg_seek_test", filename);
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     test_seek_or_die(file, 10, SEEK_SET, 10, sfinfo.channels, __LINE__);
     test_read_double_or_die(file, 0, seek_data, ARRAY_LEN(seek_data), __LINE__);
@@ -281,13 +281,13 @@ static void ogg_stereo_seek_test(const char *filename, int format)
     sfinfo.samplerate = SAMPLE_RATE;
 
     /* Write the output file. */
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
     test_write_float_or_die(file, 0, stereo_out, ARRAY_LEN(stereo_out), __LINE__);
     sf_close(file);
 
     /* Open file in again for reading. */
     memset(&sfinfo, 0, sizeof(sfinfo));
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     /* Read in the whole file. */
     test_read_float_or_die(file, 0, stereo_out, ARRAY_LEN(stereo_out), __LINE__);

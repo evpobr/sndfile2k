@@ -98,7 +98,7 @@ static void short_lrw_test(const char *filename, int filetype, const short *outp
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     test_write_short_or_die(file, 0, output, out_len, __LINE__);
 
@@ -106,7 +106,7 @@ static void short_lrw_test(const char *filename, int filetype, const short *outp
 
     memset(input, 0, sizeof(input));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     exit_if_true(sfinfo.format != filetype, "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype,
                  sfinfo.format);
@@ -147,7 +147,7 @@ static void int_lrw_test(const char *filename, int filetype, const int *output, 
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     test_write_int_or_die(file, 0, output, out_len, __LINE__);
 
@@ -155,7 +155,7 @@ static void int_lrw_test(const char *filename, int filetype, const int *output, 
 
     memset(input, 0, sizeof(input));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     exit_if_true(sfinfo.format != filetype, "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype,
                  sfinfo.format);
@@ -195,7 +195,7 @@ static void float_lrw_test(const char *filename, int filetype, const float *outp
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     test_write_float_or_die(file, 0, output, out_len, __LINE__);
 
@@ -203,7 +203,7 @@ static void float_lrw_test(const char *filename, int filetype, const float *outp
 
     memset(input, 0, sizeof(input));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     exit_if_true(sfinfo.format != filetype, "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype,
                  sfinfo.format);
@@ -244,7 +244,7 @@ static void double_lrw_test(const char *filename, int filetype, const double *ou
     sfinfo.channels = 1;
     sfinfo.format = filetype;
 
-    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     test_write_double_or_die(file, 0, output, out_len, __LINE__);
 
@@ -252,7 +252,7 @@ static void double_lrw_test(const char *filename, int filetype, const double *ou
 
     memset(input, 0, sizeof(input));
 
-    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+    file = test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     exit_if_true(sfinfo.format != filetype, "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype,
                  sfinfo.format);

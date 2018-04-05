@@ -978,8 +978,8 @@ typedef enum SF_CHANNEL_MAP
  * @ingroup file-base
  *
  * Pointer to @c ::SNDFILE is returned by set of file open finctions, including
- * sf_open(), sf_open_fd() and sf_open_virtual(). Most of API functions take
- * @c SNDFILE pointer as required parameter.
+ * sf_open(), and sf_open_virtual(). Most of API functions take @c SNDFILE
+ * pointer as required parameter.
  *
  * Make no assumptions about @c SNDFILE internal structure, it is subject to
  * change in future releases.
@@ -1300,48 +1300,10 @@ typedef struct SF_VIRTUAL_IO
  * @return A valid pointer to a #SNDFILE object on success, @c NULL
  * otherwise.
  *
- * @sa sf_wchar_open(), sf_open_fd(), sf_open_virtual()
+ * @sa sf_wchar_open(), sf_open_virtual()
  * @sa sf_close()
  */
 SNDFILE2K_EXPORT SNDFILE *sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo);
-
-/** Opens sound file using @c POSIX file descriptor
- *
- * @param[in] fd File descriptor
- * @param[in] mode File open mode
- * @param[in,out] sfinfo Format information
- * @param[in] close_desc File descriptor close mode
- *
- * sf_open_fd() is similar to sf_open(), but takes @c POSIX file descriptor
- * of already opened file instead of path.
- *
- * Care should be taken to ensure that the mode of the file represented by the
- * descriptor matches the @c mode argument.
- *
- * This function is useful in the following circumstances:
- * - Opening temporary files securely (ie use the @c tmpfile() to return a
- * @c FILE* pointer and then using @c fileno() to retrieve the file descriptor
- * which is then passed to sndfile2k.
- * - Opening files with file names using OS specific character encodings and then
- * passing the file descriptor to sf_open_fd().
- *
- * When sf_close() is called, the file descriptor is only closed if the
- * @c close_desc parameter was ::SF_TRUE when the sf_open_fd()
- * function was called.
- *
- * @note On Microsoft Windows, this function does not work if the application
- * and the sndfile2k DLL are linked to different versions of the Microsoft C runtime DLL.
- *
- * @return A valid pointer to a #SNDFILE object on success, @c NULL
- * otherwise.
- *
- * @deprecated This function and will be removed in next major release.
- * Use sf_open_virtual_ex() function instead.
- *
- * @sa sf_open(), sf_wchar_open(), sf_open_virtual()
- * @sa sf_close()
- */
-SNDFILE2K_EXPORT SNDFILE *sf_open_fd(int fd, SF_FILEMODE mode, SF_INFO *sfinfo, int close_desc);
 
 /** @defgroup file-virt Virtual I/O
  *
@@ -1358,7 +1320,7 @@ SNDFILE2K_EXPORT SNDFILE *sf_open_fd(int fd, SF_FILEMODE mode, SF_INFO *sfinfo, 
  * @param[in,out] sfinfo Format information
  * @param[in] user_data User data
  *
- * sf_open_fd() is similar to sf_open(), but takes Virtual I/O context
+ * sf_open_virtual() is similar to sf_open(), but takes Virtual I/O context
  * of already opened file instead of path.
  *
  * Care should be taken to ensure that the mode of the file represented by the
@@ -1370,7 +1332,7 @@ SNDFILE2K_EXPORT SNDFILE *sf_open_fd(int fd, SF_FILEMODE mode, SF_INFO *sfinfo, 
  * @deprecated This function is deprecated and will be removed in next major release.
  * Use sf_open_virtual_ex() instead.
  *
- * @sa sf_open(), sf_wchar_open(), sf_open_fd(), sf_open_virtual_ex()
+ * @sa sf_open(), sf_wchar_open(), sf_open_virtual_ex()
  * @sa sf_close()
  */
 SNDFILE2K_EXPORT SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo,
@@ -1410,7 +1372,7 @@ SNDFILE2K_EXPORT SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE 
  * @return A valid pointer to a #SNDFILE object on success, @c NULL
  * otherwise.
  *
- * @sa sf_open(), sf_wchar_open(), sf_open_fd(), sf_open_virtual()
+ * @sa sf_open(), sf_wchar_open(), sf_open_virtual()
  * @sa sf_close()
  */
 SNDFILE2K_EXPORT SNDFILE *sf_open_virtual_ex(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data);
@@ -1869,7 +1831,7 @@ SNDFILE2K_EXPORT sf_count_t sf_write_double(SNDFILE *sndfile, const double *ptr,
  *
  * @return Zero on success, error code otherwise.
  *
- * \sa sf_open(), sf_wchar_open(), sf_open_fd(), sf_open_virtual()
+ * \sa sf_open(), sf_wchar_open(), sf_open_virtual()
  */
 SNDFILE2K_EXPORT int sf_close(SNDFILE *sndfile);
 
@@ -1903,7 +1865,7 @@ SNDFILE2K_EXPORT void sf_write_sync(SNDFILE *sndfile);
  * @return Returns a valid pointer to a #SNDFILE object on success, @c NULL
  * otherwise.
  *
- * @sa sf_open(), sf_open_fd(), sf_open_virtual()
+ * @sa sf_open(), sf_open_virtual()
  * @sa sf_close()
  */
 SNDFILE2K_EXPORT SNDFILE *sf_wchar_open(const wchar_t *wpath, SF_FILEMODE mode, SF_INFO *sfinfo);

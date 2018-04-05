@@ -56,7 +56,7 @@ static void largefile_test(int filetype, const char *filename)
     sfinfo.format = (filetype | SF_FORMAT_PCM_32);
 
     file =
-        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__);
+        test_open_file_or_die(filename, SFM_WRITE, &sfinfo, __LINE__);
 
     for (k = 0; k < BUFFER_COUNT; k++)
         test_write_float_or_die(file, k, data, BUFFER_LEN, __LINE__);
@@ -64,7 +64,7 @@ static void largefile_test(int filetype, const char *filename)
     sf_close(file);
 
     file =
-        test_open_file_or_die(filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__);
+        test_open_file_or_die(filename, SFM_READ, &sfinfo, __LINE__);
 
     if ((sfinfo.frames * sfinfo.channels) / BUFFER_LEN != BUFFER_COUNT)
     {

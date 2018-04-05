@@ -467,36 +467,26 @@ void test_sf_format_or_die(const SF_INFO *info, int line_num)
     return;
 }
 
-SNDFILE *test_open_file_or_die(const char *filename, SF_FILEMODE mode, SF_INFO *sfinfo, int allow_fd, int line_num)
+SNDFILE *test_open_file_or_die(const char *filename, SF_FILEMODE mode, SF_INFO *sfinfo, int line_num)
 {
     static int count = 0;
 
     SNDFILE *file;
-    const char *modestr, *func_name;
-    int oflags = 0, omode = 0, err;
+    const char *modestr;
+    int err;
 
-    /*
-	** Need to test both sf_open() and sf_open_fd().
-	** Do so alternately.
-	*/
     switch (mode)
     {
     case SFM_READ:
         modestr = "SFM_READ";
-        oflags = O_RDONLY | O_BINARY;
-        omode = 0;
         break;
 
     case SFM_WRITE:
         modestr = "SFM_WRITE";
-        oflags = O_WRONLY | O_CREAT | O_TRUNC | O_BINARY;
-        omode = S_IRUSR | S_IWUSR | S_IRGRP;
         break;
 
     case SFM_RDWR:
         modestr = "SFM_RDWR";
-        oflags = O_RDWR | O_CREAT | O_BINARY;
-        omode = S_IRUSR | S_IWUSR | S_IRGRP;
         break;
     default:
         printf("\n\nLine %d: Bad mode.\n", line_num);
@@ -504,38 +494,10 @@ SNDFILE *test_open_file_or_die(const char *filename, SF_FILEMODE mode, SF_INFO *
         exit(1);
     };
 
-#ifdef _WIN32
-    /* Windows does not understand and ignores the S_IRGRP flag, but Wine
-    ** gives a run time warning message, so just clear it.
-    */
-    omode &= ~S_IRGRP;
-#endif
-
-    if (allow_fd && ((++count) & 1) == 1)
-    {
-        int fd;
-
-        /* Only use the three argument open() function if omode != 0. */
-        fd = (omode == 0) ? open(filename, oflags) : open(filename, oflags, omode);
-
-        if (fd < 0)
-        {
-            printf("\n\n%s : open failed : %s\n", __func__, strerror(errno));
-            exit(1);
-        };
-
-        func_name = "sf_open_fd";
-        file = sf_open_fd(fd, mode, sfinfo, SF_TRUE);
-    }
-    else
-    {
-        func_name = "sf_open";
-        file = sf_open(filename, mode, sfinfo);
-    };
-
+    file = sf_open(filename, mode, sfinfo);
     if (file == NULL)
     {
-        printf("\n\nLine %d: %s (%s) failed : %s\n\n", line_num, func_name, modestr, sf_strerror(NULL));
+        printf("\n\nLine %d: sf_open (%s) failed : %s\n\n", line_num, modestr, sf_strerror(NULL));
         dump_log_buffer(file);
         exit(1);
     };
