@@ -92,7 +92,6 @@ set(FILESPECIFIC
 
 # GSM610 sources
 set(libgsm_SOURCES
-  GSM610/config.h
   GSM610/gsm.h
   GSM610/gsm610_priv.h
   GSM610/add.c
