@@ -417,7 +417,7 @@ struct SF_PRIVATE
 
     SF_INFO sf;
 
-    int have_written; /* Has a single write been done to the file? */
+    bool have_written; /* Has a single write been done to the file? */
     struct PEAK_INFO *peak_info;
 
     /* Cue Marker Info */

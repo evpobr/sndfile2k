@@ -2218,12 +2218,12 @@ sf_count_t sf_write_raw(SNDFILE *sndfile, const void *ptr, sf_count_t len)
         if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
-    if (sndfile->have_written == SF_FALSE && sndfile->write_header != NULL)
+    if (!sndfile->have_written && sndfile->write_header != NULL)
     {
         if ((sndfile->error = sndfile->write_header(sndfile, SF_FALSE)))
             return 0;
     };
-    sndfile->have_written = SF_TRUE;
+    sndfile->have_written = true;
 
     count = sndfile->fwrite(ptr, 1, len);
 
@@ -2281,12 +2281,12 @@ sf_count_t sf_write_short(SNDFILE *sndfile, const short *ptr, sf_count_t len)
         if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
-    if (sndfile->have_written == SF_FALSE && sndfile->write_header != NULL)
+    if (!sndfile->have_written && sndfile->write_header != NULL)
     {
         if ((sndfile->error = sndfile->write_header(sndfile, SF_FALSE)))
             return 0;
     };
-    sndfile->have_written = SF_TRUE;
+    sndfile->have_written = true;
 
     count = sndfile->write_short(sndfile, ptr, len);
 
@@ -2338,12 +2338,12 @@ sf_count_t sf_writef_short(SNDFILE *sndfile, const short *ptr, sf_count_t frames
         if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
-    if (sndfile->have_written == SF_FALSE && sndfile->write_header != NULL)
+    if (!sndfile->have_written && sndfile->write_header != NULL)
     {
         if ((sndfile->error = sndfile->write_header(sndfile, SF_FALSE)))
             return 0;
     };
-    sndfile->have_written = SF_TRUE;
+    sndfile->have_written = true;
 
     count = sndfile->write_short(sndfile, ptr, frames * sndfile->sf.channels);
 
@@ -2401,12 +2401,12 @@ sf_count_t sf_write_int(SNDFILE *sndfile, const int *ptr, sf_count_t len)
         if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
-    if (sndfile->have_written == SF_FALSE && sndfile->write_header != NULL)
+    if (!sndfile->have_written && sndfile->write_header != NULL)
     {
         if ((sndfile->error = sndfile->write_header(sndfile, SF_FALSE)))
             return 0;
     };
-    sndfile->have_written = SF_TRUE;
+    sndfile->have_written = true;
 
     count = sndfile->write_int(sndfile, ptr, len);
 
@@ -2458,12 +2458,12 @@ sf_count_t sf_writef_int(SNDFILE *sndfile, const int *ptr, sf_count_t frames)
         if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
-    if (sndfile->have_written == SF_FALSE && sndfile->write_header != NULL)
+    if (!sndfile->have_written && sndfile->write_header != NULL)
     {
         if ((sndfile->error = sndfile->write_header(sndfile, SF_FALSE)))
             return 0;
     };
-    sndfile->have_written = SF_TRUE;
+    sndfile->have_written = true;
 
     count = sndfile->write_int(sndfile, ptr, frames * sndfile->sf.channels);
 
@@ -2521,12 +2521,12 @@ sf_count_t sf_write_float(SNDFILE *sndfile, const float *ptr, sf_count_t len)
         if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
-    if (sndfile->have_written == SF_FALSE && sndfile->write_header != NULL)
+    if (!sndfile->have_written && sndfile->write_header != NULL)
     {
         if ((sndfile->error = sndfile->write_header(sndfile, SF_FALSE)))
             return 0;
     };
-    sndfile->have_written = SF_TRUE;
+    sndfile->have_written = true;
 
     count = sndfile->write_float(sndfile, ptr, len);
 
@@ -2578,12 +2578,12 @@ sf_count_t sf_writef_float(SNDFILE *sndfile, const float *ptr, sf_count_t frames
         if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
-    if (sndfile->have_written == SF_FALSE && sndfile->write_header != NULL)
+    if (!sndfile->have_written && sndfile->write_header != NULL)
     {
         if ((sndfile->error = sndfile->write_header(sndfile, SF_FALSE)))
             return 0;
     };
-    sndfile->have_written = SF_TRUE;
+    sndfile->have_written = true;
 
     count = sndfile->write_float(sndfile, ptr, frames * sndfile->sf.channels);
 
@@ -2641,12 +2641,12 @@ sf_count_t sf_write_double(SNDFILE *sndfile, const double *ptr, sf_count_t len)
         if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
-    if (sndfile->have_written == SF_FALSE && sndfile->write_header != NULL)
+    if (!sndfile->have_written && sndfile->write_header != NULL)
     {
         if ((sndfile->error = sndfile->write_header(sndfile, SF_FALSE)))
             return 0;
     };
-    sndfile->have_written = SF_TRUE;
+    sndfile->have_written = true;
 
     count = sndfile->write_double(sndfile, ptr, len);
 
@@ -2698,12 +2698,12 @@ sf_count_t sf_writef_double(SNDFILE *sndfile, const double *ptr, sf_count_t fram
         if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
-    if (sndfile->have_written == SF_FALSE && sndfile->write_header != NULL)
+    if (!sndfile->have_written && sndfile->write_header != NULL)
     {
         if ((sndfile->error = sndfile->write_header(sndfile, SF_FALSE)))
             return 0;
     };
-    sndfile->have_written = SF_TRUE;
+    sndfile->have_written = true;
 
     count = sndfile->write_double(sndfile, ptr, frames * sndfile->sf.channels);
 
@@ -3376,7 +3376,7 @@ SNDFILE *SF_PRIVATE::open_file(SF_INFO *sfinfo)
     if (file.mode == SFM_RDWR)
     {
         write_current = sf.frames;
-        have_written = sf.frames > 0 ? SF_TRUE : SF_FALSE;
+        have_written = sf.frames > 0 ? true : false;
     };
 
     memcpy(sfinfo, &sf, sizeof(SF_INFO));

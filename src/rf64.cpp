@@ -885,7 +885,7 @@ static size_t rf64_command(SF_PRIVATE *psf, int command, void *UNUSED(data), siz
         return (wpriv->wavex_channelmask != 0);
 
     case SFC_RF64_AUTO_DOWNGRADE:
-        if (psf->have_written == 0)
+        if (!psf->have_written)
             wpriv->rf64_downgrade = datasize ? SF_TRUE : SF_FALSE;
         return wpriv->rf64_downgrade;
 
