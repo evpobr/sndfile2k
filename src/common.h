@@ -413,7 +413,7 @@ struct SF_PRIVATE
     int scale_int_float;
 
     /* True if clipping must be performed on float->int conversions. */
-    int add_clipping;
+    bool add_clipping;
 
     SF_INFO sf;
 

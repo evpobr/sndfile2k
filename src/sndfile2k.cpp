@@ -1275,7 +1275,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         /* Lite remove end */
 
     case SFC_SET_CLIPPING:
-        sndfile->add_clipping = (datasize) ? SF_TRUE : SF_FALSE;
+        sndfile->add_clipping = (datasize) ? true : false;
         return sndfile->add_clipping;
 
     case SFC_GET_CLIPPING:
