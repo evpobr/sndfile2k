@@ -39,7 +39,7 @@ int pvf_open(SF_PRIVATE *psf)
     int subformat;
     int error = 0;
 
-    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = pvf_read_header(psf)))
             return error;
@@ -47,7 +47,7 @@ int pvf_open(SF_PRIVATE *psf)
 
     subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_PVF)
             return SFE_BAD_OPEN_FORMAT;

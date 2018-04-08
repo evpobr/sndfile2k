@@ -67,10 +67,10 @@ int vox_adpcm_init(SF_PRIVATE *psf)
 {
     IMA_OKI_ADPCM *pvox = NULL;
 
-    if (psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_RDWR)
         return SFE_BAD_MODE_RW;
 
-    if (psf->file.mode == SFM_WRITE && psf->sf.channels != 1)
+    if (psf->file_mode == SFM_WRITE && psf->sf.channels != 1)
         return SFE_CHANNEL_COUNT;
 
     if ((pvox = (IMA_OKI_ADPCM *)malloc(sizeof(IMA_OKI_ADPCM))) == NULL)
@@ -79,7 +79,7 @@ int vox_adpcm_init(SF_PRIVATE *psf)
     psf->codec_data = (void *)pvox;
     memset(pvox, 0, sizeof(IMA_OKI_ADPCM));
 
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
         psf->write_short = vox_write_s;
         psf->write_int = vox_write_i;

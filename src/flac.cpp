@@ -789,10 +789,10 @@ int flac_open(SF_PRIVATE *psf)
     /* Set the default value here. Over-ridden later if necessary. */
     pflac->compression = FLAC_DEFAULT_COMPRESSION_LEVEL;
 
-    if (psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_RDWR)
         return SFE_BAD_MODE_RW;
 
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
     {
         if ((error = flac_read_header(psf)))
             return error;
@@ -800,7 +800,7 @@ int flac_open(SF_PRIVATE *psf)
 
     subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
         if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_FLAC)
             return SFE_BAD_OPEN_FORMAT;
@@ -855,14 +855,14 @@ static int flac_close(SF_PRIVATE *psf)
     if (pflac->metadata != NULL)
         FLAC__metadata_object_delete(pflac->metadata);
 
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
         FLAC__stream_encoder_finish(pflac->fse);
         FLAC__stream_encoder_delete(pflac->fse);
         free(pflac->encbuffer);
     };
 
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
     {
         FLAC__stream_decoder_finish(pflac->fsd);
         FLAC__stream_decoder_delete(pflac->fsd);
@@ -1024,10 +1024,10 @@ static size_t flac_command(SF_PRIVATE *psf, int command, void *data, size_t data
 
 int flac_init(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_RDWR)
         return SFE_BAD_MODE_RW;
 
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
     {
         psf->read_short = flac_read_flac2s;
         psf->read_int = flac_read_flac2i;
@@ -1035,7 +1035,7 @@ int flac_init(SF_PRIVATE *psf)
         psf->read_double = flac_read_flac2d;
     };
 
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
         psf->write_short = flac_write_s2flac;
         psf->write_int = flac_write_i2flac;
@@ -1596,7 +1596,7 @@ static sf_count_t flac_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offset
 
     pflac->frame = NULL;
 
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
     {
         if (FLAC__stream_decoder_seek_absolute(pflac->fsd, offset))
             return offset;
@@ -1623,7 +1623,7 @@ static sf_count_t flac_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offset
 
 static int flac_byterate(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
         return (psf->datalength * psf->sf.samplerate) / psf->sf.frames;
 
     return -1;

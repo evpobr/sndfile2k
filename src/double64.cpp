@@ -103,7 +103,7 @@ int double64_init(SF_PRIVATE *psf)
 
     psf->blockwidth = sizeof(double) * psf->sf.channels;
 
-    if (psf->file.mode == SFM_READ || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_READ || psf->file_mode == SFM_RDWR)
     {
         switch (psf->endian + double64_caps)
         {
@@ -177,7 +177,7 @@ int double64_init(SF_PRIVATE *psf)
         };
     };
 
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         switch (psf->endian + double64_caps)
         {

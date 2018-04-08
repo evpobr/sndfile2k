@@ -72,7 +72,7 @@ int mat5_open(SF_PRIVATE *psf)
 {
     int subformat, error = 0;
 
-    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = mat5_read_header(psf)))
             return error;
@@ -83,7 +83,7 @@ int mat5_open(SF_PRIVATE *psf)
 
     subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         psf->endian = SF_ENDIAN(psf->sf.format);
         if (CPU_IS_LITTLE_ENDIAN && (psf->endian == SF_ENDIAN_CPU || psf->endian == 0))
@@ -126,7 +126,7 @@ int mat5_open(SF_PRIVATE *psf)
 
 static int mat5_close(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
         mat5_write_header(psf, SF_TRUE);
 
     return 0;

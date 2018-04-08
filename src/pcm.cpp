@@ -136,7 +136,7 @@ int pcm_init(SF_PRIVATE *psf)
     else
         psf->data_endswap = (psf->endian == SF_ENDIAN_LITTLE) ? SF_FALSE : SF_TRUE;
 
-    if (psf->file.mode == SFM_READ || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_READ || psf->file_mode == SFM_RDWR)
     {
         switch (psf->bytewidth * 0x10000 + psf->endian + chars)
         {
@@ -201,7 +201,7 @@ int pcm_init(SF_PRIVATE *psf)
         };
     };
 
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         switch (psf->bytewidth * 0x10000 + psf->endian + chars)
         {

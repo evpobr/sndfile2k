@@ -1117,14 +1117,14 @@ int nms_adpcm_init(SF_PRIVATE *psf)
     if (psf->dataend > 0)
         psf->datalength -= psf->filelength - psf->dataend;
 
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
     {
         psf->read_short = nms_adpcm_read_s;
         psf->read_int = nms_adpcm_read_i;
         psf->read_float = nms_adpcm_read_f;
         psf->read_double = nms_adpcm_read_d;
     }
-    else if (psf->file.mode == SFM_WRITE)
+    else if (psf->file_mode == SFM_WRITE)
     {
         psf->write_short = nms_adpcm_write_s;
         psf->write_int = nms_adpcm_write_i;
@@ -1158,7 +1158,7 @@ static int nms_adpcm_close(SF_PRIVATE *psf)
     ** If a block has been partially assembled, write it out as the final
     ** block.
     */
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
         if (pnms->sample_curr && pnms->sample_curr < NMS_SAMPLES_PER_BLOCK)
         {
@@ -1184,7 +1184,7 @@ static sf_count_t nms_adpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
     ** NMS ADPCM is symmetric, so transitioning from reading and writing is
     ** possible, but unimplemented, as it would require syncing partial blocks.
     */
-    if (mode != psf->file.mode)
+    if (mode != psf->file_mode)
     {
         psf->error = SFE_BAD_SEEK;
         return PSF_SEEK_ERROR;

@@ -39,7 +39,7 @@ int psf_store_string(SF_PRIVATE *psf, int str_type, const char *str)
     str_len = strlen(str);
 
     /* A few extra checks for write mode. */
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         if ((psf->strings.flags & SF_STR_ALLOW_START) == 0)
             return SFE_STR_NO_SUPPORT;
@@ -63,7 +63,7 @@ int psf_store_string(SF_PRIVATE *psf, int str_type, const char *str)
 
     /* Determine flags */
     str_flags = SF_STR_LOCATE_START;
-    if (psf->file.mode == SFM_RDWR || psf->have_written)
+    if (psf->file_mode == SFM_RDWR || psf->have_written)
     {
         if ((psf->strings.flags & SF_STR_ALLOW_END) == 0)
             return SFE_STR_NO_ADD_END;
@@ -94,7 +94,7 @@ int psf_store_string(SF_PRIVATE *psf, int str_type, const char *str)
     {
     case SF_STR_SOFTWARE:
         /* In write mode, want to append libsndfile-version to string. */
-        if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+        if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
         {
             if (strstr(str, PACKAGE_NAME) == NULL)
             {
@@ -170,7 +170,7 @@ int psf_store_string(SF_PRIVATE *psf, int str_type, const char *str)
 
 int psf_set_string(SF_PRIVATE *psf, int str_type, const char *str)
 {
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
         return SFE_STR_NOT_WRITE;
 
     return psf_store_string(psf, str_type, str);

@@ -136,10 +136,10 @@ int ogg_open(SF_PRIVATE *psf)
     psf->container_data = odata;
     psf->container_close = ogg_close;
 
-    if (psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_RDWR)
         return SFE_BAD_MODE_RW;
 
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
         if ((error = ogg_stream_classify(psf, odata)) != 0)
             return error;
 

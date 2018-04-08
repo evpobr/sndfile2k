@@ -36,7 +36,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <cassert>
 #include <algorithm>
+
+using namespace std;
 
 #define INITIAL_HEADER_SIZE (256)
 
@@ -1784,4 +1787,88 @@ FILE *psf_open_tmpfile(char *fname, size_t fnamelen)
 
     memset(fname, 0, fnamelen);
     return NULL;
+}
+
+int SF_PRIVATE::fclose()
+{
+    if (vio && vio->ref && vio->unref)
+        vio->unref(vio_user_data);
+    vio_user_data = nullptr;
+
+    return 0;
+}
+
+sf_count_t SF_PRIVATE::get_filelen()
+{
+    assert(vio != nullptr);
+    assert(vio->get_filelen != nullptr);
+
+    return vio->get_filelen(vio_user_data);
+}
+
+int SF_PRIVATE::file_valid()
+{
+    return (vio_user_data) ? SF_TRUE : SF_FALSE;
+}
+
+sf_count_t SF_PRIVATE::fseek(sf_count_t offset, int whence)
+{
+    if (vio && vio->seek)
+        return vio->seek(offset, whence, vio_user_data);
+    else
+        return -1;
+}
+
+size_t SF_PRIVATE::fread(void *ptr, size_t bytes, size_t items)
+{
+    assert(vio != nullptr);
+    assert(vio->read != nullptr);
+
+    if (!ptr)
+        return 0;
+    if (items * bytes <= 0)
+        return 0;
+    else if (vio && vio->read)
+        return vio->read(ptr, bytes * items, vio_user_data) / bytes;
+    else
+        return 0;
+}
+
+size_t SF_PRIVATE::fwrite(const void *ptr, size_t bytes, size_t items)
+{
+    if (!ptr)
+        return 0;
+    if (items * bytes <= 0)
+        return 0;
+    else if (vio && vio->write)
+        return vio->write(ptr, bytes * items, vio_user_data) / bytes;
+    else
+        return 0;
+}
+
+sf_count_t SF_PRIVATE::ftell()
+{
+    assert(vio != nullptr);
+    assert(vio->tell != nullptr);
+
+    return vio->tell(vio_user_data);
+}
+
+void SF_PRIVATE::fsync()
+{
+    if (vio->flush)
+    {
+        if (file_mode == SFM_WRITE || file_mode == SFM_RDWR)
+        {
+            vio->flush(vio_user_data);
+        }
+    }
+}
+
+int SF_PRIVATE::ftruncate(sf_count_t len)
+{
+    if (vio->set_filelen)
+        return vio->set_filelen(vio_user_data, len);
+    else
+        return -1;
 }

@@ -151,7 +151,7 @@ int wav_open(SF_PRIVATE *psf)
     wpriv->wavex_ambisonic = SF_AMBISONIC_NONE;
     psf->strings.flags = SF_STR_ALLOW_START | SF_STR_ALLOW_END;
 
-    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = wav_read_header(psf, &blockalign, &framesperblock)))
             return error;
@@ -163,7 +163,7 @@ int wav_open(SF_PRIVATE *psf)
 
     subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         wpriv->wavex_ambisonic = SF_AMBISONIC_NONE;
 
@@ -180,7 +180,7 @@ int wav_open(SF_PRIVATE *psf)
         else if (psf->endian != SF_ENDIAN_BIG)
             psf->endian = SF_ENDIAN_LITTLE;
 
-        if (psf->file.mode != SFM_RDWR || psf->filelength < 44)
+        if (psf->file_mode != SFM_RDWR || psf->filelength < 44)
         {
             psf->filelength = 0;
             psf->datalength = 0;
@@ -198,7 +198,7 @@ int wav_open(SF_PRIVATE *psf)
 		 * By default, add the peak chunk to floating point files. Default behaviour
 		 * can be switched off using sf_command (SFC_SET_PEAK_CHUNK, SF_FALSE).
 		 */
-        if (psf->file.mode == SFM_WRITE &&
+        if (psf->file_mode == SFM_WRITE &&
             (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
         {
             if ((psf->peak_info = peak_info_calloc(psf->sf.channels)) == NULL)
@@ -264,7 +264,7 @@ int wav_open(SF_PRIVATE *psf)
         return SFE_UNIMPLEMENTED;
     };
 
-    if (psf->file.mode == SFM_WRITE || (psf->file.mode == SFM_RDWR && psf->filelength == 0))
+    if (psf->file_mode == SFM_WRITE || (psf->file_mode == SFM_RDWR && psf->filelength == 0))
         return psf->write_header(psf, SF_FALSE);
 
     return error;
@@ -375,7 +375,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
                 (HAVE_RIFF | HAVE_WAVE | HAVE_fmt))
                 return SFE_WAV_NO_DATA;
 
-            if (psf->file.mode == SFM_RDWR && (parsestage & HAVE_other) != 0)
+            if (psf->file_mode == SFM_RDWR && (parsestage & HAVE_other) != 0)
                 return SFE_RDWR_BAD_HEADER;
 
             parsestage |= HAVE_data;
@@ -1259,11 +1259,11 @@ static int wav_write_tailer(SF_PRIVATE *psf)
 
 static int wav_close(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         wav_write_tailer(psf);
 
-        if (psf->file.mode == SFM_RDWR)
+        if (psf->file_mode == SFM_RDWR)
         {
             sf_count_t current = psf->ftell();
 

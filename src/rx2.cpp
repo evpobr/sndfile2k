@@ -294,7 +294,7 @@ int rx2_open(SF_PRIVATE *psf)
 
 static int rx2_close(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
         /*
 		 * Now we know for certain the length of the file we can re-write

@@ -126,7 +126,7 @@ int alac_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *info)
 
     psf->codec_close = alac_close;
 
-    switch (psf->file.mode)
+    switch (psf->file_mode)
     {
     case SFM_RDWR:
         return SFE_BAD_MODE_RW;
@@ -142,7 +142,7 @@ int alac_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *info)
         break;
 
     default:
-        psf->log_printf("%s : Bad psf->file.mode.\n", __func__);
+        psf->log_printf("%s : Bad psf->file_mode.\n", __func__);
         return SFE_INTERNAL;
     };
 
@@ -180,7 +180,7 @@ static int alac_close(SF_PRIVATE *psf)
 
     plac = (ALAC_PRIVATE *)psf->codec_data;
 
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
         ALAC_ENCODER *penc = &plac->encoder;
         SF_CHUNK_INFO chunk_info;
@@ -239,7 +239,7 @@ static int alac_close(SF_PRIVATE *psf)
 
 static int alac_byterate(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
         return (psf->datalength * psf->sf.samplerate) / psf->sf.frames;
 
     return -1;
@@ -340,7 +340,7 @@ static int alac_writer_init(SF_PRIVATE *psf)
 
     plac = (ALAC_PRIVATE *)psf->codec_data;
 
-    if (psf->file.mode != SFM_WRITE)
+    if (psf->file_mode != SFM_WRITE)
         return SFE_BAD_MODE_RW;
 
     plac->channels = psf->sf.channels;

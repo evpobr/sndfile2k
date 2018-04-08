@@ -48,7 +48,7 @@ int interleave_init(SF_PRIVATE *psf)
 {
     INTERLEAVE_DATA *pdata;
 
-    if (psf->file.mode != SFM_READ)
+    if (psf->file_mode != SFM_READ)
         return SFE_INTERLEAVE_MODE;
 
     if (psf->interleave)

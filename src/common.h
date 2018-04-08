@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <inttypes.h>
@@ -285,55 +286,6 @@ static inline int psf_isprint(int ch)
     return (ch >= ' ' && ch <= '~');
 } /* psf_isprint */
 
-/*=======================================================================================
-**	SF_PRIVATE stuct - a pointer to this struct is passed back to the caller of the
-**	sf_open_XXXX functions. The caller however has no knowledge of the struct's
-**	contents.
-*/
-
-typedef struct PSF_FILE
-{
-    /* Virtual I/O functions. */
-    SF_VIRTUAL_IO vio;
-    int virtual_io;
-    void *vio_user_data;
-    unsigned long vio_ref_counter;
-    SF_BOOL use_new_vio;
-
-    union
-    {
-        char c[SF_FILENAME_LEN];
-        sfwchar_t wc[SF_FILENAME_LEN];
-    } path;
-
-    union
-    {
-        char c[SF_FILENAME_LEN];
-        sfwchar_t wc[SF_FILENAME_LEN];
-    } dir;
-
-    union
-    {
-        char c[SF_FILENAME_LEN / 4];
-        sfwchar_t wc[SF_FILENAME_LEN / 4];
-    } name;
-
-    /*
-	**	These fields can only be used in src/file_io.c.
-	**	They are basically the same as a windows file HANDLE.
-	*/
-    void *handle, *hsaved;
-    /* These fields can only be used in src/file_io.c. */
-    int filedes, savedes;
-
-#if (defined(_WIN32) || defined(__CYGWIN__))
-    SF_BOOL use_wchar;
-#endif
-
-    SF_BOOL do_not_close_descriptor;
-    SF_FILEMODE mode; /* Open mode : SFM_READ, SFM_WRITE or SFM_RDWR. */
-} PSF_FILE;
-
 typedef union
 {
     double dbuf[SF_BUFFER_LEN / sizeof(double)];
@@ -360,7 +312,10 @@ struct SF_PRIVATE
         char c[16];
     } _canary;
 
-    PSF_FILE file;
+    char _path[FILENAME_MAX];
+    SF_FILEMODE file_mode;
+    SF_VIRTUAL_IO *vio;
+    void *vio_user_data;
 
     char syserr[SF_SYSERR_LEN];
 
@@ -534,10 +489,11 @@ struct SF_PRIVATE
     void header_put_be_8byte(sf_count_t x);
     void header_put_le_8byte(sf_count_t x);
 
-    int fopen();
+    int fopen(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo);
+#ifdef _WIN32
+    int fopen(const wchar_t *path, SF_FILEMODE mode, SF_INFO *sfinfo);
+#endif
     int file_valid();
-    void set_file(int fd);
-    void init_files();
 
     SNDFILE *open_file(SF_INFO *sfinfo);
 
@@ -546,7 +502,6 @@ struct SF_PRIVATE
     sf_count_t fseek(sf_count_t offset, int whence);
     size_t fread(void *ptr, size_t bytes, size_t count);
     size_t fwrite(const void *ptr, size_t bytes, size_t count);
-    sf_count_t fgets(char *buffer, size_t bufsize);
     sf_count_t ftell();
     sf_count_t get_filelen();
 

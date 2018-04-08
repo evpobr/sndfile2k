@@ -94,7 +94,7 @@ int rf64_open(SF_PRIVATE *psf)
 
     psf->strings.flags = SF_STR_ALLOW_START | SF_STR_ALLOW_END;
 
-    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = rf64_read_header(psf, &blockalign, &framesperblock)) != 0)
             return error;
@@ -109,7 +109,7 @@ int rf64_open(SF_PRIVATE *psf)
 
     subformat = psf->sf.format & SF_FORMAT_SUBMASK;
 
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         psf->blockwidth = psf->bytewidth * psf->sf.channels;
 
@@ -847,7 +847,7 @@ static int rf64_write_tailer(SF_PRIVATE *psf)
 
 static int rf64_close(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         rf64_write_tailer(psf);
         rf64_write_header(psf, SF_TRUE);

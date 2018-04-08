@@ -131,7 +131,7 @@ int au_open(SF_PRIVATE *psf)
 {
     int error = 0;
 
-    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = au_read_header(psf)))
             return error;
@@ -142,7 +142,7 @@ int au_open(SF_PRIVATE *psf)
 
     int subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         psf->endian = SF_ENDIAN(psf->sf.format);
         if (CPU_IS_LITTLE_ENDIAN && psf->endian == SF_ENDIAN_CPU)
@@ -218,7 +218,7 @@ int au_open(SF_PRIVATE *psf)
 
 static int au_close(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
         au_write_header(psf, SF_TRUE);
 
     return 0;

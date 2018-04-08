@@ -94,7 +94,7 @@ int voc_open(SF_PRIVATE *psf)
 {
     int subformat, error = 0;
 
-    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = voc_read_header(psf)))
             return error;
@@ -102,7 +102,7 @@ int voc_open(SF_PRIVATE *psf)
 
     subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_VOC)
             return SFE_BAD_OPEN_FORMAT;
@@ -565,7 +565,7 @@ static int voc_write_header(SF_PRIVATE *psf, int calc_length)
 
 static int voc_close(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         /*
 		 * Now we know for certain the length of the file we can re-write

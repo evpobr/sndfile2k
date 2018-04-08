@@ -88,7 +88,7 @@ int dwvw_init(SF_PRIVATE *psf, int bitwidth)
     if (bitwidth > 24)
         return SFE_DWVW_BAD_BITWIDTH;
 
-    if (psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_RDWR)
         return SFE_BAD_MODE_RW;
 
     if ((pdwvw = (DWVW_PRIVATE *)calloc(1, sizeof(DWVW_PRIVATE))) == NULL)
@@ -98,7 +98,7 @@ int dwvw_init(SF_PRIVATE *psf, int bitwidth)
     pdwvw->bit_width = bitwidth;
     dwvw_read_reset(pdwvw);
 
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
     {
         psf->read_short = dwvw_read_s;
         psf->read_int = dwvw_read_i;
@@ -106,7 +106,7 @@ int dwvw_init(SF_PRIVATE *psf, int bitwidth)
         psf->read_double = dwvw_read_d;
     };
 
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
         psf->write_short = dwvw_write_s;
         psf->write_int = dwvw_write_i;
@@ -118,7 +118,7 @@ int dwvw_init(SF_PRIVATE *psf, int bitwidth)
     psf->seek = dwvw_seek;
     psf->byterate = dwvw_byterate;
 
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
     {
         psf->sf.frames = psf_decode_frame_count(psf);
         dwvw_read_reset(pdwvw);
@@ -135,7 +135,7 @@ static int dwvw_close(SF_PRIVATE *psf)
         return 0;
     pdwvw = (DWVW_PRIVATE *)psf->codec_data;
 
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
         static int last_values[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -177,7 +177,7 @@ static sf_count_t dwvw_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offset
 
 static int dwvw_byterate(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
         return (psf->datalength * psf->sf.samplerate) / psf->sf.frames;
 
     return -1;

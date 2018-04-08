@@ -90,7 +90,7 @@ int gsm610_init(SF_PRIVATE *psf)
         return SFE_INTERNAL;
     };
 
-    if (psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_RDWR)
         return SFE_BAD_MODE_RW;
 
     psf->sf.seekable = SF_FALSE;
@@ -139,7 +139,7 @@ int gsm610_init(SF_PRIVATE *psf)
         break;
     };
 
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
     {
         if (psf->datalength % pgsm610->blocksize == 0)
             pgsm610->blocks = psf->datalength / pgsm610->blocksize;
@@ -173,7 +173,7 @@ int gsm610_init(SF_PRIVATE *psf)
         psf->read_double = gsm610_read_d;
     };
 
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
         pgsm610->blockcount = 0;
         pgsm610->samplecount = 0;
@@ -435,7 +435,7 @@ static sf_count_t gsm610_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offs
     newblock = offset / pgsm610->samplesperblock;
     newsample = offset % pgsm610->samplesperblock;
 
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
     {
         if (psf->read_current != newblock * pgsm610->samplesperblock + newsample)
         {
@@ -642,7 +642,7 @@ static int gsm610_close(SF_PRIVATE *psf)
 
     pgsm610 = (GSM610_PRIVATE *)psf->codec_data;
 
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
         /*
 		 * If a block has been partially assembled, write it out

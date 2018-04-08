@@ -113,7 +113,7 @@ int wavlike_msadpcm_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
         return SFE_INTERNAL;
     };
 
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
         samplesperblock = 2 + 2 * (blockalign - 7 * psf->sf.channels) / psf->sf.channels;
 
     if (blockalign < 7 * psf->sf.channels)
@@ -143,7 +143,7 @@ int wavlike_msadpcm_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
         return SFE_INTERNAL;
     };
 
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
     {
         pms->dataremaining = psf->datalength;
 
@@ -169,7 +169,7 @@ int wavlike_msadpcm_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
         psf->read_double = msadpcm_read_d;
     };
 
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
         pms->samples = pms->dummydata;
 
@@ -799,7 +799,7 @@ static int msadpcm_close(SF_PRIVATE *psf)
 
     pms = (MSADPCM_PRIVATE *)psf->codec_data;
 
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
         /*  Now we know static int for certain the length of the file we can
         **  re-write the header.

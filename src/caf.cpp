@@ -122,7 +122,7 @@ int caf_open(SF_PRIVATE *psf)
 
     pcaf = (struct CAF_PRIVATE *)psf->container_data;
 
-    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = caf_read_header(psf)))
             return error;
@@ -134,7 +134,7 @@ int caf_open(SF_PRIVATE *psf)
 
     subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         format = SF_CONTAINER(psf->sf.format);
         if (format != SF_FORMAT_CAF)
@@ -142,7 +142,7 @@ int caf_open(SF_PRIVATE *psf)
 
         psf->blockwidth = psf->bytewidth * psf->sf.channels;
 
-        if (psf->file.mode != SFM_RDWR || psf->filelength < 44)
+        if (psf->file_mode != SFM_RDWR || psf->filelength < 44)
         {
             psf->filelength = 0;
             psf->datalength = 0;
@@ -156,7 +156,7 @@ int caf_open(SF_PRIVATE *psf)
          * By default, add the peak chunk to floating point files. Default behaviour
          * can be switched off using sf_command (SFC_SET_PEAK_CHUNK, SF_FALSE).
          */
-        if (psf->file.mode == SFM_WRITE &&
+        if (psf->file_mode == SFM_WRITE &&
             (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
         {
             if ((psf->peak_info = peak_info_calloc(psf->sf.channels)) == NULL)
@@ -203,7 +203,7 @@ int caf_open(SF_PRIVATE *psf)
     case SF_FORMAT_ALAC_20:
     case SF_FORMAT_ALAC_24:
     case SF_FORMAT_ALAC_32:
-        if (psf->file.mode == SFM_READ)
+        if (psf->file_mode == SFM_READ)
             /* Only pass the ALAC_DECODER_INFO in read mode. */
             error = alac_init(psf, &pcaf->alac);
         else
@@ -219,7 +219,7 @@ int caf_open(SF_PRIVATE *psf)
 
 static int caf_close(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         caf_write_tailer(psf);
         caf_write_header(psf, SF_TRUE);

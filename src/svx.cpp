@@ -27,6 +27,10 @@
 #include "sfendian.h"
 #include "common.h"
 
+#include <string>
+
+using namespace std;
+
 /*------------------------------------------------------------------------------
  * Macros to handle big/little endian issues.
 */
@@ -75,7 +79,7 @@ int svx_open(SF_PRIVATE *psf)
 {
     int error;
 
-    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = svx_read_header(psf)))
             return error;
@@ -89,7 +93,7 @@ int svx_open(SF_PRIVATE *psf)
         psf->fseek(psf->dataoffset, SEEK_SET);
     };
 
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_SVX)
             return SFE_BAD_OPEN_FORMAT;
@@ -236,23 +240,24 @@ static int svx_read_header(SF_PRIVATE *psf)
             break;
 
         case NAME_MARKER:
+        {
             if (!(parsestage & HAVE_SVX))
                 return SFE_SVX_NO_FORM;
 
             psf->log_printf(" %M : %u\n", marker, chunk_size);
 
-            if (strlen(psf->file.name.c) != chunk_size)
+            if (strlen(psf->_path) != chunk_size)
             {
-                if (chunk_size > sizeof(psf->file.name.c) - 1)
+                if (chunk_size > sizeof(psf->_path) - 1)
                     return SFE_SVX_BAD_NAME_LENGTH;
 
-                psf->binheader_readf("b", psf->file.name.c, chunk_size);
-                psf->file.name.c[chunk_size] = 0;
+                psf->binheader_readf("b", psf->_path, chunk_size);
+                psf->_path[chunk_size] = 0;
             }
             else
-				psf->binheader_seekf(chunk_size, SF_SEEK_CUR);
+                psf->binheader_seekf(chunk_size, SF_SEEK_CUR);
             break;
-
+        }
         case ANNO_MARKER:
             if (!(parsestage & HAVE_SVX))
                 return SFE_SVX_NO_FORM;
@@ -344,7 +349,7 @@ static int svx_read_header(SF_PRIVATE *psf)
 
 static int svx_close(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
         svx_write_header(psf, SF_TRUE);
 
     return 0;
@@ -391,8 +396,10 @@ static int svx_write_header(SF_PRIVATE *psf, int calc_length)
     if (psf->sf.channels == 2)
         psf->binheader_writef("Em44", BHWm(CHAN_MARKER), BHW4(4), BHW4(6));
 
+    string file_path = psf->_path;
+    string file_name = file_path.substr(file_path.find_last_of("/\\") + 1);
     /* Filename and annotation strings. */
-    psf->binheader_writef("Emsms", BHWm(NAME_MARKER), BHWs(psf->file.name.c), BHWm(ANNO_MARKER),
+    psf->binheader_writef("Emsms", BHWm(NAME_MARKER), BHWs(file_name.c_str()), BHWm(ANNO_MARKER),
                          BHWs(annotation));
 
     /* BODY marker and size. */

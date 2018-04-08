@@ -45,7 +45,7 @@ static void d2alaw_array(const double *buffer, size_t count, unsigned char *ptr,
 
 int alaw_init(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_READ || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_READ || psf->file_mode == SFM_RDWR)
     {
         psf->read_short = alaw_read_alaw2s;
         psf->read_int = alaw_read_alaw2i;
@@ -53,7 +53,7 @@ int alaw_init(SF_PRIVATE *psf)
         psf->read_double = alaw_read_alaw2d;
     };
 
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         psf->write_short = alaw_write_s2alaw;
         psf->write_int = alaw_write_i2alaw;

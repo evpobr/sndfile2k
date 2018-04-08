@@ -81,10 +81,10 @@ int ogg_speex_open(SF_PRIVATE *psf)
     if (spx == NULL)
         return SFE_MALLOC_FAILED;
 
-    if (psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_RDWR)
         return SFE_BAD_MODE_RW;
 
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
     {
         /* Call this here so it only gets called once, so no memory is leaked. */
         ogg_sync_init(&odata->osync);
@@ -103,7 +103,7 @@ int ogg_speex_open(SF_PRIVATE *psf)
 
     psf->codec_close = spx_close;
 
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
 #if 0
 		/* Set the default spx quality here. */

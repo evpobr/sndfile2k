@@ -133,7 +133,7 @@ int w64_open(SF_PRIVATE *psf)
         return SFE_MALLOC_FAILED;
     psf->container_data = wpriv;
 
-    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = w64_read_header(psf, &blockalign, &framesperblock)))
             return error;
@@ -144,7 +144,7 @@ int w64_open(SF_PRIVATE *psf)
 
     subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         psf->endian = SF_ENDIAN_LITTLE; /* All W64 files are little endian. */
 
@@ -671,7 +671,7 @@ static int w64_write_header(SF_PRIVATE *psf, int calc_length)
 
 static int w64_close(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
         w64_write_header(psf, SF_TRUE);
 
     return 0;

@@ -44,8 +44,6 @@
 #define LOG_BUFFER_SIZE 1024
 
 static void zero_data_test(const char *filename, int format);
-static void filesystem_full_test(int format);
-static void permission_test(const char *filename, int typemajor);
 static void wavex_amb_test(const char *filename);
 static void rf64_downgrade_test(const char *filename);
 static void rf64_long_file_downgrade_test(const char *filename);
@@ -70,8 +68,6 @@ int main(int argc, char *argv[])
     if (do_all || !strcmp(argv[1], "wav"))
     {
         zero_data_test("zerolen.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_WAV | SF_FORMAT_PCM_16);
-        permission_test("readonly.wav", SF_FORMAT_WAV);
         wavex_amb_test("ambisonic.wav");
         test_count++;
     };
@@ -79,80 +75,60 @@ int main(int argc, char *argv[])
     if (do_all || !strcmp(argv[1], "aiff"))
     {
         zero_data_test("zerolen.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_AIFF | SF_FORMAT_PCM_16);
-        permission_test("readonly.aiff", SF_FORMAT_AIFF);
         test_count++;
     };
 
     if (do_all || !strcmp(argv[1], "au"))
     {
         zero_data_test("zerolen.au", SF_FORMAT_AU | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_AU | SF_FORMAT_PCM_16);
-        permission_test("readonly.au", SF_FORMAT_AU);
         test_count++;
     };
 
     if (do_all || !strcmp(argv[1], "caf"))
     {
         zero_data_test("zerolen.caf", SF_FORMAT_CAF | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_CAF | SF_FORMAT_PCM_16);
-        permission_test("readonly.caf", SF_FORMAT_CAF);
         test_count++;
     };
 
     if (do_all || !strcmp(argv[1], "svx"))
     {
         zero_data_test("zerolen.svx", SF_FORMAT_SVX | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_SVX | SF_FORMAT_PCM_16);
-        permission_test("readonly.svx", SF_FORMAT_SVX);
         test_count++;
     };
 
     if (do_all || !strcmp(argv[1], "nist"))
     {
         zero_data_test("zerolen.nist", SF_FORMAT_NIST | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_NIST | SF_FORMAT_PCM_16);
-        permission_test("readonly.nist", SF_FORMAT_NIST);
         test_count++;
     };
 
     if (do_all || !strcmp(argv[1], "paf"))
     {
         zero_data_test("zerolen.paf", SF_FORMAT_PAF | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_PAF | SF_FORMAT_PCM_16);
-        permission_test("readonly.paf", SF_FORMAT_PAF);
         test_count++;
     };
 
     if (do_all || !strcmp(argv[1], "ircam"))
     {
         zero_data_test("zerolen.ircam", SF_FORMAT_IRCAM | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_IRCAM | SF_FORMAT_PCM_16);
-        permission_test("readonly.ircam", SF_FORMAT_IRCAM);
         test_count++;
     };
 
     if (do_all || !strcmp(argv[1], "voc"))
     {
         zero_data_test("zerolen.voc", SF_FORMAT_VOC | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_VOC | SF_FORMAT_PCM_16);
-        permission_test("readonly.voc", SF_FORMAT_VOC);
         test_count++;
     };
 
     if (do_all || !strcmp(argv[1], "w64"))
     {
         zero_data_test("zerolen.w64", SF_FORMAT_W64 | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_W64 | SF_FORMAT_PCM_16);
-        permission_test("readonly.w64", SF_FORMAT_W64);
         test_count++;
     };
 
     if (do_all || !strcmp(argv[1], "rf64"))
     {
         zero_data_test("zerolen.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_RF64 | SF_FORMAT_PCM_16);
-        permission_test("readonly.rf64", SF_FORMAT_RF64);
         rf64_downgrade_test("downgrade.wav");
         /* Disable this by default, because it needs to write 4 gigabytes of data. */
         if (SF_FALSE)
@@ -163,64 +139,48 @@ int main(int argc, char *argv[])
     if (do_all || !strcmp(argv[1], "mat4"))
     {
         zero_data_test("zerolen.mat4", SF_FORMAT_MAT4 | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_MAT4 | SF_FORMAT_PCM_16);
-        permission_test("readonly.mat4", SF_FORMAT_MAT4);
         test_count++;
     };
 
     if (do_all || !strcmp(argv[1], "mat5"))
     {
         zero_data_test("zerolen.mat5", SF_FORMAT_MAT5 | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_MAT5 | SF_FORMAT_PCM_16);
-        permission_test("readonly.mat5", SF_FORMAT_MAT5);
         test_count++;
     };
 
     if (do_all || !strcmp(argv[1], "pvf"))
     {
         zero_data_test("zerolen.pvf", SF_FORMAT_PVF | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_PVF | SF_FORMAT_PCM_16);
-        permission_test("readonly.pvf", SF_FORMAT_PVF);
         test_count++;
     };
 
     if (do_all || !strcmp(argv[1], "htk"))
     {
         zero_data_test("zerolen.htk", SF_FORMAT_HTK | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_HTK | SF_FORMAT_PCM_16);
-        permission_test("readonly.htk", SF_FORMAT_HTK);
         test_count++;
     };
 
     if (do_all || !strcmp(argv[1], "avr"))
     {
         zero_data_test("zerolen.avr", SF_FORMAT_AVR | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_AVR | SF_FORMAT_PCM_16);
-        permission_test("readonly.avr", SF_FORMAT_AVR);
         test_count++;
     };
 
     if (do_all || !strcmp(argv[1], "sds"))
     {
         zero_data_test("zerolen.sds", SF_FORMAT_SDS | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_SDS | SF_FORMAT_PCM_16);
-        permission_test("readonly.sds", SF_FORMAT_SDS);
         test_count++;
     };
 
     if (do_all || !strcmp(argv[1], "mpc2k"))
     {
         zero_data_test("zerolen.mpc", SF_FORMAT_MPC2K | SF_FORMAT_PCM_16);
-        filesystem_full_test(SF_FORMAT_MPC2K | SF_FORMAT_PCM_16);
-        permission_test("readonly.mpc", SF_FORMAT_MPC2K);
         test_count++;
     };
 
     if (do_all || !strcmp(argv[1], "ogg"))
     {
         zero_data_test("zerolen.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS);
-        /*-filesystem_full_test (SF_FORMAT_OGG | SF_FORMAT_VORBIS) ;-*/
-        permission_test("readonly.oga", SF_FORMAT_OGG);
         test_count++;
     };
 
@@ -270,145 +230,6 @@ static void zero_data_test(const char *filename, int format)
 
     unlink(filename);
     puts("ok");
-}
-
-static void filesystem_full_test(int format)
-{
-#ifndef _WIN32
-    SNDFILE *file;
-    SF_INFO sfinfo;
-    struct stat buf;
-
-    const char *filename = "/dev/full", *errorstr;
-
-    /* Make sure errno is zero before doing anything else. */
-    errno = 0;
-
-    print_test_name("filesystem_full_test", filename);
-
-    if (stat(filename, &buf) != 0)
-    {
-        puts("/dev/full missing");
-        return;
-    };
-
-    if (S_ISCHR(buf.st_mode) == 0 && S_ISBLK(buf.st_mode) == 0)
-    {
-        puts("/dev/full is not a device file");
-        return;
-    };
-
-    sfinfo.samplerate = 44100;
-    sfinfo.format = format;
-    sfinfo.channels = 1;
-    sfinfo.frames = 0;
-
-    if ((file = sf_open(filename, SFM_WRITE, &sfinfo)) != NULL)
-    {
-        printf("\n\nLine %d : Error, file should not have openned.\n", __LINE__ - 1);
-        exit(1);
-    };
-
-    errorstr = sf_strerror(file);
-
-    if (strstr(errorstr, " space ") == NULL || strstr(errorstr, "device") == NULL)
-    {
-        printf("\n\nLine %d : Error bad error string : %s.\n", __LINE__ - 1, errorstr);
-        exit(1);
-    };
-
-    puts("ok");
-
-#else
-    /* Can't run this test on Win32 so return. */
-    return;
-#endif
-}
-
-static void permission_test(const char *filename, int typemajor)
-{
-#ifdef _WIN32
-    /* Avoid compiler warnings. */
-    filename = filename;
-    typemajor = typemajor;
-
-    /* Can't run this test on Win32 so return. */
-    return;
-#else
-
-    FILE *textfile;
-    SNDFILE *file;
-    SF_INFO sfinfo;
-    const char *errorstr;
-
-    /* Make sure errno is zero before doing anything else. */
-    errno = 0;
-
-    if (getuid() == 0)
-    {
-        /* If running as root bypass this test.
-		** Root is allowed to open a readonly file for write.
-		*/
-        return;
-    };
-
-    print_test_name("permission_test", filename);
-
-    if (access(filename, F_OK) == 0)
-    {
-        chmod(filename, S_IWUSR);
-        unlink(filename);
-    };
-
-    if ((textfile = fopen(filename, "w")) == NULL)
-    {
-        printf("\n\nLine %d : not able to open text file for write.\n", __LINE__);
-        exit(1);
-    };
-
-    fprintf(textfile, "This is a read only file.\n");
-    fclose(textfile);
-
-    if (chmod(filename, S_IRUSR | S_IRGRP))
-    {
-        printf("\n\nLine %d : chmod failed", __LINE__);
-        fflush(stdout);
-        perror("");
-        exit(1);
-    };
-
-    sfinfo.samplerate = 44100;
-    sfinfo.format = (typemajor | SF_FORMAT_PCM_16);
-    sfinfo.channels = 1;
-    sfinfo.frames = 0;
-
-    if ((file = sf_open(filename, SFM_WRITE, &sfinfo)) != NULL)
-    {
-        printf("\n\nLine %d : Error, file should not have opened.\n", __LINE__ - 1);
-        exit(1);
-    };
-
-    errorstr = sf_strerror(file);
-
-    if (strstr(errorstr, "ermission denied") == NULL)
-    {
-        printf("\n\nLine %d : Error bad error string : %s.\n", __LINE__ - 1, errorstr);
-        exit(1);
-    };
-
-    if (chmod(filename, S_IWUSR | S_IWGRP))
-    {
-        printf("\n\nLine %d : chmod failed", __LINE__);
-        fflush(stdout);
-        perror("");
-        exit(1);
-    };
-
-    unlink(filename);
-
-    puts("ok");
-
-#endif
 }
 
 static void wavex_amb_test(const char *filename)

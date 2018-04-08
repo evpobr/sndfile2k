@@ -436,7 +436,7 @@ static int vorbis_close(SF_PRIVATE *psf)
 	 * followed by another [chained].
 	 */
 
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
         if (psf->write_current <= 0)
             vorbis_write_header(psf, 0);
@@ -503,12 +503,12 @@ int ogg_vorbis_open(SF_PRIVATE *psf)
     vdata = (VORBIS_PRIVATE *)calloc(1, sizeof(VORBIS_PRIVATE));
     psf->codec_data = vdata;
 
-    if (psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_RDWR)
         return SFE_BAD_MODE_RW;
 
     psf->log_printf("Vorbis library version : %s\n", vorbis_version_string());
 
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
     {
         /*
         ** First page of the ogg stream is already loaded by the ogg container
@@ -525,7 +525,7 @@ int ogg_vorbis_open(SF_PRIVATE *psf)
     };
 
     psf->codec_close = vorbis_close;
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
         /* Set the default vorbis quality here. */
         vdata->quality = 0.4;
@@ -892,7 +892,7 @@ static sf_count_t vorbis_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offs
         return ((sf_count_t)-1);
     };
 
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
     {
         sf_count_t target = offset - vdata->loc;
 
@@ -925,7 +925,7 @@ static sf_count_t vorbis_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offs
 
 static int vorbis_byterate(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
         return (psf->datalength * psf->sf.samplerate) / psf->sf.frames;
 
     return -1;

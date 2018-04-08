@@ -57,7 +57,7 @@ int mpc2k_open(SF_PRIVATE *psf)
 {
     int error = 0;
 
-    if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
     {
         if ((error = mpc2k_read_header(psf)))
             return error;
@@ -66,7 +66,7 @@ int mpc2k_open(SF_PRIVATE *psf)
     if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_MPC2K)
         return SFE_BAD_OPEN_FORMAT;
 
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         if (mpc2k_write_header(psf, SF_FALSE))
             return psf->error;
@@ -85,7 +85,7 @@ int mpc2k_open(SF_PRIVATE *psf)
 
 static int mpc2k_close(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
         mpc2k_write_header(psf, SF_TRUE);
 
     return 0;
@@ -114,7 +114,7 @@ static int mpc2k_write_header(SF_PRIVATE *psf, int calc_length)
 
     psf->fseek(0, SEEK_SET);
 
-    snprintf(sample_name, sizeof(sample_name), "%s                    ", psf->file.name.c);
+    snprintf(sample_name, sizeof(sample_name), "%s                    ", psf->_path);
 
     psf->binheader_writef("e11b", BHW1(1), BHW1(4), BHWv(sample_name), BHWz(HEADER_NAME_LEN));
     psf->binheader_writef("e111", BHW1(100), BHW1(0), BHW1((psf->sf.channels - 1) & 1));

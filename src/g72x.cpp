@@ -130,7 +130,7 @@ int g72x_init(SF_PRIVATE *psf)
     if (psf->dataend > 0)
         psf->datalength -= psf->filelength - psf->dataend;
 
-    if (psf->file.mode == SFM_READ)
+    if (psf->file_mode == SFM_READ)
     {
         pg72x->priv = g72x_reader_init(codec, &(pg72x->blocksize), &(pg72x->samplesperblock));
         if (pg72x->priv == NULL)
@@ -160,7 +160,7 @@ int g72x_init(SF_PRIVATE *psf)
 
         psf_g72x_decode_block(psf, pg72x);
     }
-    else if (psf->file.mode == SFM_WRITE)
+    else if (psf->file_mode == SFM_WRITE)
     {
         pg72x->priv = g72x_writer_init(codec, &(pg72x->blocksize), &(pg72x->samplesperblock));
         if (pg72x->priv == NULL)
@@ -542,7 +542,7 @@ static int g72x_close(SF_PRIVATE *psf)
 
     pg72x = (G72x_PRIVATE *)psf->codec_data;
 
-    if (psf->file.mode == SFM_WRITE)
+    if (psf->file_mode == SFM_WRITE)
     {
         /*	If a block has been partially assembled, write it out
 		**	as the final block.

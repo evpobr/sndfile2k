@@ -35,7 +35,7 @@ static size_t ulaw_write_d2ulaw(SF_PRIVATE *psf, const double *ptr, size_t len);
 
 int ulaw_init(SF_PRIVATE *psf)
 {
-    if (psf->file.mode == SFM_READ || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_READ || psf->file_mode == SFM_RDWR)
     {
         psf->read_short = ulaw_read_ulaw2s;
         psf->read_int = ulaw_read_ulaw2i;
@@ -43,7 +43,7 @@ int ulaw_init(SF_PRIVATE *psf)
         psf->read_double = ulaw_read_ulaw2d;
     };
 
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
     {
         psf->write_short = ulaw_write_s2ulaw;
         psf->write_int = ulaw_write_i2ulaw;
