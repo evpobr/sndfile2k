@@ -30,20 +30,6 @@
 
 using namespace std;
 
-/*=======================================================================================
-**	SF_PRIVATE stuct - a pointer to this struct is passed back to the caller of the
-**	sf_open_XXXX functions. The caller however has no knowledge of the struct's
-**	contents.
-*/
-
-struct PSF_FILE
-{
-    SF_VIRTUAL_IO vio;
-    void *vio_user_data;
-    unsigned long vio_ref_counter;
-    int filedes;
-};
-
 static sf_count_t vfget_filelen(void *user_data);
 static int vfset_filelen(void *user_data, sf_count_t len);
 static sf_count_t vfseek(sf_count_t offset, int whence, void *user_data);
@@ -74,10 +60,15 @@ SF_VIRTUAL_IO *psf_get_vio()
 	return &vio;
 }
 
-int SF_PRIVATE::fopen(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo)
+int psf_vio_from_file(const char * filename, SF_FILEMODE mode, PSF_FILE **file)
 {
-    PSF_FILE *file = new(nothrow) PSF_FILE();
     if (!file)
+        return SFE_BAD_VIRTUAL_IO;
+
+    *file = nullptr;
+
+    PSF_FILE *f = new(nothrow) PSF_FILE();
+    if (!f)
         return SFE_MALLOC_FAILED;
 
     int open_flag, share_flag;
@@ -110,30 +101,110 @@ int SF_PRIVATE::fopen(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo)
         break;
     };
 
-    file->filedes = open(path, open_flag, share_flag);
-	if (file->filedes == -SFE_BAD_OPEN_MODE)
-	{
-		error = SFE_BAD_OPEN_MODE;
-		file->filedes = -1;
+    f->filedes = open(filename, open_flag, share_flag);
+    if (f->filedes == -SFE_BAD_OPEN_MODE)
+    {
+        f->filedes = -1;
+        delete f;
+        return SFE_BAD_OPEN_MODE;
+    }
+    else if (f->filedes == -1)
+    {
+        delete f;
+        return SFE_BAD_FILE_PTR;
+    }
+    else
+    {
+        f->vio = *psf_get_vio();
+        f->vio_user_data = f;
+        f->vio_ref_counter = 0;
+        f->vio.ref(f->vio_user_data);
+        *file = f;
+    }
+
+    return SFE_NO_ERROR;
+}
+
+#ifdef _WIN32
+
+int psf_vio_from_file(const wchar_t * filename, SF_FILEMODE mode, PSF_FILE **file)
+{
+    if (!file)
+        return SFE_BAD_VIRTUAL_IO;
+
+    *file = nullptr;
+
+    PSF_FILE *f = new(nothrow) PSF_FILE();
+    if (!f)
+        return SFE_MALLOC_FAILED;
+
+    int open_flag, share_flag;
+
+    /*
+    * Sanity check. If everything is OK, this test and the printfs will
+    * be optimised out. This is meant to catch the problems caused by
+    * "sfconfig.h" being included after <stdio.h>.
+    */
+    switch (mode)
+    {
+    case SFM_READ:
+        open_flag = O_BINARY | O_RDONLY;
+        share_flag = 0;
+        break;
+
+    case SFM_WRITE:
+        open_flag = O_BINARY | O_WRONLY | O_CREAT | O_TRUNC;
+        share_flag = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
+        break;
+
+    case SFM_RDWR:
+        open_flag = O_BINARY | O_RDWR | O_CREAT;
+        share_flag = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
+        break;
+
+    default:
         delete file;
-		return error;
-	}
-    else if (file->filedes == -1)
-	{
-		psf_log_syserr(this, errno);
-        delete file;
-        return error;
-	}
-	else
-	{
-		file->vio = *psf_get_vio();
-        file->vio_user_data = file;
-        file->vio_ref_counter = 0;
+        return -SFE_BAD_OPEN_MODE;
+        break;
+    };
+
+    f->filedes = _wopen(filename, open_flag, share_flag);
+    if (f->filedes == -SFE_BAD_OPEN_MODE)
+    {
+        f->filedes = -1;
+        delete f;
+        return SFE_BAD_OPEN_MODE;
+    }
+    else if (f->filedes == -1)
+    {
+        delete f;
+        return SFE_BAD_FILE_PTR;
+    }
+    else
+    {
+        f->vio = *psf_get_vio();
+        f->vio_user_data = f;
+        f->vio_ref_counter = 0;
+        f->vio.ref(f->vio_user_data);
+        *file = f;
+    }
+
+    return SFE_NO_ERROR;
+}
+
+#endif
+
+int SF_PRIVATE::fopen(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo)
+{
+    PSF_FILE *file;
+    int error = psf_vio_from_file(path, mode, &file);
+    if (error == SFE_NO_ERROR)
+    {
+        strcpy(_path, path);
+        vio_user_data = file;
         vio = &file->vio;
-		vio_user_data = file;
-		vio->ref(vio_user_data);
         file_mode = mode;
-	}
+    }
 
 	return error;
 }
@@ -142,64 +213,13 @@ int SF_PRIVATE::fopen(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo)
 
 int SF_PRIVATE::fopen(const wchar_t *path, SF_FILEMODE mode, SF_INFO *sfinfo)
 {
-    error = 0;
-
-    PSF_FILE *file = new(nothrow) PSF_FILE();
-    if (!file)
-        return SFE_MALLOC_FAILED;
-
-    int open_flag, share_flag;
-
-    /*
-    * Sanity check. If everything is OK, this test and the printfs will
-    * be optimised out. This is meant to catch the problems caused by
-    * "sfconfig.h" being included after <stdio.h>.
-    */
-    switch (mode)
+    PSF_FILE *file;
+    int error = psf_vio_from_file(path, mode, &file);
+    if (error == SFE_NO_ERROR)
     {
-    case SFM_READ:
-        open_flag = O_BINARY | O_RDONLY;
-        share_flag = 0;
-        break;
-
-    case SFM_WRITE:
-        open_flag = O_BINARY | O_WRONLY | O_CREAT | O_TRUNC;
-        share_flag = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
-        break;
-
-    case SFM_RDWR:
-        open_flag = O_BINARY | O_RDWR | O_CREAT;
-        share_flag = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
-        break;
-
-    default:
-        delete file;
-        return -SFE_BAD_OPEN_MODE;
-        break;
-    };
-
-    file->filedes = _wopen(path, open_flag, share_flag);
-    if (file->filedes == -SFE_BAD_OPEN_MODE)
-    {
-        error = SFE_BAD_OPEN_MODE;
-        file->filedes = -1;
-        delete file;
-        return error;
-    }
-    else if (file->filedes == -1)
-    {
-        psf_log_syserr(this, errno);
-        delete file;
-        return error;
-    }
-    else
-    {
-        file->vio = *psf_get_vio();
-        file->vio_user_data = file;
-        file->vio_ref_counter = 0;
-        vio = &file->vio;
+        wcstombs(_path, path, FILENAME_MAX);
         vio_user_data = file;
-        vio->ref(this);
+        vio = &file->vio;
         file_mode = mode;
     }
 

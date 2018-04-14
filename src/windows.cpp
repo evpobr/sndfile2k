@@ -38,27 +38,28 @@ extern int sf_errno;
 
 SNDFILE *sf_wchar_open(const wchar_t *path, SF_FILEMODE mode, SF_INFO *sfinfo)
 {
-    SF_PRIVATE *psf;
+    //SF_PRIVATE *psf;
 
-    if ((psf = psf_allocate()) == NULL)
-    {
-        sf_errno = SFE_MALLOC_FAILED;
-        return NULL;
-    };
+    //if ((psf = psf_allocate()) == NULL)
+    //{
+    //    sf_errno = SFE_MALLOC_FAILED;
+    //    return NULL;
+    //};
 
-    wcstombs(psf->_path, path, FILENAME_MAX);
+    //wcstombs(psf->_path, path, FILENAME_MAX);
 
-    psf->log_printf("File : %s\n", path);
+    //psf->log_printf("File : %s\n", path);
 
-    psf->file_mode = mode;
-    psf->error = psf->fopen(path, mode, sfinfo);
-    if (psf->error != SFE_NO_ERROR)
-    {
-        sf_errno = psf->error;
-        return nullptr;
-    }
+    //psf->file_mode = mode;
+    //psf->error = psf->fopen(path, mode, sfinfo);
+    //if (psf->error != SFE_NO_ERROR)
+    //{
+    //    sf_errno = psf->error;
+    //    return nullptr;
+    //}
 
-    return psf->open_file(sfinfo);
+    //return psf->open_file(sfinfo);
+    return NULL;
 } /* sf_open */
 
 // CYGWIN

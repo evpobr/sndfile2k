@@ -495,7 +495,7 @@ struct SF_PRIVATE
 #endif
     int file_valid();
 
-    SNDFILE *open_file(SF_INFO *sfinfo);
+    //SNDFILE *open_file(SF_INFO *sfinfo);
 
     int close();
 
@@ -776,11 +776,23 @@ int macos_guess_file_type(SF_PRIVATE *psf, const char *filename);
 **	some 32 bit OSes. Implementation in file_io.c.
 */
 
+struct PSF_FILE
+{
+    SF_VIRTUAL_IO vio;
+    void *vio_user_data;
+    unsigned long vio_ref_counter;
+    int filedes;
+};
+
 #define SENSIBLE_SIZE (0x40000000)
 
 static void psf_log_syserr(SF_PRIVATE *psf, int error);
 
 SF_VIRTUAL_IO *psf_get_vio();
+int psf_vio_from_file(const char *filename, SF_FILEMODE mode, PSF_FILE **file);
+#ifdef _WIN32
+int psf_vio_from_file(const wchar_t *filename, SF_FILEMODE mode, PSF_FILE **file);
+#endif
 
 /*
 void psf_fclearerr (SF_PRIVATE *psf) ;

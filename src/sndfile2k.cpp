@@ -268,8 +268,8 @@ static ErrorStruct SndfileErrors[] = {
 /*------------------------------------------------------------------------------
 */
 
-static int format_from_extension(SF_PRIVATE *psf);
-static int guess_file_type(SF_PRIVATE *psf);
+static bool format_from_extension(const char *path, SF_INFO *sfinfo);
+static bool guess_file_type(PSF_FILE *file, SF_INFO *sfinfo);
 static int validate_sfinfo(SF_INFO *sfinfo);
 static int validate_psf(SF_PRIVATE *psf);
 static void save_header_info(SF_PRIVATE *psf);
@@ -314,24 +314,105 @@ static inline bool VALIDATE_SNDFILE_AND_ASSIGN_PSF(SNDFILE *sndfile, bool clean_
 **	Public functions.
 */
 
-int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sf)
+int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sndfile)
 {
-    if (!sf)
+    // Input parameters check
+
+    if (mode != SFM_READ && mode != SFM_WRITE && mode != SFM_RDWR)
+    {
+        sf_errno = SFE_BAD_OPEN_MODE;
+        return sf_errno;
+    };
+
+    if (!sfinfo)
+    {
+        sf_errno = SFE_BAD_SF_INFO_PTR;
+        return sf_errno;
+    };
+
+    if (!sndfile)
     {
         sf_errno = SFE_BAD_FILE_PTR;
         return sf_errno;
     }
+    *sndfile = nullptr;
 
-    *sf = nullptr;
+    // Handle open modes
 
-    SF_PRIVATE *psf;
+    // Read mode
+    if (mode == SFM_READ)
+    {
+        // For RAW files sfinfo parameter must be properly set
+        if ((SF_CONTAINER(sfinfo->format)) == SF_FORMAT_RAW)
+        {
+            if (sf_format_check(sfinfo) == 0)
+            {
+                sf_errno = SFE_RAW_BAD_FORMAT;
+                return sf_errno;
+            };
+        }
+        // For any other format in read mode sfinfo parameter is
+        // ignored, set its fields to zero.
+        else
+        {
+            memset(sfinfo, 0, sizeof(SF_INFO));
+        }
+    };
 
-    /* Ultimate sanity check. */
-    assert(sizeof(sf_count_t) == 8);
+    PSF_FILE *file;
+    int error = psf_vio_from_file(path, mode, &file);
+    if (error != SFE_NO_ERROR)
+    {
+        sf_errno = error;
+        return sf_errno;
+    }
 
-    if ((psf = psf_allocate()) == NULL)
+    // Need this to detect if we create new file (filelength = 0).
+    sf_count_t filelength = file->vio.get_filelen(file);
+
+    if (mode == SFM_WRITE || (mode == SFM_RDWR && filelength == 0))
+    {
+        // If the file is being opened for write or RDWR and the file is currently
+        // empty, then the SF_INFO struct must contain valid data.
+        if ((SF_CONTAINER(sfinfo->format)) == 0)
+        {
+            sf_errno = SFE_ZERO_MAJOR_FORMAT;
+            file->vio.unref(file);
+            return sf_errno;
+        };
+        if ((SF_CODEC(sfinfo->format)) == 0)
+        {
+            sf_errno = SFE_ZERO_MINOR_FORMAT;
+            file->vio.unref(file);
+            return sf_errno;
+        };
+
+        if (sf_format_check(sfinfo) == 0)
+        {
+            sf_errno = SFE_BAD_OPEN_FORMAT;
+            file->vio.unref(file);
+            return sf_errno;
+        };
+    }
+    else if ((SF_CONTAINER(sfinfo->format)) != SF_FORMAT_RAW)
+    {
+        // If type RAW has not been specified then need to figure out file type.
+        if (!guess_file_type(file, sfinfo))
+            if (!format_from_extension(path, sfinfo))
+            {
+                sf_errno = SFE_BAD_OPEN_FORMAT;
+                file->vio.unref(file);
+                return sf_errno;
+            }
+    };
+
+    // Here we have format detected
+
+    SF_PRIVATE *psf = psf_allocate();
+    if (!psf)
     {
         sf_errno = SFE_MALLOC_FAILED;
+        file->vio.unref(file);
         return sf_errno;
     };
 
@@ -340,82 +421,294 @@ int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sf)
     strcpy(psf->_path, path);
 
     psf->file_mode = mode;
-    psf->error = psf->fopen(path, mode, sfinfo);
-    if (psf->error != SFE_NO_ERROR)
+    psf->vio_user_data = file;
+    psf->vio = &file->vio;
+
+    memcpy(&psf->sf, sfinfo, sizeof(SF_INFO));
+
+    psf->dataoffset = 0;
+    psf->Magick = SNDFILE_MAGICK;
+    psf->norm_float = SF_TRUE;
+    psf->norm_double = SF_TRUE;
+    psf->dataoffset = -1;
+    psf->datalength = -1;
+    psf->read_current = -1;
+    psf->write_current = -1;
+    psf->auto_header = SF_FALSE;
+    psf->rwf_endian = SF_ENDIAN_LITTLE;
+    psf->seek = psf_default_seek;
+    psf->float_int_mult = 0;
+    psf->float_max = -1.0;
+    psf->filelength = filelength;
+    psf->last_op = mode;
+    if (filelength == SF_COUNT_MAX)
+        psf->log_printf("Length : unknown\n");
+    else
+        psf->log_printf("Length : %D\n", filelength);
+
+    /* An attempt at a per SF_PRIVATE unique id. */
+    psf->unique_id = psf_rand_int32();
+
+    psf->sf.sections = 1;
+
+    psf->sf.seekable = SF_TRUE;
+
+    /* Set bytewidth if known. */
+    switch (SF_CODEC(psf->sf.format))
     {
-        sf_errno = psf->error;
+    case SF_FORMAT_PCM_S8:
+    case SF_FORMAT_PCM_U8:
+    case SF_FORMAT_ULAW:
+    case SF_FORMAT_ALAW:
+    case SF_FORMAT_DPCM_8:
+        psf->bytewidth = 1;
+        break;
+
+    case SF_FORMAT_PCM_16:
+    case SF_FORMAT_DPCM_16:
+        psf->bytewidth = 2;
+        break;
+
+    case SF_FORMAT_PCM_24:
+        psf->bytewidth = 3;
+        break;
+
+    case SF_FORMAT_PCM_32:
+    case SF_FORMAT_FLOAT:
+        psf->bytewidth = 4;
+        break;
+
+    case SF_FORMAT_DOUBLE:
+        psf->bytewidth = 8;
+        break;
+    };
+
+    psf->fseek(0, SF_SEEK_SET);
+
+    /* Call the initialisation function for the relevant file type. */
+    switch (SF_CONTAINER(psf->sf.format))
+    {
+    case SF_FORMAT_WAV:
+    case SF_FORMAT_WAVEX:
+        error = wav_open(psf);
+        break;
+
+    case SF_FORMAT_AIFF:
+        error = aiff_open(psf);
+        break;
+
+    case SF_FORMAT_AU:
+        error = au_open(psf);
+        break;
+
+    case SF_FORMAT_RAW:
+        error = raw_open(psf);
+        break;
+
+    case SF_FORMAT_W64:
+        error = w64_open(psf);
+        break;
+
+    case SF_FORMAT_RF64:
+        error = rf64_open(psf);
+        break;
+
+    case SF_FORMAT_PAF:
+        error = paf_open(psf);
+        break;
+
+    case SF_FORMAT_SVX:
+        error = svx_open(psf);
+        break;
+
+    case SF_FORMAT_NIST:
+        error = nist_open(psf);
+        break;
+
+    case SF_FORMAT_IRCAM:
+        error = ircam_open(psf);
+        break;
+
+    case SF_FORMAT_VOC:
+        error = voc_open(psf);
+        break;
+
+    case SF_FORMAT_SDS:
+        error = sds_open(psf);
+        break;
+
+    case SF_FORMAT_OGG:
+        error = ogg_open(psf);
+        break;
+
+    case SF_FORMAT_TXW:
+        error = txw_open(psf);
+        break;
+
+    case SF_FORMAT_WVE:
+        error = wve_open(psf);
+        break;
+
+    case SF_FORMAT_DWD:
+        error = dwd_open(psf);
+        break;
+
+    case SF_FORMAT_MAT4:
+        error = mat4_open(psf);
+        break;
+
+    case SF_FORMAT_MAT5:
+        error = mat5_open(psf);
+        break;
+
+    case SF_FORMAT_PVF:
+        error = pvf_open(psf);
+        break;
+
+    case SF_FORMAT_XI:
+        error = xi_open(psf);
+        break;
+
+    case SF_FORMAT_HTK:
+        error = htk_open(psf);
+        break;
+
+    case SF_FORMAT_REX2:
+        error = rx2_open(psf);
+        break;
+
+    case SF_FORMAT_AVR:
+        error = avr_open(psf);
+        break;
+
+    case SF_FORMAT_FLAC:
+        error = flac_open(psf);
+        break;
+
+    case SF_FORMAT_CAF:
+        error = caf_open(psf);
+        break;
+
+    case SF_FORMAT_MPC2K:
+        error = mpc2k_open(psf);
+        break;
+
+    default:
+        error = SF_ERR_UNRECOGNISED_FORMAT;
+    };
+
+    if (error != SFE_NO_ERROR)
+    {
+        sf_errno = error;
+        sf_close(psf);
         return sf_errno;
     }
 
-    if (psf->open_file(sfinfo))
+    if (mode == SFM_RDWR && sf_format_check(&psf->sf) == 0)
     {
-        *sf = psf;
-        return SF_ERR_NO_ERROR;
-    }
-    else
-    {
+        sf_errno = SFE_BAD_MODE_RW;
+        sf_close(psf);
         return sf_errno;
-    }
-} /* sf_open */
+    };
+
+    if (validate_sfinfo(&psf->sf) == 0)
+    {
+        psf->log_SF_INFO();
+        save_header_info(psf);
+        sf_errno = SFE_BAD_SF_INFO;
+        sf_close(psf);
+        return sf_errno;
+    };
+
+    if (validate_psf(psf) == 0)
+    {
+        save_header_info(psf);
+        sf_errno = SFE_INTERNAL;
+        sf_close(psf);
+        return sf_errno;
+    };
+
+    psf->read_current = 0;
+    psf->write_current = 0;
+    if (mode == SFM_RDWR)
+    {
+        psf->write_current = psf->sf.frames;
+        psf->have_written = psf->sf.frames > 0 ? true : false;
+    };
+
+    memcpy(sfinfo, &psf->sf, sizeof(SF_INFO));
+
+    if (mode == SFM_WRITE)
+    {
+        /* Zero out these fields. */
+        sfinfo->frames = 0;
+        sfinfo->sections = 0;
+        sfinfo->seekable = 0;
+    };
+
+    *sndfile = psf;
+    return SF_ERR_NO_ERROR;
+}
 
 int sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data, SNDFILE **sndfile)
 {
-    if (!sndfile)
-    {
-        sf_errno = SFE_BAD_FILE_PTR;
-        return sf_errno;
-    }
+ //   if (!sndfile)
+ //   {
+ //       sf_errno = SFE_BAD_FILE_PTR;
+ //       return sf_errno;
+ //   }
 
-    *sndfile = nullptr;
+ //   *sndfile = nullptr;
 
-	SF_PRIVATE *psf;
+	//SF_PRIVATE *psf;
 
-	/* Make sure we have a valid set ot virtual pointers. */
-	if (sfvirtual->get_filelen == NULL || sfvirtual->seek == NULL || sfvirtual->tell == NULL)
-	{
-		sf_errno = SFE_BAD_VIRTUAL_IO;
-		snprintf(sf_parselog, sizeof(sf_parselog),
-				 "Bad vio_get_filelen / "
-				 "vio_seek / vio_tell in "
-				 "SF_VIRTUAL_IO struct.\n");
-		return NULL;
-	};
+	///* Make sure we have a valid set ot virtual pointers. */
+	//if (sfvirtual->get_filelen == NULL || sfvirtual->seek == NULL || sfvirtual->tell == NULL)
+	//{
+	//	sf_errno = SFE_BAD_VIRTUAL_IO;
+	//	snprintf(sf_parselog, sizeof(sf_parselog),
+	//			 "Bad vio_get_filelen / "
+	//			 "vio_seek / vio_tell in "
+	//			 "SF_VIRTUAL_IO struct.\n");
+	//	return NULL;
+	//};
 
-	if ((mode == SFM_READ || mode == SFM_RDWR) && sfvirtual->read == NULL)
-	{
-		sf_errno = SFE_BAD_VIRTUAL_IO;
-		snprintf(sf_parselog, sizeof(sf_parselog), "Bad vio_read in SF_VIRTUAL_IO struct.\n");
-		return NULL;
-	};
+	//if ((mode == SFM_READ || mode == SFM_RDWR) && sfvirtual->read == NULL)
+	//{
+	//	sf_errno = SFE_BAD_VIRTUAL_IO;
+	//	snprintf(sf_parselog, sizeof(sf_parselog), "Bad vio_read in SF_VIRTUAL_IO struct.\n");
+	//	return NULL;
+	//};
 
-	if ((mode == SFM_WRITE || mode == SFM_RDWR) && sfvirtual->write == NULL)
-	{
-		sf_errno = SFE_BAD_VIRTUAL_IO;
-		snprintf(sf_parselog, sizeof(sf_parselog), "Bad vio_write in SF_VIRTUAL_IO struct.\n");
-		return NULL;
-	};
+	//if ((mode == SFM_WRITE || mode == SFM_RDWR) && sfvirtual->write == NULL)
+	//{
+	//	sf_errno = SFE_BAD_VIRTUAL_IO;
+	//	snprintf(sf_parselog, sizeof(sf_parselog), "Bad vio_write in SF_VIRTUAL_IO struct.\n");
+	//	return NULL;
+	//};
 
-	if ((psf = psf_allocate()) == NULL)
-	{
-		sf_errno = SFE_MALLOC_FAILED;
-		return NULL;
-	};
+	//if ((psf = psf_allocate()) == NULL)
+	//{
+	//	sf_errno = SFE_MALLOC_FAILED;
+	//	return NULL;
+	//};
 
-	psf->vio = sfvirtual;
+	//psf->vio = sfvirtual;
 
-	psf->vio_user_data = user_data;
+	//psf->vio_user_data = user_data;
 
-	psf->file_mode = mode;
+	//psf->file_mode = mode;
 
-    if (psf->open_file(sfinfo))
-    {
-        *sndfile = psf;
-        return SF_ERR_NO_ERROR;
-    }
-    else
-    {
-        return sf_errno;
-    }
+ //   if (psf->open_file(sfinfo))
+ //   {
+ //       *sndfile = psf;
+ //       return SF_ERR_NO_ERROR;
+ //   }
+ //   else
+ //   {
+ //       return sf_errno;
+ //   }
+    return SFE_BAD_FILE_PTR;
 } /* sf_open_virtual */
 
 int sf_close(SNDFILE *sndfile)
@@ -2621,18 +2914,18 @@ sf_count_t sf_writef_double(SNDFILE *sndfile, const double *ptr, sf_count_t fram
     return count / sndfile->sf.channels;
 }
 
-static int format_from_extension(SF_PRIVATE *psf)
+static bool format_from_extension(const char *path, SF_INFO *sfinfo)
 {
     char *cptr;
     char buffer[16];
     int format = 0;
 
-    if ((cptr = strrchr(psf->_path, '.')) == NULL)
-        return 0;
+    if ((cptr = (char *)strrchr(path, '.')) == NULL)
+        return false;
 
     cptr++;
     if (strlen(cptr) > sizeof(buffer) - 1)
-        return 0;
+        return false;
 
     psf_strlcpy(buffer, sizeof(buffer), cptr);
     buffer[sizeof(buffer) - 1] = 0;
@@ -2649,174 +2942,261 @@ static int format_from_extension(SF_PRIVATE *psf)
 
     if (strcmp(cptr, "au") == 0)
     {
-        psf->sf.channels = 1;
-        psf->sf.samplerate = 8000;
-        format = SF_FORMAT_RAW | SF_FORMAT_ULAW;
+        sfinfo->channels = 1;
+        sfinfo->samplerate = 8000;
+        sfinfo->format = SF_FORMAT_RAW | SF_FORMAT_ULAW;
+        return true;
     }
     else if (strcmp(cptr, "snd") == 0)
     {
-        psf->sf.channels = 1;
-        psf->sf.samplerate = 8000;
-        format = SF_FORMAT_RAW | SF_FORMAT_ULAW;
+        sfinfo->channels = 1;
+        sfinfo->samplerate = 8000;
+        sfinfo->format = SF_FORMAT_RAW | SF_FORMAT_ULAW;
+        return true;
     }
-
     else if (strcmp(cptr, "vox") == 0 || strcmp(cptr, "vox8") == 0)
     {
-        psf->sf.channels = 1;
-        psf->sf.samplerate = 8000;
-        format = SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM;
+        sfinfo->channels = 1;
+        sfinfo->samplerate = 8000;
+        sfinfo->format = SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM;
+        return true;
     }
     else if (strcmp(cptr, "vox6") == 0)
     {
-        psf->sf.channels = 1;
-        psf->sf.samplerate = 6000;
-        format = SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM;
+        sfinfo->channels = 1;
+        sfinfo->samplerate = 6000;
+        sfinfo->format = SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM;
+        return true;
     }
     else if (strcmp(cptr, "gsm") == 0)
     {
-        psf->sf.channels = 1;
-        psf->sf.samplerate = 8000;
-        format = SF_FORMAT_RAW | SF_FORMAT_GSM610;
+        sfinfo->channels = 1;
+        sfinfo->samplerate = 8000;
+        sfinfo->format = SF_FORMAT_RAW | SF_FORMAT_GSM610;
+        return true;
     }
 
-    /* For RAW files, make sure the dataoffset if set correctly. */
-    if ((SF_CONTAINER(format)) == SF_FORMAT_RAW)
-        psf->dataoffset = 0;
-
-    return format;
+    return false;
 }
 
-static int guess_file_type(SF_PRIVATE *psf)
+static bool guess_file_type(PSF_FILE *file, SF_INFO *sfinfo)
 {
-    uint32_t buffer[3], format;
+    assert(file != nullptr);
+    assert(sfinfo != nullptr);
 
-    if (psf->binheader_readf("b", &buffer, SIGNED_SIZEOF(buffer)) != SIGNED_SIZEOF(buffer))
-    {
-        psf->error = SFE_BAD_FILE_READ;
-        return 0;
-    };
+    uint32_t buffer[3], format;
+    file->vio.seek(0, SF_SEEK_SET, file);
+    if (file->vio.read(&buffer, SIGNED_SIZEOF(buffer), file) != SIGNED_SIZEOF(buffer))
+        return false;
 
     if ((buffer[0] == MAKE_MARKER('R', 'I', 'F', 'F') ||
          buffer[0] == MAKE_MARKER('R', 'I', 'F', 'X')) &&
         buffer[2] == MAKE_MARKER('W', 'A', 'V', 'E'))
-        return SF_FORMAT_WAV;
+    {
+        sfinfo->format = SF_FORMAT_WAV;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER('F', 'O', 'R', 'M'))
     {
         if (buffer[2] == MAKE_MARKER('A', 'I', 'F', 'F') ||
             buffer[2] == MAKE_MARKER('A', 'I', 'F', 'C'))
-            return SF_FORMAT_AIFF;
+        {
+            sfinfo->format = SF_FORMAT_AIFF;
+            return true;
+        }
         if (buffer[2] == MAKE_MARKER('8', 'S', 'V', 'X') ||
             buffer[2] == MAKE_MARKER('1', '6', 'S', 'V'))
-            return SF_FORMAT_SVX;
-        return 0;
+        {
+            sfinfo->format = SF_FORMAT_SVX;
+            return true;
+        }
+        return false;
     };
 
     if (buffer[0] == MAKE_MARKER('.', 's', 'n', 'd') ||
         buffer[0] == MAKE_MARKER('d', 'n', 's', '.'))
-        return SF_FORMAT_AU;
+    {
+        sfinfo->format = SF_FORMAT_AU;
+        return true;
+    }
 
     if ((buffer[0] == MAKE_MARKER('f', 'a', 'p', ' ') ||
          buffer[0] == MAKE_MARKER(' ', 'p', 'a', 'f')))
-        return SF_FORMAT_PAF;
+    {
+        sfinfo->format = SF_FORMAT_PAF;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER('N', 'I', 'S', 'T'))
-        return SF_FORMAT_NIST;
+    {
+        sfinfo->format = SF_FORMAT_NIST;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER('C', 'r', 'e', 'a') &&
         buffer[1] == MAKE_MARKER('t', 'i', 'v', 'e'))
-        return SF_FORMAT_VOC;
+    {
+        sfinfo->format = SF_FORMAT_VOC;
+        return true;
+    }
 
     if ((buffer[0] & MAKE_MARKER(0xFF, 0xFF, 0xF8, 0xFF)) == MAKE_MARKER(0x64, 0xA3, 0x00, 0x00) ||
         (buffer[0] & MAKE_MARKER(0xFF, 0xF8, 0xFF, 0xFF)) == MAKE_MARKER(0x00, 0x00, 0xA3, 0x64))
-        return SF_FORMAT_IRCAM;
+    {
+        sfinfo->format = SF_FORMAT_IRCAM;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER('r', 'i', 'f', 'f'))
-        return SF_FORMAT_W64;
+    {
+        sfinfo->format = SF_FORMAT_W64;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER(0, 0, 0x03, 0xE8) && buffer[1] == MAKE_MARKER(0, 0, 0, 1) &&
         buffer[2] == MAKE_MARKER(0, 0, 0, 1))
-        return SF_FORMAT_MAT4;
+    {
+        sfinfo->format = SF_FORMAT_MAT4;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER(0, 0, 0, 0) && buffer[1] == MAKE_MARKER(1, 0, 0, 0) &&
         buffer[2] == MAKE_MARKER(1, 0, 0, 0))
-        return SF_FORMAT_MAT4;
+    {
+        sfinfo->format = SF_FORMAT_MAT4;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER('M', 'A', 'T', 'L') &&
         buffer[1] == MAKE_MARKER('A', 'B', ' ', '5'))
-        return SF_FORMAT_MAT5;
+    {
+        sfinfo->format = SF_FORMAT_MAT5;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER('P', 'V', 'F', '1'))
-        return SF_FORMAT_PVF;
+    {
+        sfinfo->format = SF_FORMAT_PVF;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER('E', 'x', 't', 'e') &&
         buffer[1] == MAKE_MARKER('n', 'd', 'e', 'd') &&
         buffer[2] == MAKE_MARKER(' ', 'I', 'n', 's'))
-        return SF_FORMAT_XI;
+    {
+        sfinfo->format = SF_FORMAT_XI;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER('c', 'a', 'f', 'f') &&
         buffer[2] == MAKE_MARKER('d', 'e', 's', 'c'))
-        return SF_FORMAT_CAF;
+    {
+        sfinfo->format = SF_FORMAT_CAF;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER('O', 'g', 'g', 'S'))
-        return SF_FORMAT_OGG;
+    {
+        sfinfo->format = SF_FORMAT_OGG;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER('A', 'L', 'a', 'w') &&
         buffer[1] == MAKE_MARKER('S', 'o', 'u', 'n') &&
         buffer[2] == MAKE_MARKER('d', 'F', 'i', 'l'))
-        return SF_FORMAT_WVE;
+    {
+        sfinfo->format = SF_FORMAT_WVE;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER('D', 'i', 'a', 'm') &&
         buffer[1] == MAKE_MARKER('o', 'n', 'd', 'W') &&
         buffer[2] == MAKE_MARKER('a', 'r', 'e', ' '))
-        return SF_FORMAT_DWD;
+    {
+        sfinfo->format = SF_FORMAT_DWD;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER('L', 'M', '8', '9') || buffer[0] == MAKE_MARKER('5', '3', 0, 0))
-        return SF_FORMAT_TXW;
+    {
+        sfinfo->format = SF_FORMAT_TXW;
+        return true;
+    }
 
     if ((buffer[0] & MAKE_MARKER(0xFF, 0xFF, 0x80, 0xFF)) == MAKE_MARKER(0xF0, 0x7E, 0, 0x01))
-        return SF_FORMAT_SDS;
+    {
+        sfinfo->format = SF_FORMAT_SDS;
+        return true;
+    }
 
     if ((buffer[0] & MAKE_MARKER(0xFF, 0xFF, 0, 0)) == MAKE_MARKER(1, 4, 0, 0))
-        return SF_FORMAT_MPC2K;
+    {
+        sfinfo->format = SF_FORMAT_MPC2K;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER('C', 'A', 'T', ' ') &&
         buffer[2] == MAKE_MARKER('R', 'E', 'X', '2'))
-        return SF_FORMAT_REX2;
+    {
+        sfinfo->format = SF_FORMAT_REX2;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER(0x30, 0x26, 0xB2, 0x75) &&
         buffer[1] == MAKE_MARKER(0x8E, 0x66, 0xCF, 0x11))
-        return 0 /*-SF_FORMAT_WMA-*/;
+    {
+        return false /*-SF_FORMAT_WMA-*/;
+    }
 
+    sf_count_t filelength = file->vio.get_filelen(file);
     /* HMM (Hidden Markov Model) Tool Kit. */
     if (buffer[2] == MAKE_MARKER(0, 2, 0, 0) &&
-        2 * ((int64_t)BE2H_32(buffer[0])) + 12 == psf->filelength)
-        return SF_FORMAT_HTK;
+        2 * ((int64_t)BE2H_32(buffer[0])) + 12 == filelength)
+    {
+        sfinfo->format = SF_FORMAT_HTK;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER('f', 'L', 'a', 'C'))
-        return SF_FORMAT_FLAC;
+    {
+        sfinfo->format = SF_FORMAT_FLAC;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER('2', 'B', 'I', 'T'))
-        return SF_FORMAT_AVR;
+    {
+        sfinfo->format = SF_FORMAT_AVR;
+        return true;
+    }
 
     if (buffer[0] == MAKE_MARKER('R', 'F', '6', '4') &&
         buffer[2] == MAKE_MARKER('W', 'A', 'V', 'E'))
-        return SF_FORMAT_RF64;
+    {
+        sfinfo->format = SF_FORMAT_RF64;
+        return true;
+    }
 
     /* Turtle Beach SMP 16-bit */
     if (buffer[0] == MAKE_MARKER('S', 'O', 'U', 'N') &&
         buffer[1] == MAKE_MARKER('D', ' ', 'S', 'A'))
-        return 0;
+    {
+        return false;
+    }
 
     /* Yamaha sampler format. */
     if (buffer[0] == MAKE_MARKER('S', 'Y', '8', '0') ||
         buffer[0] == MAKE_MARKER('S', 'Y', '8', '5'))
-        return 0;
+    {
+        return false;
+    }
 
     if (buffer[0] == MAKE_MARKER('a', 'j', 'k', 'g'))
-        return 0 /*-SF_FORMAT_SHN-*/;
+    {
+        return false /*-SF_FORMAT_SHN-*/;
+    }
 
-    return 0;
+    return false;
 }
 
 static int validate_sfinfo(SF_INFO *sfinfo)
@@ -2905,328 +3285,328 @@ int SF_PRIVATE::close()
     return _error;
 }
 
-SNDFILE *SF_PRIVATE::open_file(SF_INFO *sfinfo)
-{
-    int _error, format;
-
-    sf_errno = _error = 0;
-    sf_parselog[0] = 0;
-
-    if (error)
-    {
-        _error = error;
-        goto error_exit;
-    };
-
-    if (file_mode != SFM_READ && file_mode != SFM_WRITE && file_mode != SFM_RDWR)
-    {
-        _error = SFE_BAD_OPEN_MODE;
-        goto error_exit;
-    };
-
-    if (sfinfo == NULL)
-    {
-        _error = SFE_BAD_SF_INFO_PTR;
-        goto error_exit;
-    };
-
-    if (file_mode == SFM_READ)
-    {
-        if ((SF_CONTAINER(sfinfo->format)) == SF_FORMAT_RAW)
-        {
-            if (sf_format_check(sfinfo) == 0)
-            {
-                _error = SFE_RAW_BAD_FORMAT;
-                goto error_exit;
-            };
-        }
-        else
-        {
-            memset(sfinfo, 0, sizeof(SF_INFO));
-        }
-    };
-
-    memcpy(&sf, sfinfo, sizeof(SF_INFO));
-
-    Magick = SNDFILE_MAGICK;
-    norm_float = SF_TRUE;
-    norm_double = SF_TRUE;
-    dataoffset = -1;
-    datalength = -1;
-    read_current = -1;
-    write_current = -1;
-    auto_header = SF_FALSE;
-    rwf_endian = SF_ENDIAN_LITTLE;
-    seek = psf_default_seek;
-    float_int_mult = 0;
-    float_max = -1.0;
-
-    /* An attempt at a per SF_PRIVATE unique id. */
-    unique_id = psf_rand_int32();
-
-    sf.sections = 1;
-
-    sf.seekable = SF_TRUE;
-
-        /* File is open, so get the length. */
-    filelength = get_filelen();
-
-    if (filelength == SF_COUNT_MAX)
-        log_printf("Length : unknown\n");
-    else
-        log_printf("Length : %D\n", filelength);
-
-    if (file_mode == SFM_WRITE || (file_mode == SFM_RDWR && filelength == 0))
-    {
-        /* If the file is being opened for write or RDWR and the file is currently
-		** empty, then the SF_INFO struct must contain valid data.
-		*/
-        if ((SF_CONTAINER(sf.format)) == 0)
-        {
-            _error = SFE_ZERO_MAJOR_FORMAT;
-            goto error_exit;
-        };
-        if ((SF_CODEC(sf.format)) == 0)
-        {
-            _error = SFE_ZERO_MINOR_FORMAT;
-            goto error_exit;
-        };
-
-        if (sf_format_check(&sf) == 0)
-        {
-            _error = SFE_BAD_OPEN_FORMAT;
-            goto error_exit;
-        };
-    }
-    else if ((SF_CONTAINER(sf.format)) != SF_FORMAT_RAW)
-    {
-        /* If type RAW has not been specified then need to figure out file type. */
-        sf.format = guess_file_type(this);
-
-        if (sf.format == 0)
-            sf.format = format_from_extension(this);
-    };
-
-    /* Prevent unnecessary seeks */
-    last_op = file_mode;
-
-    /* Set bytewidth if known. */
-    switch (SF_CODEC(sf.format))
-    {
-    case SF_FORMAT_PCM_S8:
-    case SF_FORMAT_PCM_U8:
-    case SF_FORMAT_ULAW:
-    case SF_FORMAT_ALAW:
-    case SF_FORMAT_DPCM_8:
-        bytewidth = 1;
-        break;
-
-    case SF_FORMAT_PCM_16:
-    case SF_FORMAT_DPCM_16:
-        bytewidth = 2;
-        break;
-
-    case SF_FORMAT_PCM_24:
-        bytewidth = 3;
-        break;
-
-    case SF_FORMAT_PCM_32:
-    case SF_FORMAT_FLOAT:
-        bytewidth = 4;
-        break;
-
-    case SF_FORMAT_DOUBLE:
-        bytewidth = 8;
-        break;
-    };
-
-    /* Call the initialisation function for the relevant file type. */
-    switch (SF_CONTAINER(sf.format))
-    {
-    case SF_FORMAT_WAV:
-    case SF_FORMAT_WAVEX:
-        _error = wav_open(this);
-        break;
-
-    case SF_FORMAT_AIFF:
-        _error = aiff_open(this);
-        break;
-
-    case SF_FORMAT_AU:
-        _error = au_open(this);
-        break;
-
-    case SF_FORMAT_RAW:
-        _error = raw_open(this);
-        break;
-
-    case SF_FORMAT_W64:
-        _error = w64_open(this);
-        break;
-
-    case SF_FORMAT_RF64:
-        _error = rf64_open(this);
-        break;
-
-    /* Lite remove start */
-    case SF_FORMAT_PAF:
-        _error = paf_open(this);
-        break;
-
-    case SF_FORMAT_SVX:
-        _error = svx_open(this);
-        break;
-
-    case SF_FORMAT_NIST:
-        _error = nist_open(this);
-        break;
-
-    case SF_FORMAT_IRCAM:
-        _error = ircam_open(this);
-        break;
-
-    case SF_FORMAT_VOC:
-        _error = voc_open(this);
-        break;
-
-    case SF_FORMAT_SDS:
-        _error = sds_open(this);
-        break;
-
-    case SF_FORMAT_OGG:
-        _error = ogg_open(this);
-        break;
-
-    case SF_FORMAT_TXW:
-        _error = txw_open(this);
-        break;
-
-    case SF_FORMAT_WVE:
-        _error = wve_open(this);
-        break;
-
-    case SF_FORMAT_DWD:
-        _error = dwd_open(this);
-        break;
-
-    case SF_FORMAT_MAT4:
-        _error = mat4_open(this);
-        break;
-
-    case SF_FORMAT_MAT5:
-        _error = mat5_open(this);
-        break;
-
-    case SF_FORMAT_PVF:
-        _error = pvf_open(this);
-        break;
-
-    case SF_FORMAT_XI:
-        _error = xi_open(this);
-        break;
-
-    case SF_FORMAT_HTK:
-        _error = htk_open(this);
-        break;
-
-    case SF_FORMAT_REX2:
-        _error = rx2_open(this);
-        break;
-
-    case SF_FORMAT_AVR:
-        _error = avr_open(this);
-        break;
-
-    case SF_FORMAT_FLAC:
-        _error = flac_open(this);
-        break;
-
-    case SF_FORMAT_CAF:
-        _error = caf_open(this);
-        break;
-
-    case SF_FORMAT_MPC2K:
-        _error = mpc2k_open(this);
-        break;
-
-        /* Lite remove end */
-
-    default:
-        _error = SF_ERR_UNRECOGNISED_FORMAT;
-    };
-
-    if (_error)
-        goto error_exit;
-
-    if (file_mode == SFM_RDWR && sf_format_check(&sf) == 0)
-    {
-        _error = SFE_BAD_MODE_RW;
-        goto error_exit;
-    };
-
-    if (validate_sfinfo(&sf) == 0)
-    {
-        log_SF_INFO();
-        save_header_info(this);
-        _error = SFE_BAD_SF_INFO;
-        goto error_exit;
-    };
-
-    if (validate_psf(this) == 0)
-    {
-        save_header_info(this);
-        _error = SFE_INTERNAL;
-        goto error_exit;
-    };
-
-    read_current = 0;
-    write_current = 0;
-    if (file_mode == SFM_RDWR)
-    {
-        write_current = sf.frames;
-        have_written = sf.frames > 0 ? true : false;
-    };
-
-    memcpy(sfinfo, &sf, sizeof(SF_INFO));
-
-    if (file_mode == SFM_WRITE)
-    {
-        /* Zero out these fields. */
-        sfinfo->frames = 0;
-        sfinfo->sections = 0;
-        sfinfo->seekable = 0;
-    };
-
-    return (SNDFILE *)this;
-
-error_exit:
-    sf_errno = _error;
-
-    if (_error == SFE_SYSTEM)
-        snprintf(sf_syserr, sizeof(sf_syserr), "%s", syserr);
-    snprintf(sf_parselog, sizeof(sf_parselog), "%s", parselog.buf);
-
-    switch (_error)
-    {
-    case SF_ERR_SYSTEM:
-    case SF_ERR_UNSUPPORTED_ENCODING:
-    case SFE_UNIMPLEMENTED:
-        break;
-
-    case SFE_RAW_BAD_FORMAT:
-        break;
-
-    default:
-        if (file_mode == SFM_READ)
-        {
-            log_printf("Parse error : %s\n", sf_error_number(_error));
-            _error = SF_ERR_MALFORMED_FILE;
-        };
-    };
-
-    close();
-    return NULL;
-}
+//SNDFILE *SF_PRIVATE::open_file(SF_INFO *sfinfo)
+//{
+//    int _error, format;
+//
+//    sf_errno = _error = 0;
+//    sf_parselog[0] = 0;
+//
+//    if (error)
+//    {
+//        _error = error;
+//        goto error_exit;
+//    };
+//
+//    if (file_mode != SFM_READ && file_mode != SFM_WRITE && file_mode != SFM_RDWR)
+//    {
+//        _error = SFE_BAD_OPEN_MODE;
+//        goto error_exit;
+//    };
+//
+//    if (sfinfo == NULL)
+//    {
+//        _error = SFE_BAD_SF_INFO_PTR;
+//        goto error_exit;
+//    };
+//
+//    if (file_mode == SFM_READ)
+//    {
+//        if ((SF_CONTAINER(sfinfo->format)) == SF_FORMAT_RAW)
+//        {
+//            if (sf_format_check(sfinfo) == 0)
+//            {
+//                _error = SFE_RAW_BAD_FORMAT;
+//                goto error_exit;
+//            };
+//        }
+//        else
+//        {
+//            memset(sfinfo, 0, sizeof(SF_INFO));
+//        }
+//    };
+//
+//    memcpy(&sf, sfinfo, sizeof(SF_INFO));
+//
+//    Magick = SNDFILE_MAGICK;
+//    norm_float = SF_TRUE;
+//    norm_double = SF_TRUE;
+//    dataoffset = -1;
+//    datalength = -1;
+//    read_current = -1;
+//    write_current = -1;
+//    auto_header = SF_FALSE;
+//    rwf_endian = SF_ENDIAN_LITTLE;
+//    seek = psf_default_seek;
+//    float_int_mult = 0;
+//    float_max = -1.0;
+//
+//    /* An attempt at a per SF_PRIVATE unique id. */
+//    unique_id = psf_rand_int32();
+//
+//    sf.sections = 1;
+//
+//    sf.seekable = SF_TRUE;
+//
+//        /* File is open, so get the length. */
+//    filelength = get_filelen();
+//
+//    if (filelength == SF_COUNT_MAX)
+//        log_printf("Length : unknown\n");
+//    else
+//        log_printf("Length : %D\n", filelength);
+//
+//    if (file_mode == SFM_WRITE || (file_mode == SFM_RDWR && filelength == 0))
+//    {
+//        /* If the file is being opened for write or RDWR and the file is currently
+//		** empty, then the SF_INFO struct must contain valid data.
+//		*/
+//        if ((SF_CONTAINER(sf.format)) == 0)
+//        {
+//            _error = SFE_ZERO_MAJOR_FORMAT;
+//            goto error_exit;
+//        };
+//        if ((SF_CODEC(sf.format)) == 0)
+//        {
+//            _error = SFE_ZERO_MINOR_FORMAT;
+//            goto error_exit;
+//        };
+//
+//        if (sf_format_check(&sf) == 0)
+//        {
+//            _error = SFE_BAD_OPEN_FORMAT;
+//            goto error_exit;
+//        };
+//    }
+//    else if ((SF_CONTAINER(sf.format)) != SF_FORMAT_RAW)
+//    {
+//        /* If type RAW has not been specified then need to figure out file type. */
+//        sf.format = guess_file_type(this);
+//
+//        if (sf.format == 0)
+//            sf.format = format_from_extension(this);
+//    };
+//
+//    /* Prevent unnecessary seeks */
+//    last_op = file_mode;
+//
+//    /* Set bytewidth if known. */
+//    switch (SF_CODEC(sf.format))
+//    {
+//    case SF_FORMAT_PCM_S8:
+//    case SF_FORMAT_PCM_U8:
+//    case SF_FORMAT_ULAW:
+//    case SF_FORMAT_ALAW:
+//    case SF_FORMAT_DPCM_8:
+//        bytewidth = 1;
+//        break;
+//
+//    case SF_FORMAT_PCM_16:
+//    case SF_FORMAT_DPCM_16:
+//        bytewidth = 2;
+//        break;
+//
+//    case SF_FORMAT_PCM_24:
+//        bytewidth = 3;
+//        break;
+//
+//    case SF_FORMAT_PCM_32:
+//    case SF_FORMAT_FLOAT:
+//        bytewidth = 4;
+//        break;
+//
+//    case SF_FORMAT_DOUBLE:
+//        bytewidth = 8;
+//        break;
+//    };
+//
+//    /* Call the initialisation function for the relevant file type. */
+//    switch (SF_CONTAINER(sf.format))
+//    {
+//    case SF_FORMAT_WAV:
+//    case SF_FORMAT_WAVEX:
+//        _error = wav_open(this);
+//        break;
+//
+//    case SF_FORMAT_AIFF:
+//        _error = aiff_open(this);
+//        break;
+//
+//    case SF_FORMAT_AU:
+//        _error = au_open(this);
+//        break;
+//
+//    case SF_FORMAT_RAW:
+//        _error = raw_open(this);
+//        break;
+//
+//    case SF_FORMAT_W64:
+//        _error = w64_open(this);
+//        break;
+//
+//    case SF_FORMAT_RF64:
+//        _error = rf64_open(this);
+//        break;
+//
+//    /* Lite remove start */
+//    case SF_FORMAT_PAF:
+//        _error = paf_open(this);
+//        break;
+//
+//    case SF_FORMAT_SVX:
+//        _error = svx_open(this);
+//        break;
+//
+//    case SF_FORMAT_NIST:
+//        _error = nist_open(this);
+//        break;
+//
+//    case SF_FORMAT_IRCAM:
+//        _error = ircam_open(this);
+//        break;
+//
+//    case SF_FORMAT_VOC:
+//        _error = voc_open(this);
+//        break;
+//
+//    case SF_FORMAT_SDS:
+//        _error = sds_open(this);
+//        break;
+//
+//    case SF_FORMAT_OGG:
+//        _error = ogg_open(this);
+//        break;
+//
+//    case SF_FORMAT_TXW:
+//        _error = txw_open(this);
+//        break;
+//
+//    case SF_FORMAT_WVE:
+//        _error = wve_open(this);
+//        break;
+//
+//    case SF_FORMAT_DWD:
+//        _error = dwd_open(this);
+//        break;
+//
+//    case SF_FORMAT_MAT4:
+//        _error = mat4_open(this);
+//        break;
+//
+//    case SF_FORMAT_MAT5:
+//        _error = mat5_open(this);
+//        break;
+//
+//    case SF_FORMAT_PVF:
+//        _error = pvf_open(this);
+//        break;
+//
+//    case SF_FORMAT_XI:
+//        _error = xi_open(this);
+//        break;
+//
+//    case SF_FORMAT_HTK:
+//        _error = htk_open(this);
+//        break;
+//
+//    case SF_FORMAT_REX2:
+//        _error = rx2_open(this);
+//        break;
+//
+//    case SF_FORMAT_AVR:
+//        _error = avr_open(this);
+//        break;
+//
+//    case SF_FORMAT_FLAC:
+//        _error = flac_open(this);
+//        break;
+//
+//    case SF_FORMAT_CAF:
+//        _error = caf_open(this);
+//        break;
+//
+//    case SF_FORMAT_MPC2K:
+//        _error = mpc2k_open(this);
+//        break;
+//
+//        /* Lite remove end */
+//
+//    default:
+//        _error = SF_ERR_UNRECOGNISED_FORMAT;
+//    };
+//
+//    if (_error)
+//        goto error_exit;
+//
+//    if (file_mode == SFM_RDWR && sf_format_check(&sf) == 0)
+//    {
+//        _error = SFE_BAD_MODE_RW;
+//        goto error_exit;
+//    };
+//
+//    if (validate_sfinfo(&sf) == 0)
+//    {
+//        log_SF_INFO();
+//        save_header_info(this);
+//        _error = SFE_BAD_SF_INFO;
+//        goto error_exit;
+//    };
+//
+//    if (validate_psf(this) == 0)
+//    {
+//        save_header_info(this);
+//        _error = SFE_INTERNAL;
+//        goto error_exit;
+//    };
+//
+//    read_current = 0;
+//    write_current = 0;
+//    if (file_mode == SFM_RDWR)
+//    {
+//        write_current = sf.frames;
+//        have_written = sf.frames > 0 ? true : false;
+//    };
+//
+//    memcpy(sfinfo, &sf, sizeof(SF_INFO));
+//
+//    if (file_mode == SFM_WRITE)
+//    {
+//        /* Zero out these fields. */
+//        sfinfo->frames = 0;
+//        sfinfo->sections = 0;
+//        sfinfo->seekable = 0;
+//    };
+//
+//    return (SNDFILE *)this;
+//
+//error_exit:
+//    sf_errno = _error;
+//
+//    if (_error == SFE_SYSTEM)
+//        snprintf(sf_syserr, sizeof(sf_syserr), "%s", syserr);
+//    snprintf(sf_parselog, sizeof(sf_parselog), "%s", parselog.buf);
+//
+//    switch (_error)
+//    {
+//    case SF_ERR_SYSTEM:
+//    case SF_ERR_UNSUPPORTED_ENCODING:
+//    case SFE_UNIMPLEMENTED:
+//        break;
+//
+//    case SFE_RAW_BAD_FORMAT:
+//        break;
+//
+//    default:
+//        if (file_mode == SFM_READ)
+//        {
+//            log_printf("Parse error : %s\n", sf_error_number(_error));
+//            _error = SF_ERR_MALFORMED_FILE;
+//        };
+//    };
+//
+//    close();
+//    return NULL;
+//}
 
 /*==============================================================================
 ** Chunk getting and setting.
