@@ -1323,36 +1323,6 @@ SNDFILE2K_EXPORT int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo
  * sf_open_virtual() is similar to sf_open(), but takes Virtual I/O context
  * of already opened file instead of path.
  *
- * Care should be taken to ensure that the mode of the file represented by the
- * descriptor matches the @c mode argument.
- *
- * @return A valid pointer to a #SNDFILE object on success, @c NULL
- * otherwise.
- *
- * @deprecated This function is deprecated and will be removed in next major release.
- * Use sf_open_virtual_ex() instead.
- *
- * @sa sf_open(), sf_wchar_open(), sf_open_virtual_ex()
- * @sa sf_close()
- */
-SNDFILE2K_EXPORT SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo,
-                                          void *user_data);
-
-/** Opens sound file using Virtual I/O context
- *
- * @param[in] sfvirtual Virtual I/O context
- * @param[in] mode File open mode
- * @param[in,out] sfinfo Format information
- * @param[in] user_data User data
- *
- * sf_open_virtual_ex() is similar to sf_open(), but takes Virtual I/O context
- * of already opened file instead of path.
- *
- * sf_open_virtual_ex() uses new SF_VIRTUAL_IO members: SF_VIRTUAL_IO::flush,
- * SF_VIRTUAL_IO::set_filelen, SF_VIRTUAL_IO::ref and SF_VIRTUAL_IO::unref.
- * Anyway, all this callbaks are not required and
- * could be set to @c NULL.
- *
  * - SF_VIRTUAL_IO::flush is helpful in write mode, performing flashing cache data
  * to disk.
  * - SF_VIRTUAL_IO::set_filelen truncates file to desired size by the library.
@@ -1372,10 +1342,10 @@ SNDFILE2K_EXPORT SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE 
  * @return A valid pointer to a #SNDFILE object on success, @c NULL
  * otherwise.
  *
- * @sa sf_open(), sf_wchar_open(), sf_open_virtual()
+ * @sa sf_open(), sf_wchar_open()
  * @sa sf_close()
  */
-SNDFILE2K_EXPORT SNDFILE *sf_open_virtual_ex(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data);
+SNDFILE2K_EXPORT SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data);
 
 /** @}*/
 
