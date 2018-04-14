@@ -96,7 +96,7 @@ static void alsa_play(int argc, char *argv[])
         memset(&sfinfo, 0, sizeof(sfinfo));
 
         printf("Playing %s\n", argv[k]);
-        if (!(sndfile = sf_open(argv[k], SFM_READ, &sfinfo)))
+        if (sf_open(argv[k], SFM_READ, &sfinfo, &sndfile) != SF_ERR_NO_ERROR)
         {
             puts(sf_strerror(NULL));
             continue;
@@ -401,7 +401,7 @@ static int opensoundsys_play(int argc, char *argv[])
         memset(&sfinfo, 0, sizeof(sfinfo));
 
         printf("Playing %s\n", argv[k]);
-        if (!(sndfile = sf_open(argv[k], SFM_READ, &sfinfo)))
+        if (sf_open(argv[k], SFM_READ, &sfinfo, &sndfile) != SF_ERR_NO_ERROR)
         {
             puts(sf_strerror(NULL));
             continue;
@@ -738,7 +738,7 @@ static void sndio_play(int argc, char *argv[])
     for (k = 1; k < argc; k++)
     {
         printf("Playing %s\n", argv[k]);
-        if (!(sndfile = sf_open(argv[k], SFM_READ, &sfinfo)))
+        if (sf_open(argv[k], SFM_READ, &sfinfo, &sndfile) != SF_ERR_NO_ERROR)
         {
             puts(sf_strerror(NULL));
             continue;
@@ -805,7 +805,7 @@ static void solaris_play(int argc, char *argv[])
     for (k = 1; k < argc; k++)
     {
         printf("Playing %s\n", argv[k]);
-        if (!(sndfile = sf_open(argv[k], SFM_READ, &sfinfo)))
+        if (sf_open(argv[k], SFM_READ, &sfinfo, &sndfile) != SF_ERR_NO_ERROR)
         {
             puts(sf_strerror(NULL));
             continue;
