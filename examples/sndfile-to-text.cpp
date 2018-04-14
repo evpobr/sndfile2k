@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    if ((infile = sf_open(infilename, SFM_READ, &sfinfo)) == NULL)
+    if (sf_open(infilename, SFM_READ, &sfinfo, &infile) != SF_ERR_NO_ERROR)
     {
         printf("Not able to open input file %s.\n", infilename);
         puts(sf_strerror(NULL));

@@ -65,7 +65,7 @@ static void file_open_test(const char *filename)
 
     /* Test that open for read fails if the file doesn't exist. */
     SF_INFO sfinfo = { 0 };
-    psf = sf_open(filename, SFM_READ, &sfinfo);
+    sf_open(filename, SFM_READ, &sfinfo, &psf);
     if (psf)
     {
         printf("\n\nLine %d: psf->fopen() should have failed.\n\n", __LINE__);

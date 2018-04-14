@@ -628,7 +628,7 @@ static void win32_play(int argc, char *argv[])
     {
         printf("Playing %s\n", argv[k]);
 
-        if (!(audio_data.sndfile = sf_open(argv[k], SFM_READ, &(audio_data.sfinfo))))
+        if (sf_open(argv[k], SFM_READ, &audio_data.sfinfo, &audio_data.sndfile) != SF_ERR_NO_ERROR)
         {
             puts(sf_strerror(NULL));
             continue;

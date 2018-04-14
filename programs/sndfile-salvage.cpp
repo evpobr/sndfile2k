@@ -105,7 +105,7 @@ static void salvage_file(const char *broken_wav, const char *fixed_w64)
 
     /* Grab the format info from the broken file. */
     memset(&sfinfo, 0, sizeof(sfinfo));
-    if ((sndfile = sf_open(broken_wav, SFM_READ, &sfinfo)) == NULL)
+    if (sf_open(broken_wav, SFM_READ, &sfinfo, &sndfile) != SF_ERR_NO_ERROR)
     {
         printf("sf_open ('%s') failed : %s\n", broken_wav, sf_strerror(NULL));
         exit(1);
@@ -159,7 +159,7 @@ static void salvage_file(const char *broken_wav, const char *fixed_w64)
 
     read_size *= sfinfo.channels;
 
-    if ((sndfile = sf_open(fixed_w64, SFM_WRITE, &sfinfo)) == NULL)
+    if (sf_open(fixed_w64, SFM_WRITE, &sfinfo, &sndfile) != SF_ERR_NO_ERROR)
     {
         printf("sf_open ('%s') failed : %s\n", fixed_w64, sf_strerror(NULL));
         exit(1);

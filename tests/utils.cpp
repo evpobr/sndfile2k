@@ -100,7 +100,7 @@ void create_short_sndfile(const char *filename, int format, int channels)
     sfinfo.channels = channels;
     sfinfo.format = format;
 
-    if ((file = sf_open(filename, SFM_WRITE, &sfinfo)) == NULL)
+    if (sf_open(filename, SFM_WRITE, &sfinfo, &file) != SF_ERR_NO_ERROR)
     {
         printf("Error (%s, %d) : sf_open failed : %s\n", __FILE__, __LINE__, sf_strerror(file));
         exit(1);
@@ -494,7 +494,7 @@ SNDFILE *test_open_file_or_die(const char *filename, SF_FILEMODE mode, SF_INFO *
         exit(1);
     };
 
-    file = sf_open(filename, mode, sfinfo);
+    sf_open(filename, mode, sfinfo, &file);
     if (file == NULL)
     {
         printf("\n\nLine %d: sf_open (%s) failed : %s\n\n", line_num, modestr, sf_strerror(NULL));
@@ -1046,7 +1046,7 @@ void write_mono_file(const char *filename, int format, int srate, float *output,
     sfinfo.channels = 1;
     sfinfo.format = format;
 
-    if ((file = sf_open(filename, SFM_WRITE, &sfinfo)) == NULL)
+    if (sf_open(filename, SFM_WRITE, &sfinfo, &file) != SF_ERR_NO_ERROR)
     {
         printf("sf_open (%s) : %s\n", filename, sf_strerror(NULL));
         exit(1);

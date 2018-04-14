@@ -49,7 +49,7 @@ int main(void)
 
     sf_info_setup(&sfinfo, SF_FORMAT_RAW | SF_FORMAT_ALAW, 44100, 1);
 
-    if ((file = sf_open(filename, SFM_WRITE, &sfinfo)) == NULL)
+    if (sf_open(filename, SFM_WRITE, &sfinfo, &file) != SF_ERR_NO_ERROR)
     {
         printf("sf_open_write failed with error : ");
         fflush(stdout);
@@ -71,7 +71,7 @@ int main(void)
 	** with what they should be.
 	*/
 
-    if ((file = sf_open(filename, SFM_READ, &sfinfo)) == NULL)
+    if (sf_open(filename, SFM_READ, &sfinfo, &file) != SF_ERR_NO_ERROR)
     {
         printf("sf_open_write failed with error : ");
         puts(sf_strerror(NULL));
@@ -103,7 +103,7 @@ int main(void)
 	** sample values and write it to disk as alaw encoded.frames.
 	*/
 
-    if (!(file = sf_open(filename, SFM_WRITE, &sfinfo)))
+    if (sf_open(filename, SFM_WRITE, &sfinfo, &file) != SF_ERR_NO_ERROR)
     {
         printf("sf_open_write failed with error : ");
         puts(sf_strerror(NULL));
@@ -120,7 +120,7 @@ int main(void)
 	** with what they should be.
 	*/
 
-    if (!(file = sf_open(filename, SFM_READ, &sfinfo)))
+    if (sf_open(filename, SFM_READ, &sfinfo, &file) != SF_ERR_NO_ERROR)
     {
         printf("sf_open_write failed with error : ");
         puts(sf_strerror(NULL));

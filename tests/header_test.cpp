@@ -751,7 +751,7 @@ static void extra_header_test(const char *filename, int filetype)
 	** integration is done.
 	*/
 
-    if ((infile = sf_open(filename, SFM_RDWR, &sfinfo)) != NULL)
+    if (sf_open(filename, SFM_RDWR, &sfinfo, &infile) == SF_ERR_NO_ERROR)
     {
         printf("\n\nError : should not be able to open this file in "
                "SFM_RDWR.\n\n");

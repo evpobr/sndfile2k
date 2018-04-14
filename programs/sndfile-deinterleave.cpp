@@ -82,7 +82,7 @@ int main(int argc, char **argv)
     memset(&state, 0, sizeof(state));
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    if ((state.infile = sf_open(argv[1], SFM_READ, &sfinfo)) == NULL)
+    if (sf_open(argv[1], SFM_READ, &sfinfo, &state.infile) != SF_ERR_NO_ERROR)
     {
         printf("\nError : Not able to open input file '%s'\n%s\n", argv[1], sf_strerror(NULL));
         exit(1);
@@ -122,7 +122,7 @@ int main(int argc, char **argv)
 
         snprintf(filename, sizeof(filename), "%s_%02d%s", pathname, ch, ext);
 
-        if ((state.outfile[ch] = sf_open(filename, SFM_WRITE, &sfinfo)) == NULL)
+        if (sf_open(filename, SFM_WRITE, &sfinfo, &state.outfile[ch]) != SF_ERR_NO_ERROR)
         {
             printf("Not able to open output file '%s'\n%s\n", filename, sf_strerror(NULL));
             exit(1);

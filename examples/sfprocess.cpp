@@ -86,7 +86,7 @@ int main(void)
 	 *      sfinfo.format   = SF_FORMAT_RAW | SF_FORMAT_PCM_16;
 	 *      sfinfo.channels = 2;
 	*/
-    if (!(infile = sf_open(infilename, SFM_READ, &sfinfo)))
+    if (sf_open(infilename, SFM_READ, &sfinfo, &infile) != SF_ERR_NO_ERROR)
     {
         /* Open failed so print an error message. */
         printf("Not able to open input file %s.\n", infilename);
@@ -101,7 +101,7 @@ int main(void)
         return 1;
     };
     /* Open the output file. */
-    if (!(outfile = sf_open(outfilename, SFM_WRITE, &sfinfo)))
+    if (sf_open(outfilename, SFM_WRITE, &sfinfo, &outfile) != SF_ERR_NO_ERROR)
     {
         printf("Not able to open output file %s.\n", outfilename);
         puts(sf_strerror(NULL));

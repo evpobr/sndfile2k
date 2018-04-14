@@ -67,7 +67,7 @@ int main(void)
     sfinfo.channels = 2;
     sfinfo.format = (SF_FORMAT_WAV | SF_FORMAT_PCM_24);
 
-    if (!(file = sf_open("sine.wav", SFM_WRITE, &sfinfo)))
+    if (sf_open("sine.wav", SFM_WRITE, &sfinfo, &file) != SF_ERR_NO_ERROR)
     {
         printf("Error : Not able to open output file.\n");
         free(buffer);

@@ -1303,7 +1303,7 @@ typedef struct SF_VIRTUAL_IO
  * @sa sf_wchar_open(), sf_open_virtual()
  * @sa sf_close()
  */
-SNDFILE2K_EXPORT SNDFILE *sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo);
+SNDFILE2K_EXPORT int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sf);
 
 /** @defgroup file-virt Virtual I/O
  *

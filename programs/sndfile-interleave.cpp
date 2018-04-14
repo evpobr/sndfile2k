@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 
     for (k = 1; k < argc - 2; k++)
     {
-        if ((state.infile[k - 1] = sf_open(argv[k], SFM_READ, &sfinfo)) == NULL)
+        if (sf_open(argv[k], SFM_READ, &sfinfo, &state.infile[k - 1]) != SF_ERR_NO_ERROR)
         {
             printf("\nError : Not able to open input file '%s'\n%s\n", argv[k], sf_strerror(NULL));
             exit(1);
@@ -126,7 +126,7 @@ int main(int argc, char **argv)
     sfinfo.channels = state.channels;
     sfinfo.format = sfe_file_type_of_ext(argv[argc - 1], sfinfo.format);
 
-    if ((state.outfile = sf_open(argv[argc - 1], SFM_WRITE, &sfinfo)) == NULL)
+    if (sf_open(argv[argc - 1], SFM_WRITE, &sfinfo, &state.outfile) != SF_ERR_NO_ERROR)
     {
         printf("Not able to open output file '%s'\n%s\n", argv[argc - 1], sf_strerror(NULL));
         exit(1);

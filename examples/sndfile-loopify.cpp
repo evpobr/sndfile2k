@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 
     memset(&in_sfinfo, 0, sizeof(in_sfinfo));
 
-    if ((infile = sf_open(infilename, SFM_READ, &in_sfinfo)) == NULL)
+    if (sf_open(infilename, SFM_READ, &in_sfinfo, &infile) != SF_ERR_NO_ERROR)
     {
         printf("Not able to open input file %s.\n", infilename);
         puts(sf_strerror(NULL));
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 
     memcpy(&out_sfinfo, &in_sfinfo, sizeof(out_sfinfo));
     /* Open the output file. */
-    if ((outfile = sf_open(outfilename, SFM_WRITE, &out_sfinfo)) == NULL)
+    if (sf_open(outfilename, SFM_WRITE, &out_sfinfo, &outfile) != SF_ERR_NO_ERROR)
     {
         printf("Not able to open output file %s : %s\n", outfilename,
                sf_strerror(NULL));

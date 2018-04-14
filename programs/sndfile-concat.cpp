@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 
     memset(&sfinfo_in, 0, sizeof(sfinfo_in));
 
-    if ((infiles[0] = sf_open(argv[0], SFM_READ, &sfinfo_in)) == NULL)
+    if (sf_open(argv[0], SFM_READ, &sfinfo_in, &infiles[0]) != SF_ERR_NO_ERROR)
     {
         printf("\nError : failed to open file '%s'.\n\n", argv[0]);
         exit(1);
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
 
     for (k = 1; k < argc; k++)
     {
-        if ((infiles[k] = sf_open(argv[k], SFM_READ, &sfinfo_in)) == NULL)
+        if (sf_open(argv[k], SFM_READ, &sfinfo_in, &infiles[k]) != SF_ERR_NO_ERROR)
         {
             printf("\nError : failed to open file '%s'.\n\n", argv[k]);
             exit(1);
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
         };
     };
 
-    if ((outfile = sf_open(outfilename, SFM_WRITE, &sfinfo_out)) == NULL)
+    if (sf_open(outfilename, SFM_WRITE, &sfinfo_out, &outfile) != SF_ERR_NO_ERROR)
     {
         printf("\nError : Not able to open input file %s.\n", outfilename);
         puts(sf_strerror(NULL));

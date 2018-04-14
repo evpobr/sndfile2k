@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     };
 
     memset(&sfinfo, 0, sizeof(sfinfo));
-    if ((file = sf_open(filename, SFM_READ, &sfinfo)) == NULL)
+    if (sf_open(filename, SFM_READ, &sfinfo, &file) != SF_ERR_NO_ERROR)
     {
         printf("Error : Open of file '%s' failed : %s\n\n", filename, sf_strerror(file));
         exit(1);

@@ -169,9 +169,10 @@ static void bad_raw_test(void)
     sfinfo.format = SF_FORMAT_RAW | 0xABCD;
     sfinfo.channels = 1;
 
-    if ((file = sf_open(filename, SFM_READ, &sfinfo)) != NULL)
+    if (sf_open(filename, SFM_READ, &sfinfo, &file) == SF_ERR_NO_ERROR)
     {
         printf("\n\nLine %d : Error, file should not have opened.\n", __LINE__ - 1);
+        sf_close(file);
         exit(1);
     };
 

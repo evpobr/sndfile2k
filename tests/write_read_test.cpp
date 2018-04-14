@@ -1097,11 +1097,11 @@ static void mono_rdwr_char_test(const char *filename, int format, int long_file_
         /* Opening a already existing short file (ie invalid header) RDWR is disallowed.
 		** If this returns a valif pointer sf_open() screwed up.
 		*/
-        if ((file = sf_open(filename, SFM_RDWR, &sfinfo)))
+        if (sf_open(filename, SFM_RDWR, &sfinfo, &file) == SF_ERR_NO_ERROR)
         {
-            printf("\n\nLine %d: sf_open should (SFM_RDWR) have failed but "
-                   "didn't.\n",
+            printf("\n\nLine %d: sf_open should (SFM_RDWR) have failed but didn't.\n",
                    __LINE__);
+            sf_close(file);
             exit(1);
         };
 
@@ -1751,11 +1751,11 @@ static void mono_rdwr_short_test(const char *filename, int format, int long_file
         /* Opening a already existing short file (ie invalid header) RDWR is disallowed.
 		** If this returns a valif pointer sf_open() screwed up.
 		*/
-        if ((file = sf_open(filename, SFM_RDWR, &sfinfo)))
+        if (sf_open(filename, SFM_RDWR, &sfinfo, &file) == SF_ERR_NO_ERROR)
         {
-            printf("\n\nLine %d: sf_open should (SFM_RDWR) have failed but "
-                   "didn't.\n",
+            printf("\n\nLine %d: sf_open should (SFM_RDWR) have failed but didn't.\n",
                    __LINE__);
+            sf_close(file);
             exit(1);
         };
 
@@ -2405,11 +2405,11 @@ static void mono_rdwr_20bit_test(const char *filename, int format, int long_file
         /* Opening a already existing short file (ie invalid header) RDWR is disallowed.
 		** If this returns a valif pointer sf_open() screwed up.
 		*/
-        if ((file = sf_open(filename, SFM_RDWR, &sfinfo)))
+        if (sf_open(filename, SFM_RDWR, &sfinfo, &file) == SF_ERR_NO_ERROR)
         {
-            printf("\n\nLine %d: sf_open should (SFM_RDWR) have failed but "
-                   "didn't.\n",
+            printf("\n\nLine %d: sf_open should (SFM_RDWR) have failed but didn't.\n",
                    __LINE__);
+            sf_close(file);
             exit(1);
         };
 
@@ -3059,11 +3059,11 @@ static void mono_rdwr_24bit_test(const char *filename, int format, int long_file
         /* Opening a already existing short file (ie invalid header) RDWR is disallowed.
 		** If this returns a valif pointer sf_open() screwed up.
 		*/
-        if ((file = sf_open(filename, SFM_RDWR, &sfinfo)))
+        if (sf_open(filename, SFM_RDWR, &sfinfo, &file) == SF_ERR_NO_ERROR)
         {
-            printf("\n\nLine %d: sf_open should (SFM_RDWR) have failed but "
-                   "didn't.\n",
+            printf("\n\nLine %d: sf_open should (SFM_RDWR) have failed but didn't.\n",
                    __LINE__);
+            sf_close(file);
             exit(1);
         };
 
@@ -3713,11 +3713,11 @@ static void mono_rdwr_int_test(const char *filename, int format, int long_file_o
         /* Opening a already existing short file (ie invalid header) RDWR is disallowed.
 		** If this returns a valif pointer sf_open() screwed up.
 		*/
-        if ((file = sf_open(filename, SFM_RDWR, &sfinfo)))
+        if (sf_open(filename, SFM_RDWR, &sfinfo, &file) == SF_ERR_NO_ERROR)
         {
-            printf("\n\nLine %d: sf_open should (SFM_RDWR) have failed but "
-                   "didn't.\n",
+            printf("\n\nLine %d: sf_open should (SFM_RDWR) have failed but didn't.\n",
                    __LINE__);
+            sf_close(file);
             exit(1);
         };
 
@@ -4366,11 +4366,11 @@ static void mono_rdwr_float_test(const char *filename, int format, int long_file
         /* Opening a already existing short file (ie invalid header) RDWR is disallowed.
 		** If this returns a valif pointer sf_open() screwed up.
 		*/
-        if ((file = sf_open(filename, SFM_RDWR, &sfinfo)))
+        if (sf_open(filename, SFM_RDWR, &sfinfo, &file) == SF_ERR_NO_ERROR)
         {
-            printf("\n\nLine %d: sf_open should (SFM_RDWR) have failed but "
-                   "didn't.\n",
+            printf("\n\nLine %d: sf_open should (SFM_RDWR) have failed but didn't.\n",
                    __LINE__);
+            sf_close(file);
             exit(1);
         };
 
@@ -5019,11 +5019,11 @@ static void mono_rdwr_double_test(const char *filename, int format, int long_fil
         /* Opening a already existing short file (ie invalid header) RDWR is disallowed.
 		** If this returns a valif pointer sf_open() screwed up.
 		*/
-        if ((file = sf_open(filename, SFM_RDWR, &sfinfo)))
+        if (sf_open(filename, SFM_RDWR, &sfinfo, &file) == SF_ERR_NO_ERROR)
         {
-            printf("\n\nLine %d: sf_open should (SFM_RDWR) have failed but "
-                   "didn't.\n",
+            printf("\n\nLine %d: sf_open should (SFM_RDWR) have failed but didn't.\n",
                    __LINE__);
+            sf_close(file);
             exit(1);
         };
 

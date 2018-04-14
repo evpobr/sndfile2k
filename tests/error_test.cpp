@@ -80,10 +80,11 @@ static void error_value_test(void)
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    file = sf_open(filename, SFM_READ, &sfinfo);
+    sf_open(filename, SFM_READ, &sfinfo, &file);
     if (file != NULL)
     {
         printf("\n\nLine %d : Should not have been able to open this file.\n\n", __LINE__);
+        sf_close(file);
         exit(1);
     };
 
@@ -108,7 +109,7 @@ static void no_file_test(const char *filename)
     unlink(filename);
 
     memset(&sfinfo, 0, sizeof(sfinfo));
-    sndfile = sf_open(filename, SFM_READ, &sfinfo);
+    sf_open(filename, SFM_READ, &sfinfo, &sndfile);
 
     exit_if_true(sndfile != NULL, "\n\nLine %d : should not have received a valid SNDFILE* pointer.\n", __LINE__);
 
@@ -130,7 +131,7 @@ static void zero_length_test(const char *filename)
     fclose(file);
 
     memset(&sfinfo, 0, sizeof(sfinfo));
-    sndfile = sf_open(filename, SFM_READ, &sfinfo);
+    sf_open(filename, SFM_READ, &sfinfo, &sndfile);
 
     exit_if_true(sndfile != NULL, "\n\nLine %d : should not have received a valid SNDFILE* pointer.\n", __LINE__);
 
@@ -161,7 +162,7 @@ static void bad_wav_test(const char *filename)
     fclose(file);
 
     memset(&sfinfo, 0, sizeof(sfinfo));
-    sndfile = sf_open(filename, SFM_READ, &sfinfo);
+    sf_open(filename, SFM_READ, &sfinfo, &sndfile);
 
     if (sndfile)
     {
@@ -188,7 +189,8 @@ static void unrecognised_test(void)
 
     SF_INFO sfinfo;
     memset(&sfinfo, 0, sizeof(sfinfo));
-    SNDFILE *sndfile = sf_open(filename, SFM_READ, &sfinfo);
+    SNDFILE *sndfile;
+    sf_open(filename, SFM_READ, &sfinfo, &sndfile);
 
     exit_if_true(sndfile != NULL, "\n\nLine %d : SNDFILE* pointer (%p) should ne NULL.\n", __LINE__, sndfile);
 

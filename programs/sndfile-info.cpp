@@ -206,7 +206,7 @@ static void info_dump(const char *filename)
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    if ((file = sf_open(filename, SFM_READ, &sfinfo)) == NULL)
+    if (sf_open(filename, SFM_READ, &sfinfo, &file) != SF_ERR_NO_ERROR)
     {
         printf("Error : Not able to open input file %s.\n", filename);
         fflush(stdout);
@@ -279,7 +279,7 @@ static int instrument_dump(const char *filename)
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    if ((file = sf_open(filename, SFM_READ, &sfinfo)) == NULL)
+    if (sf_open(filename, SFM_READ, &sfinfo, &file) != SF_ERR_NO_ERROR)
     {
         printf("Error : Not able to open input file %s.\n", filename);
         fflush(stdout);
@@ -322,7 +322,7 @@ static int chanmap_dump(const char *filename)
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    if ((file = sf_open(filename, SFM_READ, &sfinfo)) == NULL)
+    if (sf_open(filename, SFM_READ, &sfinfo, &file) != SF_ERR_NO_ERROR)
     {
         printf("Error : Not able to open input file %s.\n", filename);
         fflush(stdout);

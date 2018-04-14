@@ -111,7 +111,7 @@ static void rw_test(const char *filename)
     memset(&sfinfo_rw, 0, sizeof(sfinfo_rw));
 
     /* Open the file in read only mode and fill in the SF_INFO struct. */
-    if ((file = sf_open(filename, SFM_READ, &sfinfo_rd)) == NULL)
+    if (sf_open(filename, SFM_READ, &sfinfo_rd, &file) != SF_ERR_NO_ERROR)
     {
         printf("\n\nLine %d : sf_open SFM_READ failed : %s\n\n", __LINE__, sf_strerror(NULL));
         exit(1);
@@ -120,7 +120,7 @@ static void rw_test(const char *filename)
     sf_close(file);
 
     /* Now open read/write and close the file. */
-    if ((file = sf_open(filename, SFM_RDWR, &sfinfo_rw)) == NULL)
+    if (sf_open(filename, SFM_RDWR, &sfinfo_rw, &file) != SF_ERR_NO_ERROR)
     {
         printf("\n\nLine %d : sf_open SFM_RDWR failed : %s\n\n", __LINE__, sf_strerror(NULL));
         exit(1);
@@ -130,7 +130,7 @@ static void rw_test(const char *filename)
 
     /* Open again as read only again and fill in a new SF_INFO struct.  */
     memset(&sfinfo_rw, 0, sizeof(sfinfo_rw));
-    if ((file = sf_open(filename, SFM_READ, &sfinfo_rw)) == NULL)
+    if (sf_open(filename, SFM_READ, &sfinfo_rw, &file) != SF_ERR_NO_ERROR)
     {
         printf("\n\nLine %d : sf_open SFM_RDWR failed : %s\n\n", __LINE__, sf_strerror(NULL));
         exit(1);

@@ -314,8 +314,16 @@ static inline bool VALIDATE_SNDFILE_AND_ASSIGN_PSF(SNDFILE *sndfile, bool clean_
 **	Public functions.
 */
 
-SNDFILE *sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo)
+int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sf)
 {
+    if (!sf)
+    {
+        sf_errno = SFE_BAD_FILE_PTR;
+        return sf_errno;
+    }
+
+    *sf = nullptr;
+
     SF_PRIVATE *psf;
 
     /* Ultimate sanity check. */
@@ -324,7 +332,7 @@ SNDFILE *sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo)
     if ((psf = psf_allocate()) == NULL)
     {
         sf_errno = SFE_MALLOC_FAILED;
-        return NULL;
+        return sf_errno;
     };
 
     psf->log_printf("File : %s\n", path);
@@ -336,10 +344,18 @@ SNDFILE *sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo)
     if (psf->error != SFE_NO_ERROR)
     {
         sf_errno = psf->error;
-        return nullptr;
+        return sf_errno;
     }
 
-    return psf->open_file(sfinfo);
+    if (psf->open_file(sfinfo))
+    {
+        *sf = psf;
+        return SF_ERR_NO_ERROR;
+    }
+    else
+    {
+        return sf_errno;
+    }
 } /* sf_open */
 
 SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data)

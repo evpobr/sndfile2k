@@ -67,7 +67,7 @@ static void vorbis_test(void)
 	 * <= 22050. Increasing the sample rate to 32000 avoids triggering it.
 	 * See https://trac.xiph.org/ticket/1229
 	 */
-    if ((file = sf_open(filename, SFM_WRITE, &sfinfo)) == NULL)
+    if (sf_open(filename, SFM_WRITE, &sfinfo, &file) != SF_ERR_NO_ERROR)
     {
         const char *errstr;
 

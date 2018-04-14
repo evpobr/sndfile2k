@@ -550,7 +550,7 @@ inline SndfileHandle::SndfileHandle(const char *path, SF_FILEMODE mode, int fmt,
 		p->sfinfo.sections = 0;
 		p->sfinfo.seekable = 0;
 
-		p->sf = sf_open(path, mode, &p->sfinfo);
+		sf_open(path, mode, &p->sfinfo, &p->sf);
 	};
 
 	return;
@@ -573,7 +573,7 @@ inline SndfileHandle::SndfileHandle(std::string const &path, SF_FILEMODE mode, i
 		p->sfinfo.sections = 0;
 		p->sfinfo.seekable = 0;
 
-		p->sf = sf_open(path.c_str(), mode, &p->sfinfo);
+		sf_open(path.c_str(), mode, &p->sfinfo, &p->sf);
 	};
 
 	return;

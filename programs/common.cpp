@@ -133,14 +133,17 @@ void sfe_apply_metadata_changes(const char *filenames[2], const METADATA_INFO *i
     memset(&tmpinfo, 0, sizeof(tmpinfo));
 
     if (filenames[1] == NULL)
-        infile = outfile = sf_open(filenames[0], SFM_RDWR, &sfinfo);
+    {
+        sf_open(filenames[0], SFM_RDWR, &sfinfo, &outfile);
+        infile = outfile;
+    }
     else
     {
-        infile = sf_open(filenames[0], SFM_READ, &sfinfo);
+        sf_open(filenames[0], SFM_READ, &sfinfo, &infile);
 
         /* Output must be WAV. */
         sfinfo.format = SF_FORMAT_WAV | (SF_FORMAT_SUBMASK & sfinfo.format);
-        outfile = sf_open(filenames[1], SFM_WRITE, &sfinfo);
+        sf_open(filenames[1], SFM_WRITE, &sfinfo, &outfile);
     };
 
     if (infile == NULL)

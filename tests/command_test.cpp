@@ -202,7 +202,7 @@ static void float_norm_test(const char *filename)
     for (k = BUFFER_LEN / 2; k < BUFFER_LEN; k++)
         float_data[k] = (k + 5);
 
-    if (!(file = sf_open(filename, SFM_WRITE, &sfinfo)))
+    if (sf_open(filename, SFM_WRITE, &sfinfo, &file) != SF_ERR_NO_ERROR)
     {
         printf("Line %d: sf_open_write failed with error : ", __LINE__);
         fflush(stdout);
@@ -230,7 +230,7 @@ static void float_norm_test(const char *filename)
     sf_close(file);
 
     /* sfinfo struct should still contain correct data. */
-    if (!(file = sf_open(filename, SFM_READ, &sfinfo)))
+    if (sf_open(filename, SFM_READ, &sfinfo, &file) != SF_ERR_NO_ERROR)
     {
         printf("Line %d: sf_open_read failed with error : ", __LINE__);
         fflush(stdout);
@@ -333,7 +333,7 @@ static void double_norm_test(const char *filename)
     for (k = BUFFER_LEN / 2; k < BUFFER_LEN; k++)
         double_data[k] = (k + 5);
 
-    if (!(file = sf_open(filename, SFM_WRITE, &sfinfo)))
+    if (sf_open(filename, SFM_WRITE, &sfinfo, &file) != SF_ERR_NO_ERROR)
     {
         printf("Line %d: sf_open_write failed with error : ", __LINE__);
         fflush(stdout);
@@ -361,7 +361,7 @@ static void double_norm_test(const char *filename)
 
     sf_close(file);
 
-    if (!(file = sf_open(filename, SFM_READ, &sfinfo)))
+    if (sf_open(filename, SFM_READ, &sfinfo, &file) != SF_ERR_NO_ERROR)
     {
         printf("Line %d: sf_open_read failed with error : ", __LINE__);
         fflush(stdout);

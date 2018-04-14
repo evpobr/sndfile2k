@@ -72,7 +72,7 @@ static int compare(void)
     int retval = 0;
 
     memset(&sfinfo1, 0, sizeof(SF_INFO));
-    sf1 = sf_open(filename1, SFM_READ, &sfinfo1);
+    sf_open(filename1, SFM_READ, &sfinfo1, &sf1);
     if (sf1 == NULL)
     {
         printf("Error opening %s.\n", filename1);
@@ -81,7 +81,7 @@ static int compare(void)
     };
 
     memset(&sfinfo2, 0, sizeof(SF_INFO));
-    sf2 = sf_open(filename2, SFM_READ, &sfinfo2);
+    sf_open(filename2, SFM_READ, &sfinfo2, &sf2);
     if (sf2 == NULL)
     {
         printf("Error opening %s.\n", filename2);
