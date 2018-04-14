@@ -1345,7 +1345,7 @@ SNDFILE2K_EXPORT int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo
  * @sa sf_open(), sf_wchar_open()
  * @sa sf_close()
  */
-SNDFILE2K_EXPORT SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data);
+SNDFILE2K_EXPORT int sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data, SNDFILE **sndfile);
 
 /** @}*/
 

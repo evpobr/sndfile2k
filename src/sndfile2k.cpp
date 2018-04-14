@@ -358,8 +358,16 @@ int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sf)
     }
 } /* sf_open */
 
-SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data)
+int sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data, SNDFILE **sndfile)
 {
+    if (!sndfile)
+    {
+        sf_errno = SFE_BAD_FILE_PTR;
+        return sf_errno;
+    }
+
+    *sndfile = nullptr;
+
 	SF_PRIVATE *psf;
 
 	/* Make sure we have a valid set ot virtual pointers. */
@@ -399,7 +407,15 @@ SNDFILE *sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sf
 
 	psf->file_mode = mode;
 
-	return psf->open_file(sfinfo);
+    if (psf->open_file(sfinfo))
+    {
+        *sndfile = psf;
+        return SF_ERR_NO_ERROR;
+    }
+    else
+    {
+        return sf_errno;
+    }
 } /* sf_open_virtual */
 
 int sf_close(SNDFILE *sndfile)

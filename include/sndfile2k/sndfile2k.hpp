@@ -596,7 +596,7 @@ inline SndfileHandle::SndfileHandle(SF_VIRTUAL_IO &sfvirtual, void *user_data, S
 		p->sfinfo.sections = 0;
 		p->sfinfo.seekable = 0;
 
-		p->sf = sf_open_virtual(&sfvirtual, mode, &p->sfinfo, user_data);
+		sf_open_virtual(&sfvirtual, mode, &p->sfinfo, user_data, &p->sf);
 	};
 
 	return;

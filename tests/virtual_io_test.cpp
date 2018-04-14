@@ -177,11 +177,14 @@ static void vio_test(const char *fname, int format)
 
     /* Set up pointers to the locally defined functions. */
     vio.get_filelen = vfget_filelen;
+    vio.set_filelen = nullptr;
     vio.seek = vfseek;
     vio.read = vfread;
     vio.write = vfwrite;
     vio.tell = vftell;
     vio.flush = vflush;
+    vio.ref = nullptr;
+    vio.unref = nullptr;
 
     /* Set virtual file offset and length to zero. */
     vio_data.offset = 0;
@@ -192,7 +195,7 @@ static void vio_test(const char *fname, int format)
     sfinfo.channels = 2;
     sfinfo.samplerate = 44100;
 
-    if ((file = sf_open_virtual(&vio, SFM_WRITE, &sfinfo, &vio_data)) == NULL)
+    if (sf_open_virtual(&vio, SFM_WRITE, &sfinfo, &vio_data, &file) != SF_ERR_NO_ERROR)
     {
         printf("\n\nLine %d : sf_open_write failed with error : ", __LINE__);
         fflush(stdout);
@@ -228,7 +231,7 @@ static void vio_test(const char *fname, int format)
 
     vio_data.offset = 0;
 
-    if ((file = sf_open_virtual(&vio, SFM_READ, &sfinfo, &vio_data)) == NULL)
+    if (sf_open_virtual(&vio, SFM_READ, &sfinfo, &vio_data, &file) != SF_ERR_NO_ERROR)
     {
         printf("\n\nLine %d : sf_open_write failed with error : ", __LINE__);
         fflush(stdout);
