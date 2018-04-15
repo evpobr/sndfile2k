@@ -205,13 +205,18 @@ struct PEAK_INFO
     unsigned int edit_number;
 
     /* the per channel peak info */
-    struct PEAK_POS peaks[];
+    PEAK_POS *peaks;
 };
 
 static inline struct PEAK_INFO *peak_info_calloc(int channels)
 {
-    return (struct PEAK_INFO *)calloc(1, sizeof(struct PEAK_INFO) + channels * sizeof(struct PEAK_POS));
-} /* peak_info_calloc */
+    PEAK_INFO *peak_info = (PEAK_INFO *)calloc(1, sizeof(PEAK_INFO));
+    if (peak_info)
+    {
+        peak_info->peaks = (PEAK_POS *)calloc(channels, sizeof(PEAK_POS));
+    }
+    return peak_info;
+}
 
 struct STR_DATA
 {
@@ -373,7 +378,7 @@ struct SF_PRIVATE
     SF_INFO sf;
 
     bool have_written; /* Has a single write been done to the file? */
-    struct PEAK_INFO *peak_info;
+    PEAK_INFO *peak_info;
 
     /* Cue Marker Info */
     std::vector<SF_CUE_POINT> cues;

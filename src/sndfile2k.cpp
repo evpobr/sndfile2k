@@ -1328,6 +1328,11 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         /* Everything seems OK, so set psf->has_peak and re-write header. */
         if (datasize == SF_FALSE && sndfile->peak_info != NULL)
         {
+            if (sndfile->peak_info->peaks)
+            {
+                free(sndfile->peak_info->peaks);
+                sndfile->peak_info->peaks = NULL;
+            }
             free(sndfile->peak_info);
             sndfile->peak_info = NULL;
         }
@@ -3265,6 +3270,8 @@ int SF_PRIVATE::close()
     free(codec_data);
     free(interleave);
     free(dither);
+    if (peak_info)
+        free(peak_info->peaks);
     free(peak_info);
     free(loop_info);
     free(instrument);
