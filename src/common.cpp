@@ -53,7 +53,7 @@ SF_PRIVATE::SF_PRIVATE()
         header.ptr = (unsigned char *)calloc(1, INITIAL_HEADER_SIZE);
     if (!header.ptr)
     {
-        sf_errno = SFE_BAD_MALLOC;
+        sf_errno = SFE_MALLOC_FAILED;
         throw bad_alloc();
     }
     header.len = INITIAL_HEADER_SIZE;
@@ -103,7 +103,7 @@ SF_PRIVATE::SF_PRIVATE(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, void *user_da
     header.ptr = (unsigned char *)calloc(1, INITIAL_HEADER_SIZE);
     if (!header.ptr)
     {
-        sf_errno = SFE_BAD_MALLOC;
+        sf_errno = SFE_MALLOC_FAILED;
         throw bad_alloc();
     }
     header.len = INITIAL_HEADER_SIZE;
@@ -170,19 +170,18 @@ SF_PRIVATE::SF_PRIVATE(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfin
 SF_PRIVATE::~SF_PRIVATE()
 {
     uint32_t k;
-    int _error = 0;
 
     if (codec_close)
     {
-        _error = codec_close(this);
+        error = codec_close(this);
         /* To prevent it being called in psf->container_close(). */
         codec_close = NULL;
     };
 
     if (container_close)
-        _error = container_close(this);
+        error = container_close(this);
 
-    _error = fclose();
+    error = fclose();
 
     /* For an ISO C compliant implementation it is ok to free a NULL pointer. */
     free(header.ptr);
