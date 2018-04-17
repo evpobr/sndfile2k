@@ -540,7 +540,7 @@ int ogg_vorbis_open(SF_PRIVATE *psf)
         psf->strings.flags = SF_STR_ALLOW_START;
     };
 
-    psf->seek = vorbis_seek;
+    psf->seek_from_start = vorbis_seek;
     psf->command = vorbis_command;
     psf->byterate = vorbis_byterate;
 

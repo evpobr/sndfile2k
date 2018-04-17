@@ -143,7 +143,7 @@ int g72x_init(SF_PRIVATE *psf)
         psf->read_float = g72x_read_f;
         psf->read_double = g72x_read_d;
 
-        psf->seek = g72x_seek;
+        psf->seek_from_start = g72x_seek;
 
         if (psf->datalength % pg72x->blocksize)
         {

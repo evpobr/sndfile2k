@@ -186,7 +186,7 @@ int gsm610_init(SF_PRIVATE *psf)
 
     psf->codec_close = gsm610_close;
 
-    psf->seek = gsm610_seek;
+    psf->seek_from_start = gsm610_seek;
 
     psf->filelength = psf->get_filelen();
     psf->datalength = psf->filelength - psf->dataoffset;

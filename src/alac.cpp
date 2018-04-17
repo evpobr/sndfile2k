@@ -325,7 +325,7 @@ static int alac_reader_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *inf
     };
 
     psf->codec_close = alac_close;
-    psf->seek = alac_seek;
+    psf->seek_from_start = alac_seek;
 
     psf->sf.frames = alac_reader_calc_frames(psf, plac);
     alac_seek(psf, SFM_READ, 0);

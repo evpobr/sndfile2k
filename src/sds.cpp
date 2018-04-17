@@ -123,7 +123,7 @@ int sds_open(SF_PRIVATE *psf)
         return error;
 
     psf->container_close = sds_close;
-    psf->seek = sds_seek;
+    psf->seek_from_start = sds_seek;
     psf->byterate = sds_byterate;
 
     psf->blockwidth = 0;

@@ -824,7 +824,7 @@ int flac_open(SF_PRIVATE *psf)
     psf->dataoffset = 0;
 
     psf->container_close = flac_close;
-    psf->seek = flac_seek;
+    psf->seek_from_start = flac_seek;
     psf->byterate = flac_byterate;
 
     psf->command = flac_command;

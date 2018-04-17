@@ -115,7 +115,7 @@ int dwvw_init(SF_PRIVATE *psf, int bitwidth)
     };
 
     psf->codec_close = dwvw_close;
-    psf->seek = dwvw_seek;
+    psf->seek_from_start = dwvw_seek;
     psf->byterate = dwvw_byterate;
 
     if (psf->file_mode == SFM_READ)

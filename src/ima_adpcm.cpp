@@ -119,7 +119,7 @@ int wavlike_ima_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
             return error;
 
     psf->codec_close = ima_close;
-    psf->seek = wavlike_ima_seek;
+    psf->seek_from_start = wavlike_ima_seek;
 
     return 0;
 }
@@ -140,7 +140,7 @@ int aiff_ima_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
             return error;
 
     psf->codec_close = ima_close;
-    psf->seek = aiff_ima_seek;
+    psf->seek_from_start = aiff_ima_seek;
 
     return 0;
 }

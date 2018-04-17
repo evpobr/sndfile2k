@@ -1143,7 +1143,7 @@ int nms_adpcm_init(SF_PRIVATE *psf)
 
     psf->sf.frames = pnms->blocks_total * NMS_SAMPLES_PER_BLOCK;
     psf->codec_close = nms_adpcm_close;
-    psf->seek = nms_adpcm_seek;
+    psf->seek_from_start = nms_adpcm_seek;
 
     return 0;
 }

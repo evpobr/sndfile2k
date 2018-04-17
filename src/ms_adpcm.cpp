@@ -182,7 +182,7 @@ int wavlike_msadpcm_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
     };
 
     psf->codec_close = msadpcm_close;
-    psf->seek = msadpcm_seek;
+    psf->seek_from_start = msadpcm_seek;
 
     return 0;
 }

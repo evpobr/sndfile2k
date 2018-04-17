@@ -107,7 +107,7 @@ int txw_open(SF_PRIVATE *psf)
     psf->read_float = txw_read_f;
     psf->read_double = txw_read_d;
 
-    psf->seek = txw_seek;
+    psf->seek_from_start = txw_seek;
 
     return 0;
 }

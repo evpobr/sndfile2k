@@ -389,7 +389,7 @@ static int paf24_init(SF_PRIVATE *psf)
         psf->write_double = paf24_write_d;
     };
 
-    psf->seek = paf24_seek;
+    psf->seek_from_start = paf24_seek;
     psf->container_close = paf24_close;
 
     psf->filelength = psf->get_filelen();

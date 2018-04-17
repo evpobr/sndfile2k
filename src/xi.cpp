@@ -99,7 +99,7 @@ int xi_open(SF_PRIVATE *psf)
     };
 
     psf->container_close = xi_close;
-    psf->seek = dpcm_seek;
+    psf->seek_from_start = dpcm_seek;
 
     psf->sf.seekable = SF_FALSE;
 

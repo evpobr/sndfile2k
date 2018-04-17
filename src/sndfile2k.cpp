@@ -1692,11 +1692,11 @@ sf_count_t sf_seek(SNDFILE *sndfile, sf_count_t offset, int whence)
         return PSF_SEEK_ERROR;
     };
 
-    if (sndfile->seek)
+    if (sndfile->seek_from_start)
     {
         int new_mode = (whence & SFM_MASK) ? (whence & SFM_MASK) : sndfile->file_mode;
 
-        retval = sndfile->seek(sndfile, new_mode, seek_from_start);
+        retval = sndfile->seek_from_start(sndfile, new_mode, seek_from_start);
 
         switch (new_mode)
         {
@@ -1826,7 +1826,7 @@ sf_count_t sf_read_raw(SNDFILE *sndfile, void *ptr, sf_count_t bytes)
     };
 
     if (sndfile->last_op != SFM_READ)
-        if (sndfile->seek(sndfile, SFM_READ, sndfile->read_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_READ, sndfile->read_current) < 0)
             return 0;
 
     count = sndfile->fread(ptr, 1, bytes);
@@ -1882,14 +1882,14 @@ sf_count_t sf_read_short(SNDFILE *sndfile, short *ptr, sf_count_t len)
         return 0; /* End of file. */
     };
 
-    if (sndfile->read_short == NULL || sndfile->seek == NULL)
+    if (sndfile->read_short == NULL || sndfile->seek_from_start == NULL)
     {
         sndfile->error = SFE_UNIMPLEMENTED;
         return 0;
     };
 
     if (sndfile->last_op != SFM_READ)
-        if (sndfile->seek(sndfile, SFM_READ, sndfile->read_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_READ, sndfile->read_current) < 0)
             return 0;
 
     count = sndfile->read_short(sndfile, ptr, len);
@@ -1937,14 +1937,14 @@ sf_count_t sf_readf_short(SNDFILE *sndfile, short *ptr, sf_count_t frames)
         return 0; /* End of file. */
     };
 
-    if (sndfile->read_short == NULL || sndfile->seek == NULL)
+    if (sndfile->read_short == NULL || sndfile->seek_from_start == NULL)
     {
         sndfile->error = SFE_UNIMPLEMENTED;
         return 0;
     };
 
     if (sndfile->last_op != SFM_READ)
-        if (sndfile->seek(sndfile, SFM_READ, sndfile->read_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_READ, sndfile->read_current) < 0)
             return 0;
 
     count = sndfile->read_short(sndfile, ptr, frames * sndfile->sf.channels);
@@ -1998,14 +1998,14 @@ sf_count_t sf_read_int(SNDFILE *sndfile, int *ptr, sf_count_t len)
         return 0;
     };
 
-    if (sndfile->read_int == NULL || sndfile->seek == NULL)
+    if (sndfile->read_int == NULL || sndfile->seek_from_start == NULL)
     {
         sndfile->error = SFE_UNIMPLEMENTED;
         return 0;
     };
 
     if (sndfile->last_op != SFM_READ)
-        if (sndfile->seek(sndfile, SFM_READ, sndfile->read_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_READ, sndfile->read_current) < 0)
             return 0;
 
     count = sndfile->read_int(sndfile, ptr, len);
@@ -2053,14 +2053,14 @@ sf_count_t sf_readf_int(SNDFILE *sndfile, int *ptr, sf_count_t frames)
         return 0;
     };
 
-    if (sndfile->read_int == NULL || sndfile->seek == NULL)
+    if (sndfile->read_int == NULL || sndfile->seek_from_start == NULL)
     {
         sndfile->error = SFE_UNIMPLEMENTED;
         return 0;
     };
 
     if (sndfile->last_op != SFM_READ)
-        if (sndfile->seek(sndfile, SFM_READ, sndfile->read_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_READ, sndfile->read_current) < 0)
             return 0;
 
     count = sndfile->read_int(sndfile, ptr, frames * sndfile->sf.channels);
@@ -2116,14 +2116,14 @@ sf_count_t sf_read_float(SNDFILE *sndfile, float *ptr, sf_count_t len)
         return 0;
     };
 
-    if (sndfile->read_float == NULL || sndfile->seek == NULL)
+    if (sndfile->read_float == NULL || sndfile->seek_from_start == NULL)
     {
         sndfile->error = SFE_UNIMPLEMENTED;
         return 0;
     };
 
     if (sndfile->last_op != SFM_READ)
-        if (sndfile->seek(sndfile, SFM_READ, sndfile->read_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_READ, sndfile->read_current) < 0)
             return 0;
 
     count = sndfile->read_float(sndfile, ptr, len);
@@ -2171,14 +2171,14 @@ sf_count_t sf_readf_float(SNDFILE *sndfile, float *ptr, sf_count_t frames)
         return 0;
     };
 
-    if (sndfile->read_float == NULL || sndfile->seek == NULL)
+    if (sndfile->read_float == NULL || sndfile->seek_from_start == NULL)
     {
         sndfile->error = SFE_UNIMPLEMENTED;
         return 0;
     };
 
     if (sndfile->last_op != SFM_READ)
-        if (sndfile->seek(sndfile, SFM_READ, sndfile->read_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_READ, sndfile->read_current) < 0)
             return 0;
 
     count = sndfile->read_float(sndfile, ptr, frames * sndfile->sf.channels);
@@ -2232,14 +2232,14 @@ sf_count_t sf_read_double(SNDFILE *sndfile, double *ptr, sf_count_t len)
         return 0;
     };
 
-    if (sndfile->read_double == NULL || sndfile->seek == NULL)
+    if (sndfile->read_double == NULL || sndfile->seek_from_start == NULL)
     {
         sndfile->error = SFE_UNIMPLEMENTED;
         return 0;
     };
 
     if (sndfile->last_op != SFM_READ)
-        if (sndfile->seek(sndfile, SFM_READ, sndfile->read_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_READ, sndfile->read_current) < 0)
             return 0;
 
     count = sndfile->read_double(sndfile, ptr, len);
@@ -2289,14 +2289,14 @@ sf_count_t sf_readf_double(SNDFILE *sndfile, double *ptr, sf_count_t frames)
         return 0;
     };
 
-    if (sndfile->read_double == NULL || sndfile->seek == NULL)
+    if (sndfile->read_double == NULL || sndfile->seek_from_start == NULL)
     {
         sndfile->error = SFE_UNIMPLEMENTED;
         return 0;
     };
 
     if (sndfile->last_op != SFM_READ)
-        if (sndfile->seek(sndfile, SFM_READ, sndfile->read_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_READ, sndfile->read_current) < 0)
             return 0;
 
     count = sndfile->read_double(sndfile, ptr, frames * sndfile->sf.channels);
@@ -2349,7 +2349,7 @@ sf_count_t sf_write_raw(SNDFILE *sndfile, const void *ptr, sf_count_t len)
     };
 
     if (sndfile->last_op != SFM_WRITE)
-        if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
     if (!sndfile->have_written && sndfile->write_header != NULL)
@@ -2405,14 +2405,14 @@ sf_count_t sf_write_short(SNDFILE *sndfile, const short *ptr, sf_count_t len)
         return 0;
     };
 
-    if (sndfile->write_short == NULL || sndfile->seek == NULL)
+    if (sndfile->write_short == NULL || sndfile->seek_from_start == NULL)
     {
         sndfile->error = SFE_UNIMPLEMENTED;
         return 0;
     };
 
     if (sndfile->last_op != SFM_WRITE)
-        if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
     if (!sndfile->have_written && sndfile->write_header != NULL)
@@ -2462,14 +2462,14 @@ sf_count_t sf_writef_short(SNDFILE *sndfile, const short *ptr, sf_count_t frames
         return 0;
     };
 
-    if (sndfile->write_short == NULL || sndfile->seek == NULL)
+    if (sndfile->write_short == NULL || sndfile->seek_from_start == NULL)
     {
         sndfile->error = SFE_UNIMPLEMENTED;
         return 0;
     };
 
     if (sndfile->last_op != SFM_WRITE)
-        if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
     if (!sndfile->have_written && sndfile->write_header != NULL)
@@ -2525,14 +2525,14 @@ sf_count_t sf_write_int(SNDFILE *sndfile, const int *ptr, sf_count_t len)
         return 0;
     };
 
-    if (sndfile->write_int == NULL || sndfile->seek == NULL)
+    if (sndfile->write_int == NULL || sndfile->seek_from_start == NULL)
     {
         sndfile->error = SFE_UNIMPLEMENTED;
         return 0;
     };
 
     if (sndfile->last_op != SFM_WRITE)
-        if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
     if (!sndfile->have_written && sndfile->write_header != NULL)
@@ -2582,14 +2582,14 @@ sf_count_t sf_writef_int(SNDFILE *sndfile, const int *ptr, sf_count_t frames)
         return 0;
     };
 
-    if (sndfile->write_int == NULL || sndfile->seek == NULL)
+    if (sndfile->write_int == NULL || sndfile->seek_from_start == NULL)
     {
         sndfile->error = SFE_UNIMPLEMENTED;
         return 0;
     };
 
     if (sndfile->last_op != SFM_WRITE)
-        if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
     if (!sndfile->have_written && sndfile->write_header != NULL)
@@ -2645,14 +2645,14 @@ sf_count_t sf_write_float(SNDFILE *sndfile, const float *ptr, sf_count_t len)
         return 0;
     };
 
-    if (sndfile->write_float == NULL || sndfile->seek == NULL)
+    if (sndfile->write_float == NULL || sndfile->seek_from_start == NULL)
     {
         sndfile->error = SFE_UNIMPLEMENTED;
         return 0;
     };
 
     if (sndfile->last_op != SFM_WRITE)
-        if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
     if (!sndfile->have_written && sndfile->write_header != NULL)
@@ -2702,14 +2702,14 @@ sf_count_t sf_writef_float(SNDFILE *sndfile, const float *ptr, sf_count_t frames
         return 0;
     };
 
-    if (sndfile->write_float == NULL || sndfile->seek == NULL)
+    if (sndfile->write_float == NULL || sndfile->seek_from_start == NULL)
     {
         sndfile->error = SFE_UNIMPLEMENTED;
         return 0;
     };
 
     if (sndfile->last_op != SFM_WRITE)
-        if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
     if (!sndfile->have_written && sndfile->write_header != NULL)
@@ -2765,14 +2765,14 @@ sf_count_t sf_write_double(SNDFILE *sndfile, const double *ptr, sf_count_t len)
         return 0;
     };
 
-    if (sndfile->write_double == NULL || sndfile->seek == NULL)
+    if (sndfile->write_double == NULL || sndfile->seek_from_start == NULL)
     {
         sndfile->error = SFE_UNIMPLEMENTED;
         return 0;
     };
 
     if (sndfile->last_op != SFM_WRITE)
-        if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
     if (!sndfile->have_written && sndfile->write_header != NULL)
@@ -2822,14 +2822,14 @@ sf_count_t sf_writef_double(SNDFILE *sndfile, const double *ptr, sf_count_t fram
         return 0;
     };
 
-    if (sndfile->write_double == NULL || sndfile->seek == NULL)
+    if (sndfile->write_double == NULL || sndfile->seek_from_start == NULL)
     {
         sndfile->error = SFE_UNIMPLEMENTED;
         return 0;
     };
 
     if (sndfile->last_op != SFM_WRITE)
-        if (sndfile->seek(sndfile, SFM_WRITE, sndfile->write_current) < 0)
+        if (sndfile->seek_from_start(sndfile, SFM_WRITE, sndfile->write_current) < 0)
             return 0;
 
     if (!sndfile->have_written && sndfile->write_header != NULL)

@@ -57,7 +57,7 @@ SF_PRIVATE::SF_PRIVATE()
         throw bad_alloc();
     }
     header.len = INITIAL_HEADER_SIZE;
-    seek = psf_default_seek;
+    seek_from_start = psf_default_seek;
 }
 
 SF_PRIVATE::SF_PRIVATE(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, void *user_data)
@@ -107,7 +107,7 @@ SF_PRIVATE::SF_PRIVATE(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, void *user_da
         throw bad_alloc();
     }
     header.len = INITIAL_HEADER_SIZE;
-    seek = psf_default_seek;
+    seek_from_start = psf_default_seek;
 
     filelength = vio->get_filelen(vio_user_data);
     vio->seek(0, SF_SEEK_SET, vio_user_data);

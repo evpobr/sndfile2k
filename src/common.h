@@ -443,7 +443,7 @@ struct SF_PRIVATE
     size_t (*write_float)(struct SF_PRIVATE *, const float *ptr, size_t len) = nullptr;
     size_t (*write_double)(struct SF_PRIVATE *, const double *ptr, size_t len) = nullptr;
 
-    sf_count_t (*seek)(struct SF_PRIVATE *, int mode, sf_count_t samples_from_start) = nullptr;
+    sf_count_t (*seek_from_start)(struct SF_PRIVATE *, int mode, sf_count_t samples_from_start) = nullptr;
     int (*write_header)(struct SF_PRIVATE *, int calc_length) = nullptr;
     size_t (*command)(struct SF_PRIVATE *, int command, void *data, size_t datasize) = nullptr;
     int (*byterate)(struct SF_PRIVATE *) = nullptr;

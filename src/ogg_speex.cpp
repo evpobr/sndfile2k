@@ -124,7 +124,7 @@ int ogg_speex_open(SF_PRIVATE *psf)
     psf->blockwidth = psf->bytewidth * psf->sf.channels;
 
 #if 0
-	psf->seek = spx_seek;
+	psf->seek_from_start = spx_seek;
 	psf->command = spx_command;
 #endif
 

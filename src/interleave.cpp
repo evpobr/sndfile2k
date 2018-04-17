@@ -79,7 +79,7 @@ int interleave_init(SF_PRIVATE *psf)
     psf->read_float = interleave_read_float;
     psf->read_double = interleave_read_double;
 
-    psf->seek = interleave_seek;
+    psf->seek_from_start = interleave_seek;
 
     return 0;
 }

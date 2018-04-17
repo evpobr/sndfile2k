@@ -105,7 +105,7 @@ int ogg_opus_open(SF_PRIVATE *psf)
     psf->blockwidth = psf->bytewidth * psf->sf.channels;
 
 #if 0
-	psf->seek = ogg_opus_seek;
+	psf->seek_from_start = ogg_opus_seek;
 	psf->command = ogg_opus_command;
 #endif
 
