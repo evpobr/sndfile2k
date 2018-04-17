@@ -53,6 +53,7 @@
 #define WARN_UNUSED
 #endif
 
+#define SNDFILE_MAGICK (0x1234C0DE)
 #define SF_BUFFER_LEN (8192)
 #define SF_FILENAME_LEN (1024)
 #define SF_SYSERR_LEN (256)
@@ -309,20 +310,25 @@ typedef union
 
 struct SF_PRIVATE
 {
+    SF_PRIVATE();
+    SF_PRIVATE(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, void *user_data);
+    SF_PRIVATE(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data);
+    ~SF_PRIVATE();
+
     /* Canary in a coal mine. */
     union canary
     {
         /* Place a double here to encourage double alignment. */
         double d[2];
         char c[16];
-    } _canary;
+    } _canary = {0};
 
-    char _path[FILENAME_MAX];
-    SF_FILEMODE file_mode;
-    SF_VIRTUAL_IO *vio;
-    void *vio_user_data;
+    char _path[FILENAME_MAX] = {0};
+    SF_FILEMODE file_mode = SFM_READ;
+    SF_VIRTUAL_IO *vio = nullptr;
+    void *vio_user_data = nullptr;
 
-    char syserr[SF_SYSERR_LEN];
+    char syserr[SF_SYSERR_LEN] = {0};
 
     /* parselog and indx should only be changed within the logging functions
 	** of common.c
@@ -331,15 +337,15 @@ struct SF_PRIVATE
     {
         char buf[SF_PARSELOG_LEN];
         int indx;
-    } parselog;
+    } parselog = {0};
 
     struct header_storage
     {
         unsigned char *ptr;
         sf_count_t indx, end, len;
-    } header;
+    } header = {0};
 
-    int rwf_endian; /* Header endian-ness flag. */
+    int rwf_endian = SF_ENDIAN_LITTLE; /* Header endian-ness flag. */
 
     /* Storage and housekeeping data for adding/reading strings from
 	** sound files.
@@ -351,118 +357,118 @@ struct SF_PRIVATE
         size_t storage_len;
         size_t storage_used;
         uint32_t flags;
-    } strings;
+    } strings = {0};
 
     /* Guard value. If this changes the buffers above have overflowed. */
-    int Magick;
+    int Magick = SNDFILE_MAGICK;
 
-    unsigned unique_id;
+    unsigned unique_id = 0;
 
-    int error;
+    int error = 0;
 
-    int endian; /* File endianness : SF_ENDIAN_LITTLE or SF_ENDIAN_BIG. */
-    int data_endswap; /* Need to endswap data? */
+    int endian = 0; /* File endianness : SF_ENDIAN_LITTLE or SF_ENDIAN_BIG. */
+    int data_endswap = 0; /* Need to endswap data? */
 
     /*
 	** Maximum float value for calculating the multiplier for
 	** float/double to short/int conversions.
 	*/
-    int float_int_mult;
-    float float_max;
+    int float_int_mult = 0;
+    float float_max = -1.0;
 
-    int scale_int_float;
+    int scale_int_float = 0;
 
     /* True if clipping must be performed on float->int conversions. */
-    bool add_clipping;
+    bool add_clipping = false;
 
-    SF_INFO sf;
+    SF_INFO sf = {0};
 
-    bool have_written; /* Has a single write been done to the file? */
-    PEAK_INFO *peak_info;
+    bool have_written = false; /* Has a single write been done to the file? */
+    PEAK_INFO *peak_info = nullptr;
 
     /* Cue Marker Info */
     std::vector<SF_CUE_POINT> cues;
 
     /* Loop Info */
-    SF_LOOP_INFO *loop_info;
-    SF_INSTRUMENT *instrument;
+    SF_LOOP_INFO *loop_info = nullptr;
+    SF_INSTRUMENT *instrument = nullptr;
 
     /* Channel map data (if present) : an array of ints. */
-    int *channel_map;
+    int *channel_map = nullptr;
 
-    sf_count_t filelength; /* Overall length of file. */
+    sf_count_t filelength = 0; /* Overall length of file. */
 
-    sf_count_t dataoffset; /* Offset in number of bytes from beginning of file. */
-    sf_count_t datalength; /* Length in bytes of the audio data. */
-    sf_count_t dataend; /* Offset to file tailer. */
+    sf_count_t dataoffset = 0; /* Offset in number of bytes from beginning of file. */
+    sf_count_t datalength = 0; /* Length in bytes of the audio data. */
+    sf_count_t dataend = 0; /* Offset to file tailer. */
 
-    int blockwidth; /* Size in bytes of one set of interleaved samples. */
-    int bytewidth; /* Size in bytes of one sample (one channel). */
+    int blockwidth = 0; /* Size in bytes of one set of interleaved samples. */
+    int bytewidth = 0; /* Size in bytes of one sample (one channel). */
 
-    void *dither;
-    void *interleave;
+    void *dither = nullptr;
+    void *interleave = nullptr;
 
-    int last_op; /* Last operation; either SFM_READ or SFM_WRITE */
-    sf_count_t read_current;
-    sf_count_t write_current;
+    int last_op = SFM_READ; /* Last operation; either SFM_READ or SFM_WRITE */
+    sf_count_t read_current = 0;
+    sf_count_t write_current = 0;
 
     /* This is a pointer to dynamically allocated file
 	** container format specific data.
 	*/
-    void *container_data;
+    void *container_data = nullptr;
 
     /* This is a pointer to dynamically allocated file
 	** codec format specific data.
 	*/
-    void *codec_data;
+    void *codec_data = nullptr;
 
-    SF_DITHER_INFO write_dither;
-    SF_DITHER_INFO read_dither;
+    SF_DITHER_INFO write_dither = {0};
+    SF_DITHER_INFO read_dither = {0};
 
-    int norm_double;
-    int norm_float;
+    int norm_double = SF_TRUE;
+    int norm_float = SF_TRUE;
 
-    int auto_header;
+    int auto_header = SF_FALSE;
 
-    int ieee_replace;
+    int ieee_replace = SF_FALSE;
 
     /* A set of file specific function pointers */
-    size_t (*read_short)(struct SF_PRIVATE *, short *ptr, size_t len);
-    size_t (*read_int)(struct SF_PRIVATE *, int *ptr, size_t len);
-    size_t (*read_float)(struct SF_PRIVATE *, float *ptr, size_t len);
-    size_t (*read_double)(struct SF_PRIVATE *, double *ptr, size_t len);
+    size_t (*read_short)(struct SF_PRIVATE *, short *ptr, size_t len) = nullptr;
+    size_t (*read_int)(struct SF_PRIVATE *, int *ptr, size_t len) = nullptr;
+    size_t (*read_float)(struct SF_PRIVATE *, float *ptr, size_t len) = nullptr;
+    size_t (*read_double)(struct SF_PRIVATE *, double *ptr, size_t len) = nullptr;
 
-    size_t (*write_short)(struct SF_PRIVATE *, const short *ptr, size_t len);
-    size_t (*write_int)(struct SF_PRIVATE *, const int *ptr, size_t len);
-    size_t (*write_float)(struct SF_PRIVATE *, const float *ptr, size_t len);
-    size_t (*write_double)(struct SF_PRIVATE *, const double *ptr, size_t len);
+    size_t (*write_short)(struct SF_PRIVATE *, const short *ptr, size_t len) = nullptr;
+    size_t (*write_int)(struct SF_PRIVATE *, const int *ptr, size_t len) = nullptr;
+    size_t (*write_float)(struct SF_PRIVATE *, const float *ptr, size_t len) = nullptr;
+    size_t (*write_double)(struct SF_PRIVATE *, const double *ptr, size_t len) = nullptr;
 
-    sf_count_t (*seek)(struct SF_PRIVATE *, int mode, sf_count_t samples_from_start);
-    int (*write_header)(struct SF_PRIVATE *, int calc_length);
-    size_t (*command)(struct SF_PRIVATE *, int command, void *data, size_t datasize);
-    int (*byterate)(struct SF_PRIVATE *);
+    sf_count_t (*seek)(struct SF_PRIVATE *, int mode, sf_count_t samples_from_start) = nullptr;
+    int (*write_header)(struct SF_PRIVATE *, int calc_length) = nullptr;
+    size_t (*command)(struct SF_PRIVATE *, int command, void *data, size_t datasize) = nullptr;
+    int (*byterate)(struct SF_PRIVATE *) = nullptr;
 
     /*
 	**	Separate close functions for the codec and the container.
 	**	The codec close function is always called first.
 	*/
-    int (*codec_close)(struct SF_PRIVATE *);
-    int (*container_close)(struct SF_PRIVATE *);
+    int (*codec_close)(struct SF_PRIVATE *) = nullptr;
+    int (*container_close)(struct SF_PRIVATE *) = nullptr;
 
-    char *format_desc;
+    char *format_desc = nullptr;
 
     /* Chunk get/set. */
-    SF_CHUNK_ITERATOR *iterator;
+    SF_CHUNK_ITERATOR *iterator = nullptr;
 
-    struct READ_CHUNKS rchunks;
-	struct WRITE_CHUNKS wchunks;
+    struct READ_CHUNKS rchunks = {0};
+	struct WRITE_CHUNKS wchunks = {0};
 
-    int (*set_chunk)(struct SF_PRIVATE *, const SF_CHUNK_INFO *chunk_info);
-    SF_CHUNK_ITERATOR *(*next_chunk_iterator)(struct SF_PRIVATE *, SF_CHUNK_ITERATOR *iterator);
+    int (*set_chunk)(struct SF_PRIVATE *, const SF_CHUNK_INFO *chunk_info) = nullptr;
+    SF_CHUNK_ITERATOR *(*next_chunk_iterator)(struct SF_PRIVATE *, SF_CHUNK_ITERATOR *iterator) = nullptr;
     int (*get_chunk_size)(struct SF_PRIVATE *, const SF_CHUNK_ITERATOR *iterator,
-                          SF_CHUNK_INFO *chunk_info);
+                          SF_CHUNK_INFO *chunk_info) = nullptr;
     int (*get_chunk_data)(struct SF_PRIVATE *, const SF_CHUNK_ITERATOR *iterator,
-                          SF_CHUNK_INFO *chunk_info);
+                          SF_CHUNK_INFO *chunk_info) = nullptr;
 
     /* Functions for writing to the internal logging buffer. */
 
@@ -709,9 +715,6 @@ enum
 
     SFE_MAX_ERROR /* This must be last in list. */
 };
-
-/* Allocate and initialize the SF_PRIVATE struct. */
-SF_PRIVATE *psf_allocate(void);
 
 int subformat_to_bytewidth(int format);
 int s_bitwidth_to_subformat(int bits);

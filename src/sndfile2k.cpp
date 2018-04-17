@@ -31,8 +31,6 @@
 
 #include <algorithm>
 
-#define SNDFILE_MAGICK (0x1234C0DE)
-
 #ifdef __APPLE__
 /*
 **	Detect if a compile for a universal binary is being attempted and barf if it is.
@@ -279,7 +277,7 @@ static void save_header_info(SF_PRIVATE *psf);
 */
 
 int sf_errno = 0;
-static char sf_parselog[SF_BUFFER_LEN] = {0};
+char sf_parselog[SF_BUFFER_LEN] = {0};
 static char sf_syserr[SF_SYSERR_LEN] = {0};
 
 /*------------------------------------------------------------------------------
@@ -408,82 +406,22 @@ int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sndfi
 
     // Here we have format detected
 
-    SF_PRIVATE *psf = psf_allocate();
-    if (!psf)
+    SF_PRIVATE *psf = nullptr;
+    try
+    {
+        psf = new SF_PRIVATE(&file->vio, mode, sfinfo, reinterpret_cast<void *>(file));
+    }
+    catch (...)
     {
         sf_errno = SFE_MALLOC_FAILED;
         file->vio.unref(file);
         return sf_errno;
     };
+    file->vio.unref(file);
 
     psf->log_printf("File : %s\n", path);
 
     strcpy(psf->_path, path);
-
-    psf->file_mode = mode;
-    psf->vio_user_data = file;
-    psf->vio = &file->vio;
-
-    memcpy(&psf->sf, sfinfo, sizeof(SF_INFO));
-
-    psf->dataoffset = 0;
-    psf->Magick = SNDFILE_MAGICK;
-    psf->norm_float = SF_TRUE;
-    psf->norm_double = SF_TRUE;
-    psf->dataoffset = -1;
-    psf->datalength = -1;
-    psf->read_current = -1;
-    psf->write_current = -1;
-    psf->auto_header = SF_FALSE;
-    psf->rwf_endian = SF_ENDIAN_LITTLE;
-    psf->seek = psf_default_seek;
-    psf->float_int_mult = 0;
-    psf->float_max = -1.0;
-    psf->filelength = filelength;
-    psf->last_op = mode;
-    if (filelength == SF_COUNT_MAX)
-        psf->log_printf("Length : unknown\n");
-    else
-        psf->log_printf("Length : %D\n", filelength);
-
-    /* An attempt at a per SF_PRIVATE unique id. */
-    psf->unique_id = psf_rand_int32();
-
-    psf->sf.sections = 1;
-
-    psf->sf.seekable = SF_TRUE;
-
-    /* Set bytewidth if known. */
-    switch (SF_CODEC(psf->sf.format))
-    {
-    case SF_FORMAT_PCM_S8:
-    case SF_FORMAT_PCM_U8:
-    case SF_FORMAT_ULAW:
-    case SF_FORMAT_ALAW:
-    case SF_FORMAT_DPCM_8:
-        psf->bytewidth = 1;
-        break;
-
-    case SF_FORMAT_PCM_16:
-    case SF_FORMAT_DPCM_16:
-        psf->bytewidth = 2;
-        break;
-
-    case SF_FORMAT_PCM_24:
-        psf->bytewidth = 3;
-        break;
-
-    case SF_FORMAT_PCM_32:
-    case SF_FORMAT_FLOAT:
-        psf->bytewidth = 4;
-        break;
-
-    case SF_FORMAT_DOUBLE:
-        psf->bytewidth = 8;
-        break;
-    };
-
-    psf->fseek(0, SF_SEEK_SET);
 
     /* Call the initialisation function for the relevant file type. */
     switch (SF_CONTAINER(psf->sf.format))
@@ -716,7 +654,7 @@ int sf_close(SNDFILE *sndfile)
     if (!VALIDATE_SNDFILE_AND_ASSIGN_PSF(sndfile, true))
         return 0;
 
-    return sndfile->close();
+    delete sndfile;
 } /* sf_close */
 
 void sf_write_sync(SNDFILE *sndfile)
@@ -3286,8 +3224,6 @@ int SF_PRIVATE::close()
     free(rchunks.chunks);
     free(wchunks.chunks);
     free(iterator);
-
-    delete this;
 
     return _error;
 }

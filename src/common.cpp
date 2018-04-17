@@ -38,24 +38,174 @@
 
 #include <cassert>
 #include <algorithm>
+#include <stdexcept>
 
 using namespace std;
 
 #define INITIAL_HEADER_SIZE (256)
 
-/* Allocate and initialize the SF_PRIVATE struct. */
-SF_PRIVATE *psf_allocate(void)
+extern int sf_errno;
+extern char sf_parselog[SF_BUFFER_LEN];
+
+SF_PRIVATE::SF_PRIVATE()
 {
-	SF_PRIVATE *psf = new SF_PRIVATE();
-
-    if ((psf->header.ptr = (unsigned char *)calloc(1, INITIAL_HEADER_SIZE)) == NULL)
+    unique_id = psf_rand_int32();
+        header.ptr = (unsigned char *)calloc(1, INITIAL_HEADER_SIZE);
+    if (!header.ptr)
     {
-        delete psf;
-        return NULL;
-    };
-    psf->header.len = INITIAL_HEADER_SIZE;
+        sf_errno = SFE_BAD_MALLOC;
+        throw bad_alloc();
+    }
+    header.len = INITIAL_HEADER_SIZE;
+    seek = psf_default_seek;
+}
 
-    return psf;
+SF_PRIVATE::SF_PRIVATE(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, void *user_data)
+    : vio(sfvirtual), file_mode(mode), vio_user_data(user_data)
+{
+    if (!vio)
+    {
+        sf_errno = SFE_BAD_VIRTUAL_IO;
+        throw invalid_argument(sf_error_number(SFE_BAD_VIRTUAL_IO));
+    }
+   if (file_mode != SFM_READ &&
+       file_mode != SFM_WRITE &&
+       file_mode != SFM_RDWR)
+    {
+        sf_errno = SFE_BAD_OPEN_MODE;
+        throw invalid_argument(sf_error_number(SFE_BAD_OPEN_MODE));
+    } 
+
+	/* Make sure we have a valid set ot virtual pointers. */
+	if (!vio->get_filelen || !vio->seek || !vio->tell)
+	{
+		sf_errno = SFE_BAD_VIRTUAL_IO;
+		snprintf(sf_parselog, sizeof(sf_parselog),
+				 "Bad vio_get_filelen / vio_seek / vio_tell in SF_VIRTUAL_IO struct.\n");
+		throw invalid_argument("Bad vio_get_filelen / vio_seek / vio_tell in SF_VIRTUAL_IO struct.");
+	};
+
+	if ((mode == SFM_READ || mode == SFM_RDWR) && !sfvirtual->read)
+	{
+		sf_errno = SFE_BAD_VIRTUAL_IO;
+		snprintf(sf_parselog, sizeof(sf_parselog), "Bad vio_read in SF_VIRTUAL_IO struct.\n");
+		throw invalid_argument("Bad vio_read in SF_VIRTUAL_IO struct.");
+	};
+
+	if ((mode == SFM_WRITE || mode == SFM_RDWR) && !sfvirtual->write)
+	{
+		sf_errno = SFE_BAD_VIRTUAL_IO;
+		snprintf(sf_parselog, sizeof(sf_parselog), "Bad vio_write in SF_VIRTUAL_IO struct.\n");
+		throw invalid_argument("Bad vio_write in SF_VIRTUAL_IO struct.");
+	};
+
+    unique_id = psf_rand_int32();
+    header.ptr = (unsigned char *)calloc(1, INITIAL_HEADER_SIZE);
+    if (!header.ptr)
+    {
+        sf_errno = SFE_BAD_MALLOC;
+        throw bad_alloc();
+    }
+    header.len = INITIAL_HEADER_SIZE;
+    seek = psf_default_seek;
+
+    filelength = vio->get_filelen(vio_user_data);
+    vio->seek(0, SF_SEEK_SET, vio_user_data);
+    if (filelength == SF_COUNT_MAX)
+        log_printf("Length : unknown\n");
+    else
+        log_printf("Length : %D\n", filelength);
+
+    last_op = file_mode;
+
+    if (vio->ref)
+        vio->ref(vio_user_data);
+}
+
+SF_PRIVATE::SF_PRIVATE(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data)
+    : SF_PRIVATE(sfvirtual, mode, user_data)
+{
+    if (!sfinfo)
+    {
+        sf_errno = SFE_BAD_SF_INFO_PTR;
+        throw invalid_argument(sf_error_number(SFE_BAD_SF_INFO_PTR)); 
+    }
+
+    memcpy(&sf, sfinfo, sizeof(SF_INFO));
+
+    sf.sections = 1;
+    sf.seekable = SF_TRUE;
+
+    /* Set bytewidth if known. */
+    switch (SF_CODEC(sf.format))
+    {
+    case SF_FORMAT_PCM_S8:
+    case SF_FORMAT_PCM_U8:
+    case SF_FORMAT_ULAW:
+    case SF_FORMAT_ALAW:
+    case SF_FORMAT_DPCM_8:
+        bytewidth = 1;
+        break;
+
+    case SF_FORMAT_PCM_16:
+    case SF_FORMAT_DPCM_16:
+        bytewidth = 2;
+        break;
+
+    case SF_FORMAT_PCM_24:
+        bytewidth = 3;
+        break;
+
+    case SF_FORMAT_PCM_32:
+    case SF_FORMAT_FLOAT:
+        bytewidth = 4;
+        break;
+
+    case SF_FORMAT_DOUBLE:
+        bytewidth = 8;
+        break;
+    };
+}
+
+SF_PRIVATE::~SF_PRIVATE()
+{
+    uint32_t k;
+    int _error = 0;
+
+    if (codec_close)
+    {
+        _error = codec_close(this);
+        /* To prevent it being called in psf->container_close(). */
+        codec_close = NULL;
+    };
+
+    if (container_close)
+        _error = container_close(this);
+
+    _error = fclose();
+
+    /* For an ISO C compliant implementation it is ok to free a NULL pointer. */
+    free(header.ptr);
+    free(container_data);
+    free(codec_data);
+    free(interleave);
+    free(dither);
+    if (peak_info)
+        free(peak_info->peaks);
+    free(peak_info);
+    free(loop_info);
+    free(instrument);
+	cues.clear();
+    free(channel_map);
+    free(format_desc);
+    free(strings.storage);
+
+    if (wchunks.chunks)
+        for (k = 0; k < wchunks.used; k++)
+            free(wchunks.chunks[k].data);
+    free(rchunks.chunks);
+    free(wchunks.chunks);
+    free(iterator);
 }
 
 int SF_PRIVATE::bump_header_allocation(sf_count_t needed)
