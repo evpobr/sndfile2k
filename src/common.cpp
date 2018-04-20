@@ -32,30 +32,24 @@
 #include "sndfile2k/sndfile2k.h"
 #include "sfendian.h"
 #include "common.h"
+#include "sndfile_error.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 
 #include <cassert>
 #include <algorithm>
-#include <stdexcept>
 
 using namespace std;
 
 #define INITIAL_HEADER_SIZE (256)
-
-extern int sf_errno;
-extern char sf_parselog[SF_BUFFER_LEN];
 
 SF_PRIVATE::SF_PRIVATE()
 {
     unique_id = psf_rand_int32();
         header.ptr = (unsigned char *)calloc(1, INITIAL_HEADER_SIZE);
     if (!header.ptr)
-    {
-        sf_errno = SFE_MALLOC_FAILED;
-        throw bad_alloc();
-    }
+        throw sf::sndfile_error(SFE_MALLOC_FAILED);
     header.len = INITIAL_HEADER_SIZE;
     seek_from_start = psf_default_seek;
 }
@@ -64,48 +58,28 @@ SF_PRIVATE::SF_PRIVATE(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, void *user_da
     : vio(sfvirtual), file_mode(mode), vio_user_data(user_data)
 {
     if (!vio)
-    {
-        sf_errno = SFE_BAD_VIRTUAL_IO;
-        throw invalid_argument(sf_error_number(SFE_BAD_VIRTUAL_IO));
-    }
-   if (file_mode != SFM_READ &&
-       file_mode != SFM_WRITE &&
-       file_mode != SFM_RDWR)
-    {
-        sf_errno = SFE_BAD_OPEN_MODE;
-        throw invalid_argument(sf_error_number(SFE_BAD_OPEN_MODE));
-    } 
+        throw sf::sndfile_error(SFE_BAD_VIRTUAL_IO);
+
+    if (file_mode != SFM_READ &&
+        file_mode != SFM_WRITE &&
+        file_mode != SFM_RDWR)
+        throw sf::sndfile_error(SFE_BAD_OPEN_MODE);
 
 	/* Make sure we have a valid set ot virtual pointers. */
 	if (!vio->get_filelen || !vio->seek || !vio->tell)
-	{
-		sf_errno = SFE_BAD_VIRTUAL_IO;
-		snprintf(sf_parselog, sizeof(sf_parselog),
-				 "Bad vio_get_filelen / vio_seek / vio_tell in SF_VIRTUAL_IO struct.\n");
-		throw invalid_argument("Bad vio_get_filelen / vio_seek / vio_tell in SF_VIRTUAL_IO struct.");
-	};
+        throw sf::sndfile_error(SFE_BAD_VIRTUAL_IO);
 
 	if ((mode == SFM_READ || mode == SFM_RDWR) && !sfvirtual->read)
-	{
-		sf_errno = SFE_BAD_VIRTUAL_IO;
-		snprintf(sf_parselog, sizeof(sf_parselog), "Bad vio_read in SF_VIRTUAL_IO struct.\n");
-		throw invalid_argument("Bad vio_read in SF_VIRTUAL_IO struct.");
-	};
+        throw sf::sndfile_error(SFE_BAD_VIRTUAL_IO);
 
 	if ((mode == SFM_WRITE || mode == SFM_RDWR) && !sfvirtual->write)
-	{
-		sf_errno = SFE_BAD_VIRTUAL_IO;
-		snprintf(sf_parselog, sizeof(sf_parselog), "Bad vio_write in SF_VIRTUAL_IO struct.\n");
-		throw invalid_argument("Bad vio_write in SF_VIRTUAL_IO struct.");
-	};
+        throw sf::sndfile_error(SFE_BAD_VIRTUAL_IO);
 
     unique_id = psf_rand_int32();
     header.ptr = (unsigned char *)calloc(1, INITIAL_HEADER_SIZE);
     if (!header.ptr)
-    {
-        sf_errno = SFE_MALLOC_FAILED;
-        throw bad_alloc();
-    }
+        throw sf::sndfile_error(SFE_BAD_VIRTUAL_IO);
+
     header.len = INITIAL_HEADER_SIZE;
     seek_from_start = psf_default_seek;
 
@@ -126,10 +100,7 @@ SF_PRIVATE::SF_PRIVATE(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfin
     : SF_PRIVATE(sfvirtual, mode, user_data)
 {
     if (!sfinfo)
-    {
-        sf_errno = SFE_BAD_SF_INFO_PTR;
-        throw invalid_argument(sf_error_number(SFE_BAD_SF_INFO_PTR)); 
-    }
+        throw sf::sndfile_error(SFE_BAD_SF_INFO_PTR);
 
     memcpy(&sf, sfinfo, sizeof(SF_INFO));
 

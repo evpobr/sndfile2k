@@ -28,6 +28,7 @@
 #include "sndfile2k/sndfile2k.h"
 #include "sfendian.h"
 #include "common.h"
+#include "sndfile_error.h"
 
 #include <algorithm>
 
@@ -411,11 +412,10 @@ int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sndfi
     {
         psf = new SF_PRIVATE(&file->vio, mode, sfinfo, reinterpret_cast<void *>(file));
     }
-    catch (...)
+    catch (sf::sndfile_error &e)
     {
-        sf_errno = SFE_MALLOC_FAILED;
         file->vio.unref(file);
-        return sf_errno;
+        return e.error();
     };
     file->vio.unref(file);
 
