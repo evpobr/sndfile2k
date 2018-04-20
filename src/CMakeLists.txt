@@ -45,6 +45,7 @@ set(COMMON
   ogg.cpp
   chanmap.cpp
   file_io.cpp
+  sndfile_error.h
 )
 if(WIN32 OR CYGWIN)
   list(APPEND COMMON windows.cpp)
