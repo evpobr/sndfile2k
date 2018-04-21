@@ -32,9 +32,9 @@ using namespace std;
 
 static sf_count_t vfget_filelen(void *user_data);
 static int vfset_filelen(void *user_data, sf_count_t len);
-static sf_count_t vfseek(sf_count_t offset, int whence, void *user_data);
-static sf_count_t vfread(void *ptr, sf_count_t count, void *user_data);
-static sf_count_t vfwrite(const void *ptr, sf_count_t count, void *user_data);
+static sf_count_t vfseek(void *user_data, sf_count_t offset, int whence);
+static sf_count_t vfread(void *user_data, void *ptr, sf_count_t count);
+static sf_count_t vfwrite(void *user_data, const void *ptr, sf_count_t count);
 static sf_count_t vftell(void *user_data);
 static void vfflush(void *user_data);
 static unsigned long vfref(void *user_data);
@@ -311,7 +311,7 @@ static sf_count_t vfget_filelen(void *user_data)
 #endif
 }
 
-static sf_count_t vfseek(sf_count_t offset, int whence, void *user_data)
+static sf_count_t vfseek(void *user_data, sf_count_t offset, int whence)
 {
     PSF_FILE *file = reinterpret_cast<PSF_FILE *>(user_data);
     if (!file)
@@ -324,7 +324,7 @@ static sf_count_t vfseek(sf_count_t offset, int whence, void *user_data)
 #endif
 }
 
-static sf_count_t vfread(void *ptr, sf_count_t count, void *user_data)
+static sf_count_t vfread(void *user_data, void *ptr, sf_count_t count)
 {
     PSF_FILE *file = reinterpret_cast<PSF_FILE *>(user_data);
     if (!file)
@@ -333,7 +333,7 @@ static sf_count_t vfread(void *ptr, sf_count_t count, void *user_data)
 	return read(file->filedes, ptr, count);
 }
 
-static sf_count_t vfwrite(const void *ptr, sf_count_t count, void *user_data)
+static sf_count_t vfwrite(void *user_data, const void *ptr, sf_count_t count)
 {
     PSF_FILE *file = reinterpret_cast<PSF_FILE *>(user_data);
     if (!file)
@@ -369,7 +369,7 @@ static void vfflush(void *user_data)
 }
 
 
-int vfset_filelen(void * user_data, sf_count_t len)
+int vfset_filelen(void *user_data, sf_count_t len)
 {
     PSF_FILE *file = reinterpret_cast<PSF_FILE *>(user_data);
     if (!file)

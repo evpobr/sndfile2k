@@ -59,7 +59,7 @@ static sf_count_t vfget_filelen(void *user_data)
     return vf->length;
 } /* vfget_filelen */
 
-static sf_count_t vfseek(sf_count_t offset, int whence, void *user_data)
+static sf_count_t vfseek(void *user_data, sf_count_t offset, int whence)
 {
     VIO_DATA *vf = (VIO_DATA *)user_data;
 
@@ -83,7 +83,7 @@ static sf_count_t vfseek(sf_count_t offset, int whence, void *user_data)
     return vf->offset;
 } /* vfseek */
 
-static sf_count_t vfread(void *ptr, sf_count_t count, void *user_data)
+static sf_count_t vfread(void *user_data, void *ptr, sf_count_t count)
 {
     VIO_DATA *vf = (VIO_DATA *)user_data;
 
@@ -100,7 +100,7 @@ static sf_count_t vfread(void *ptr, sf_count_t count, void *user_data)
     return count;
 } /* vfread */
 
-static sf_count_t vfwrite(const void *ptr, sf_count_t count, void *user_data)
+static sf_count_t vfwrite(void *user_data, const void *ptr, sf_count_t count)
 {
     VIO_DATA *vf = (VIO_DATA *)user_data;
 

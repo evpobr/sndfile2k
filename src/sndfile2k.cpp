@@ -2934,8 +2934,8 @@ static bool guess_file_type(PSF_FILE *file, SF_INFO *sfinfo)
     assert(sfinfo != nullptr);
 
     uint32_t buffer[3], format;
-    file->vio.seek(0, SF_SEEK_SET, file);
-    if (file->vio.read(&buffer, SIGNED_SIZEOF(buffer), file) != SIGNED_SIZEOF(buffer))
+    file->vio.seek(file, 0, SF_SEEK_SET);
+    if (file->vio.read(file, &buffer, SIGNED_SIZEOF(buffer)) != SIGNED_SIZEOF(buffer))
         return false;
 
     if ((buffer[0] == MAKE_MARKER('R', 'I', 'F', 'F') ||

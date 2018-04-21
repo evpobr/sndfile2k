@@ -1166,9 +1166,9 @@ typedef sf_count_t (*sf_vio_get_filelen)(void *user_data);
  *
  * @ingroup file-virt
  *
+ * @param[in] user_data User defined value.
  * @param[in] offset Offset to seek.
  * @param[in] whence Seek mode, one of ::SF_SEEK_MODE values.
- * @param[in] user_data User defined value.
  *
  * @c offset must be non-negative if @c whence is ::SF_SEEK_SET or ::SF_SEEK_CUR
  * or non-positive if @c whence is ::SF_SEEK_END.
@@ -1176,30 +1176,30 @@ typedef sf_count_t (*sf_vio_get_filelen)(void *user_data);
  * @return Non-negative offset from start on the file on success, @c -1
  * otherwise.
  */
-typedef sf_count_t (*sf_vio_seek)(sf_count_t offset, int whence, void *user_data);
+typedef sf_count_t (*sf_vio_seek)(void *user_data, sf_count_t offset, int whence);
 /** Type of user defined read function
  *
  * @ingroup file-virt
  *
+ * @param[in] user_data User defined value.
  * @param[in] ptr Pointer to an allocated block memory.
  * @param[in] count Size in bytes of /c ptr.
- * @param[in] user_data User defined value.
  *
  * @return Count of bytes actually read or zero otherwise.
  */
-typedef sf_count_t (*sf_vio_read)(void *ptr, sf_count_t count, void *user_data);
+typedef sf_count_t (*sf_vio_read)(void *user_data, void *ptr, sf_count_t count);
 
 /** Type of user defined write function
  *
  * @ingroup file-virt
  *
+ * @param[in] user_data User defined value.
  * @param[in] ptr Pointer to an allocated block memory.
  * @param[in] count Size in bytes of @c ptr.
- * @param[in] user_data User defined value.
  *
  * @return Count of bytes actually written or zero otherwise.
  */
-typedef sf_count_t (*sf_vio_write)(const void *ptr, sf_count_t count, void *user_data);
+typedef sf_count_t (*sf_vio_write)(void *user_data, const void *ptr, sf_count_t count);
 /** Type of user defined function that returns current position in file
 *
 * @ingroup file-base

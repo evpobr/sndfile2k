@@ -121,7 +121,7 @@ int SF_PRIVATE::open(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo
     else
         log_printf("Length : %D\n", filelength);
 
-    vio->seek(0, SF_SEEK_SET, vio_user_data);
+    vio->seek(vio_user_data, 0, SF_SEEK_SET);
 
     m_is_open = true;
     return SFE_NO_ERROR;
@@ -1932,7 +1932,7 @@ int SF_PRIVATE::file_valid()
 sf_count_t SF_PRIVATE::fseek(sf_count_t offset, int whence)
 {
     if (vio && vio->seek)
-        return vio->seek(offset, whence, vio_user_data);
+        return vio->seek(vio_user_data, offset, whence);
     else
         return -1;
 }
@@ -1947,7 +1947,7 @@ size_t SF_PRIVATE::fread(void *ptr, size_t bytes, size_t items)
     if (items * bytes <= 0)
         return 0;
     else if (vio && vio->read)
-        return vio->read(ptr, bytes * items, vio_user_data) / bytes;
+        return vio->read(vio_user_data, ptr, bytes * items) / bytes;
     else
         return 0;
 }
@@ -1959,7 +1959,7 @@ size_t SF_PRIVATE::fwrite(const void *ptr, size_t bytes, size_t items)
     if (items * bytes <= 0)
         return 0;
     else if (vio && vio->write)
-        return vio->write(ptr, bytes * items, vio_user_data) / bytes;
+        return vio->write(vio_user_data, ptr, bytes * items) / bytes;
     else
         return 0;
 }
