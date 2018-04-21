@@ -54,54 +54,32 @@ SF_PRIVATE::SF_PRIVATE()
     seek_from_start = psf_default_seek;
 }
 
-SF_PRIVATE::SF_PRIVATE(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, void *user_data)
-    : vio(sfvirtual), file_mode(mode), vio_user_data(user_data)
+int SF_PRIVATE::open(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data)
 {
-    if (!vio)
-        throw sf::sndfile_error(SFE_BAD_VIRTUAL_IO);
+    if (m_is_open)
+        return SFE_ALREADY_INITIALIZED;
+    if (!sfvirtual)
+        return SFE_BAD_VIRTUAL_IO;
+    if (!sfvirtual->get_filelen || !sfvirtual->seek || !sfvirtual->tell)
+        return SFE_BAD_VIRTUAL_IO;
+    if ((mode == SFM_READ || mode == SFM_RDWR) && !sfvirtual->read)
+        return SFE_BAD_VIRTUAL_IO;
+    if ((mode == SFM_WRITE || mode == SFM_RDWR) && !sfvirtual->write)
+        return SFE_BAD_VIRTUAL_IO;
 
-    if (file_mode != SFM_READ &&
-        file_mode != SFM_WRITE &&
-        file_mode != SFM_RDWR)
-        throw sf::sndfile_error(SFE_BAD_OPEN_MODE);
+    if (mode != SFM_READ &&
+        mode != SFM_WRITE &&
+        mode != SFM_RDWR)
+        return SFE_BAD_OPEN_MODE;
 
-	/* Make sure we have a valid set ot virtual pointers. */
-	if (!vio->get_filelen || !vio->seek || !vio->tell)
-        throw sf::sndfile_error(SFE_BAD_VIRTUAL_IO);
-
-	if ((mode == SFM_READ || mode == SFM_RDWR) && !sfvirtual->read)
-        throw sf::sndfile_error(SFE_BAD_VIRTUAL_IO);
-
-	if ((mode == SFM_WRITE || mode == SFM_RDWR) && !sfvirtual->write)
-        throw sf::sndfile_error(SFE_BAD_VIRTUAL_IO);
-
-    unique_id = psf_rand_int32();
-    header.ptr = (unsigned char *)calloc(1, INITIAL_HEADER_SIZE);
-    if (!header.ptr)
-        throw sf::sndfile_error(SFE_BAD_VIRTUAL_IO);
-
-    header.len = INITIAL_HEADER_SIZE;
-    seek_from_start = psf_default_seek;
-
-    filelength = vio->get_filelen(vio_user_data);
-    vio->seek(0, SF_SEEK_SET, vio_user_data);
-    if (filelength == SF_COUNT_MAX)
-        log_printf("Length : unknown\n");
-    else
-        log_printf("Length : %D\n", filelength);
-
-    last_op = file_mode;
-
-    if (vio->ref)
-        vio->ref(vio_user_data);
-}
-
-SF_PRIVATE::SF_PRIVATE(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data)
-    : SF_PRIVATE(sfvirtual, mode, user_data)
-{
     if (!sfinfo)
-        throw sf::sndfile_error(SFE_BAD_SF_INFO_PTR);
+        return SFE_BAD_SF_INFO_PTR;
 
+    vio = sfvirtual;
+    vio_user_data = user_data;
+    vio->ref(vio_user_data);
+    file_mode = mode;
+    last_op = file_mode;
     memcpy(&sf, sfinfo, sizeof(SF_INFO));
 
     sf.sections = 1;
@@ -136,17 +114,31 @@ SF_PRIVATE::SF_PRIVATE(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfin
         bytewidth = 8;
         break;
     };
+
+    filelength = vio->get_filelen(vio_user_data);
+    if (filelength == SF_COUNT_MAX)
+        log_printf("Length : unknown\n");
+    else
+        log_printf("Length : %D\n", filelength);
+
+    vio->seek(0, SF_SEEK_SET, vio_user_data);
+
+    m_is_open = true;
+    return SFE_NO_ERROR;
 }
 
-SF_PRIVATE::~SF_PRIVATE()
+bool SF_PRIVATE::is_open() const
 {
-    uint32_t k;
+    return m_is_open;
+}
 
+void SF_PRIVATE::close()
+{
     if (codec_close)
     {
         error = codec_close(this);
         /* To prevent it being called in psf->container_close(). */
-        codec_close = NULL;
+        codec_close = nullptr;
     };
 
     if (container_close)
@@ -165,17 +157,23 @@ SF_PRIVATE::~SF_PRIVATE()
     free(peak_info);
     free(loop_info);
     free(instrument);
-	cues.clear();
+    cues.clear();
     free(channel_map);
     free(format_desc);
     free(strings.storage);
 
     if (wchunks.chunks)
-        for (k = 0; k < wchunks.used; k++)
+        for (uint32_t k = 0; k < wchunks.used; k++)
             free(wchunks.chunks[k].data);
     free(rchunks.chunks);
     free(wchunks.chunks);
     free(iterator);
+    m_is_open = false;
+}
+
+SF_PRIVATE::~SF_PRIVATE()
+{
+    close();
 }
 
 int SF_PRIVATE::bump_header_allocation(sf_count_t needed)

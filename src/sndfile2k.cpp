@@ -261,6 +261,8 @@ static ErrorStruct SndfileErrors[] = {
     {SFE_FILENAME_TOO_LONG, "Error : Supplied filename too long."},
     {SFE_NEGATIVE_RW_LEN, "Error : Length parameter passed to read/write is negative."},
 
+    {SFE_ALREADY_INITIALIZED, "Error : Already initialized." },
+
     {SFE_MAX_ERROR, "Maximum error number."},
     {SFE_MAX_ERROR + 1, NULL}};
 
@@ -410,18 +412,22 @@ int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sndfi
     SF_PRIVATE *psf = nullptr;
     try
     {
-        psf = new SF_PRIVATE(&file->vio, mode, sfinfo, reinterpret_cast<void *>(file));
+        //psf = new SF_PRIVATE(&file->vio, mode, sfinfo, reinterpret_cast<void *>(file));
+        psf = new SF_PRIVATE();
+
+        psf->log_printf("File : %s\n", path);
+        strcpy(psf->_path, path);
+
+        psf->open(&file->vio, mode, sfinfo, reinterpret_cast<void *>(file));
+        file->vio.unref(file);
+        if (!psf->is_open())
+            throw sf::sndfile_error(psf->error);
     }
     catch (sf::sndfile_error &e)
     {
-        file->vio.unref(file);
+        delete psf;
         return e.error();
     };
-    file->vio.unref(file);
-
-    psf->log_printf("File : %s\n", path);
-
-    strcpy(psf->_path, path);
 
     /* Call the initialisation function for the relevant file type. */
     switch (SF_CONTAINER(psf->sf.format))
@@ -3183,49 +3189,6 @@ static int validate_psf(SF_PRIVATE *psf)
 static void save_header_info(SF_PRIVATE *psf)
 {
     snprintf(sf_parselog, sizeof(sf_parselog), "%s", psf->parselog.buf);
-}
-
-int SF_PRIVATE::close()
-{
-    uint32_t k;
-    int _error = 0;
-
-    if (codec_close)
-    {
-        _error = codec_close(this);
-        /* To prevent it being called in psf->container_close(). */
-        codec_close = NULL;
-    };
-
-    if (container_close)
-        _error = container_close(this);
-
-    _error = fclose();
-
-    /* For an ISO C compliant implementation it is ok to free a NULL pointer. */
-    free(header.ptr);
-    free(container_data);
-    free(codec_data);
-    free(interleave);
-    free(dither);
-    if (peak_info)
-        free(peak_info->peaks);
-    free(peak_info);
-    free(loop_info);
-    free(instrument);
-	cues.clear();
-    free(channel_map);
-    free(format_desc);
-    free(strings.storage);
-
-    if (wchunks.chunks)
-        for (k = 0; k < wchunks.used; k++)
-            free(wchunks.chunks[k].data);
-    free(rchunks.chunks);
-    free(wchunks.chunks);
-    free(iterator);
-
-    return _error;
 }
 
 //SNDFILE *SF_PRIVATE::open_file(SF_INFO *sfinfo)

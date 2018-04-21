@@ -310,9 +310,14 @@ typedef union
 
 struct SF_PRIVATE
 {
+    bool m_is_open = false;
+
     SF_PRIVATE();
-    SF_PRIVATE(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, void *user_data);
-    SF_PRIVATE(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data);
+
+    int open(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data);
+    bool is_open() const;
+    void close();
+
     ~SF_PRIVATE();
 
     /* Canary in a coal mine. */
@@ -507,8 +512,6 @@ struct SF_PRIVATE
     int file_valid();
 
     //SNDFILE *open_file(SF_INFO *sfinfo);
-
-    int close();
 
     sf_count_t fseek(sf_count_t offset, int whence);
     size_t fread(void *ptr, size_t bytes, size_t count);
@@ -712,6 +715,8 @@ enum
     SFE_ALAC_FAIL_TMPFILE,
     SFE_FILENAME_TOO_LONG,
     SFE_NEGATIVE_RW_LEN,
+
+    SFE_ALREADY_INITIALIZED,
 
     SFE_MAX_ERROR /* This must be last in list. */
 };
