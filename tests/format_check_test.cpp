@@ -52,15 +52,15 @@ static void format_error_test(void)
     info.samplerate = 44100;
 
     info.format = SF_FORMAT_WAV;
-    sf_open(filename, SFM_WRITE, &info, &file);
+    int errnum = sf_open(filename, SFM_WRITE, &info, &file);
     exit_if_true(file != NULL, "\n\nLine %d : Format should not be valid.\n\n", __LINE__);
-    exit_if_true(strstr(sf_strerror(NULL), "minor format") == NULL,
+    exit_if_true(strstr(sf_error_number(errnum), "minor format") == NULL,
                  "\n\nLine %d : Error string should reference bad 'minor format'.\n\n", __LINE__);
 
     info.format = SF_FORMAT_PCM_16;
-    sf_open(filename, SFM_WRITE, &info, &file);
+    errnum = sf_open(filename, SFM_WRITE, &info, &file);
     exit_if_true(file != NULL, "\n\nLine %d : Format should not be valid.\n\n", __LINE__);
-    exit_if_true(strstr(sf_strerror(NULL), "major format") == NULL,
+    exit_if_true(strstr(sf_error_number(errnum), "major format") == NULL,
                  "\n\nLine %d : Error string should reference bad 'major format'.\n\n", __LINE__);
 
     unlink(filename);

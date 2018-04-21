@@ -314,7 +314,8 @@ struct SF_PRIVATE
 
     SF_PRIVATE();
 
-    int open(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data);
+    int open(const char *filename, SF_FILEMODE mode, SF_INFO *sfinfo);
+    int open(SF_STREAM *stream, SF_FILEMODE mode, SF_INFO *sfinfo);
     bool is_open() const;
     void close();
 
@@ -330,8 +331,7 @@ struct SF_PRIVATE
 
     char _path[FILENAME_MAX] = {0};
     SF_FILEMODE file_mode = SFM_READ;
-    SF_VIRTUAL_IO *vio = nullptr;
-    void *vio_user_data = nullptr;
+    SF_STREAM *vio = nullptr;
 
     char syserr[SF_SYSERR_LEN] = {0};
 
@@ -505,10 +505,6 @@ struct SF_PRIVATE
     void header_put_be_8byte(sf_count_t x);
     void header_put_le_8byte(sf_count_t x);
 
-    int fopen(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo);
-#ifdef _WIN32
-    int fopen(const wchar_t *path, SF_FILEMODE mode, SF_INFO *sfinfo);
-#endif
     int file_valid();
 
     //SNDFILE *open_file(SF_INFO *sfinfo);
@@ -522,7 +518,6 @@ struct SF_PRIVATE
     void fsync();
 
     int ftruncate(sf_count_t len);
-    int fclose();
 };
 
 enum
@@ -789,22 +784,14 @@ int macos_guess_file_type(SF_PRIVATE *psf, const char *filename);
 **	some 32 bit OSes. Implementation in file_io.c.
 */
 
-struct PSF_FILE
-{
-    SF_VIRTUAL_IO vio;
-    void *vio_user_data;
-    unsigned long vio_ref_counter;
-    int filedes;
-};
-
 #define SENSIBLE_SIZE (0x40000000)
 
 static void psf_log_syserr(SF_PRIVATE *psf, int error);
 
 SF_VIRTUAL_IO *psf_get_vio();
-int psf_vio_from_file(const char *filename, SF_FILEMODE mode, PSF_FILE **file);
+int psf_open_file_stream(const char *filename, SF_FILEMODE mode, SF_STREAM **stream);
 #ifdef _WIN32
-int psf_vio_from_file(const wchar_t *filename, SF_FILEMODE mode, PSF_FILE **file);
+int psf_open_file_stream(const wchar_t *filename, SF_FILEMODE mode, SF_STREAM **stream);
 #endif
 
 /*

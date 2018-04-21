@@ -288,7 +288,7 @@ static void file_open_test(const char *filename)
 
 static void test_close_or_die(SF_PRIVATE *psf, int linenum)
 {
-    psf->fclose();
+    psf->close();
     if (psf->file_valid())
     {
         printf("\n\nLine %d: psf->file.filedes should not be valid.\n\n", linenum);

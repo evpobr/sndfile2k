@@ -70,7 +70,7 @@ static void conversion_test(char endian)
 
     SF_INFO sfinfo = { 0 };
     psf->file_mode = SFM_WRITE;
-    if (psf->fopen(filename, SFM_WRITE, &sfinfo) != 0)
+    if (psf->open(filename, SFM_WRITE, &sfinfo) != 0)
     {
         printf("\n\nError : failed to open file '%s' for write.\n\n", filename);
         exit(1);
@@ -83,7 +83,7 @@ static void conversion_test(char endian)
     memset(psf, 0, sizeof(sf_private));
 
     sfinfo = { 0 };
-    if (psf->fopen(filename, SFM_READ, &sfinfo) != 0)
+    if (psf->open(filename, SFM_READ, &sfinfo) != 0)
     {
         printf("\n\nError : failed to open file '%s' for read.\n\n", filename);
         exit(1);

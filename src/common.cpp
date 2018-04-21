@@ -54,17 +54,21 @@ SF_PRIVATE::SF_PRIVATE()
     seek_from_start = psf_default_seek;
 }
 
-int SF_PRIVATE::open(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data)
+int SF_PRIVATE::open(const char *filename, SF_FILEMODE mode, SF_INFO *sfinfo)
+{
+    SF_STREAM *stream = nullptr;
+    error = psf_open_file_stream(filename, mode, &stream);
+    if (error == SFE_NO_ERROR)
+        error = open(stream, mode, sfinfo);
+
+    return error;
+}
+
+int SF_PRIVATE::open(SF_STREAM *stream, SF_FILEMODE mode, SF_INFO *sfinfo)
 {
     if (m_is_open)
         return SFE_ALREADY_INITIALIZED;
-    if (!sfvirtual)
-        return SFE_BAD_VIRTUAL_IO;
-    if (!sfvirtual->get_filelen || !sfvirtual->seek || !sfvirtual->tell)
-        return SFE_BAD_VIRTUAL_IO;
-    if ((mode == SFM_READ || mode == SFM_RDWR) && !sfvirtual->read)
-        return SFE_BAD_VIRTUAL_IO;
-    if ((mode == SFM_WRITE || mode == SFM_RDWR) && !sfvirtual->write)
+    if (!stream)
         return SFE_BAD_VIRTUAL_IO;
 
     if (mode != SFM_READ &&
@@ -75,9 +79,8 @@ int SF_PRIVATE::open(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo
     if (!sfinfo)
         return SFE_BAD_SF_INFO_PTR;
 
-    vio = sfvirtual;
-    vio_user_data = user_data;
-    vio->ref(vio_user_data);
+    vio = stream;
+    vio->ref();
     file_mode = mode;
     last_op = file_mode;
     memcpy(&sf, sfinfo, sizeof(SF_INFO));
@@ -115,13 +118,13 @@ int SF_PRIVATE::open(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo
         break;
     };
 
-    filelength = vio->get_filelen(vio_user_data);
+    filelength = vio->get_filelen();
     if (filelength == SF_COUNT_MAX)
         log_printf("Length : unknown\n");
     else
         log_printf("Length : %D\n", filelength);
 
-    vio->seek(vio_user_data, 0, SF_SEEK_SET);
+    vio->seek(0, SF_SEEK_SET);
 
     m_is_open = true;
     return SFE_NO_ERROR;
@@ -144,7 +147,8 @@ void SF_PRIVATE::close()
     if (container_close)
         error = container_close(this);
 
-    error = fclose();
+    if (vio)
+        vio->unref();
 
     /* For an ISO C compliant implementation it is ok to free a NULL pointer. */
     free(header.ptr);
@@ -1907,32 +1911,22 @@ FILE *psf_open_tmpfile(char *fname, size_t fnamelen)
     return NULL;
 }
 
-int SF_PRIVATE::fclose()
-{
-    if (vio && vio->ref && vio->unref)
-        vio->unref(vio_user_data);
-    vio_user_data = nullptr;
-
-    return 0;
-}
-
 sf_count_t SF_PRIVATE::get_filelen()
 {
     assert(vio != nullptr);
-    assert(vio->get_filelen != nullptr);
 
-    return vio->get_filelen(vio_user_data);
+    return vio->get_filelen();
 }
 
 int SF_PRIVATE::file_valid()
 {
-    return (vio_user_data) ? SF_TRUE : SF_FALSE;
+    return (vio != nullptr) ? SF_TRUE : SF_FALSE;
 }
 
 sf_count_t SF_PRIVATE::fseek(sf_count_t offset, int whence)
 {
-    if (vio && vio->seek)
-        return vio->seek(vio_user_data, offset, whence);
+    if (vio)
+        return vio->seek(offset, whence);
     else
         return -1;
 }
@@ -1940,14 +1934,13 @@ sf_count_t SF_PRIVATE::fseek(sf_count_t offset, int whence)
 size_t SF_PRIVATE::fread(void *ptr, size_t bytes, size_t items)
 {
     assert(vio != nullptr);
-    assert(vio->read != nullptr);
 
     if (!ptr)
         return 0;
     if (items * bytes <= 0)
         return 0;
-    else if (vio && vio->read)
-        return vio->read(vio_user_data, ptr, bytes * items) / bytes;
+    else if (vio)
+        return vio->read(ptr, bytes * items) / bytes;
     else
         return 0;
 }
@@ -1958,8 +1951,8 @@ size_t SF_PRIVATE::fwrite(const void *ptr, size_t bytes, size_t items)
         return 0;
     if (items * bytes <= 0)
         return 0;
-    else if (vio && vio->write)
-        return vio->write(vio_user_data, ptr, bytes * items) / bytes;
+    else if (vio)
+        return vio->write(ptr, bytes * items) / bytes;
     else
         return 0;
 }
@@ -1967,26 +1960,17 @@ size_t SF_PRIVATE::fwrite(const void *ptr, size_t bytes, size_t items)
 sf_count_t SF_PRIVATE::ftell()
 {
     assert(vio != nullptr);
-    assert(vio->tell != nullptr);
 
-    return vio->tell(vio_user_data);
+    return vio->tell();
 }
 
 void SF_PRIVATE::fsync()
 {
-    if (vio->flush)
-    {
-        if (file_mode == SFM_WRITE || file_mode == SFM_RDWR)
-        {
-            vio->flush(vio_user_data);
-        }
-    }
+    if (file_mode == SFM_WRITE || file_mode == SFM_RDWR)
+        vio->flush();
 }
 
 int SF_PRIVATE::ftruncate(sf_count_t len)
 {
-    if (vio->set_filelen)
-        return vio->set_filelen(vio_user_data, len);
-    else
-        return -1;
+    return vio->set_filelen(len);
 }

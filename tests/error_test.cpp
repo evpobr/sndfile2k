@@ -80,7 +80,7 @@ static void error_value_test(void)
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    sf_open(filename, SFM_READ, &sfinfo, &file);
+    error_num = sf_open(filename, SFM_READ, &sfinfo, &file);
     if (file != NULL)
     {
         printf("\n\nLine %d : Should not have been able to open this file.\n\n", __LINE__);
@@ -88,7 +88,7 @@ static void error_value_test(void)
         exit(1);
     };
 
-    if ((error_num = sf_error(NULL)) <= 1 || error_num > 300)
+    if (error_num <= 1 || error_num > 300)
     {
         printf("\n\nLine %d : Should not have had an error number of %d.\n\n", __LINE__, error_num);
         exit(1);
@@ -190,13 +190,12 @@ static void unrecognised_test(void)
     SF_INFO sfinfo;
     memset(&sfinfo, 0, sizeof(sfinfo));
     SNDFILE *sndfile;
-    sf_open(filename, SFM_READ, &sfinfo, &sndfile);
+    int errnum = sf_open(filename, SFM_READ, &sfinfo, &sndfile);
 
     exit_if_true(sndfile != NULL, "\n\nLine %d : SNDFILE* pointer (%p) should ne NULL.\n", __LINE__, sndfile);
 
-    int k = sf_error(sndfile);
-    exit_if_true(k != SF_ERR_UNRECOGNISED_FORMAT, "\n\nLine %d : error (%d) should have been SF_ERR_UNRECOGNISED_FORMAT (%d).\n",
-                 __LINE__, k, SF_ERR_UNRECOGNISED_FORMAT);
+    exit_if_true(errnum != SF_ERR_UNRECOGNISED_FORMAT, "\n\nLine %d : error (%d) should have been SF_ERR_UNRECOGNISED_FORMAT (%d).\n",
+                 __LINE__, errnum, SF_ERR_UNRECOGNISED_FORMAT);
 
     unlink(filename);
     puts("ok");

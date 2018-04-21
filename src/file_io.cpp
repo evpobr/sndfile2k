@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "common.h"
+#include "sndfile_error.h"
 
 #include <string.h>
 #include <fcntl.h>
@@ -30,231 +31,261 @@
 
 using namespace std;
 
-static sf_count_t vfget_filelen(void *user_data);
-static int vfset_filelen(void *user_data, sf_count_t len);
-static sf_count_t vfseek(void *user_data, sf_count_t offset, int whence);
-static sf_count_t vfread(void *user_data, void *ptr, sf_count_t count);
-static sf_count_t vfwrite(void *user_data, const void *ptr, sf_count_t count);
-static sf_count_t vftell(void *user_data);
-static void vfflush(void *user_data);
-static unsigned long vfref(void *user_data);
-static void vfunref(void *user_data);
-
 static sf_count_t psf_get_filelen_fd(int fd);
 
-static SF_VIRTUAL_IO vio;
-
-SF_VIRTUAL_IO *psf_get_vio()
+class SF_FILE_STREAM: public SF_STREAM
 {
-	vio.ref = vfref;
-	vio.unref = vfunref;
-	vio.get_filelen = vfget_filelen;
-	vio.set_filelen = vfset_filelen;
-	vio.seek = vfseek;
-	vio.read = vfread;
-	vio.write = vfwrite;
-	vio.flush = vfflush;
-	vio.tell = vftell;
-	vio.flush = vfflush;
+    unsigned long m_ref = 0;
+    int m_filedes = -1;
 
-	return &vio;
-}
+    void close()
+    {
+        if (m_filedes >= 0)
+            ::close(m_filedes);
+        m_filedes = -1;
+    }
 
-int psf_vio_from_file(const char * filename, SF_FILEMODE mode, PSF_FILE **file)
+public:
+    SF_FILE_STREAM(const char * filename, SF_FILEMODE mode)
+    {
+        int open_flag, share_flag;
+
+        switch (mode)
+        {
+        case SFM_READ:
+            open_flag = O_BINARY | O_RDONLY;
+            share_flag = 0;
+            break;
+
+        case SFM_WRITE:
+            open_flag = O_BINARY | O_WRONLY | O_CREAT | O_TRUNC;
+            share_flag = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
+            break;
+
+        case SFM_RDWR:
+            open_flag = O_BINARY | O_RDWR | O_CREAT;
+            share_flag = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
+            break;
+
+        default:
+            throw sf::sndfile_error(-SFE_BAD_OPEN_MODE);
+            break;
+        };
+
+        try
+        {
+            m_filedes = open(filename, open_flag, share_flag);
+            if (m_filedes == -SFE_BAD_OPEN_MODE)
+            {
+                throw sf::sndfile_error(-SFE_BAD_OPEN_MODE);
+            }
+            else if (m_filedes == -1)
+            {
+                throw sf::sndfile_error(-SFE_BAD_FILE_PTR);
+            }
+        }
+        catch (...)
+        {
+            close();
+            throw;
+        }
+    }
+
+#ifdef _WIN32
+
+    SF_FILE_STREAM(const wchar_t *filename, SF_FILEMODE mode)
+    {
+        int open_flag, share_flag;
+
+        switch (mode)
+        {
+        case SFM_READ:
+            open_flag = O_BINARY | O_RDONLY;
+            share_flag = 0;
+            break;
+
+        case SFM_WRITE:
+            open_flag = O_BINARY | O_WRONLY | O_CREAT | O_TRUNC;
+            share_flag = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
+            break;
+
+        case SFM_RDWR:
+            open_flag = O_BINARY | O_RDWR | O_CREAT;
+            share_flag = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
+            break;
+
+        default:
+            throw sf::sndfile_error(-SFE_BAD_OPEN_MODE);
+            break;
+        };
+
+        try
+        {
+            m_filedes = _wopen(filename, open_flag, share_flag);
+            if (m_filedes == -SFE_BAD_OPEN_MODE)
+            {
+                throw sf::sndfile_error(-SFE_BAD_OPEN_MODE);
+            }
+            else if (m_filedes == -1)
+            {
+                throw sf::sndfile_error(-SFE_BAD_FILE_PTR);
+            }
+        }
+        catch (...)
+        {
+            close();
+        }
+    }
+
+#endif
+
+    ~SF_FILE_STREAM()
+    {
+        close();
+    }
+
+    // Inherited via SF_STREAM
+    unsigned long ref() override
+    {
+        unsigned long ref_counter = 0;
+
+        ref_counter = ++m_ref;
+
+        return ref_counter;
+    }
+
+    void unref() override
+    {
+        m_ref--;
+        if (m_ref == 0)
+            delete this;
+    }
+
+    sf_count_t get_filelen() override
+    {
+#ifdef _WIN32
+        struct _stat64 statbuf;
+
+        if (_fstat64(m_filedes, &statbuf) == -1)
+            return (sf_count_t)-1;
+
+        return statbuf.st_size;
+#else
+        struct stat statbuf;
+
+        if (fstat(m_filedes, &statbuf) == -1)
+            return (sf_count_t)-1;
+
+        return statbuf.st_size;
+#endif
+    }
+
+    sf_count_t seek(sf_count_t offset, int whence) override
+    {
+#ifdef _WIN32
+        return _lseeki64(m_filedes, offset, whence);
+#else
+        return lseek(m_filedes, offset, whence);
+#endif
+    }
+
+    sf_count_t read(void * ptr, sf_count_t count) override
+    {
+        return ::read(m_filedes, ptr, count);
+    }
+
+    sf_count_t write(const void * ptr, sf_count_t count) override
+    {
+        return ::write(m_filedes, ptr, count);
+    }
+
+    sf_count_t tell() override
+    {
+#if _WIN32
+        return _lseeki64(m_filedes, 0, SEEK_CUR);
+#else
+        return lseek(m_filedes, 0, SEEK_CUR);
+#endif
+    }
+
+    void flush() override
+    {
+#ifdef HAVE_FSYNC
+        ::fsync(m_filedes);
+#elif _WIN32
+        _commit(m_filedes);
+#endif
+    }
+
+    int set_filelen(sf_count_t len) override
+    {
+        if (len < 0)
+            return -1;
+
+        if ((sizeof(off_t) < sizeof(sf_count_t)) && len > 0x7FFFFFFF)
+            return -1;
+
+#ifdef _WIN32
+        int retval = _chsize_s(m_filedes, len);
+#else
+        int retval = ::ftruncate(m_filedes, len);
+#endif
+
+        return retval;
+    }
+};
+
+int psf_open_file_stream(const char * filename, SF_FILEMODE mode, SF_STREAM **stream)
 {
-    if (!file)
+    if (!stream)
         return SFE_BAD_VIRTUAL_IO;
 
-    *file = nullptr;
+    *stream = nullptr;
 
-    PSF_FILE *f = new(nothrow) PSF_FILE();
-    if (!f)
-        return SFE_MALLOC_FAILED;
-
-    int open_flag, share_flag;
-
-    /*
-    * Sanity check. If everything is OK, this test and the printfs will
-    * be optimised out. This is meant to catch the problems caused by
-    * "sfconfig.h" being included after <stdio.h>.
-    */
-    switch (mode)
+    SF_FILE_STREAM *s = nullptr;
+    try
     {
-    case SFM_READ:
-        open_flag = O_BINARY | O_RDONLY;
-        share_flag = 0;
-        break;
+        s = new SF_FILE_STREAM(filename, mode);
 
-    case SFM_WRITE:
-        open_flag = O_BINARY | O_WRONLY | O_CREAT | O_TRUNC;
-        share_flag = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
-        break;
+        *stream = static_cast<SF_STREAM *>(s);
+        s->ref();
 
-    case SFM_RDWR:
-        open_flag = O_BINARY | O_RDWR | O_CREAT;
-        share_flag = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
-        break;
-
-    default:
-        delete file;
-        return -SFE_BAD_OPEN_MODE;
-        break;
-    };
-
-    f->filedes = open(filename, open_flag, share_flag);
-    if (f->filedes == -SFE_BAD_OPEN_MODE)
-    {
-        f->filedes = -1;
-        delete f;
-        return SFE_BAD_OPEN_MODE;
+        return SFE_NO_ERROR;
     }
-    else if (f->filedes == -1)
+    catch (const sf::sndfile_error &e)
     {
-        delete f;
-        return SFE_BAD_FILE_PTR;
+        delete s;
+        return e.error();
     }
-    else
-    {
-        f->vio = *psf_get_vio();
-        f->vio_user_data = f;
-        f->vio_ref_counter = 0;
-        f->vio.ref(f->vio_user_data);
-        *file = f;
-    }
-
-    return SFE_NO_ERROR;
 }
 
 #ifdef _WIN32
 
-int psf_vio_from_file(const wchar_t * filename, SF_FILEMODE mode, PSF_FILE **file)
+int psf_open_file_stream(const wchar_t * filename, SF_FILEMODE mode, SF_STREAM **stream)
 {
-    if (!file)
+    if (!stream)
         return SFE_BAD_VIRTUAL_IO;
 
-    *file = nullptr;
+    *stream = nullptr;
 
-    PSF_FILE *f = new(nothrow) PSF_FILE();
-    if (!f)
-        return SFE_MALLOC_FAILED;
-
-    int open_flag, share_flag;
-
-    /*
-    * Sanity check. If everything is OK, this test and the printfs will
-    * be optimised out. This is meant to catch the problems caused by
-    * "sfconfig.h" being included after <stdio.h>.
-    */
-    switch (mode)
+    SF_FILE_STREAM *s = nullptr;
+    try
     {
-    case SFM_READ:
-        open_flag = O_BINARY | O_RDONLY;
-        share_flag = 0;
-        break;
-
-    case SFM_WRITE:
-        open_flag = O_BINARY | O_WRONLY | O_CREAT | O_TRUNC;
-        share_flag = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
-        break;
-
-    case SFM_RDWR:
-        open_flag = O_BINARY | O_RDWR | O_CREAT;
-        share_flag = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
-        break;
-
-    default:
-        delete file;
-        return -SFE_BAD_OPEN_MODE;
-        break;
-    };
-
-    f->filedes = _wopen(filename, open_flag, share_flag);
-    if (f->filedes == -SFE_BAD_OPEN_MODE)
-    {
-        f->filedes = -1;
-        delete f;
-        return SFE_BAD_OPEN_MODE;
+        s = new SF_FILE_STREAM(filename, mode);
     }
-    else if (f->filedes == -1)
+    catch (const sf::sndfile_error &e)
     {
-        delete f;
-        return SFE_BAD_FILE_PTR;
+        delete s;
+        return e.error();
     }
-    else
-    {
-        f->vio = *psf_get_vio();
-        f->vio_user_data = f;
-        f->vio_ref_counter = 0;
-        f->vio.ref(f->vio_user_data);
-        *file = f;
-    }
+
+    *stream = static_cast<SF_STREAM *>(s);
+    s->ref();
 
     return SFE_NO_ERROR;
 }
 
 #endif
-
-int SF_PRIVATE::fopen(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo)
-{
-    PSF_FILE *file;
-    int error = psf_vio_from_file(path, mode, &file);
-    if (error == SFE_NO_ERROR)
-    {
-        strcpy(_path, path);
-        vio_user_data = file;
-        vio = &file->vio;
-        file_mode = mode;
-    }
-
-	return error;
-}
-
-#ifdef _WIN32
-
-int SF_PRIVATE::fopen(const wchar_t *path, SF_FILEMODE mode, SF_INFO *sfinfo)
-{
-    PSF_FILE *file;
-    int error = psf_vio_from_file(path, mode, &file);
-    if (error == SFE_NO_ERROR)
-    {
-        wcstombs(_path, path, FILENAME_MAX);
-        vio_user_data = file;
-        vio = &file->vio;
-        file_mode = mode;
-    }
-
-    return error;
-}
-
-#endif
-
-unsigned long vfref(void * user_data)
-{
-    PSF_FILE *file = reinterpret_cast<PSF_FILE *>(user_data);
-
-	unsigned long ref_counter = 0;
-
-	if (file && file->vio.ref && file->vio.unref)
-	{
-		ref_counter = ++file->vio_ref_counter;
-	}
-	return ref_counter;
-}
-
-void vfunref(void * user_data)
-{
-    PSF_FILE *file = reinterpret_cast<PSF_FILE *>(user_data);
-
-	if (file && file->vio.unref)
-	{
-		file->vio_ref_counter--;
-		if (file->vio_ref_counter == 0)
-		{
-            close(file->filedes);
-			file->filedes = -1;
-		}
-	}
-}
 
 static sf_count_t psf_get_filelen_fd(int fd)
 {
@@ -285,108 +316,4 @@ static void psf_log_syserr(SF_PRIVATE *psf, int error)
 	};
 
 	return;
-}
-
-static sf_count_t vfget_filelen(void *user_data)
-{
-    PSF_FILE *file = reinterpret_cast<PSF_FILE *>(user_data);
-
-    if (!file)
-        return -1;
-
-#ifdef _WIN32
-    struct _stat64 statbuf;
-
-    if (_fstat64(file->filedes, &statbuf) == -1)
-        return (sf_count_t)-1;
-
-    return statbuf.st_size;
-#else
-    struct stat statbuf;
-
-    if (fstat(file->filedes, &statbuf) == -1)
-        return (sf_count_t)-1;
-
-    return statbuf.st_size;
-#endif
-}
-
-static sf_count_t vfseek(void *user_data, sf_count_t offset, int whence)
-{
-    PSF_FILE *file = reinterpret_cast<PSF_FILE *>(user_data);
-    if (!file)
-        return -1;
-
-#ifdef _WIN32
-	return _lseeki64(file->filedes, offset, whence);
-#else
-	return lseek(file->filedes, offset, whence);
-#endif
-}
-
-static sf_count_t vfread(void *user_data, void *ptr, sf_count_t count)
-{
-    PSF_FILE *file = reinterpret_cast<PSF_FILE *>(user_data);
-    if (!file)
-        return 0;
-
-	return read(file->filedes, ptr, count);
-}
-
-static sf_count_t vfwrite(void *user_data, const void *ptr, sf_count_t count)
-{
-    PSF_FILE *file = reinterpret_cast<PSF_FILE *>(user_data);
-    if (!file)
-        return 0;
-
-	return write(file->filedes, ptr, count);
-}
-
-static sf_count_t vftell(void *user_data)
-{
-    PSF_FILE *file = reinterpret_cast<PSF_FILE *>(user_data);
-    if (!file)
-        return -1;
-
-#if _WIN32
-	return _lseeki64(file->filedes, 0, SEEK_CUR);
-#else
-	return lseek(file->filedes, 0, SEEK_CUR);
-#endif
-}
-
-static void vfflush(void *user_data)
-{
-    PSF_FILE *file = reinterpret_cast<PSF_FILE *>(user_data);
-    if (!file)
-        return;
-
-#ifdef HAVE_FSYNC
-    ::fsync(file->filedes);
-#elif _WIN32
-    _commit(file->filedes);
-#endif
-}
-
-
-int vfset_filelen(void *user_data, sf_count_t len)
-{
-    PSF_FILE *file = reinterpret_cast<PSF_FILE *>(user_data);
-    if (!file)
-        return -1;
-
-	/* Returns 0 on success, non-zero on failure. */
-	if (len < 0)
-		return -1;
-
-	if ((sizeof(off_t) < sizeof(sf_count_t)) && len > 0x7FFFFFFF)
-		return -1;
-
-#ifdef _WIN32
-	int retval = _chsize_s(file->filedes, len);
-#else
-	int retval = ::ftruncate(file->filedes, len);
-#endif
-
-	return retval;
 }

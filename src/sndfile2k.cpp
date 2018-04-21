@@ -270,7 +270,7 @@ static ErrorStruct SndfileErrors[] = {
 */
 
 static bool format_from_extension(const char *path, SF_INFO *sfinfo);
-static bool guess_file_type(PSF_FILE *file, SF_INFO *sfinfo);
+static bool guess_file_type(SF_STREAM *stream, SF_INFO *sfinfo);
 static int validate_sfinfo(SF_INFO *sfinfo);
 static int validate_psf(SF_PRIVATE *psf);
 static void save_header_info(SF_PRIVATE *psf);
@@ -360,238 +360,218 @@ int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sndfi
         }
     };
 
-    PSF_FILE *file;
-    int error = psf_vio_from_file(path, mode, &file);
-    if (error != SFE_NO_ERROR)
-    {
-        sf_errno = error;
-        return sf_errno;
-    }
-
-    // Need this to detect if we create new file (filelength = 0).
-    sf_count_t filelength = file->vio.get_filelen(file);
-
-    if (mode == SFM_WRITE || (mode == SFM_RDWR && filelength == 0))
-    {
-        // If the file is being opened for write or RDWR and the file is currently
-        // empty, then the SF_INFO struct must contain valid data.
-        if ((SF_CONTAINER(sfinfo->format)) == 0)
-        {
-            sf_errno = SFE_ZERO_MAJOR_FORMAT;
-            file->vio.unref(file);
-            return sf_errno;
-        };
-        if ((SF_CODEC(sfinfo->format)) == 0)
-        {
-            sf_errno = SFE_ZERO_MINOR_FORMAT;
-            file->vio.unref(file);
-            return sf_errno;
-        };
-
-        if (sf_format_check(sfinfo) == 0)
-        {
-            sf_errno = SFE_BAD_OPEN_FORMAT;
-            file->vio.unref(file);
-            return sf_errno;
-        };
-    }
-    else if ((SF_CONTAINER(sfinfo->format)) != SF_FORMAT_RAW)
-    {
-        // If type RAW has not been specified then need to figure out file type.
-        if (!guess_file_type(file, sfinfo))
-            if (!format_from_extension(path, sfinfo))
-            {
-                sf_errno = SFE_BAD_OPEN_FORMAT;
-                file->vio.unref(file);
-                return sf_errno;
-            }
-    };
-
-    // Here we have format detected
-
+    SF_STREAM *stream = nullptr;
     SF_PRIVATE *psf = nullptr;
     try
     {
-        //psf = new SF_PRIVATE(&file->vio, mode, sfinfo, reinterpret_cast<void *>(file));
         psf = new SF_PRIVATE();
+
+        int error = psf_open_file_stream(path, mode, &stream);
+        if (error != SFE_NO_ERROR)
+            throw sf::sndfile_error(error);
+
+        // Need this to detect if we create new file (filelength = 0).
+        sf_count_t filelength = stream->get_filelen();
+
+        if (mode == SFM_WRITE || (mode == SFM_RDWR && filelength == 0))
+        {
+            // If the file is being opened for write or RDWR and the file is currently
+            // empty, then the SF_INFO struct must contain valid data.
+            if ((SF_CONTAINER(sfinfo->format)) == 0)
+                throw sf::sndfile_error(SFE_ZERO_MAJOR_FORMAT);
+
+            if ((SF_CODEC(sfinfo->format)) == 0)
+                throw sf::sndfile_error(SFE_ZERO_MINOR_FORMAT);
+
+            if (sf_format_check(sfinfo) == 0)
+                throw sf::sndfile_error(SFE_BAD_OPEN_FORMAT);
+        }
+        else if ((SF_CONTAINER(sfinfo->format)) != SF_FORMAT_RAW)
+        {
+            // If type RAW has not been specified then need to figure out file type.
+            if (!guess_file_type(stream, sfinfo))
+            {
+                if (!format_from_extension(path, sfinfo))
+                {
+                    throw sf::sndfile_error(SFE_BAD_OPEN_FORMAT);
+                }
+            }
+        };
+
+        // Here we have format detected
+
+            //psf = new SF_PRIVATE(&file->vio, mode, sfinfo, reinterpret_cast<void *>(file));
 
         psf->log_printf("File : %s\n", path);
         strcpy(psf->_path, path);
 
-        psf->open(&file->vio, mode, sfinfo, reinterpret_cast<void *>(file));
-        file->vio.unref(file);
+        psf->open(stream, mode, sfinfo);
+        stream->unref();
+        stream = nullptr;
         if (!psf->is_open())
             throw sf::sndfile_error(psf->error);
+
+        /* Call the initialisation function for the relevant file type. */
+        switch (SF_CONTAINER(psf->sf.format))
+        {
+        case SF_FORMAT_WAV:
+        case SF_FORMAT_WAVEX:
+            error = wav_open(psf);
+            break;
+
+        case SF_FORMAT_AIFF:
+            error = aiff_open(psf);
+            break;
+
+        case SF_FORMAT_AU:
+            error = au_open(psf);
+            break;
+
+        case SF_FORMAT_RAW:
+            error = raw_open(psf);
+            break;
+
+        case SF_FORMAT_W64:
+            error = w64_open(psf);
+            break;
+
+        case SF_FORMAT_RF64:
+            error = rf64_open(psf);
+            break;
+
+        case SF_FORMAT_PAF:
+            error = paf_open(psf);
+            break;
+
+        case SF_FORMAT_SVX:
+            error = svx_open(psf);
+            break;
+
+        case SF_FORMAT_NIST:
+            error = nist_open(psf);
+            break;
+
+        case SF_FORMAT_IRCAM:
+            error = ircam_open(psf);
+            break;
+
+        case SF_FORMAT_VOC:
+            error = voc_open(psf);
+            break;
+
+        case SF_FORMAT_SDS:
+            error = sds_open(psf);
+            break;
+
+        case SF_FORMAT_OGG:
+            error = ogg_open(psf);
+            break;
+
+        case SF_FORMAT_TXW:
+            error = txw_open(psf);
+            break;
+
+        case SF_FORMAT_WVE:
+            error = wve_open(psf);
+            break;
+
+        case SF_FORMAT_DWD:
+            error = dwd_open(psf);
+            break;
+
+        case SF_FORMAT_MAT4:
+            error = mat4_open(psf);
+            break;
+
+        case SF_FORMAT_MAT5:
+            error = mat5_open(psf);
+            break;
+
+        case SF_FORMAT_PVF:
+            error = pvf_open(psf);
+            break;
+
+        case SF_FORMAT_XI:
+            error = xi_open(psf);
+            break;
+
+        case SF_FORMAT_HTK:
+            error = htk_open(psf);
+            break;
+
+        case SF_FORMAT_REX2:
+            error = rx2_open(psf);
+            break;
+
+        case SF_FORMAT_AVR:
+            error = avr_open(psf);
+            break;
+
+        case SF_FORMAT_FLAC:
+            error = flac_open(psf);
+            break;
+
+        case SF_FORMAT_CAF:
+            error = caf_open(psf);
+            break;
+
+        case SF_FORMAT_MPC2K:
+            error = mpc2k_open(psf);
+            break;
+
+        default:
+            error = SF_ERR_UNRECOGNISED_FORMAT;
+        };
+
+        if (error != SFE_NO_ERROR)
+            throw sf::sndfile_error(error);
+
+        if (mode == SFM_RDWR && sf_format_check(&psf->sf) == 0)
+            throw sf::sndfile_error(SFE_BAD_MODE_RW);
+
+        if (validate_sfinfo(&psf->sf) == 0)
+        {
+            psf->log_SF_INFO();
+            save_header_info(psf);
+            throw sf::sndfile_error(SFE_BAD_SF_INFO);
+        };
+
+        if (validate_psf(psf) == 0)
+        {
+            save_header_info(psf);
+            throw sf::sndfile_error(SFE_INTERNAL);
+        };
+
+        psf->read_current = 0;
+        psf->write_current = 0;
+        if (mode == SFM_RDWR)
+        {
+            psf->write_current = psf->sf.frames;
+            psf->have_written = psf->sf.frames > 0 ? true : false;
+        };
+
+        memcpy(sfinfo, &psf->sf, sizeof(SF_INFO));
+
+        if (mode == SFM_WRITE)
+        {
+            /* Zero out these fields. */
+            sfinfo->frames = 0;
+            sfinfo->sections = 0;
+            sfinfo->seekable = 0;
+        };
+
+        *sndfile = psf;
+
+        return SF_ERR_NO_ERROR;
     }
     catch (sf::sndfile_error &e)
     {
+        if (stream)
+            stream->unref();
         delete psf;
+
         return e.error();
     };
-
-    /* Call the initialisation function for the relevant file type. */
-    switch (SF_CONTAINER(psf->sf.format))
-    {
-    case SF_FORMAT_WAV:
-    case SF_FORMAT_WAVEX:
-        error = wav_open(psf);
-        break;
-
-    case SF_FORMAT_AIFF:
-        error = aiff_open(psf);
-        break;
-
-    case SF_FORMAT_AU:
-        error = au_open(psf);
-        break;
-
-    case SF_FORMAT_RAW:
-        error = raw_open(psf);
-        break;
-
-    case SF_FORMAT_W64:
-        error = w64_open(psf);
-        break;
-
-    case SF_FORMAT_RF64:
-        error = rf64_open(psf);
-        break;
-
-    case SF_FORMAT_PAF:
-        error = paf_open(psf);
-        break;
-
-    case SF_FORMAT_SVX:
-        error = svx_open(psf);
-        break;
-
-    case SF_FORMAT_NIST:
-        error = nist_open(psf);
-        break;
-
-    case SF_FORMAT_IRCAM:
-        error = ircam_open(psf);
-        break;
-
-    case SF_FORMAT_VOC:
-        error = voc_open(psf);
-        break;
-
-    case SF_FORMAT_SDS:
-        error = sds_open(psf);
-        break;
-
-    case SF_FORMAT_OGG:
-        error = ogg_open(psf);
-        break;
-
-    case SF_FORMAT_TXW:
-        error = txw_open(psf);
-        break;
-
-    case SF_FORMAT_WVE:
-        error = wve_open(psf);
-        break;
-
-    case SF_FORMAT_DWD:
-        error = dwd_open(psf);
-        break;
-
-    case SF_FORMAT_MAT4:
-        error = mat4_open(psf);
-        break;
-
-    case SF_FORMAT_MAT5:
-        error = mat5_open(psf);
-        break;
-
-    case SF_FORMAT_PVF:
-        error = pvf_open(psf);
-        break;
-
-    case SF_FORMAT_XI:
-        error = xi_open(psf);
-        break;
-
-    case SF_FORMAT_HTK:
-        error = htk_open(psf);
-        break;
-
-    case SF_FORMAT_REX2:
-        error = rx2_open(psf);
-        break;
-
-    case SF_FORMAT_AVR:
-        error = avr_open(psf);
-        break;
-
-    case SF_FORMAT_FLAC:
-        error = flac_open(psf);
-        break;
-
-    case SF_FORMAT_CAF:
-        error = caf_open(psf);
-        break;
-
-    case SF_FORMAT_MPC2K:
-        error = mpc2k_open(psf);
-        break;
-
-    default:
-        error = SF_ERR_UNRECOGNISED_FORMAT;
-    };
-
-    if (error != SFE_NO_ERROR)
-    {
-        sf_errno = error;
-        sf_close(psf);
-        return sf_errno;
-    }
-
-    if (mode == SFM_RDWR && sf_format_check(&psf->sf) == 0)
-    {
-        sf_errno = SFE_BAD_MODE_RW;
-        sf_close(psf);
-        return sf_errno;
-    };
-
-    if (validate_sfinfo(&psf->sf) == 0)
-    {
-        psf->log_SF_INFO();
-        save_header_info(psf);
-        sf_errno = SFE_BAD_SF_INFO;
-        sf_close(psf);
-        return sf_errno;
-    };
-
-    if (validate_psf(psf) == 0)
-    {
-        save_header_info(psf);
-        sf_errno = SFE_INTERNAL;
-        sf_close(psf);
-        return sf_errno;
-    };
-
-    psf->read_current = 0;
-    psf->write_current = 0;
-    if (mode == SFM_RDWR)
-    {
-        psf->write_current = psf->sf.frames;
-        psf->have_written = psf->sf.frames > 0 ? true : false;
-    };
-
-    memcpy(sfinfo, &psf->sf, sizeof(SF_INFO));
-
-    if (mode == SFM_WRITE)
-    {
-        /* Zero out these fields. */
-        sfinfo->frames = 0;
-        sfinfo->sections = 0;
-        sfinfo->seekable = 0;
-    };
-
-    *sndfile = psf;
-    return SF_ERR_NO_ERROR;
 }
 
 int sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data, SNDFILE **sndfile)
@@ -2928,14 +2908,14 @@ static bool format_from_extension(const char *path, SF_INFO *sfinfo)
     return false;
 }
 
-static bool guess_file_type(PSF_FILE *file, SF_INFO *sfinfo)
+static bool guess_file_type(SF_STREAM *stream, SF_INFO *sfinfo)
 {
-    assert(file != nullptr);
+    assert(stream != nullptr);
     assert(sfinfo != nullptr);
 
     uint32_t buffer[3], format;
-    file->vio.seek(file, 0, SF_SEEK_SET);
-    if (file->vio.read(file, &buffer, SIGNED_SIZEOF(buffer)) != SIGNED_SIZEOF(buffer))
+    stream->seek(0, SF_SEEK_SET);
+    if (stream->read(&buffer, SIGNED_SIZEOF(buffer)) != SIGNED_SIZEOF(buffer))
         return false;
 
     if ((buffer[0] == MAKE_MARKER('R', 'I', 'F', 'F') ||
@@ -3098,7 +3078,7 @@ static bool guess_file_type(PSF_FILE *file, SF_INFO *sfinfo)
         return false /*-SF_FORMAT_WMA-*/;
     }
 
-    sf_count_t filelength = file->vio.get_filelen(file);
+    sf_count_t filelength = stream->get_filelen();
     /* HMM (Hidden Markov Model) Tool Kit. */
     if (buffer[2] == MAKE_MARKER(0, 2, 0, 0) &&
         2 * ((int64_t)BE2H_32(buffer[0])) + 12 == filelength)

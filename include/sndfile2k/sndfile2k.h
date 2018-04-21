@@ -1243,6 +1243,10 @@ typedef int (*sf_vio_set_filelen)(void *user_data, sf_count_t len);
  */
 typedef struct SF_VIRTUAL_IO
 {
+    //! Pointer to a user defined function that increases reference count.
+    sf_ref_callback ref;
+    //! Pointer to a user defined function that decreases reference count.
+    sf_unref_callback unref;
     //! Pointer to a used defined function that returns file size
     sf_vio_get_filelen get_filelen;
     //! Pointer to a user defined seek function
@@ -1257,11 +1261,31 @@ typedef struct SF_VIRTUAL_IO
     sf_vio_flush flush;
 	//! Pointer to a user defined function that truncates stream
 	sf_vio_set_filelen set_filelen;
-	//! Pointer to a user defined function that increases reference count.
-	sf_ref_callback ref;
-	//! Pointer to a user defined function that decreases reference count.
-	sf_unref_callback unref;
 } SF_VIRTUAL_IO;
+
+#ifdef __cplusplus
+
+struct SF_STREAM
+{
+    virtual unsigned long ref() = 0;
+    virtual void unref() = 0;
+    virtual sf_count_t get_filelen() = 0;
+    virtual sf_count_t seek(sf_count_t offset, int whence) = 0;
+    virtual sf_count_t read(void *ptr, sf_count_t count) = 0;
+    virtual sf_count_t write(const void *ptr, sf_count_t count) = 0;
+    virtual sf_count_t tell() = 0;
+    virtual void flush() = 0;
+    virtual int set_filelen(sf_count_t len) = 0;
+};
+
+#else
+
+typedef struct SF_STREAM
+{
+    SF_VIRTUAL_IO *vio;
+} SF_STREAM;
+
+#endif
 
 #include "sndfile2k_export.h"
 
