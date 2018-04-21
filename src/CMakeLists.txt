@@ -46,6 +46,8 @@ set(COMMON
   chanmap.cpp
   file_io.cpp
   sndfile_error.h
+  ref_ptr.cpp
+  ref_ptr.h
 )
 if(WIN32 OR CYGWIN)
   list(APPEND COMMON windows.cpp)

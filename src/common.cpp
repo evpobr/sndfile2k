@@ -56,15 +56,15 @@ SF_PRIVATE::SF_PRIVATE()
 
 int SF_PRIVATE::open(const char *filename, SF_FILEMODE mode, SF_INFO *sfinfo)
 {
-    SF_STREAM *stream = nullptr;
-    error = psf_open_file_stream(filename, mode, &stream);
+    sf::ref_ptr<SF_STREAM> stream;
+    error = psf_open_file_stream(filename, mode, stream.get_address_of());
     if (error == SFE_NO_ERROR)
         error = open(stream, mode, sfinfo);
 
     return error;
 }
 
-int SF_PRIVATE::open(SF_STREAM *stream, SF_FILEMODE mode, SF_INFO *sfinfo)
+int SF_PRIVATE::open(sf::ref_ptr<SF_STREAM> &stream, SF_FILEMODE mode, SF_INFO *sfinfo)
 {
     if (m_is_open)
         return SFE_ALREADY_INITIALIZED;
@@ -1913,14 +1913,14 @@ FILE *psf_open_tmpfile(char *fname, size_t fnamelen)
 
 sf_count_t SF_PRIVATE::get_filelen()
 {
-    assert(vio != nullptr);
+    assert(vio);
 
     return vio->get_filelen();
 }
 
 int SF_PRIVATE::file_valid()
 {
-    return (vio != nullptr) ? SF_TRUE : SF_FALSE;
+    return (vio) ? SF_TRUE : SF_FALSE;
 }
 
 sf_count_t SF_PRIVATE::fseek(sf_count_t offset, int whence)
@@ -1933,7 +1933,7 @@ sf_count_t SF_PRIVATE::fseek(sf_count_t offset, int whence)
 
 size_t SF_PRIVATE::fread(void *ptr, size_t bytes, size_t items)
 {
-    assert(vio != nullptr);
+    assert(vio);
 
     if (!ptr)
         return 0;
@@ -1959,7 +1959,7 @@ size_t SF_PRIVATE::fwrite(const void *ptr, size_t bytes, size_t items)
 
 sf_count_t SF_PRIVATE::ftell()
 {
-    assert(vio != nullptr);
+    assert(vio);
 
     return vio->tell();
 }

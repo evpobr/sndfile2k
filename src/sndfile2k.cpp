@@ -29,6 +29,7 @@
 #include "sfendian.h"
 #include "common.h"
 #include "sndfile_error.h"
+#include "ref_ptr.h"
 
 #include <algorithm>
 
@@ -270,7 +271,7 @@ static ErrorStruct SndfileErrors[] = {
 */
 
 static bool format_from_extension(const char *path, SF_INFO *sfinfo);
-static bool guess_file_type(SF_STREAM *stream, SF_INFO *sfinfo);
+static bool guess_file_type(sf::ref_ptr<SF_STREAM> &stream, SF_INFO *sfinfo);
 static int validate_sfinfo(SF_INFO *sfinfo);
 static int validate_psf(SF_PRIVATE *psf);
 static void save_header_info(SF_PRIVATE *psf);
@@ -359,14 +360,14 @@ int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sndfi
             memset(sfinfo, 0, sizeof(SF_INFO));
         }
     };
-
-    SF_STREAM *stream = nullptr;
+    
     SF_PRIVATE *psf = nullptr;
     try
     {
         psf = new SF_PRIVATE();
 
-        int error = psf_open_file_stream(path, mode, &stream);
+        sf::ref_ptr<SF_STREAM> stream;
+        int error = psf_open_file_stream(path, mode, stream.get_address_of());
         if (error != SFE_NO_ERROR)
             throw sf::sndfile_error(error);
 
@@ -406,8 +407,6 @@ int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sndfi
         strcpy(psf->_path, path);
 
         psf->open(stream, mode, sfinfo);
-        stream->unref();
-        stream = nullptr;
         if (!psf->is_open())
             throw sf::sndfile_error(psf->error);
 
@@ -566,8 +565,6 @@ int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sndfi
     }
     catch (sf::sndfile_error &e)
     {
-        if (stream)
-            stream->unref();
         delete psf;
 
         return e.error();
@@ -2908,9 +2905,12 @@ static bool format_from_extension(const char *path, SF_INFO *sfinfo)
     return false;
 }
 
-static bool guess_file_type(SF_STREAM *stream, SF_INFO *sfinfo)
+#include <windows.h>
+
+static bool guess_file_type(sf::ref_ptr<SF_STREAM> &stream, SF_INFO *sfinfo)
 {
-    assert(stream != nullptr);
+    HANDLE hFile = INVALID_HANDLE_VALUE;
+    assert(stream);
     assert(sfinfo != nullptr);
 
     uint32_t buffer[3], format;

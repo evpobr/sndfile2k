@@ -1265,10 +1265,14 @@ typedef struct SF_VIRTUAL_IO
 
 #ifdef __cplusplus
 
-struct SF_STREAM
+struct SF_OBJECT
 {
     virtual unsigned long ref() = 0;
     virtual void unref() = 0;
+};
+
+struct SF_STREAM: public SF_OBJECT
+{
     virtual sf_count_t get_filelen() = 0;
     virtual sf_count_t seek(sf_count_t offset, int whence) = 0;
     virtual sf_count_t read(void *ptr, sf_count_t count) = 0;

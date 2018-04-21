@@ -22,6 +22,7 @@
 
 #include "common.h"
 #include "sndfile_error.h"
+#include "ref_ptr.h"
 
 #include <string.h>
 #include <fcntl.h>

@@ -31,6 +31,7 @@
 
 #ifndef SNDFILE2_H
 #include "sndfile2k/sndfile2k.h"
+#include "ref_ptr.h"
 #endif
 
 #include <vector>
@@ -315,7 +316,7 @@ struct SF_PRIVATE
     SF_PRIVATE();
 
     int open(const char *filename, SF_FILEMODE mode, SF_INFO *sfinfo);
-    int open(SF_STREAM *stream, SF_FILEMODE mode, SF_INFO *sfinfo);
+    int open(sf::ref_ptr<SF_STREAM> &stream, SF_FILEMODE mode, SF_INFO *sfinfo);
     bool is_open() const;
     void close();
 
@@ -331,7 +332,7 @@ struct SF_PRIVATE
 
     char _path[FILENAME_MAX] = {0};
     SF_FILEMODE file_mode = SFM_READ;
-    SF_STREAM *vio = nullptr;
+    sf::ref_ptr<SF_STREAM> vio;
 
     char syserr[SF_SYSERR_LEN] = {0};
 
