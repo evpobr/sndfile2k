@@ -35,6 +35,7 @@
 #endif
 
 #include <vector>
+#include <memory>
 
 /*
 ** Inspiration : http://sourcefrog.net/weblog/software/languages/C/unused.html
@@ -196,29 +197,27 @@ struct PEAK_POS
 
 struct PEAK_INFO
 {
+    PEAK_INFO(int channels)
+        : peaks(channels)
+    {
+    }
+
     /* libsndfile internal : write a PEAK chunk at the start or end of the file? */
-    enum SF_PEAK_POSITION peak_loc;
+    enum SF_PEAK_POSITION peak_loc = SF_PEAK_START;
 
     /* WAV/AIFF */
-    unsigned int version; /* version of the PEAK chunk */
-    unsigned int timestamp; /* secs since 1/1/1970  */
+    unsigned int version = 0; /* version of the PEAK chunk */
+    unsigned int timestamp = 0; /* secs since 1/1/1970  */
 
     /* CAF */
-    unsigned int edit_number;
+    unsigned int edit_number = 0;
 
     /* the per channel peak info */
-    PEAK_POS *peaks;
-};
+    std::vector<PEAK_POS> peaks;
 
-static inline struct PEAK_INFO *peak_info_calloc(int channels)
-{
-    PEAK_INFO *peak_info = (PEAK_INFO *)calloc(1, sizeof(PEAK_INFO));
-    if (peak_info)
-    {
-        peak_info->peaks = (PEAK_POS *)calloc(channels, sizeof(PEAK_POS));
-    }
-    return peak_info;
-}
+private:
+    PEAK_INFO() = delete;
+};
 
 struct STR_DATA
 {
@@ -390,7 +389,7 @@ struct SF_PRIVATE
     SF_INFO sf = {0};
 
     bool m_have_written = false; /* Has a single write been done to the file? */
-    PEAK_INFO *m_peak_info = nullptr;
+    std::unique_ptr<PEAK_INFO> m_peak_info = nullptr;
 
     /* Cue Marker Info */
     std::vector<SF_CUE_POINT> m_cues;

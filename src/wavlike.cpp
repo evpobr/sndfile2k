@@ -1060,8 +1060,7 @@ int wavlike_read_peak_chunk(SF_PRIVATE *psf, size_t chunk_size)
         return SFE_WAV_BAD_PEAK;
     };
 
-    if ((psf->m_peak_info = peak_info_calloc(psf->sf.channels)) == NULL)
-        return SFE_MALLOC_FAILED;
+    psf->m_peak_info = std::make_unique<PEAK_INFO>(psf->sf.channels);
 
     /* read in rest of PEAK chunk. */
     psf->binheader_readf("44", &(psf->m_peak_info->version), &(psf->m_peak_info->timestamp));

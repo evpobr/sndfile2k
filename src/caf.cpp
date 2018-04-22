@@ -33,6 +33,7 @@
 #include "chanmap.h"
 
 #include <algorithm>
+#include <memory>
 
 /*
  * Macros to handle big/little endian issues.
@@ -159,9 +160,7 @@ int caf_open(SF_PRIVATE *psf)
         if (psf->m_mode == SFM_WRITE &&
             (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
         {
-            if ((psf->m_peak_info = peak_info_calloc(psf->sf.channels)) == NULL)
-                return SFE_MALLOC_FAILED;
-            psf->m_peak_info->peak_loc = SF_PEAK_START;
+            psf->m_peak_info = std::make_unique<PEAK_INFO>(psf->sf.channels);
         };
 
         if ((error = caf_write_header(psf, SF_FALSE)) != 0)
@@ -438,8 +437,7 @@ static int caf_read_header(SF_PRIVATE *psf)
                 return SFE_CAF_BAD_PEAK;
             };
 
-            if ((psf->m_peak_info = peak_info_calloc(psf->sf.channels)) == NULL)
-                return SFE_MALLOC_FAILED;
+            psf->m_peak_info = std::make_unique<PEAK_INFO>(psf->sf.channels);
 
             /* read in rest of PEAK chunk. */
             psf->binheader_readf("E4", &(psf->m_peak_info->edit_number));

@@ -1249,19 +1249,14 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         /* Everything seems OK, so set psf->has_peak and re-write header. */
         if (datasize == SF_FALSE && sndfile->m_peak_info != NULL)
         {
-            if (sndfile->m_peak_info->peaks)
+            if (sndfile->m_peak_info)
             {
-                free(sndfile->m_peak_info->peaks);
-                sndfile->m_peak_info->peaks = NULL;
+                sndfile->m_peak_info.reset();
             }
-            free(sndfile->m_peak_info);
-            sndfile->m_peak_info = NULL;
         }
-        else if (sndfile->m_peak_info == NULL)
+        else if (!sndfile->m_peak_info)
         {
-            sndfile->m_peak_info = peak_info_calloc(sndfile->sf.channels);
-            if (sndfile->m_peak_info != NULL)
-                sndfile->m_peak_info->peak_loc = SF_PEAK_START;
+            sndfile->m_peak_info = std::make_unique<PEAK_INFO>(sndfile->sf.channels);
         };
 
         if (sndfile->write_header)

@@ -156,9 +156,6 @@ void SF_PRIVATE::close()
     free(m_codec_data);
     free(m_interleave);
     free(m_dither);
-    if (m_peak_info)
-        free(m_peak_info->peaks);
-    free(m_peak_info);
     free(m_loop_info);
     free(m_instrument);
     m_cues.clear();

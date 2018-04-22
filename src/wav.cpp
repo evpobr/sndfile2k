@@ -201,9 +201,7 @@ int wav_open(SF_PRIVATE *psf)
         if (psf->m_mode == SFM_WRITE &&
             (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
         {
-            if ((psf->m_peak_info = peak_info_calloc(psf->sf.channels)) == NULL)
-                return SFE_MALLOC_FAILED;
-            psf->m_peak_info->peak_loc = SF_PEAK_START;
+            psf->m_peak_info = std::make_unique<PEAK_INFO>(psf->sf.channels);
         };
 
         psf->write_header = wav_write_header;
