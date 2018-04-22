@@ -826,7 +826,7 @@ inline SndfileHandle::SndfileHandle(const wchar_t *wpath, SF_FILEMODE mode, int 
 		p->sfinfo.sections = 0;
 		p->sfinfo.seekable = 0;
 
-		p->sf = sf_wchar_open(wpath, mode, &p->sfinfo);
+		sf_wchar_open(wpath, mode, &p->sfinfo, &p->sf);
 	};
 
 	return;

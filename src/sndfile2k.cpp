@@ -270,11 +270,11 @@ static ErrorStruct SndfileErrors[] = {
 /*------------------------------------------------------------------------------
 */
 
-static bool format_from_extension(const char *path, SF_INFO *sfinfo);
-static bool guess_file_type(sf::ref_ptr<SF_STREAM> &stream, SF_INFO *sfinfo);
-static int validate_sfinfo(SF_INFO *sfinfo);
-static int validate_psf(SF_PRIVATE *psf);
-static void save_header_info(SF_PRIVATE *psf);
+bool format_from_extension(const char *path, SF_INFO *sfinfo);
+bool guess_file_type(sf::ref_ptr<SF_STREAM> &stream, SF_INFO *sfinfo);
+int validate_sfinfo(SF_INFO *sfinfo);
+int validate_psf(SF_PRIVATE *psf);
+void save_header_info(SF_PRIVATE *psf);
 
 /*------------------------------------------------------------------------------
 ** Private (static) variables.
@@ -2829,7 +2829,7 @@ sf_count_t sf_writef_double(SNDFILE *sndfile, const double *ptr, sf_count_t fram
     return count / sndfile->sf.channels;
 }
 
-static bool format_from_extension(const char *path, SF_INFO *sfinfo)
+bool format_from_extension(const char *path, SF_INFO *sfinfo)
 {
     char *cptr;
     char buffer[16];
@@ -2896,7 +2896,7 @@ static bool format_from_extension(const char *path, SF_INFO *sfinfo)
 
 #include <windows.h>
 
-static bool guess_file_type(sf::ref_ptr<SF_STREAM> &stream, SF_INFO *sfinfo)
+bool guess_file_type(sf::ref_ptr<SF_STREAM> &stream, SF_INFO *sfinfo)
 {
     HANDLE hFile = INVALID_HANDLE_VALUE;
     assert(stream);
@@ -3117,7 +3117,7 @@ static bool guess_file_type(sf::ref_ptr<SF_STREAM> &stream, SF_INFO *sfinfo)
     return false;
 }
 
-static int validate_sfinfo(SF_INFO *sfinfo)
+int validate_sfinfo(SF_INFO *sfinfo)
 {
     if (sfinfo->samplerate < 1)
         return 0;
@@ -3134,7 +3134,7 @@ static int validate_sfinfo(SF_INFO *sfinfo)
     return 1;
 }
 
-static int validate_psf(SF_PRIVATE *psf)
+int validate_psf(SF_PRIVATE *psf)
 {
     if (psf->m_datalength < 0)
     {
@@ -3155,7 +3155,7 @@ static int validate_psf(SF_PRIVATE *psf)
     return 1;
 }
 
-static void save_header_info(SF_PRIVATE *psf)
+void save_header_info(SF_PRIVATE *psf)
 {
     snprintf(sf_parselog, sizeof(sf_parselog), "%s", psf->m_parselog.buf);
 }

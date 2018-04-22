@@ -59,7 +59,7 @@ static void wchar_test(void)
     info.channels = 1;
     info.samplerate = 44100;
 
-    file = sf_wchar_open(filename, SFM_WRITE, &info);
+    int error = sf_wchar_open(filename, SFM_WRITE, &info, &file);
     exit_if_true(file == NULL, "\n\nLine %d : sf_wchar_open failed : %s\n\n", __LINE__, sf_strerror(NULL));
     sf_close(file);
 

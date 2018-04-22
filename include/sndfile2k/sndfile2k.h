@@ -1866,7 +1866,7 @@ SNDFILE2K_EXPORT void sf_write_sync(SNDFILE *sndfile);
  * @sa sf_open(), sf_open_virtual()
  * @sa sf_close()
  */
-SNDFILE2K_EXPORT SNDFILE *sf_wchar_open(const wchar_t *wpath, SF_FILEMODE mode, SF_INFO *sfinfo);
+SNDFILE2K_EXPORT int sf_wchar_open(const wchar_t *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sndfile);
 #endif
 
 /** @defgroup chunks Chunks API
