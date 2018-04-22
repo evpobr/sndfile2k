@@ -179,10 +179,13 @@ SF_PRIVATE::~SF_PRIVATE()
 
 int SF_PRIVATE::bump_header_allocation(sf_count_t needed)
 {
-    size_t newlen, smallest = INITIAL_HEADER_SIZE;
-    void *ptr;
+    size_t newlen;
+    size_t smallest = INITIAL_HEADER_SIZE;
 
-    newlen = (needed > m_header.len) ? 2 * std::max(needed, static_cast<sf_count_t>(smallest)) : 2 * m_header.len;
+    if (needed > m_header.len)
+        newlen = 2 * std::max(needed, static_cast<sf_count_t>(smallest));
+    else
+        newlen = 2 * m_header.len;
 
     if (newlen > 100 * 1024)
     {
@@ -190,7 +193,8 @@ int SF_PRIVATE::bump_header_allocation(sf_count_t needed)
         return 1;
     }
 
-    if ((ptr = realloc(m_header.ptr, newlen)) == NULL)
+    void *ptr = realloc(m_header.ptr, newlen);
+    if (!ptr)
     {
         log_printf("realloc (%p, %z) failed\n", m_header.ptr, newlen);
         m_error = SFE_MALLOC_FAILED;
@@ -538,11 +542,9 @@ void SF_PRIVATE::log_printf(const char *format, ...)
 void SF_PRIVATE::asciiheader_printf(const char *format, ...)
 {
     va_list argptr;
-    int maxlen;
-    char *start;
 
-    maxlen = strlen((char *)m_header.ptr);
-    start = ((char *)m_header.ptr) + maxlen;
+    int maxlen = strlen((char *)m_header.ptr);
+    char *start = ((char *)m_header.ptr) + maxlen;
     maxlen = m_header.len - maxlen;
 
     va_start(argptr, format);
@@ -1027,11 +1029,10 @@ size_t SF_PRIVATE::header_read(void *ptr, size_t bytes)
 
 int SF_PRIVATE::header_gets(char *ptr, int bufsize)
 {
-    int k;
-
     if (m_header.indx + bufsize >= m_header.len && bump_header_allocation(bufsize))
         return 0;
 
+    int k;
     for (k = 0; k < bufsize - 1; k++)
     {
         if (m_header.indx < m_header.end)
@@ -1294,8 +1295,6 @@ int SF_PRIVATE::binheader_readf(char const *format, ...)
 
 sf_count_t psf_default_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t samples_from_start)
 {
-    sf_count_t position, retval;
-
     if (!(psf->m_blockwidth && psf->m_dataoffset >= 0))
     {
         psf->m_error = SFE_BAD_SEEK;
@@ -1308,9 +1307,10 @@ sf_count_t psf_default_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t sample
         return PSF_SEEK_ERROR;
     };
 
-    position = psf->m_dataoffset + psf->m_blockwidth * samples_from_start;
+    sf_count_t position = psf->m_dataoffset + psf->m_blockwidth * samples_from_start;
 
-    if ((retval = psf->fseek(position, SEEK_SET)) != position)
+    sf_count_t retval = psf->fseek(position, SEEK_SET);
+    if (retval != position)
     {
         psf->m_error = SFE_SEEK_FAILED;
         return PSF_SEEK_ERROR;
@@ -1321,21 +1321,22 @@ sf_count_t psf_default_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t sample
 
 void psf_hexdump(const void *ptr, int len)
 {
-    const char *data;
-    char ascii[17];
-    int k, m;
+    const char *data = (const char *)ptr;
 
-    if ((data = (const char *)ptr) == NULL)
+    if (!data)
         return;
     if (len <= 0)
         return;
 
     puts("");
-    for (k = 0; k < len; k += 16)
+    for (int k = 0; k < len; k += 16)
     {
+        char ascii[17];
         memset(ascii, ' ', sizeof(ascii));
 
         printf("%08X: ", k);
+
+        int m = 0;
         for (m = 0; m < 16 && k + m < len; m++)
         {
             printf(m == 8 ? " %02X " : "%02X ", data[k + m] & 0xFF);
@@ -1374,14 +1375,11 @@ void SF_PRIVATE::log_SF_INFO()
 
 void *psf_memset(void *s, int c, sf_count_t len)
 {
-    char *ptr;
-    int setcount;
-
-    ptr = (char *)s;
+    char *ptr = (char *)s;
 
     while (len > 0)
     {
-        setcount = (len > 0x10000000) ? 0x10000000 : (int)len;
+        int setcount = (len > 0x10000000) ? 0x10000000 : (int)len;
 
         memset(ptr, c, setcount);
 
@@ -1411,9 +1409,7 @@ SF_CUE_POINT *psf_cues_dup(const SF_CUE_POINT *cues, uint32_t cue_count)
 
 SF_INSTRUMENT *psf_instrument_alloc(void)
 {
-    SF_INSTRUMENT *instr;
-
-    instr = (SF_INSTRUMENT *)calloc(1, sizeof(SF_INSTRUMENT));
+    SF_INSTRUMENT *instr = (SF_INSTRUMENT *)calloc(1, sizeof(SF_INSTRUMENT));
 
     if (instr == NULL)
         return NULL;
@@ -1515,7 +1511,6 @@ int u_bitwidth_to_subformat(int bits)
 int32_t psf_rand_int32(void)
 {
     static uint64_t value = 0;
-    int k, count;
 
     if (value == 0)
     {
@@ -1528,8 +1523,8 @@ int32_t psf_rand_int32(void)
 #endif
     };
 
-    count = 4 + (value & 7);
-    for (k = 0; k < count; k++)
+    int count = 4 + (value & 7);
+    for (int k = 0; k < count; k++)
         value = (11117 * value + 211231) & 0x7fffffff;
 
     return (int32_t)value;
@@ -1719,9 +1714,7 @@ const char *str_of_endianness(int end)
 
 void psf_f2s_array(const float *src, short *dest, size_t count, int normalize)
 {
-    float normfact;
-
-    normfact = (float)(normalize ? (1.0 * 0x7FFF) : 1.0);
+    float normfact = (float)(normalize ? (1.0 * 0x7FFF) : 1.0);
     while (count)
     {
         count--;
@@ -1733,14 +1726,12 @@ void psf_f2s_array(const float *src, short *dest, size_t count, int normalize)
 
 void psf_f2s_clip_array(const float *src, short *dest, size_t count, int normalize)
 {
-    float normfact, scaled_value;
-
-    normfact = (float)(normalize ? (1.0 * 0x8000) : 1.0);
+    float normfact = (float)(normalize ? (1.0 * 0x8000) : 1.0);
 
     while (count)
     {
         count--;
-        scaled_value = src[count] * normfact;
+        float scaled_value = src[count] * normfact;
         if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFF))
         {
             dest[count] = 0x7FFF;
@@ -1760,9 +1751,7 @@ void psf_f2s_clip_array(const float *src, short *dest, size_t count, int normali
 
 void psf_d2s_array(const double *src, short *dest, size_t count, int normalize)
 {
-    double normfact;
-
-    normfact = normalize ? (1.0 * 0x7FFF) : 1.0;
+    double normfact = normalize ? (1.0 * 0x7FFF) : 1.0;
     while (count)
     {
         count--;
@@ -1774,14 +1763,12 @@ void psf_d2s_array(const double *src, short *dest, size_t count, int normalize)
 
 void psf_d2s_clip_array(const double *src, short *dest, size_t count, int normalize)
 {
-    double normfact, scaled_value;
-
-    normfact = normalize ? (1.0 * 0x8000) : 1.0;
+    double normfact = normalize ? (1.0 * 0x8000) : 1.0;
 
     while (count)
     {
         count--;
-        scaled_value = src[count] * normfact;
+        double scaled_value = src[count] * normfact;
         if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFF))
         {
             dest[count] = 0x7FFF;
@@ -1801,9 +1788,7 @@ void psf_d2s_clip_array(const double *src, short *dest, size_t count, int normal
 
 void psf_f2i_array(const float *src, int *dest, size_t count, int normalize)
 {
-    float normfact;
-
-    normfact = (float)(normalize ? (1.0 * 0x7FFFFFFF) : 1.0);
+    float normfact = (float)(normalize ? (1.0 * 0x7FFFFFFF) : 1.0);
     while (count)
     {
         count--;
@@ -1815,14 +1800,12 @@ void psf_f2i_array(const float *src, int *dest, size_t count, int normalize)
 
 void psf_f2i_clip_array(const float *src, int *dest, size_t count, int normalize)
 {
-    float normfact, scaled_value;
-
-    normfact = (float)(normalize ? (8.0 * 0x10000000) : 1.0);
+    double normfact = (float)(normalize ? (8.0 * 0x10000000) : 1.0);
 
     while (count)
     {
         count--;
-        scaled_value = src[count] * normfact;
+        double scaled_value = src[count] * normfact;
         if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
         {
             dest[count] = 0x7FFFFFFF;
@@ -1842,9 +1825,7 @@ void psf_f2i_clip_array(const float *src, int *dest, size_t count, int normalize
 
 void psf_d2i_array(const double *src, int *dest, size_t count, int normalize)
 {
-    double normfact;
-
-    normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0;
+    double normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0;
     while (count)
     {
         count--;
@@ -1856,14 +1837,12 @@ void psf_d2i_array(const double *src, int *dest, size_t count, int normalize)
 
 void psf_d2i_clip_array(const double *src, int *dest, size_t count, int normalize)
 {
-    double normfact, scaled_value;
-
-    normfact = normalize ? (8.0 * 0x10000000) : 1.0;
+    double normfact = normalize ? (8.0 * 0x10000000) : 1.0;
 
     while (count)
     {
         count--;
-        scaled_value = src[count] * normfact;
+        double scaled_value = src[count] * normfact;
         if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
         {
             dest[count] = 0x7FFFFFFF;
