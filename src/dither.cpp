@@ -88,10 +88,10 @@ int dither_init(SF_PRIVATE *psf, int mode)
 {
     DITHER_DATA *pdither;
 
-    pdither = (DITHER_DATA *)psf->dither; /* This may be NULL. */
+    pdither = (DITHER_DATA *)psf->m_dither; /* This may be NULL. */
 
     /* Turn off dither on read. */
-    if (mode == SFM_READ && psf->read_dither.type == SFD_NO_DITHER)
+    if (mode == SFM_READ && psf->m_read_dither.type == SFD_NO_DITHER)
     {
         if (pdither == NULL)
             return 0; /* Dither is already off, so just return. */
@@ -108,7 +108,7 @@ int dither_init(SF_PRIVATE *psf, int mode)
     };
 
     /* Turn off dither on write. */
-    if (mode == SFM_WRITE && psf->write_dither.type == SFD_NO_DITHER)
+    if (mode == SFM_WRITE && psf->m_write_dither.type == SFD_NO_DITHER)
     {
         if (pdither == NULL)
             return 0; /* Dither is already off, so just return. */
@@ -125,12 +125,12 @@ int dither_init(SF_PRIVATE *psf, int mode)
     };
 
     /* Turn on dither on read if asked. */
-    if (mode == SFM_READ && psf->read_dither.type != 0)
+    if (mode == SFM_READ && psf->m_read_dither.type != 0)
     {
 		if (pdither == NULL)
 		{
-			psf->dither = (DITHER_DATA *)calloc(1, sizeof(DITHER_DATA));
-			pdither = (DITHER_DATA *)psf->dither;
+			psf->m_dither = (DITHER_DATA *)calloc(1, sizeof(DITHER_DATA));
+			pdither = (DITHER_DATA *)psf->m_dither;
 		}
         if (pdither == NULL)
             return SFE_MALLOC_FAILED;
@@ -158,12 +158,12 @@ int dither_init(SF_PRIVATE *psf, int mode)
     };
 
     /* Turn on dither on write if asked. */
-    if (mode == SFM_WRITE && psf->write_dither.type != 0)
+    if (mode == SFM_WRITE && psf->m_write_dither.type != 0)
     {
 		if (pdither == NULL)
 		{
-			psf->dither = (DITHER_DATA *)calloc(1, sizeof(DITHER_DATA));
-			pdither = (DITHER_DATA *)psf->dither;
+			psf->m_dither = (DITHER_DATA *)calloc(1, sizeof(DITHER_DATA));
+			pdither = (DITHER_DATA *)psf->m_dither;
 		}
         if (pdither == NULL)
             return SFE_MALLOC_FAILED;
@@ -225,9 +225,9 @@ static size_t dither_write_short(SF_PRIVATE *psf, const short *ptr, size_t len)
     size_t bufferlen, writecount, thiswrite;
     size_t total = 0;
 
-    if ((pdither = (DITHER_DATA *)psf->dither) == NULL)
+    if ((pdither = (DITHER_DATA *)psf->m_dither) == NULL)
     {
-        psf->error = SFE_DITHER_BAD_PTR;
+        psf->m_error = SFE_DITHER_BAD_PTR;
         return 0;
     };
 
@@ -269,9 +269,9 @@ static size_t dither_write_int(SF_PRIVATE *psf, const int *ptr, size_t len)
     size_t bufferlen, writecount, thiswrite;
     size_t total = 0;
 
-    if ((pdither = (DITHER_DATA *)psf->dither) == NULL)
+    if ((pdither = (DITHER_DATA *)psf->m_dither) == NULL)
     {
-        psf->error = SFE_DITHER_BAD_PTR;
+        psf->m_error = SFE_DITHER_BAD_PTR;
         return 0;
     };
 
@@ -317,9 +317,9 @@ static size_t dither_write_float(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t bufferlen, writecount, thiswrite;
     size_t total = 0;
 
-    if ((pdither = (DITHER_DATA *)psf->dither) == NULL)
+    if ((pdither = (DITHER_DATA *)psf->m_dither) == NULL)
     {
-        psf->error = SFE_DITHER_BAD_PTR;
+        psf->m_error = SFE_DITHER_BAD_PTR;
         return 0;
     };
 
@@ -366,9 +366,9 @@ static size_t dither_write_double(SF_PRIVATE *psf, const double *ptr, size_t len
     size_t bufferlen, writecount, thiswrite;
     size_t total = 0;
 
-    if ((pdither = (DITHER_DATA *)psf->dither) == NULL)
+    if ((pdither = (DITHER_DATA *)psf->m_dither) == NULL)
     {
-        psf->error = SFE_DITHER_BAD_PTR;
+        psf->m_error = SFE_DITHER_BAD_PTR;
         return 0;
     };
 

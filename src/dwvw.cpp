@@ -79,7 +79,7 @@ int dwvw_init(SF_PRIVATE *psf, int bitwidth)
 {
     DWVW_PRIVATE *pdwvw;
 
-    if (psf->codec_data != NULL)
+    if (psf->m_codec_data != NULL)
     {
         psf->log_printf("*** psf->codec_data is not NULL.\n");
         return SFE_INTERNAL;
@@ -88,17 +88,17 @@ int dwvw_init(SF_PRIVATE *psf, int bitwidth)
     if (bitwidth > 24)
         return SFE_DWVW_BAD_BITWIDTH;
 
-    if (psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_RDWR)
         return SFE_BAD_MODE_RW;
 
     if ((pdwvw = (DWVW_PRIVATE *)calloc(1, sizeof(DWVW_PRIVATE))) == NULL)
         return SFE_MALLOC_FAILED;
 
-    psf->codec_data = (void *)pdwvw;
+    psf->m_codec_data = (void *)pdwvw;
     pdwvw->bit_width = bitwidth;
     dwvw_read_reset(pdwvw);
 
-    if (psf->file_mode == SFM_READ)
+    if (psf->m_mode == SFM_READ)
     {
         psf->read_short = dwvw_read_s;
         psf->read_int = dwvw_read_i;
@@ -106,7 +106,7 @@ int dwvw_init(SF_PRIVATE *psf, int bitwidth)
         psf->read_double = dwvw_read_d;
     };
 
-    if (psf->file_mode == SFM_WRITE)
+    if (psf->m_mode == SFM_WRITE)
     {
         psf->write_short = dwvw_write_s;
         psf->write_int = dwvw_write_i;
@@ -118,7 +118,7 @@ int dwvw_init(SF_PRIVATE *psf, int bitwidth)
     psf->seek_from_start = dwvw_seek;
     psf->byterate = dwvw_byterate;
 
-    if (psf->file_mode == SFM_READ)
+    if (psf->m_mode == SFM_READ)
     {
         psf->sf.frames = psf_decode_frame_count(psf);
         dwvw_read_reset(pdwvw);
@@ -131,11 +131,11 @@ static int dwvw_close(SF_PRIVATE *psf)
 {
     DWVW_PRIVATE *pdwvw;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pdwvw = (DWVW_PRIVATE *)psf->codec_data;
+    pdwvw = (DWVW_PRIVATE *)psf->m_codec_data;
 
-    if (psf->file_mode == SFM_WRITE)
+    if (psf->m_mode == SFM_WRITE)
     {
         static int last_values[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -156,29 +156,29 @@ static sf_count_t dwvw_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offset
 {
     DWVW_PRIVATE *pdwvw;
 
-    if (!psf->codec_data)
+    if (!psf->m_codec_data)
     {
-        psf->error = SFE_INTERNAL;
+        psf->m_error = SFE_INTERNAL;
         return PSF_SEEK_ERROR;
     };
 
-    pdwvw = (DWVW_PRIVATE *)psf->codec_data;
+    pdwvw = (DWVW_PRIVATE *)psf->m_codec_data;
 
     if (offset == 0)
     {
-        psf->fseek(psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->m_dataoffset, SEEK_SET);
         dwvw_read_reset(pdwvw);
         return 0;
     };
 
-    psf->error = SFE_BAD_SEEK;
+    psf->m_error = SFE_BAD_SEEK;
     return PSF_SEEK_ERROR;
 }
 
 static int dwvw_byterate(SF_PRIVATE *psf)
 {
-    if (psf->file_mode == SFM_READ)
-        return (psf->datalength * psf->sf.samplerate) / psf->sf.frames;
+    if (psf->m_mode == SFM_READ)
+        return (psf->m_datalength * psf->sf.samplerate) / psf->sf.frames;
 
     return -1;
 }
@@ -191,9 +191,9 @@ static size_t dwvw_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     size_t k, bufferlen, readcount = 0, count;
     size_t total = 0;
 
-    if (!psf->codec_data)
+    if (!psf->m_codec_data)
         return 0;
-    pdwvw = (DWVW_PRIVATE *)psf->codec_data;
+    pdwvw = (DWVW_PRIVATE *)psf->m_codec_data;
 
     iptr = ubuf.ibuf;
     bufferlen = ARRAY_LEN(ubuf.ibuf);
@@ -219,9 +219,9 @@ static size_t dwvw_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     size_t readcount, count;
     size_t total = 0;
 
-    if (!psf->codec_data)
+    if (!psf->m_codec_data)
         return 0;
-    pdwvw = (DWVW_PRIVATE *)psf->codec_data;
+    pdwvw = (DWVW_PRIVATE *)psf->m_codec_data;
 
     while (len > 0)
     {
@@ -248,11 +248,11 @@ static size_t dwvw_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if (!psf->codec_data)
+    if (!psf->m_codec_data)
         return 0;
-    pdwvw = (DWVW_PRIVATE *)psf->codec_data;
+    pdwvw = (DWVW_PRIVATE *)psf->m_codec_data;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0);
 
     iptr = ubuf.ibuf;
     bufferlen = ARRAY_LEN(ubuf.ibuf);
@@ -281,11 +281,11 @@ static size_t dwvw_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if (!psf->codec_data)
+    if (!psf->m_codec_data)
         return 0;
-    pdwvw = (DWVW_PRIVATE *)psf->codec_data;
+    pdwvw = (DWVW_PRIVATE *)psf->m_codec_data;
 
-    normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x80000000) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? 1.0 / ((double)0x80000000) : 1.0;
 
     iptr = ubuf.ibuf;
     bufferlen = ARRAY_LEN(ubuf.ibuf);
@@ -588,9 +588,9 @@ static size_t dwvw_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
     size_t k, bufferlen, writecount = 0, count;
     size_t total = 0;
 
-    if (!psf->codec_data)
+    if (!psf->m_codec_data)
         return 0;
-    pdwvw = (DWVW_PRIVATE *)psf->codec_data;
+    pdwvw = (DWVW_PRIVATE *)psf->m_codec_data;
 
     iptr = ubuf.ibuf;
     bufferlen = ARRAY_LEN(ubuf.ibuf);
@@ -616,9 +616,9 @@ static size_t dwvw_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
     size_t writecount, count;
     size_t total = 0;
 
-    if (!psf->codec_data)
+    if (!psf->m_codec_data)
         return 0;
-    pdwvw = (DWVW_PRIVATE *)psf->codec_data;
+    pdwvw = (DWVW_PRIVATE *)psf->m_codec_data;
 
     while (len > 0)
     {
@@ -645,11 +645,11 @@ static size_t dwvw_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if (!psf->codec_data)
+    if (!psf->m_codec_data)
         return 0;
-    pdwvw = (DWVW_PRIVATE *)psf->codec_data;
+    pdwvw = (DWVW_PRIVATE *)psf->m_codec_data;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : 1.0);
 
     iptr = ubuf.ibuf;
     bufferlen = ARRAY_LEN(ubuf.ibuf);
@@ -678,11 +678,11 @@ static size_t dwvw_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if (!psf->codec_data)
+    if (!psf->m_codec_data)
         return 0;
-    pdwvw = (DWVW_PRIVATE *)psf->codec_data;
+    pdwvw = (DWVW_PRIVATE *)psf->m_codec_data;
 
-    normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : 1.0;
 
     iptr = ubuf.ibuf;
     bufferlen = ARRAY_LEN(ubuf.ibuf);

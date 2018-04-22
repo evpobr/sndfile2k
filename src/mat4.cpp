@@ -68,7 +68,7 @@ int mat4_open(SF_PRIVATE *psf)
 {
     int subformat, error = 0;
 
-    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->m_mode == SFM_READ || (psf->m_mode == SFM_RDWR && psf->m_filelength > 0))
     {
         if ((error = mat4_read_header(psf)))
             return error;
@@ -79,13 +79,13 @@ int mat4_open(SF_PRIVATE *psf)
 
     subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
-        psf->endian = SF_ENDIAN(psf->sf.format);
-        if (CPU_IS_LITTLE_ENDIAN && (psf->endian == SF_ENDIAN_CPU || psf->endian == 0))
-            psf->endian = SF_ENDIAN_LITTLE;
-        else if (CPU_IS_BIG_ENDIAN && (psf->endian == SF_ENDIAN_CPU || psf->endian == 0))
-            psf->endian = SF_ENDIAN_BIG;
+        psf->m_endian = SF_ENDIAN(psf->sf.format);
+        if (CPU_IS_LITTLE_ENDIAN && (psf->m_endian == SF_ENDIAN_CPU || psf->m_endian == 0))
+            psf->m_endian = SF_ENDIAN_LITTLE;
+        else if (CPU_IS_BIG_ENDIAN && (psf->m_endian == SF_ENDIAN_CPU || psf->m_endian == 0))
+            psf->m_endian = SF_ENDIAN_BIG;
 
         if ((error = mat4_write_header(psf, SF_FALSE)))
             return error;
@@ -95,7 +95,7 @@ int mat4_open(SF_PRIVATE *psf)
 
     psf->container_close = mat4_close;
 
-    psf->blockwidth = psf->bytewidth * psf->sf.channels;
+    psf->m_blockwidth = psf->m_bytewidth * psf->sf.channels;
 
     switch (subformat)
     {
@@ -121,7 +121,7 @@ int mat4_open(SF_PRIVATE *psf)
 
 static int mat4_close(SF_PRIVATE *psf)
 {
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
         mat4_write_header(psf, SF_TRUE);
 
     return 0;
@@ -137,29 +137,29 @@ static int mat4_write_header(SF_PRIVATE *psf, int calc_length)
 
     if (calc_length)
     {
-        psf->filelength = psf->get_filelen();
+        psf->m_filelength = psf->get_filelen();
 
-        psf->datalength = psf->filelength - psf->dataoffset;
-        if (psf->dataend)
-            psf->datalength -= psf->filelength - psf->dataend;
+        psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
+        if (psf->m_dataend)
+            psf->m_datalength -= psf->m_filelength - psf->m_dataend;
 
-        psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels);
+        psf->sf.frames = psf->m_datalength / (psf->m_bytewidth * psf->sf.channels);
     };
 
-    encoding = mat4_format_to_encoding(SF_CODEC(psf->sf.format), psf->endian);
+    encoding = mat4_format_to_encoding(SF_CODEC(psf->sf.format), psf->m_endian);
 
     if (encoding == -1)
         return SFE_BAD_OPEN_FORMAT;
 
     /* Reset the current header length to zero. */
-    psf->header.ptr[0] = 0;
-    psf->header.indx = 0;
+    psf->m_header.ptr[0] = 0;
+    psf->m_header.indx = 0;
     psf->fseek(0, SEEK_SET);
 
     /* Need sample rate as a double for writing to the header. */
     samplerate = psf->sf.samplerate;
 
-    if (psf->endian == SF_ENDIAN_BIG)
+    if (psf->m_endian == SF_ENDIAN_BIG)
     {
         psf->binheader_writef("Em444", BHWm(MAT4_BE_DOUBLE), BHW4(1), BHW4(1), BHW4(0));
         psf->binheader_writef("E4bd", BHW4(11), BHWv("samplerate"), BHWz(11), BHWd(samplerate));
@@ -167,7 +167,7 @@ static int mat4_write_header(SF_PRIVATE *psf, int calc_length)
                              BHW8(psf->sf.frames), BHW4(0));
         psf->binheader_writef("E4b", BHW4(9), BHWv("wavedata"), BHWz(9));
     }
-    else if (psf->endian == SF_ENDIAN_LITTLE)
+    else if (psf->m_endian == SF_ENDIAN_LITTLE)
     {
         psf->binheader_writef("em444", BHWm(MAT4_LE_DOUBLE), BHW4(1), BHW4(1), BHW4(0));
         psf->binheader_writef("e4bd", BHW4(11), BHWv("samplerate"), BHWz(11), BHWd(samplerate));
@@ -179,17 +179,17 @@ static int mat4_write_header(SF_PRIVATE *psf, int calc_length)
         return SFE_BAD_OPEN_FORMAT;
 
     /* Header construction complete so write it out. */
-    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
+    psf->fwrite(psf->m_header.ptr, psf->m_header.indx, 1);
 
-    if (psf->error)
-        return psf->error;
+    if (psf->m_error)
+        return psf->m_error;
 
-    psf->dataoffset = psf->header.indx;
+    psf->m_dataoffset = psf->m_header.indx;
 
     if (current > 0)
         psf->fseek(current, SEEK_SET);
 
-    return psf->error;
+    return psf->m_error;
 }
 
 static int mat4_read_header(SF_PRIVATE *psf)
@@ -207,12 +207,12 @@ static int mat4_read_header(SF_PRIVATE *psf)
     /* MAT4 file must start with a double for the samplerate. */
     if (marker == MAT4_BE_DOUBLE)
     {
-        psf->endian = psf->rwf_endian = SF_ENDIAN_BIG;
+        psf->m_endian = psf->m_rwf_endian = SF_ENDIAN_BIG;
         marker_str = "big endian double";
     }
     else if (marker == MAT4_LE_DOUBLE)
     {
-        psf->endian = psf->rwf_endian = SF_ENDIAN_LITTLE;
+        psf->m_endian = psf->m_rwf_endian = SF_ENDIAN_LITTLE;
         marker_str = "little endian double";
     }
     else
@@ -268,7 +268,7 @@ static int mat4_read_header(SF_PRIVATE *psf)
 
     psf->log_printf(" Name  : %s\n", name);
 
-    psf->dataoffset = psf->ftell();
+    psf->m_dataoffset = psf->ftell();
 
     if (rows == 0)
     {
@@ -284,31 +284,31 @@ static int mat4_read_header(SF_PRIVATE *psf)
     psf->sf.channels = rows;
     psf->sf.frames = cols;
 
-    psf->sf.format = psf->endian | SF_FORMAT_MAT4;
+    psf->sf.format = psf->m_endian | SF_FORMAT_MAT4;
     switch (marker)
     {
     case MAT4_BE_DOUBLE:
     case MAT4_LE_DOUBLE:
         psf->sf.format |= SF_FORMAT_DOUBLE;
-        psf->bytewidth = 8;
+        psf->m_bytewidth = 8;
         break;
 
     case MAT4_BE_FLOAT:
     case MAT4_LE_FLOAT:
         psf->sf.format |= SF_FORMAT_FLOAT;
-        psf->bytewidth = 4;
+        psf->m_bytewidth = 4;
         break;
 
     case MAT4_BE_PCM_32:
     case MAT4_LE_PCM_32:
         psf->sf.format |= SF_FORMAT_PCM_32;
-        psf->bytewidth = 4;
+        psf->m_bytewidth = 4;
         break;
 
     case MAT4_BE_PCM_16:
     case MAT4_LE_PCM_16:
         psf->sf.format |= SF_FORMAT_PCM_16;
-        psf->bytewidth = 2;
+        psf->m_bytewidth = 2;
         break;
 
     default:
@@ -316,19 +316,19 @@ static int mat4_read_header(SF_PRIVATE *psf)
         return SFE_UNIMPLEMENTED;
     };
 
-    if ((psf->filelength - psf->dataoffset) < psf->sf.channels * psf->sf.frames * psf->bytewidth)
+    if ((psf->m_filelength - psf->m_dataoffset) < psf->sf.channels * psf->sf.frames * psf->m_bytewidth)
     {
         psf->log_printf("*** File seems to be truncated. %D <--> %D\n",
-                       psf->filelength - psf->dataoffset,
-                       psf->sf.channels * psf->sf.frames * psf->bytewidth);
+                       psf->m_filelength - psf->m_dataoffset,
+                       psf->sf.channels * psf->sf.frames * psf->m_bytewidth);
     }
-    else if ((psf->filelength - psf->dataoffset) >
-             psf->sf.channels * psf->sf.frames * psf->bytewidth)
+    else if ((psf->m_filelength - psf->m_dataoffset) >
+             psf->sf.channels * psf->sf.frames * psf->m_bytewidth)
     {
-        psf->dataend = psf->dataoffset + rows * cols * psf->bytewidth;
+        psf->m_dataend = psf->m_dataoffset + rows * cols * psf->m_bytewidth;
     }
 
-    psf->datalength = psf->filelength - psf->dataoffset - psf->dataend;
+    psf->m_datalength = psf->m_filelength - psf->m_dataoffset - psf->m_dataend;
 
     psf->sf.sections = 1;
 

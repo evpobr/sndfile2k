@@ -784,9 +784,9 @@ static size_t nms_adpcm_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     int readcount, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pnms = (NMS_ADPCM_PRIVATE *)psf->codec_data;
+    pnms = (NMS_ADPCM_PRIVATE *)psf->m_codec_data;
 
     while (len > 0)
     {
@@ -812,9 +812,9 @@ static size_t nms_adpcm_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     size_t k, bufferlen, readcount = 0, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pnms = (NMS_ADPCM_PRIVATE *)psf->codec_data;
+    pnms = (NMS_ADPCM_PRIVATE *)psf->m_codec_data;
 
     sptr = ubuf.sbuf;
     bufferlen = SF_BUFFER_LEN / sizeof(short);
@@ -844,11 +844,11 @@ static size_t nms_adpcm_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pnms = (NMS_ADPCM_PRIVATE *)psf->codec_data;
+    pnms = (NMS_ADPCM_PRIVATE *)psf->m_codec_data;
 
-    normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0;
+    normfact = (psf->m_norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0;
 
     sptr = ubuf.sbuf;
     bufferlen = SF_BUFFER_LEN / sizeof(short);
@@ -877,11 +877,11 @@ static size_t nms_adpcm_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pnms = (NMS_ADPCM_PRIVATE *)psf->codec_data;
+    pnms = (NMS_ADPCM_PRIVATE *)psf->m_codec_data;
 
-    normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x8000) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? 1.0 / ((double)0x8000) : 1.0;
 
     sptr = ubuf.sbuf;
     bufferlen = SF_BUFFER_LEN / sizeof(short);
@@ -952,9 +952,9 @@ static size_t nms_adpcm_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
     size_t writecount, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pnms = (NMS_ADPCM_PRIVATE *)psf->codec_data;
+    pnms = (NMS_ADPCM_PRIVATE *)psf->m_codec_data;
 
     while (len > 0)
     {
@@ -979,9 +979,9 @@ static size_t nms_adpcm_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
     size_t k, bufferlen, writecount = 0, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pnms = (NMS_ADPCM_PRIVATE *)psf->codec_data;
+    pnms = (NMS_ADPCM_PRIVATE *)psf->m_codec_data;
 
     sptr = ubuf.sbuf;
     bufferlen = SF_BUFFER_LEN / sizeof(short);
@@ -1009,11 +1009,11 @@ static size_t nms_adpcm_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pnms = (NMS_ADPCM_PRIVATE *)psf->codec_data;
+    pnms = (NMS_ADPCM_PRIVATE *)psf->m_codec_data;
 
-    normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x8000) : 1.0;
+    normfact = (psf->m_norm_float == SF_TRUE) ? (1.0 * 0x8000) : 1.0;
 
     sptr = ubuf.sbuf;
     bufferlen = SF_BUFFER_LEN / sizeof(short);
@@ -1042,11 +1042,11 @@ static size_t nms_adpcm_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pnms = (NMS_ADPCM_PRIVATE *)psf->codec_data;
+    pnms = (NMS_ADPCM_PRIVATE *)psf->m_codec_data;
 
-    normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x8000) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? (1.0 * 0x8000) : 1.0;
 
     sptr = ubuf.sbuf;
     bufferlen = SF_BUFFER_LEN / sizeof(short);
@@ -1070,7 +1070,7 @@ int nms_adpcm_init(SF_PRIVATE *psf)
 {
     NMS_ADPCM_PRIVATE *pnms;
 
-    if (psf->codec_data != NULL)
+    if (psf->m_codec_data != NULL)
     {
         psf->log_printf("*** psf->codec_data is not NULL.\n");
         return SFE_INTERNAL;
@@ -1084,7 +1084,7 @@ int nms_adpcm_init(SF_PRIVATE *psf)
     if ((pnms = (NMS_ADPCM_PRIVATE *)calloc(1, sizeof(NMS_ADPCM_PRIVATE))) == NULL)
         return SFE_MALLOC_FAILED;
 
-    psf->codec_data = (void *)pnms;
+    psf->m_codec_data = (void *)pnms;
 
     pnms->block_curr = 0;
     pnms->sample_curr = 0;
@@ -1109,22 +1109,22 @@ int nms_adpcm_init(SF_PRIVATE *psf)
     };
     nms_adpcm_codec_init(&pnms->state, pnms->type);
 
-    psf->filelength = psf->get_filelen();
-    if (psf->filelength < psf->dataoffset)
-        psf->filelength = psf->dataoffset;
+    psf->m_filelength = psf->get_filelen();
+    if (psf->m_filelength < psf->m_dataoffset)
+        psf->m_filelength = psf->m_dataoffset;
 
-    psf->datalength = psf->filelength - psf->dataoffset;
-    if (psf->dataend > 0)
-        psf->datalength -= psf->filelength - psf->dataend;
+    psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
+    if (psf->m_dataend > 0)
+        psf->m_datalength -= psf->m_filelength - psf->m_dataend;
 
-    if (psf->file_mode == SFM_READ)
+    if (psf->m_mode == SFM_READ)
     {
         psf->read_short = nms_adpcm_read_s;
         psf->read_int = nms_adpcm_read_i;
         psf->read_float = nms_adpcm_read_f;
         psf->read_double = nms_adpcm_read_d;
     }
-    else if (psf->file_mode == SFM_WRITE)
+    else if (psf->m_mode == SFM_WRITE)
     {
         psf->write_short = nms_adpcm_write_s;
         psf->write_int = nms_adpcm_write_i;
@@ -1132,14 +1132,14 @@ int nms_adpcm_init(SF_PRIVATE *psf)
         psf->write_double = nms_adpcm_write_d;
     };
 
-    if (psf->datalength % (pnms->shortsperblock * sizeof(short)))
+    if (psf->m_datalength % (pnms->shortsperblock * sizeof(short)))
     {
         psf->log_printf("*** Odd psf->datalength (%D) should be a multiple of %d\n",
-                       psf->datalength, pnms->shortsperblock * sizeof(short));
-        pnms->blocks_total = (psf->datalength / (pnms->shortsperblock * sizeof(short))) + 1;
+                       psf->m_datalength, pnms->shortsperblock * sizeof(short));
+        pnms->blocks_total = (psf->m_datalength / (pnms->shortsperblock * sizeof(short))) + 1;
     }
     else
-        pnms->blocks_total = psf->datalength / (pnms->shortsperblock * sizeof(short));
+        pnms->blocks_total = psf->m_datalength / (pnms->shortsperblock * sizeof(short));
 
     psf->sf.frames = pnms->blocks_total * NMS_SAMPLES_PER_BLOCK;
     psf->codec_close = nms_adpcm_close;
@@ -1152,13 +1152,13 @@ static int nms_adpcm_close(SF_PRIVATE *psf)
 {
     NMS_ADPCM_PRIVATE *pnms;
 
-    pnms = (NMS_ADPCM_PRIVATE *)psf->codec_data;
+    pnms = (NMS_ADPCM_PRIVATE *)psf->m_codec_data;
 
     /*
     ** If a block has been partially assembled, write it out as the final
     ** block.
     */
-    if (psf->file_mode == SFM_WRITE)
+    if (psf->m_mode == SFM_WRITE)
     {
         if (pnms->sample_curr && pnms->sample_curr < NMS_SAMPLES_PER_BLOCK)
         {
@@ -1178,15 +1178,15 @@ static sf_count_t nms_adpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
 {
     NMS_ADPCM_PRIVATE *pnms;
 
-    pnms = (NMS_ADPCM_PRIVATE *)psf->codec_data;
+    pnms = (NMS_ADPCM_PRIVATE *)psf->m_codec_data;
 
     /*
     ** NMS ADPCM is symmetric, so transitioning from reading and writing is
     ** possible, but unimplemented, as it would require syncing partial blocks.
     */
-    if (mode != psf->file_mode)
+    if (mode != psf->m_mode)
     {
-        psf->error = SFE_BAD_SEEK;
+        psf->m_error = SFE_BAD_SEEK;
         return PSF_SEEK_ERROR;
     };
 
@@ -1196,11 +1196,11 @@ static sf_count_t nms_adpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
     */
     if (offset != 0)
     {
-        psf->error = SFE_BAD_SEEK;
+        psf->m_error = SFE_BAD_SEEK;
         return PSF_SEEK_ERROR;
     };
 
-    if (psf->fseek(psf->dataoffset, SEEK_SET) == PSF_SEEK_ERROR)
+    if (psf->fseek(psf->m_dataoffset, SEEK_SET) == PSF_SEEK_ERROR)
         return PSF_SEEK_ERROR;
 
     nms_adpcm_codec_init(&pnms->state, pnms->type);

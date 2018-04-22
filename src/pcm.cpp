@@ -117,14 +117,14 @@ int pcm_init(SF_PRIVATE *psf)
 {
     int chars = 0;
 
-    if (psf->bytewidth == 0 || psf->sf.channels == 0)
+    if (psf->m_bytewidth == 0 || psf->sf.channels == 0)
     {
         psf->log_printf("pcm_init : internal error : bytewitdh = %d, channels = %d\n",
-                        psf->bytewidth, psf->sf.channels);
+                        psf->m_bytewidth, psf->sf.channels);
         return SFE_INTERNAL;
     };
 
-    psf->blockwidth = psf->bytewidth * psf->sf.channels;
+    psf->m_blockwidth = psf->m_bytewidth * psf->sf.channels;
 
     if ((SF_CODEC(psf->sf.format)) == SF_FORMAT_PCM_S8)
         chars = SF_CHARS_SIGNED;
@@ -132,13 +132,13 @@ int pcm_init(SF_PRIVATE *psf)
         chars = SF_CHARS_UNSIGNED;
 
     if (CPU_IS_BIG_ENDIAN)
-        psf->data_endswap = (psf->endian == SF_ENDIAN_BIG) ? SF_FALSE : SF_TRUE;
+        psf->m_data_endswap = (psf->m_endian == SF_ENDIAN_BIG) ? SF_FALSE : SF_TRUE;
     else
-        psf->data_endswap = (psf->endian == SF_ENDIAN_LITTLE) ? SF_FALSE : SF_TRUE;
+        psf->m_data_endswap = (psf->m_endian == SF_ENDIAN_LITTLE) ? SF_FALSE : SF_TRUE;
 
-    if (psf->file_mode == SFM_READ || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_READ || psf->m_mode == SFM_RDWR)
     {
-        switch (psf->bytewidth * 0x10000 + psf->endian + chars)
+        switch (psf->m_bytewidth * 0x10000 + psf->m_endian + chars)
         {
         case (0x10000 + SF_ENDIAN_BIG + SF_CHARS_SIGNED):
         case (0x10000 + SF_ENDIAN_LITTLE + SF_CHARS_SIGNED):
@@ -196,14 +196,14 @@ int pcm_init(SF_PRIVATE *psf)
         default:
             psf->log_printf("pcm.c returning SFE_UNIMPLEMENTED\nbytewidth "
                             "%d    endian %d\n",
-                            psf->bytewidth, psf->endian);
+                            psf->m_bytewidth, psf->m_endian);
             return SFE_UNIMPLEMENTED;
         };
     };
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
-        switch (psf->bytewidth * 0x10000 + psf->endian + chars)
+        switch (psf->m_bytewidth * 0x10000 + psf->m_endian + chars)
         {
         case (0x10000 + SF_ENDIAN_BIG + SF_CHARS_SIGNED):
         case (0x10000 + SF_ENDIAN_LITTLE + SF_CHARS_SIGNED):
@@ -265,18 +265,18 @@ int pcm_init(SF_PRIVATE *psf)
         default:
             psf->log_printf("pcm.c returning SFE_UNIMPLEMENTED\nbytewidth "
                             "%d    endian %d\n",
-                            psf->bytewidth, psf->endian);
+                            psf->m_bytewidth, psf->m_endian);
             return SFE_UNIMPLEMENTED;
         };
     };
 
-    if (psf->filelength > psf->dataoffset)
-        psf->datalength =
-            (psf->dataend > 0) ? psf->dataend - psf->dataoffset : psf->filelength - psf->dataoffset;
+    if (psf->m_filelength > psf->m_dataoffset)
+        psf->m_datalength =
+            (psf->m_dataend > 0) ? psf->m_dataend - psf->m_dataoffset : psf->m_filelength - psf->m_dataoffset;
     else
-        psf->datalength = 0;
+        psf->m_datalength = 0;
 
-    psf->sf.frames = psf->blockwidth > 0 ? psf->datalength / psf->blockwidth : 0;
+    psf->sf.frames = psf->m_blockwidth > 0 ? psf->m_datalength / psf->m_blockwidth : 0;
 
     return 0;
 }
@@ -1104,7 +1104,7 @@ static size_t pcm_read_sc2f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? 1.0 / ((float)0x80) : 1.0);
 
     bufferlen = ARRAY_LEN(ubuf.scbuf);
 
@@ -1130,7 +1130,7 @@ static size_t pcm_read_uc2f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? 1.0 / ((float)0x80) : 1.0);
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
 
@@ -1156,7 +1156,7 @@ static size_t pcm_read_bes2f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
 
     bufferlen = ARRAY_LEN(ubuf.sbuf);
 
@@ -1182,7 +1182,7 @@ static size_t pcm_read_les2f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
 
     bufferlen = ARRAY_LEN(ubuf.sbuf);
 
@@ -1209,7 +1209,7 @@ static size_t pcm_read_bet2f(SF_PRIVATE *psf, float *ptr, size_t len)
     float normfact;
 
     /* Special normfactor because tribyte value is read into an int. */
-    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0 / 256.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0 / 256.0);
 
     bufferlen = sizeof(ubuf.ucbuf) / SIZEOF_TRIBYTE;
 
@@ -1236,7 +1236,7 @@ static size_t pcm_read_let2f(SF_PRIVATE *psf, float *ptr, size_t len)
     float normfact;
 
     /* Special normfactor because tribyte value is read into an int. */
-    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0 / 256.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0 / 256.0);
 
     bufferlen = sizeof(ubuf.ucbuf) / SIZEOF_TRIBYTE;
 
@@ -1262,7 +1262,7 @@ static size_t pcm_read_bei2f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0);
 
     bufferlen = ARRAY_LEN(ubuf.ibuf);
 
@@ -1288,7 +1288,7 @@ static size_t pcm_read_lei2f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0);
 
     bufferlen = ARRAY_LEN(ubuf.ibuf);
 
@@ -1314,7 +1314,7 @@ static size_t pcm_read_sc2d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x80) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? 1.0 / ((double)0x80) : 1.0;
 
     bufferlen = ARRAY_LEN(ubuf.scbuf);
 
@@ -1340,7 +1340,7 @@ static size_t pcm_read_uc2d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x80) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? 1.0 / ((double)0x80) : 1.0;
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
 
@@ -1366,7 +1366,7 @@ static size_t pcm_read_bes2d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x8000) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? 1.0 / ((double)0x8000) : 1.0;
 
     bufferlen = ARRAY_LEN(ubuf.sbuf);
 
@@ -1392,7 +1392,7 @@ static size_t pcm_read_les2d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x8000) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? 1.0 / ((double)0x8000) : 1.0;
 
     bufferlen = ARRAY_LEN(ubuf.sbuf);
 
@@ -1418,7 +1418,7 @@ static size_t pcm_read_bet2d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x80000000) : 1.0 / 256.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? 1.0 / ((double)0x80000000) : 1.0 / 256.0;
 
     bufferlen = sizeof(ubuf.ucbuf) / SIZEOF_TRIBYTE;
 
@@ -1445,7 +1445,7 @@ static size_t pcm_read_let2d(SF_PRIVATE *psf, double *ptr, size_t len)
     double normfact;
 
     /* Special normfactor because tribyte value is read into an int. */
-    normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x80000000) : 1.0 / 256.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? 1.0 / ((double)0x80000000) : 1.0 / 256.0;
 
     bufferlen = sizeof(ubuf.ucbuf) / SIZEOF_TRIBYTE;
 
@@ -1471,7 +1471,7 @@ static size_t pcm_read_bei2d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x80000000) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? 1.0 / ((double)0x80000000) : 1.0;
 
     bufferlen = ARRAY_LEN(ubuf.ibuf);
 
@@ -1497,7 +1497,7 @@ static size_t pcm_read_lei2d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x80000000) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? 1.0 / ((double)0x80000000) : 1.0;
 
     bufferlen = ARRAY_LEN(ubuf.ibuf);
 
@@ -1941,14 +1941,14 @@ static size_t pcm_write_f2sc(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    convert = (psf->add_clipping) ? f2sc_clip_array : f2sc_array;
+    convert = (psf->m_add_clipping) ? f2sc_clip_array : f2sc_array;
     bufferlen = ARRAY_LEN(ubuf.scbuf);
 
     while (len > 0)
     {
         if (len < bufferlen)
             bufferlen = len;
-        convert(ptr + total, ubuf.scbuf, bufferlen, psf->norm_float);
+        convert(ptr + total, ubuf.scbuf, bufferlen, psf->m_norm_float);
         writecount = psf->fwrite(ubuf.scbuf, sizeof(signed char), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
@@ -2004,14 +2004,14 @@ static size_t pcm_write_f2uc(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    convert = (psf->add_clipping) ? f2uc_clip_array : f2uc_array;
+    convert = (psf->m_add_clipping) ? f2uc_clip_array : f2uc_array;
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
 
     while (len > 0)
     {
         if (len < bufferlen)
             bufferlen = len;
-        convert(ptr + total, ubuf.ucbuf, bufferlen, psf->norm_float);
+        convert(ptr + total, ubuf.ucbuf, bufferlen, psf->m_norm_float);
         writecount = psf->fwrite(ubuf.ucbuf, sizeof(unsigned char), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
@@ -2081,14 +2081,14 @@ static size_t pcm_write_f2bes(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    convert = (psf->add_clipping) ? f2bes_clip_array : f2bes_array;
+    convert = (psf->m_add_clipping) ? f2bes_clip_array : f2bes_array;
     bufferlen = ARRAY_LEN(ubuf.sbuf);
 
     while (len > 0)
     {
         if (len < bufferlen)
             bufferlen = len;
-        convert(ptr + total, ubuf.sbuf, bufferlen, psf->norm_float);
+        convert(ptr + total, ubuf.sbuf, bufferlen, psf->m_norm_float);
         writecount = psf->fwrite(ubuf.sbuf, sizeof(short), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
@@ -2158,14 +2158,14 @@ static size_t pcm_write_f2les(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    convert = (psf->add_clipping) ? f2les_clip_array : f2les_array;
+    convert = (psf->m_add_clipping) ? f2les_clip_array : f2les_array;
     bufferlen = ARRAY_LEN(ubuf.sbuf);
 
     while (len > 0)
     {
         if (len < bufferlen)
             bufferlen = len;
-        convert(ptr + total, ubuf.sbuf, bufferlen, psf->norm_float);
+        convert(ptr + total, ubuf.sbuf, bufferlen, psf->m_norm_float);
         writecount = psf->fwrite(ubuf.sbuf, sizeof(short), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
@@ -2239,14 +2239,14 @@ static size_t pcm_write_f2let(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    convert = (psf->add_clipping) ? f2let_clip_array : f2let_array;
+    convert = (psf->m_add_clipping) ? f2let_clip_array : f2let_array;
     bufferlen = sizeof(ubuf.ucbuf) / SIZEOF_TRIBYTE;
 
     while (len > 0)
     {
         if (len < bufferlen)
             bufferlen = len;
-        convert(ptr + total, (tribyte *)(ubuf.ucbuf), bufferlen, psf->norm_float);
+        convert(ptr + total, (tribyte *)(ubuf.ucbuf), bufferlen, psf->m_norm_float);
         writecount = psf->fwrite(ubuf.ucbuf, SIZEOF_TRIBYTE, bufferlen);
         total += writecount;
         if (writecount < bufferlen)
@@ -2320,14 +2320,14 @@ static size_t pcm_write_f2bet(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    convert = (psf->add_clipping) ? f2bet_clip_array : f2bet_array;
+    convert = (psf->m_add_clipping) ? f2bet_clip_array : f2bet_array;
     bufferlen = sizeof(ubuf.ucbuf) / SIZEOF_TRIBYTE;
 
     while (len > 0)
     {
         if (len < bufferlen)
             bufferlen = len;
-        convert(ptr + total, (tribyte *)(ubuf.ucbuf), bufferlen, psf->norm_float);
+        convert(ptr + total, (tribyte *)(ubuf.ucbuf), bufferlen, psf->m_norm_float);
         writecount = psf->fwrite(ubuf.ucbuf, SIZEOF_TRIBYTE, bufferlen);
         total += writecount;
         if (writecount < bufferlen)
@@ -2404,14 +2404,14 @@ static size_t pcm_write_f2bei(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    convert = (psf->add_clipping) ? f2bei_clip_array : f2bei_array;
+    convert = (psf->m_add_clipping) ? f2bei_clip_array : f2bei_array;
     bufferlen = ARRAY_LEN(ubuf.ibuf);
 
     while (len > 0)
     {
         if (len < bufferlen)
             bufferlen = len;
-        convert(ptr + total, ubuf.ibuf, bufferlen, psf->norm_float);
+        convert(ptr + total, ubuf.ibuf, bufferlen, psf->m_norm_float);
         writecount = psf->fwrite(ubuf.ibuf, sizeof(int), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
@@ -2489,14 +2489,14 @@ static size_t pcm_write_f2lei(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    convert = (psf->add_clipping) ? f2lei_clip_array : f2lei_array;
+    convert = (psf->m_add_clipping) ? f2lei_clip_array : f2lei_array;
     bufferlen = ARRAY_LEN(ubuf.ibuf);
 
     while (len > 0)
     {
         if (len < bufferlen)
             bufferlen = len;
-        convert(ptr + total, ubuf.ibuf, bufferlen, psf->norm_float);
+        convert(ptr + total, ubuf.ibuf, bufferlen, psf->m_norm_float);
         writecount = psf->fwrite(ubuf.ibuf, sizeof(int), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
@@ -2552,14 +2552,14 @@ static size_t pcm_write_d2sc(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    convert = (psf->add_clipping) ? d2sc_clip_array : d2sc_array;
+    convert = (psf->m_add_clipping) ? d2sc_clip_array : d2sc_array;
     bufferlen = ARRAY_LEN(ubuf.scbuf);
 
     while (len > 0)
     {
         if (len < bufferlen)
             bufferlen = len;
-        convert(ptr + total, ubuf.scbuf, bufferlen, psf->norm_double);
+        convert(ptr + total, ubuf.scbuf, bufferlen, psf->m_norm_double);
         writecount = psf->fwrite(ubuf.scbuf, sizeof(signed char), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
@@ -2615,14 +2615,14 @@ static size_t pcm_write_d2uc(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    convert = (psf->add_clipping) ? d2uc_clip_array : d2uc_array;
+    convert = (psf->m_add_clipping) ? d2uc_clip_array : d2uc_array;
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
 
     while (len > 0)
     {
         if (len < bufferlen)
             bufferlen = len;
-        convert(ptr + total, ubuf.ucbuf, bufferlen, psf->norm_double);
+        convert(ptr + total, ubuf.ucbuf, bufferlen, psf->m_norm_double);
         writecount = psf->fwrite(ubuf.ucbuf, sizeof(unsigned char), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
@@ -2692,14 +2692,14 @@ static size_t pcm_write_d2bes(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    convert = (psf->add_clipping) ? d2bes_clip_array : d2bes_array;
+    convert = (psf->m_add_clipping) ? d2bes_clip_array : d2bes_array;
     bufferlen = ARRAY_LEN(ubuf.sbuf);
 
     while (len > 0)
     {
         if (len < bufferlen)
             bufferlen = len;
-        convert(ptr + total, ubuf.sbuf, bufferlen, psf->norm_double);
+        convert(ptr + total, ubuf.sbuf, bufferlen, psf->m_norm_double);
         writecount = psf->fwrite(ubuf.sbuf, sizeof(short), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
@@ -2769,14 +2769,14 @@ static size_t pcm_write_d2les(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    convert = (psf->add_clipping) ? d2les_clip_array : d2les_array;
+    convert = (psf->m_add_clipping) ? d2les_clip_array : d2les_array;
     bufferlen = ARRAY_LEN(ubuf.sbuf);
 
     while (len > 0)
     {
         if (len < bufferlen)
             bufferlen = len;
-        convert(ptr + total, ubuf.sbuf, bufferlen, psf->norm_double);
+        convert(ptr + total, ubuf.sbuf, bufferlen, psf->m_norm_double);
         writecount = psf->fwrite(ubuf.sbuf, sizeof(short), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
@@ -2850,14 +2850,14 @@ static size_t pcm_write_d2let(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    convert = (psf->add_clipping) ? d2let_clip_array : d2let_array;
+    convert = (psf->m_add_clipping) ? d2let_clip_array : d2let_array;
     bufferlen = sizeof(ubuf.ucbuf) / SIZEOF_TRIBYTE;
 
     while (len > 0)
     {
         if (len < bufferlen)
             bufferlen = len;
-        convert(ptr + total, (tribyte *)(ubuf.ucbuf), bufferlen, psf->norm_double);
+        convert(ptr + total, (tribyte *)(ubuf.ucbuf), bufferlen, psf->m_norm_double);
         writecount = psf->fwrite(ubuf.ucbuf, SIZEOF_TRIBYTE, bufferlen);
         total += writecount;
         if (writecount < bufferlen)
@@ -2931,14 +2931,14 @@ static size_t pcm_write_d2bet(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    convert = (psf->add_clipping) ? d2bet_clip_array : d2bet_array;
+    convert = (psf->m_add_clipping) ? d2bet_clip_array : d2bet_array;
     bufferlen = sizeof(ubuf.ucbuf) / SIZEOF_TRIBYTE;
 
     while (len > 0)
     {
         if (len < bufferlen)
             bufferlen = len;
-        convert(ptr + total, (tribyte *)(ubuf.ucbuf), bufferlen, psf->norm_double);
+        convert(ptr + total, (tribyte *)(ubuf.ucbuf), bufferlen, psf->m_norm_double);
         writecount = psf->fwrite(ubuf.ucbuf, SIZEOF_TRIBYTE, bufferlen);
         total += writecount;
         if (writecount < bufferlen)
@@ -3016,14 +3016,14 @@ static size_t pcm_write_d2bei(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    convert = (psf->add_clipping) ? d2bei_clip_array : d2bei_array;
+    convert = (psf->m_add_clipping) ? d2bei_clip_array : d2bei_array;
     bufferlen = ARRAY_LEN(ubuf.ibuf);
 
     while (len > 0)
     {
         if (len < bufferlen)
             bufferlen = len;
-        convert(ptr + total, ubuf.ibuf, bufferlen, psf->norm_double);
+        convert(ptr + total, ubuf.ibuf, bufferlen, psf->m_norm_double);
         writecount = psf->fwrite(ubuf.ibuf, sizeof(int), bufferlen);
         total += writecount;
         if (writecount < bufferlen)
@@ -3101,14 +3101,14 @@ static size_t pcm_write_d2lei(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    convert = (psf->add_clipping) ? d2lei_clip_array : d2lei_array;
+    convert = (psf->m_add_clipping) ? d2lei_clip_array : d2lei_array;
     bufferlen = ARRAY_LEN(ubuf.ibuf);
 
     while (len > 0)
     {
         if (len < bufferlen)
             bufferlen = len;
-        convert(ptr + total, ubuf.ibuf, bufferlen, psf->norm_double);
+        convert(ptr + total, ubuf.ibuf, bufferlen, psf->m_norm_double);
         writecount = psf->fwrite(ubuf.ibuf, sizeof(int), bufferlen);
         total += writecount;
         if (writecount < bufferlen)

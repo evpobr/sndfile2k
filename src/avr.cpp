@@ -96,7 +96,7 @@ int avr_open(SF_PRIVATE *psf)
 {
     int error = 0;
 
-    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->m_mode == SFM_READ || (psf->m_mode == SFM_RDWR && psf->m_filelength > 0))
     {
         if ((error = avr_read_header(psf)))
             return error;
@@ -105,19 +105,19 @@ int avr_open(SF_PRIVATE *psf)
     if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_AVR)
         return SFE_BAD_OPEN_FORMAT;
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
-        psf->endian = SF_ENDIAN_BIG;
+        psf->m_endian = SF_ENDIAN_BIG;
 
         if (avr_write_header(psf, SF_FALSE))
-            return psf->error;
+            return psf->m_error;
 
         psf->write_header = avr_write_header;
     };
 
     psf->container_close = avr_close;
 
-    psf->blockwidth = psf->bytewidth * psf->sf.channels;
+    psf->m_blockwidth = psf->m_bytewidth * psf->sf.channels;
 
     error = pcm_init(psf);
 
@@ -150,17 +150,17 @@ static int avr_read_header(SF_PRIVATE *psf)
     {
     case ((8 << 16) + 0):
         psf->sf.format = SF_FORMAT_AVR | SF_FORMAT_PCM_U8;
-        psf->bytewidth = 1;
+        psf->m_bytewidth = 1;
         break;
 
     case ((8 << 16) + 1):
         psf->sf.format = SF_FORMAT_AVR | SF_FORMAT_PCM_S8;
-        psf->bytewidth = 1;
+        psf->m_bytewidth = 1;
         break;
 
     case ((16 << 16) + 1):
         psf->sf.format = SF_FORMAT_AVR | SF_FORMAT_PCM_16;
-        psf->bytewidth = 2;
+        psf->m_bytewidth = 2;
         break;
 
     default:
@@ -181,18 +181,18 @@ static int avr_read_header(SF_PRIVATE *psf)
 
     psf->log_printf("  Ext         : %s\n  User        : %s\n", hdr.ext, hdr.user);
 
-    psf->endian = SF_ENDIAN_BIG;
+    psf->m_endian = SF_ENDIAN_BIG;
 
-    psf->dataoffset = AVR_HDR_SIZE;
-    psf->datalength = hdr.frames * (hdr.rez / 8);
+    psf->m_dataoffset = AVR_HDR_SIZE;
+    psf->m_datalength = hdr.frames * (hdr.rez / 8);
 
-	if (psf->ftell() != psf->dataoffset)
-		psf->binheader_seekf(psf->dataoffset - psf->ftell(), SF_SEEK_CUR);
+	if (psf->ftell() != psf->m_dataoffset)
+		psf->binheader_seekf(psf->m_dataoffset - psf->ftell(), SF_SEEK_CUR);
 
-    psf->blockwidth = psf->sf.channels * psf->bytewidth;
+    psf->m_blockwidth = psf->sf.channels * psf->m_bytewidth;
 
-    if (psf->sf.frames == 0 && psf->blockwidth)
-        psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth;
+    if (psf->sf.frames == 0 && psf->m_blockwidth)
+        psf->sf.frames = (psf->m_filelength - psf->m_dataoffset) / psf->m_blockwidth;
 
     return 0;
 }
@@ -206,23 +206,23 @@ static int avr_write_header(SF_PRIVATE *psf, int calc_length)
 
     if (calc_length)
     {
-        psf->filelength = psf->get_filelen();
+        psf->m_filelength = psf->get_filelen();
 
-        psf->datalength = psf->filelength - psf->dataoffset;
-        if (psf->dataend)
-            psf->datalength -= psf->filelength - psf->dataend;
+        psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
+        if (psf->m_dataend)
+            psf->m_datalength -= psf->m_filelength - psf->m_dataend;
 
-        psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels);
+        psf->sf.frames = psf->m_datalength / (psf->m_bytewidth * psf->sf.channels);
     };
 
     /* Reset the current header length to zero. */
-    psf->header.ptr[0] = 0;
-    psf->header.indx = 0;
+    psf->m_header.ptr[0] = 0;
+    psf->m_header.indx = 0;
 
     psf->fseek(0, SEEK_SET);
 
     psf->binheader_writef("Emz22", BHWm(TWOBIT_MARKER), BHWz(8),
-                         BHW2(psf->sf.channels == 2 ? 0xFFFF : 0), BHW2(psf->bytewidth * 8));
+                         BHW2(psf->sf.channels == 2 ? 0xFFFF : 0), BHW2(psf->m_bytewidth * 8));
 
     sign = ((SF_CODEC(psf->sf.format)) == SF_FORMAT_PCM_U8) ? 0 : 0xFFFF;
 
@@ -233,22 +233,22 @@ static int avr_write_header(SF_PRIVATE *psf, int calc_length)
     psf->binheader_writef("E222zz", BHW2(0), BHW2(0), BHW2(0), BHWz(20), BHWz(64));
 
     /* Header construction complete so write it out. */
-    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
+    psf->fwrite(psf->m_header.ptr, psf->m_header.indx, 1);
 
-    if (psf->error)
-        return psf->error;
+    if (psf->m_error)
+        return psf->m_error;
 
-    psf->dataoffset = psf->header.indx;
+    psf->m_dataoffset = psf->m_header.indx;
 
     if (current > 0)
         psf->fseek(current, SEEK_SET);
 
-    return psf->error;
+    return psf->m_error;
 }
 
 static int avr_close(SF_PRIVATE *psf)
 {
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
         avr_write_header(psf, SF_TRUE);
 
     return 0;

@@ -120,13 +120,13 @@ int alac_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *info)
 {
     int error;
 
-    if ((psf->codec_data = calloc(1, sizeof(ALAC_PRIVATE) + psf->sf.channels * sizeof(int) *
+    if ((psf->m_codec_data = calloc(1, sizeof(ALAC_PRIVATE) + psf->sf.channels * sizeof(int) *
                                                                 ALAC_MAX_FRAME_SIZE)) == NULL)
         return SFE_MALLOC_FAILED;
 
     psf->codec_close = alac_close;
 
-    switch (psf->file_mode)
+    switch (psf->m_mode)
     {
     case SFM_RDWR:
         return SFE_BAD_MODE_RW;
@@ -178,9 +178,9 @@ static int alac_close(SF_PRIVATE *psf)
     ALAC_PRIVATE *plac;
     BUF_UNION ubuf;
 
-    plac = (ALAC_PRIVATE *)psf->codec_data;
+    plac = (ALAC_PRIVATE *)psf->m_codec_data;
 
-    if (psf->file_mode == SFM_WRITE)
+    if (psf->m_mode == SFM_WRITE)
     {
         ALAC_ENCODER *penc = &plac->encoder;
         SF_CHUNK_INFO chunk_info;
@@ -206,13 +206,13 @@ static int alac_close(SF_PRIVATE *psf)
         chunk_info.id_size = snprintf(chunk_info.id, sizeof(chunk_info.id), "kuki");
         chunk_info.data = kuki_data;
         chunk_info.datalen = plac->kuki_size;
-        psf_save_write_chunk(&psf->wchunks, &chunk_info);
+        psf_save_write_chunk(&psf->m_wchunks, &chunk_info);
 
         memset(&chunk_info, 0, sizeof(chunk_info));
         chunk_info.id_size = snprintf(chunk_info.id, sizeof(chunk_info.id), "pakt");
         chunk_info.data = alac_pakt_encode(psf, &pakt_size);
         chunk_info.datalen = pakt_size;
-        psf_save_write_chunk(&psf->wchunks, &chunk_info);
+        psf_save_write_chunk(&psf->m_wchunks, &chunk_info);
 
         free(chunk_info.data);
         chunk_info.data = NULL;
@@ -239,8 +239,8 @@ static int alac_close(SF_PRIVATE *psf)
 
 static int alac_byterate(SF_PRIVATE *psf)
 {
-    if (psf->file_mode == SFM_READ)
-        return (psf->datalength * psf->sf.samplerate) / psf->sf.frames;
+    if (psf->m_mode == SFM_READ)
+        return (psf->m_datalength * psf->sf.samplerate) / psf->sf.frames;
 
     return -1;
 }
@@ -273,7 +273,7 @@ static int alac_reader_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *inf
         return SFE_INTERNAL;
     };
 
-    plac = (ALAC_PRIVATE *)psf->codec_data;
+    plac = (ALAC_PRIVATE *)psf->m_codec_data;
 
     plac->channels = psf->sf.channels;
     plac->frames_per_block = info->frames_per_packet;
@@ -338,9 +338,9 @@ static int alac_writer_init(SF_PRIVATE *psf)
     ALAC_PRIVATE *plac;
     uint32_t alac_format_flags = 0;
 
-    plac = (ALAC_PRIVATE *)psf->codec_data;
+    plac = (ALAC_PRIVATE *)psf->m_codec_data;
 
-    if (psf->file_mode != SFM_WRITE)
+    if (psf->m_mode != SFM_WRITE)
         return SFE_BAD_MODE_RW;
 
     plac->channels = psf->sf.channels;
@@ -413,7 +413,7 @@ static sf_count_t alac_reader_calc_frames(SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 
     plac->pakt_info->current = 0;
 
-    while (current_pos < psf->filelength && current_pos > 0)
+    while (current_pos < psf->m_filelength && current_pos > 0)
     {
         current_pos = alac_reader_next_packet_size(plac->pakt_info);
         blocks = current_pos > 0 ? blocks + 1 : blocks;
@@ -499,7 +499,7 @@ static size_t alac_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     size_t k, readcount;
     size_t total = 0;
 
-    if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
+    if ((plac = (ALAC_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
     while (len > 0)
@@ -531,7 +531,7 @@ static size_t alac_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     size_t k, readcount;
     size_t total = 0;
 
-    if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
+    if ((plac = (ALAC_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
     while (len > 0)
@@ -564,10 +564,10 @@ static size_t alac_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
+    if ((plac = (ALAC_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0);
 
     while (len > 0)
     {
@@ -599,10 +599,10 @@ static size_t alac_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
+    if ((plac = (ALAC_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
-    normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? 1.0 / ((float)0x80000000) : 1.0;
 
     while (len > 0)
     {
@@ -631,29 +631,29 @@ static sf_count_t alac_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
     ALAC_PRIVATE *plac;
     int newblock, newsample;
 
-    if (!psf->codec_data)
+    if (!psf->m_codec_data)
         return 0;
-    plac = (ALAC_PRIVATE *)psf->codec_data;
+    plac = (ALAC_PRIVATE *)psf->m_codec_data;
 
-    if (psf->datalength < 0 || psf->dataoffset < 0)
+    if (psf->m_datalength < 0 || psf->m_dataoffset < 0)
     {
-        psf->error = SFE_BAD_SEEK;
+        psf->m_error = SFE_BAD_SEEK;
         return PSF_SEEK_ERROR;
     };
 
     if (offset == 0)
     {
-        psf->fseek(psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->m_dataoffset, SEEK_SET);
 
         plac->frames_this_block = 0;
-        plac->input_data_pos = psf->dataoffset;
+        plac->input_data_pos = psf->m_dataoffset;
         plac->pakt_info->current = 0;
         return 0;
     };
 
     if (offset < 0 || offset > plac->pakt_info->count * plac->frames_per_block)
     {
-        psf->error = SFE_BAD_SEEK;
+        psf->m_error = SFE_BAD_SEEK;
         return PSF_SEEK_ERROR;
     };
 
@@ -662,7 +662,7 @@ static sf_count_t alac_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
     if (mode == SFM_READ)
     {
-        plac->input_data_pos = psf->dataoffset + alac_pakt_block_offset(plac->pakt_info, newblock);
+        plac->input_data_pos = psf->m_dataoffset + alac_pakt_block_offset(plac->pakt_info, newblock);
 
         plac->pakt_info->current = newblock;
         alac_decode_block(psf, plac);
@@ -671,7 +671,7 @@ static sf_count_t alac_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
     else
     {
         /* What to do about write??? */
-        psf->error = SFE_BAD_SEEK;
+        psf->m_error = SFE_BAD_SEEK;
         return PSF_SEEK_ERROR;
     };
 
@@ -689,7 +689,7 @@ static size_t alac_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
     size_t k, writecount;
     size_t total = 0;
 
-    if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
+    if ((plac = (ALAC_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
     while (len > 0)
@@ -721,7 +721,7 @@ static size_t alac_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
     size_t k, writecount;
     size_t total = 0;
 
-    if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
+    if ((plac = (ALAC_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
     while (len > 0)
@@ -754,10 +754,10 @@ static size_t alac_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t writecount;
     size_t total = 0;
 
-    if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
+    if ((plac = (ALAC_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
-    convert = (psf->add_clipping) ? psf_f2i_clip_array : psf_f2i_array;
+    convert = (psf->m_add_clipping) ? psf_f2i_clip_array : psf_f2i_array;
 
     while (len > 0)
     {
@@ -766,7 +766,7 @@ static size_t alac_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
 
         iptr = plac->buffer + plac->partial_block_frames * plac->channels;
 
-        convert(ptr, iptr, writecount, psf->norm_float);
+        convert(ptr, iptr, writecount, psf->m_norm_float);
 
         plac->partial_block_frames += writecount / plac->channels;
         total += writecount;
@@ -788,10 +788,10 @@ static size_t alac_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t writecount;
     size_t total = 0;
 
-    if ((plac = (ALAC_PRIVATE *)psf->codec_data) == NULL)
+    if ((plac = (ALAC_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
-    convert = (psf->add_clipping) ? psf_d2i_clip_array : psf_d2i_array;
+    convert = (psf->m_add_clipping) ? psf_d2i_clip_array : psf_d2i_array;
 
     while (len > 0)
     {
@@ -800,7 +800,7 @@ static size_t alac_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
 
         iptr = plac->buffer + plac->partial_block_frames * plac->channels;
 
-        convert(ptr, iptr, writecount, psf->norm_float);
+        convert(ptr, iptr, writecount, psf->m_norm_float);
 
         plac->partial_block_frames += writecount / plac->channels;
         total += writecount;
@@ -936,7 +936,7 @@ static uint8_t *alac_pakt_encode(const SF_PRIVATE *psf, uint32_t *pakt_size_out)
     uint8_t *data;
     uint32_t k, allocated, pakt_size;
 
-    plac = (const ALAC_PRIVATE *)psf->codec_data;
+    plac = (const ALAC_PRIVATE *)psf->m_codec_data;
     info = plac->pakt_info;
 
     allocated = 100 + 2 * info->count;

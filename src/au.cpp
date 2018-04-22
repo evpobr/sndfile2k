@@ -131,7 +131,7 @@ int au_open(SF_PRIVATE *psf)
 {
     int error = 0;
 
-    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->m_mode == SFM_READ || (psf->m_mode == SFM_RDWR && psf->m_filelength > 0))
     {
         if ((error = au_read_header(psf)))
             return error;
@@ -142,21 +142,21 @@ int au_open(SF_PRIVATE *psf)
 
     int subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
-        psf->endian = SF_ENDIAN(psf->sf.format);
-        if (CPU_IS_LITTLE_ENDIAN && psf->endian == SF_ENDIAN_CPU)
+        psf->m_endian = SF_ENDIAN(psf->sf.format);
+        if (CPU_IS_LITTLE_ENDIAN && psf->m_endian == SF_ENDIAN_CPU)
         {
-            psf->endian = SF_ENDIAN_LITTLE;
+            psf->m_endian = SF_ENDIAN_LITTLE;
         }
-        else if (psf->endian != SF_ENDIAN_LITTLE)
+        else if (psf->m_endian != SF_ENDIAN_LITTLE)
         {
-            psf->endian = SF_ENDIAN_BIG;
+            psf->m_endian = SF_ENDIAN_BIG;
         }
 
         if (au_write_header(psf, SF_FALSE))
         {
-            return psf->error;
+            return psf->m_error;
         }
 
         psf->write_header = au_write_header;
@@ -164,7 +164,7 @@ int au_open(SF_PRIVATE *psf)
 
     psf->container_close = au_close;
 
-    psf->blockwidth = psf->bytewidth * psf->sf.channels;
+    psf->m_blockwidth = psf->m_bytewidth * psf->sf.channels;
 
     switch (subformat)
     {
@@ -218,7 +218,7 @@ int au_open(SF_PRIVATE *psf)
 
 static int au_close(SF_PRIVATE *psf)
 {
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
         au_write_header(psf, SF_TRUE);
 
     return 0;
@@ -230,22 +230,22 @@ static int au_write_header(SF_PRIVATE *psf, int calc_length)
 
     if (calc_length)
     {
-        psf->filelength = psf->get_filelen();
+        psf->m_filelength = psf->get_filelen();
 
-        psf->datalength = psf->filelength - psf->dataoffset;
-        if (psf->dataend)
+        psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
+        if (psf->m_dataend)
         {
-            psf->datalength -= psf->filelength - psf->dataend;
+            psf->m_datalength -= psf->m_filelength - psf->m_dataend;
         }
     };
 
     int encoding = au_format_to_encoding(SF_CODEC(psf->sf.format));
     if (!encoding)
-        return (psf->error = SFE_BAD_OPEN_FORMAT);
+        return (psf->m_error = SFE_BAD_OPEN_FORMAT);
 
     /* Reset the current header length to zero. */
-    psf->header.ptr[0] = 0;
-    psf->header.indx = 0;
+    psf->m_header.ptr[0] = 0;
+    psf->m_header.indx = 0;
 
     psf->fseek(0, SEEK_SET);
 
@@ -257,18 +257,18 @@ static int au_write_header(SF_PRIVATE *psf, int calc_length)
     
     int datalength;
 
-    if (psf->datalength < 0 || psf->datalength > 0x7FFFFFFF)
+    if (psf->m_datalength < 0 || psf->m_datalength > 0x7FFFFFFF)
         datalength = -1;
     else
-        datalength = (int)(psf->datalength & 0x7FFFFFFF);
+        datalength = (int)(psf->m_datalength & 0x7FFFFFFF);
 
-    if (psf->endian == SF_ENDIAN_BIG)
+    if (psf->m_endian == SF_ENDIAN_BIG)
     {
         psf->binheader_writef("Em4", BHWm(DOTSND_MARKER), BHW4(AU_DATA_OFFSET));
         psf->binheader_writef("E4444", BHW4(datalength), BHW4(encoding),
                              BHW4(psf->sf.samplerate), BHW4(psf->sf.channels));
     }
-    else if (psf->endian == SF_ENDIAN_LITTLE)
+    else if (psf->m_endian == SF_ENDIAN_LITTLE)
     {
         psf->binheader_writef("em4", BHWm(DNSDOT_MARKER), BHW4(AU_DATA_OFFSET));
         psf->binheader_writef("e4444", BHW4(datalength), BHW4(encoding),
@@ -276,21 +276,21 @@ static int au_write_header(SF_PRIVATE *psf, int calc_length)
     }
     else
     {
-        return (psf->error = SFE_BAD_OPEN_FORMAT);
+        return (psf->m_error = SFE_BAD_OPEN_FORMAT);
     }
 
     /* Header construction complete so write it out. */
-    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
+    psf->fwrite(psf->m_header.ptr, psf->m_header.indx, 1);
 
-    if (psf->error)
-        return psf->error;
+    if (psf->m_error)
+        return psf->m_error;
 
-    psf->dataoffset = psf->header.indx;
+    psf->m_dataoffset = psf->m_header.indx;
 
     if (current > 0)
         psf->fseek(current, SEEK_SET);
 
-    return psf->error;
+    return psf->m_error;
 }
 
 static int au_format_to_encoding(int format)
@@ -341,14 +341,14 @@ static int au_read_header(SF_PRIVATE *psf)
 
     if (marker == DOTSND_MARKER)
     {
-        psf->endian = SF_ENDIAN_BIG;
+        psf->m_endian = SF_ENDIAN_BIG;
 
         psf->binheader_readf("E44444", &(au_fmt.dataoffset), &(au_fmt.datasize),
                             &(au_fmt.encoding), &(au_fmt.samplerate), &(au_fmt.channels));
     }
     else if (marker == DNSDOT_MARKER)
     {
-        psf->endian = SF_ENDIAN_LITTLE;
+        psf->m_endian = SF_ENDIAN_LITTLE;
         psf->binheader_readf("e44444", &(au_fmt.dataoffset), &(au_fmt.datasize),
                             &(au_fmt.encoding), &(au_fmt.samplerate), &(au_fmt.channels));
     }
@@ -359,35 +359,35 @@ static int au_read_header(SF_PRIVATE *psf)
 
     psf->log_printf("  Data Offset : %d\n", au_fmt.dataoffset);
 
-    if (au_fmt.datasize == -1 || au_fmt.dataoffset + au_fmt.datasize == psf->filelength)
+    if (au_fmt.datasize == -1 || au_fmt.dataoffset + au_fmt.datasize == psf->m_filelength)
     {
         psf->log_printf("  Data Size   : %d\n", au_fmt.datasize);
     }
-    else if (au_fmt.dataoffset + au_fmt.datasize < psf->filelength)
+    else if (au_fmt.dataoffset + au_fmt.datasize < psf->m_filelength)
     {
-        psf->filelength = au_fmt.dataoffset + au_fmt.datasize;
+        psf->m_filelength = au_fmt.dataoffset + au_fmt.datasize;
         psf->log_printf("  Data Size   : %d\n", au_fmt.datasize);
     }
     else
     {
-        int dword = psf->filelength - au_fmt.dataoffset;
+        int dword = psf->m_filelength - au_fmt.dataoffset;
         psf->log_printf("  Data Size   : %d (should be %d)\n", au_fmt.datasize, dword);
         au_fmt.datasize = dword;
     };
 
-    psf->dataoffset = au_fmt.dataoffset;
-    psf->datalength = psf->filelength - psf->dataoffset;
+    psf->m_dataoffset = au_fmt.dataoffset;
+    psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
 
-	if (psf->ftell() < psf->dataoffset)
-		psf->binheader_seekf(psf->dataoffset - psf->ftell(), SF_SEEK_CUR);
+	if (psf->ftell() < psf->m_dataoffset)
+		psf->binheader_seekf(psf->m_dataoffset - psf->ftell(), SF_SEEK_CUR);
 
     psf->sf.samplerate = au_fmt.samplerate;
     psf->sf.channels = au_fmt.channels;
 
     /* Only fill in type major. */
-    if (psf->endian == SF_ENDIAN_BIG)
+    if (psf->m_endian == SF_ENDIAN_BIG)
         psf->sf.format = SF_FORMAT_AU;
-    else if (psf->endian == SF_ENDIAN_LITTLE)
+    else if (psf->m_endian == SF_ENDIAN_LITTLE)
         psf->sf.format = SF_ENDIAN_LITTLE | SF_FORMAT_AU;
 
     psf->log_printf("  Encoding    : %d => ", au_fmt.encoding);
@@ -398,67 +398,67 @@ static int au_read_header(SF_PRIVATE *psf)
     {
     case AU_ENCODING_ULAW_8:
         psf->sf.format |= SF_FORMAT_AU | SF_FORMAT_ULAW;
-        psf->bytewidth = 1; /* Before decoding */
+        psf->m_bytewidth = 1; /* Before decoding */
         psf->log_printf("8-bit ISDN u-law\n");
         break;
 
     case AU_ENCODING_PCM_8:
         psf->sf.format |= SF_FORMAT_AU | SF_FORMAT_PCM_S8;
-        psf->bytewidth = 1;
+        psf->m_bytewidth = 1;
         psf->log_printf("8-bit linear PCM\n");
         break;
 
     case AU_ENCODING_PCM_16:
         psf->sf.format |= SF_FORMAT_AU | SF_FORMAT_PCM_16;
-        psf->bytewidth = 2;
+        psf->m_bytewidth = 2;
         psf->log_printf("16-bit linear PCM\n");
         break;
 
     case AU_ENCODING_PCM_24:
         psf->sf.format |= SF_FORMAT_AU | SF_FORMAT_PCM_24;
-        psf->bytewidth = 3;
+        psf->m_bytewidth = 3;
         psf->log_printf("24-bit linear PCM\n");
         break;
 
     case AU_ENCODING_PCM_32:
         psf->sf.format |= SF_FORMAT_AU | SF_FORMAT_PCM_32;
-        psf->bytewidth = 4;
+        psf->m_bytewidth = 4;
         psf->log_printf("32-bit linear PCM\n");
         break;
 
     case AU_ENCODING_FLOAT:
         psf->sf.format |= SF_FORMAT_AU | SF_FORMAT_FLOAT;
-        psf->bytewidth = 4;
+        psf->m_bytewidth = 4;
         psf->log_printf("32-bit float\n");
         break;
 
     case AU_ENCODING_DOUBLE:
         psf->sf.format |= SF_FORMAT_AU | SF_FORMAT_DOUBLE;
-        psf->bytewidth = 8;
+        psf->m_bytewidth = 8;
         psf->log_printf("64-bit double precision float\n");
         break;
 
     case AU_ENCODING_ALAW_8:
         psf->sf.format |= SF_FORMAT_AU | SF_FORMAT_ALAW;
-        psf->bytewidth = 1; /* Before decoding */
+        psf->m_bytewidth = 1; /* Before decoding */
         psf->log_printf("8-bit ISDN A-law\n");
         break;
 
     case AU_ENCODING_ADPCM_G721_32:
         psf->sf.format |= SF_FORMAT_AU | SF_FORMAT_G721_32;
-        psf->bytewidth = 0;
+        psf->m_bytewidth = 0;
         psf->log_printf("G721 32kbs ADPCM\n");
         break;
 
     case AU_ENCODING_ADPCM_G723_24:
         psf->sf.format |= SF_FORMAT_AU | SF_FORMAT_G723_24;
-        psf->bytewidth = 0;
+        psf->m_bytewidth = 0;
         psf->log_printf("G723 24kbs ADPCM\n");
         break;
 
     case AU_ENCODING_ADPCM_G723_40:
         psf->sf.format |= SF_FORMAT_AU | SF_FORMAT_G723_40;
-        psf->bytewidth = 0;
+        psf->m_bytewidth = 0;
         psf->log_printf("G723 40kbs ADPCM\n");
         break;
 
@@ -489,10 +489,10 @@ static int au_read_header(SF_PRIVATE *psf)
 
     psf->log_printf("  Channels    : %d\n", au_fmt.channels);
 
-    psf->blockwidth = psf->sf.channels * psf->bytewidth;
+    psf->m_blockwidth = psf->sf.channels * psf->m_bytewidth;
 
-    if (!psf->sf.frames && psf->blockwidth)
-        psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth;
+    if (!psf->sf.frames && psf->m_blockwidth)
+        psf->sf.frames = (psf->m_filelength - psf->m_dataoffset) / psf->m_blockwidth;
 
     return 0;
 }

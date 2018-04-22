@@ -29,16 +29,16 @@ int raw_open(SF_PRIVATE *psf)
 
     subformat = SF_CODEC(psf->sf.format);
 
-    psf->endian = SF_ENDIAN(psf->sf.format);
+    psf->m_endian = SF_ENDIAN(psf->sf.format);
 
-    if (CPU_IS_BIG_ENDIAN && (psf->endian == 0 || psf->endian == SF_ENDIAN_CPU))
-        psf->endian = SF_ENDIAN_BIG;
-    else if (CPU_IS_LITTLE_ENDIAN && (psf->endian == 0 || psf->endian == SF_ENDIAN_CPU))
-        psf->endian = SF_ENDIAN_LITTLE;
+    if (CPU_IS_BIG_ENDIAN && (psf->m_endian == 0 || psf->m_endian == SF_ENDIAN_CPU))
+        psf->m_endian = SF_ENDIAN_BIG;
+    else if (CPU_IS_LITTLE_ENDIAN && (psf->m_endian == 0 || psf->m_endian == SF_ENDIAN_CPU))
+        psf->m_endian = SF_ENDIAN_LITTLE;
 
-    psf->blockwidth = psf->bytewidth * psf->sf.channels;
-    psf->dataoffset = 0;
-    psf->datalength = psf->filelength;
+    psf->m_blockwidth = psf->m_bytewidth * psf->sf.channels;
+    psf->m_dataoffset = 0;
+    psf->m_datalength = psf->m_filelength;
 
     switch (subformat)
     {

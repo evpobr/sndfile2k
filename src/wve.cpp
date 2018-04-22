@@ -44,18 +44,18 @@ int wve_open(SF_PRIVATE *psf)
 {
     int error = 0;
 
-    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->m_mode == SFM_READ || (psf->m_mode == SFM_RDWR && psf->m_filelength > 0))
     {
         if ((error = wve_read_header(psf)))
             return error;
     };
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_WVE)
             return SFE_BAD_OPEN_FORMAT;
 
-        psf->endian = SF_ENDIAN_BIG;
+        psf->m_endian = SF_ENDIAN_BIG;
 
         if ((error = wve_write_header(psf, SF_FALSE)))
             return error;
@@ -63,7 +63,7 @@ int wve_open(SF_PRIVATE *psf)
         psf->write_header = wve_write_header;
     };
 
-    psf->blockwidth = psf->bytewidth * psf->sf.channels;
+    psf->m_blockwidth = psf->m_bytewidth * psf->sf.channels;
 
     psf->container_close = wve_close;
 
@@ -118,15 +118,15 @@ static int wve_read_header(SF_PRIVATE *psf)
 
     uint32_t datalength;
     psf->binheader_readf("E4", &datalength);
-    psf->dataoffset = PSION_DATAOFFSET;
-    if (datalength != psf->filelength - psf->dataoffset)
+    psf->m_dataoffset = PSION_DATAOFFSET;
+    if (datalength != psf->m_filelength - psf->m_dataoffset)
     {
-        psf->datalength = psf->filelength - psf->dataoffset;
-        psf->log_printf("Data length %d should be %D\n", datalength, psf->datalength);
+        psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
+        psf->log_printf("Data length %d should be %D\n", datalength, psf->m_datalength);
     }
     else
     {
-        psf->datalength = datalength;
+        psf->m_datalength = datalength;
     }
 
     uint16_t padding, repeats, trash;
@@ -134,7 +134,7 @@ static int wve_read_header(SF_PRIVATE *psf)
 
     psf->sf.format = SF_FORMAT_WVE | SF_FORMAT_ALAW;
     psf->sf.samplerate = 8000;
-    psf->sf.frames = psf->datalength;
+    psf->sf.frames = psf->m_datalength;
     psf->sf.channels = 1;
 
     return SFE_NO_ERROR;
@@ -146,45 +146,45 @@ static int wve_write_header(SF_PRIVATE *psf, int calc_length)
 
     if (calc_length)
     {
-        psf->filelength = psf->get_filelen();
+        psf->m_filelength = psf->get_filelen();
 
-        psf->datalength = psf->filelength - psf->dataoffset;
-        if (psf->dataend)
-            psf->datalength -= psf->filelength - psf->dataend;
+        psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
+        if (psf->m_dataend)
+            psf->m_datalength -= psf->m_filelength - psf->m_dataend;
 
-        psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels);
+        psf->sf.frames = psf->m_datalength / (psf->m_bytewidth * psf->sf.channels);
     };
 
     /* Reset the current header length to zero. */
-    psf->header.ptr[0] = 0;
-    psf->header.indx = 0;
+    psf->m_header.ptr[0] = 0;
+    psf->m_header.indx = 0;
     psf->fseek(0, SEEK_SET);
 
     /* Write header. */
-    uint32_t datalen = (uint32_t)psf->datalength;
+    uint32_t datalen = (uint32_t)psf->m_datalength;
     psf->binheader_writef("Emmmm", BHWm(ALAW_MARKER), BHWm(SOUN_MARKER), BHWm(DFIL_MARKER),
                          BHWm(ESSN_MARKER));
     psf->binheader_writef("E2422222", BHW2(PSION_VERSION), BHW4(datalen), BHW2(0), BHW2(0),
                          BHW2(0), BHW2(0), BHW2(0));
-    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
+    psf->fwrite(psf->m_header.ptr, psf->m_header.indx, 1);
 
     if (psf->sf.channels != 1)
         return SFE_CHANNEL_COUNT;
 
-    if (psf->error)
-        return psf->error;
+    if (psf->m_error)
+        return psf->m_error;
 
-    psf->dataoffset = psf->header.indx;
+    psf->m_dataoffset = psf->m_header.indx;
 
     if (current > 0)
         psf->fseek(current, SEEK_SET);
 
-    return psf->error;
+    return psf->m_error;
 }
 
 static int wve_close(SF_PRIVATE *psf)
 {
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         /*
 		 * Now we know for certain the length of the file we can re-write

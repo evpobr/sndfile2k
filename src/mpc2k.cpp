@@ -57,7 +57,7 @@ int mpc2k_open(SF_PRIVATE *psf)
 {
     int error = 0;
 
-    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->m_mode == SFM_READ || (psf->m_mode == SFM_RDWR && psf->m_filelength > 0))
     {
         if ((error = mpc2k_read_header(psf)))
             return error;
@@ -66,17 +66,17 @@ int mpc2k_open(SF_PRIVATE *psf)
     if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_MPC2K)
         return SFE_BAD_OPEN_FORMAT;
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         if (mpc2k_write_header(psf, SF_FALSE))
-            return psf->error;
+            return psf->m_error;
 
         psf->write_header = mpc2k_write_header;
     };
 
     psf->container_close = mpc2k_close;
 
-    psf->blockwidth = psf->bytewidth * psf->sf.channels;
+    psf->m_blockwidth = psf->m_bytewidth * psf->sf.channels;
 
     error = pcm_init(psf);
 
@@ -85,7 +85,7 @@ int mpc2k_open(SF_PRIVATE *psf)
 
 static int mpc2k_close(SF_PRIVATE *psf)
 {
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
         mpc2k_write_header(psf, SF_TRUE);
 
     return 0;
@@ -100,21 +100,21 @@ static int mpc2k_write_header(SF_PRIVATE *psf, int calc_length)
 
     if (calc_length)
     {
-        psf->filelength = psf->get_filelen();
+        psf->m_filelength = psf->get_filelen();
 
-        psf->dataoffset = HEADER_LENGTH;
-        psf->datalength = psf->filelength - psf->dataoffset;
+        psf->m_dataoffset = HEADER_LENGTH;
+        psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
 
-        psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels);
+        psf->sf.frames = psf->m_datalength / (psf->m_bytewidth * psf->sf.channels);
     };
 
     /* Reset the current header length to zero. */
-    psf->header.ptr[0] = 0;
-    psf->header.indx = 0;
+    psf->m_header.ptr[0] = 0;
+    psf->m_header.indx = 0;
 
     psf->fseek(0, SEEK_SET);
 
-    snprintf(sample_name, sizeof(sample_name), "%s                    ", psf->_path);
+    snprintf(sample_name, sizeof(sample_name), "%s                    ", psf->m_path);
 
     psf->binheader_writef("e11b", BHW1(1), BHW1(4), BHWv(sample_name), BHWz(HEADER_NAME_LEN));
     psf->binheader_writef("e111", BHW1(100), BHW1(0), BHW1((psf->sf.channels - 1) & 1));
@@ -123,20 +123,20 @@ static int mpc2k_write_header(SF_PRIVATE *psf, int calc_length)
     psf->binheader_writef("e112", BHW1(0), BHW1(1), BHW2((uint16_t)psf->sf.samplerate));
 
     /* Always 16 bit little endian data. */
-    psf->bytewidth = 2;
-    psf->endian = SF_ENDIAN_LITTLE;
+    psf->m_bytewidth = 2;
+    psf->m_endian = SF_ENDIAN_LITTLE;
 
-    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
+    psf->fwrite(psf->m_header.ptr, psf->m_header.indx, 1);
 
-    if (psf->error)
-        return psf->error;
+    if (psf->m_error)
+        return psf->m_error;
 
-    psf->dataoffset = psf->header.indx;
+    psf->m_dataoffset = psf->m_header.indx;
 
     if (current > 0)
         psf->fseek(current, SEEK_SET);
 
-    return psf->error;
+    return psf->m_error;
 }
 
 static int mpc2k_read_header(SF_PRIVATE *psf)
@@ -178,17 +178,17 @@ static int mpc2k_read_header(SF_PRIVATE *psf)
 
     psf->sf.format = SF_FORMAT_MPC2K | SF_FORMAT_PCM_16;
 
-    psf->dataoffset = psf->ftell();
+    psf->m_dataoffset = psf->ftell();
 
     /* Always 16 bit little endian data. */
-    psf->bytewidth = 2;
-    psf->endian = SF_ENDIAN_LITTLE;
+    psf->m_bytewidth = 2;
+    psf->m_endian = SF_ENDIAN_LITTLE;
 
-    psf->datalength = psf->filelength - psf->dataoffset;
-    psf->blockwidth = psf->sf.channels * psf->bytewidth;
-    psf->sf.frames = psf->datalength / psf->blockwidth;
+    psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
+    psf->m_blockwidth = psf->sf.channels * psf->m_bytewidth;
+    psf->sf.frames = psf->m_datalength / psf->m_blockwidth;
 
-    psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth;
+    psf->sf.frames = (psf->m_filelength - psf->m_dataoffset) / psf->m_blockwidth;
 
     return 0;
 }

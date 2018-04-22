@@ -94,7 +94,7 @@ int voc_open(SF_PRIVATE *psf)
 {
     int subformat, error = 0;
 
-    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->m_mode == SFM_READ || (psf->m_mode == SFM_RDWR && psf->m_filelength > 0))
     {
         if ((error = voc_read_header(psf)))
             return error;
@@ -102,12 +102,12 @@ int voc_open(SF_PRIVATE *psf)
 
     subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_VOC)
             return SFE_BAD_OPEN_FORMAT;
 
-        psf->endian = SF_ENDIAN_LITTLE;
+        psf->m_endian = SF_ENDIAN_LITTLE;
 
         if ((error = voc_write_header(psf, SF_FALSE)))
             return error;
@@ -115,7 +115,7 @@ int voc_open(SF_PRIVATE *psf)
         psf->write_header = voc_write_header;
     };
 
-    psf->blockwidth = psf->bytewidth * psf->sf.channels;
+    psf->m_blockwidth = psf->m_bytewidth * psf->sf.channels;
 
     psf->container_close = voc_close;
 
@@ -166,28 +166,28 @@ static int voc_read_header(SF_PRIVATE *psf)
 
     offset += psf->binheader_readf("e222", &dataoffset, &version, &checksum);
 
-    psf->dataoffset = dataoffset;
+    psf->m_dataoffset = dataoffset;
 
     psf->log_printf(
                    "dataoffset : %d\n"
                    "version    : 0x%X\n"
                    "checksum   : 0x%X\n",
-                   psf->dataoffset, version, checksum);
+                   psf->m_dataoffset, version, checksum);
 
     if (version != 0x010A && version != 0x0114)
         return SFE_VOC_BAD_VERSION;
 
-    if (!(psf->codec_data = malloc(sizeof(VOC_DATA))))
+    if (!(psf->m_codec_data = malloc(sizeof(VOC_DATA))))
         return SFE_MALLOC_FAILED;
 
-    pvoc = (VOC_DATA *)psf->codec_data;
+    pvoc = (VOC_DATA *)psf->m_codec_data;
 
     memset(pvoc, 0, sizeof(VOC_DATA));
 
     /* Set the default encoding now. */
     psf->sf.format = SF_FORMAT_VOC; /* Major format */
     encoding = SF_FORMAT_PCM_U8; /* Minor format */
-    psf->endian = SF_ENDIAN_LITTLE;
+    psf->m_endian = SF_ENDIAN_LITTLE;
 
     while (1)
     {
@@ -246,26 +246,26 @@ static int voc_read_header(SF_PRIVATE *psf)
         psf->log_printf(" Sound Data : %d\n  sr   : %d => %dHz\n  comp : %d\n", size, rate_byte,
                        psf->sf.samplerate, compression);
 
-        if (offset + size - 1 > psf->filelength)
+        if (offset + size - 1 > psf->m_filelength)
         {
             psf->log_printf("Seems to be a truncated file.\n");
             psf->log_printf("offset: %d    size: %d    sum: %d    filelength: %D\n", offset,
-                           size, offset + size, psf->filelength);
+                           size, offset + size, psf->m_filelength);
             return SFE_VOC_BAD_SECTIONS;
         }
-        else if (psf->filelength - offset - size > 4)
+        else if (psf->m_filelength - offset - size > 4)
         {
             psf->log_printf("Seems to be a multi-segment file (#1).\n");
             psf->log_printf("offset: %d    size: %d    sum: %d    filelength: %D\n", offset,
-                           size, offset + size, psf->filelength);
+                           size, offset + size, psf->m_filelength);
             return SFE_VOC_BAD_SECTIONS;
         };
 
-        psf->dataoffset = offset;
-        psf->dataend = psf->filelength - 1;
+        psf->m_dataoffset = offset;
+        psf->m_dataend = psf->m_filelength - 1;
 
         psf->sf.channels = 1;
-        psf->bytewidth = 1;
+        psf->m_bytewidth = 1;
 
         psf->sf.format = SF_FORMAT_VOC | SF_FORMAT_PCM_U8;
 
@@ -320,25 +320,25 @@ static int voc_read_header(SF_PRIVATE *psf)
                        "  comp   : %d\n",
                        size, rate_byte, compression);
 
-        if (offset + size - 1 > psf->filelength)
+        if (offset + size - 1 > psf->m_filelength)
         {
             psf->log_printf("Seems to be a truncated file.\n");
             psf->log_printf("offset: %d    size: %d    sum: %d    filelength: %D\n", offset,
-                           size, offset + size, psf->filelength);
+                           size, offset + size, psf->m_filelength);
             return SFE_VOC_BAD_SECTIONS;
         }
-        else if (offset + size - 1 < psf->filelength)
+        else if (offset + size - 1 < psf->m_filelength)
         {
             psf->log_printf("Seems to be a multi-segment file (#2).\n");
             psf->log_printf("offset: %d    size: %d    sum: %d    filelength: %D\n", offset,
-                           size, offset + size, psf->filelength);
+                           size, offset + size, psf->m_filelength);
             return SFE_VOC_BAD_SECTIONS;
         };
 
-        psf->dataoffset = offset;
-        psf->dataend = psf->filelength - 1;
+        psf->m_dataoffset = offset;
+        psf->m_dataend = psf->m_filelength - 1;
 
-        psf->bytewidth = 1;
+        psf->m_bytewidth = 1;
 
         psf->sf.format = SF_FORMAT_VOC | SF_FORMAT_PCM_U8;
 
@@ -353,9 +353,9 @@ static int voc_read_header(SF_PRIVATE *psf)
         offset += psf->binheader_readf("e341124", &size, &psf->sf.samplerate, &bitwidth,
                                       &channels, &encoding, &fourbytes);
 
-        if (size * 2 == psf->filelength - 39)
+        if (size * 2 == psf->m_filelength - 39)
         {
-            int temp_size = psf->filelength - 31;
+            int temp_size = psf->m_filelength - 31;
 
             psf->log_printf(" Extended II : %d (SoX bug: should be %d)\n", size, temp_size);
             size = temp_size;
@@ -382,47 +382,47 @@ static int voc_read_header(SF_PRIVATE *psf)
 
         psf->sf.channels = channels;
 
-        psf->dataoffset = offset;
-        psf->dataend = psf->filelength - 1;
+        psf->m_dataoffset = offset;
+        psf->m_dataend = psf->m_filelength - 1;
 
-        if (size + 31 == psf->filelength + 1)
+        if (size + 31 == psf->m_filelength + 1)
         {
             /*
 			 * Hack for reading files produced using
 			 * sf_command (SFC_UPDATE_HEADER_NOW).
 			 */
             psf->log_printf("Missing zero byte at end of file.\n");
-            size = psf->filelength - 30;
-            psf->dataend = 0;
+            size = psf->m_filelength - 30;
+            psf->m_dataend = 0;
         }
-        else if (size + 31 > psf->filelength)
+        else if (size + 31 > psf->m_filelength)
         {
             psf->log_printf("Seems to be a truncated file.\n");
-            size = psf->filelength - 31;
+            size = psf->m_filelength - 31;
         }
-        else if (size + 31 < psf->filelength)
+        else if (size + 31 < psf->m_filelength)
             psf->log_printf("Seems to be a multi-segment file (#3).\n");
 
         switch (encoding)
         {
         case 0:
             psf->sf.format = SF_FORMAT_VOC | SF_FORMAT_PCM_U8;
-            psf->bytewidth = 1;
+            psf->m_bytewidth = 1;
             break;
 
         case 4:
             psf->sf.format = SF_FORMAT_VOC | SF_FORMAT_PCM_16;
-            psf->bytewidth = 2;
+            psf->m_bytewidth = 2;
             break;
 
         case 6:
             psf->sf.format = SF_FORMAT_VOC | SF_FORMAT_ALAW;
-            psf->bytewidth = 1;
+            psf->m_bytewidth = 1;
             break;
 
         case 7:
             psf->sf.format = SF_FORMAT_VOC | SF_FORMAT_ULAW;
-            psf->bytewidth = 1;
+            psf->m_bytewidth = 1;
             break;
 
         default: /* Unknown */
@@ -443,19 +443,19 @@ static int voc_write_header(SF_PRIVATE *psf, int calc_length)
 
     if (calc_length)
     {
-        psf->filelength = psf->get_filelen();
+        psf->m_filelength = psf->get_filelen();
 
-        psf->datalength = psf->filelength - psf->dataoffset;
-        if (psf->dataend)
-            psf->datalength -= psf->filelength - psf->dataend;
+        psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
+        if (psf->m_dataend)
+            psf->m_datalength -= psf->m_filelength - psf->m_dataend;
 
-        psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels);
+        psf->sf.frames = psf->m_datalength / (psf->m_bytewidth * psf->sf.channels);
     };
 
     subformat = SF_CODEC(psf->sf.format);
     /* Reset the current header length to zero. */
-    psf->header.ptr[0] = 0;
-    psf->header.indx = 0;
+    psf->m_header.ptr[0] = 0;
+    psf->m_header.indx = 0;
     psf->fseek(0, SEEK_SET);
 
     /* VOC marker and 0x1A byte. */
@@ -477,7 +477,7 @@ static int voc_write_header(SF_PRIVATE *psf, int calc_length)
         rate_const = 256 - 1000000 / psf->sf.samplerate;
 
         /* First type marker, length, rate_const and compression */
-        psf->binheader_writef("e1311", BHW1(VOC_SOUND_DATA), BHW3((int)(psf->datalength + 1)),
+        psf->binheader_writef("e1311", BHW1(VOC_SOUND_DATA), BHW3((int)(psf->m_datalength + 1)),
                              BHW1(rate_const), BHW1(0));
     }
     else if (subformat == SF_FORMAT_PCM_U8 && psf->sf.channels == 2)
@@ -499,7 +499,7 @@ static int voc_write_header(SF_PRIVATE *psf, int calc_length)
 		 * Now write the VOC_SOUND_DATA section
 		 * marker, length, rate_const and compression
 		 */
-        psf->binheader_writef("e1311", BHW1(VOC_SOUND_DATA), BHW3((int)(psf->datalength + 1)),
+        psf->binheader_writef("e1311", BHW1(VOC_SOUND_DATA), BHW3((int)(psf->m_datalength + 1)),
                              BHW1(rate_const), BHW1(0));
     }
     else
@@ -512,8 +512,8 @@ static int voc_write_header(SF_PRIVATE *psf, int calc_length)
         switch (subformat)
         {
         case SF_FORMAT_PCM_U8:
-            psf->bytewidth = 1;
-            length = psf->sf.frames * psf->sf.channels * psf->bytewidth + 12;
+            psf->m_bytewidth = 1;
+            length = psf->sf.frames * psf->sf.channels * psf->m_bytewidth + 12;
             /* Marker, length, sample rate, bitwidth, stereo flag, encoding and fourt zero bytes. */
             psf->binheader_writef("e1341124", BHW1(VOC_EXTENDED_II), BHW3(length),
                                  BHW4(psf->sf.samplerate), BHW1(16), BHW1(psf->sf.channels),
@@ -521,8 +521,8 @@ static int voc_write_header(SF_PRIVATE *psf, int calc_length)
             break;
 
         case SF_FORMAT_PCM_16:
-            psf->bytewidth = 2;
-            length = psf->sf.frames * psf->sf.channels * psf->bytewidth + 12;
+            psf->m_bytewidth = 2;
+            length = psf->sf.frames * psf->sf.channels * psf->m_bytewidth + 12;
             /* Marker, length, sample rate, bitwidth, stereo flag, encoding and fourt zero bytes. */
             psf->binheader_writef("e1341124", BHW1(VOC_EXTENDED_II), BHW3(length),
                                  BHW4(psf->sf.samplerate), BHW1(16), BHW1(psf->sf.channels),
@@ -530,16 +530,16 @@ static int voc_write_header(SF_PRIVATE *psf, int calc_length)
             break;
 
         case SF_FORMAT_ALAW:
-            psf->bytewidth = 1;
-            length = psf->sf.frames * psf->sf.channels * psf->bytewidth + 12;
+            psf->m_bytewidth = 1;
+            length = psf->sf.frames * psf->sf.channels * psf->m_bytewidth + 12;
             psf->binheader_writef("e1341124", BHW1(VOC_EXTENDED_II), BHW3(length),
                                  BHW4(psf->sf.samplerate), BHW1(8), BHW1(psf->sf.channels), BHW2(6),
                                  BHW4(0));
             break;
 
         case SF_FORMAT_ULAW:
-            psf->bytewidth = 1;
-            length = psf->sf.frames * psf->sf.channels * psf->bytewidth + 12;
+            psf->m_bytewidth = 1;
+            length = psf->sf.frames * psf->sf.channels * psf->m_bytewidth + 12;
             psf->binheader_writef("e1341124", BHW1(VOC_EXTENDED_II), BHW3(length),
                                  BHW4(psf->sf.samplerate), BHW1(8), BHW1(psf->sf.channels), BHW2(7),
                                  BHW4(0));
@@ -550,22 +550,22 @@ static int voc_write_header(SF_PRIVATE *psf, int calc_length)
         };
     };
 
-    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
+    psf->fwrite(psf->m_header.ptr, psf->m_header.indx, 1);
 
-    if (psf->error)
-        return psf->error;
+    if (psf->m_error)
+        return psf->m_error;
 
-    psf->dataoffset = psf->header.indx;
+    psf->m_dataoffset = psf->m_header.indx;
 
     if (current > 0)
         psf->fseek(current, SEEK_SET);
 
-    return psf->error;
+    return psf->m_error;
 }
 
 static int voc_close(SF_PRIVATE *psf)
 {
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         /*
 		 * Now we know for certain the length of the file we can re-write

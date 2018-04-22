@@ -33,10 +33,10 @@
 do                                                                       \
     \
 {                                                                       \
-        psf->parselog.indx = 0;                                              \
+        psf->m_parselog.indx = 0;                                              \
         snprintf(buffer, sizeof(buffer), (fmt));                             \
         psf->log_printf((fmt));                                          \
-        err += compare_strings_or_die(line, fmt, buffer, psf->parselog.buf); \
+        err += compare_strings_or_die(line, fmt, buffer, psf->m_parselog.buf); \
     \
 }                                                                       \
     while (0)                                                                \
@@ -47,10 +47,10 @@ do                                                                       \
 do                                                                       \
     \
 {                                                                       \
-        psf->parselog.indx = 0;                                              \
+        psf->m_parselog.indx = 0;                                              \
         snprintf(buffer, sizeof(buffer), (fmt), (a), (a));                   \
         psf->log_printf((fmt), (a), (a));                                \
-        err += compare_strings_or_die(line, fmt, buffer, psf->parselog.buf); \
+        err += compare_strings_or_die(line, fmt, buffer, psf->m_parselog.buf); \
     \
 }                                                                       \
     while (0)                                                                \
@@ -61,10 +61,10 @@ do                                                                       \
 do                                                                       \
     \
 {                                                                       \
-        psf->parselog.indx = 0;                                              \
+        psf->m_parselog.indx = 0;                                              \
         snprintf(buffer, sizeof(buffer), (fmt), (a), (a), (a), (a));         \
         psf->log_printf((fmt), (a), (a), (a), (a));                      \
-        err += compare_strings_or_die(line, fmt, buffer, psf->parselog.buf); \
+        err += compare_strings_or_die(line, fmt, buffer, psf->m_parselog.buf); \
     \
 }                                                                       \
     while (0)                                                                \
@@ -76,10 +76,10 @@ do                                                                       \
     \
 {                                                                       \
                                                                              \
-        psf->parselog.indx = 0;                                              \
+        psf->m_parselog.indx = 0;                                              \
         snprintf(buffer, sizeof(buffer), (fmt), (a), (a), (a), (a), (a));    \
         psf->log_printf((fmt), (a), (a), (a), (a), (a));                 \
-        err += compare_strings_or_die(line, fmt, buffer, psf->parselog.buf); \
+        err += compare_strings_or_die(line, fmt, buffer, psf->m_parselog.buf); \
     \
 }                                                                       \
     while (0)                                                                \
@@ -90,10 +90,10 @@ do                                                                       \
 do                                                                         \
     \
 {                                                                         \
-        psf->parselog.indx = 0;                                                \
+        psf->m_parselog.indx = 0;                                                \
         snprintf(buffer, sizeof(buffer), (fmt), (a), (a), (a), (a), (a), (a)); \
         psf->log_printf((fmt), (a), (a), (a), (a), (a), (a));              \
-        err += compare_strings_or_die(line, fmt, buffer, psf->parselog.buf);   \
+        err += compare_strings_or_die(line, fmt, buffer, psf->m_parselog.buf);   \
     \
 }                                                                         \
     while (0)                                                                  \

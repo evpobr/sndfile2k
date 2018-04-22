@@ -72,7 +72,7 @@ int mat5_open(SF_PRIVATE *psf)
 {
     int subformat, error = 0;
 
-    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->m_mode == SFM_READ || (psf->m_mode == SFM_RDWR && psf->m_filelength > 0))
     {
         if ((error = mat5_read_header(psf)))
             return error;
@@ -83,13 +83,13 @@ int mat5_open(SF_PRIVATE *psf)
 
     subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
-        psf->endian = SF_ENDIAN(psf->sf.format);
-        if (CPU_IS_LITTLE_ENDIAN && (psf->endian == SF_ENDIAN_CPU || psf->endian == 0))
-            psf->endian = SF_ENDIAN_LITTLE;
-        else if (CPU_IS_BIG_ENDIAN && (psf->endian == SF_ENDIAN_CPU || psf->endian == 0))
-            psf->endian = SF_ENDIAN_BIG;
+        psf->m_endian = SF_ENDIAN(psf->sf.format);
+        if (CPU_IS_LITTLE_ENDIAN && (psf->m_endian == SF_ENDIAN_CPU || psf->m_endian == 0))
+            psf->m_endian = SF_ENDIAN_LITTLE;
+        else if (CPU_IS_BIG_ENDIAN && (psf->m_endian == SF_ENDIAN_CPU || psf->m_endian == 0))
+            psf->m_endian = SF_ENDIAN_BIG;
 
         if ((error = mat5_write_header(psf, SF_FALSE)))
             return error;
@@ -99,7 +99,7 @@ int mat5_open(SF_PRIVATE *psf)
 
     psf->container_close = mat5_close;
 
-    psf->blockwidth = psf->bytewidth * psf->sf.channels;
+    psf->m_blockwidth = psf->m_bytewidth * psf->sf.channels;
 
     switch (subformat)
     {
@@ -126,7 +126,7 @@ int mat5_open(SF_PRIVATE *psf)
 
 static int mat5_close(SF_PRIVATE *psf)
 {
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
         mat5_write_header(psf, SF_TRUE);
 
     return 0;
@@ -150,14 +150,14 @@ static int mat5_write_header(SF_PRIVATE *psf, int calc_length)
     if (calc_length)
     {
         psf->fseek(0, SEEK_END);
-        psf->filelength = psf->ftell();
+        psf->m_filelength = psf->ftell();
         psf->fseek(0, SEEK_SET);
 
-        psf->datalength = psf->filelength - psf->dataoffset;
-        if (psf->dataend)
-            psf->datalength -= psf->filelength - psf->dataend;
+        psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
+        if (psf->m_dataend)
+            psf->m_datalength -= psf->m_filelength - psf->m_dataend;
 
-        psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels);
+        psf->sf.frames = psf->m_datalength / (psf->m_bytewidth * psf->sf.channels);
     };
 
     switch (SF_CODEC(psf->sf.format))
@@ -187,20 +187,20 @@ static int mat5_write_header(SF_PRIVATE *psf, int calc_length)
     };
 
     /* Reset the current header length to zero. */
-    psf->header.ptr[0] = 0;
-    psf->header.indx = 0;
+    psf->m_header.ptr[0] = 0;
+    psf->m_header.indx = 0;
     psf->fseek(0, SEEK_SET);
 
     psf_get_date_str(buffer, sizeof(buffer));
     psf->binheader_writef("bb", BHWv(filename), BHWz(strlen(filename)), BHWv(buffer),
                          BHWz(strlen(buffer) + 1));
 
-    memset(buffer, ' ', 124 - psf->header.indx);
-    psf->binheader_writef("b", BHWv(buffer), BHWz(124 - psf->header.indx));
+    memset(buffer, ' ', 124 - psf->m_header.indx);
+    psf->binheader_writef("b", BHWv(buffer), BHWz(124 - psf->m_header.indx));
 
-    psf->rwf_endian = psf->endian;
+    psf->m_rwf_endian = psf->m_endian;
 
-    if (psf->rwf_endian == SF_ENDIAN_BIG)
+    if (psf->m_rwf_endian == SF_ENDIAN_BIG)
         psf->binheader_writef("2b", BHW2(0x0100), BHWv("MI"), BHWz(2));
     else
         psf->binheader_writef("2b", BHW2(0x0100), BHWv("IM"), BHWz(2));
@@ -222,7 +222,7 @@ static int mat5_write_header(SF_PRIVATE *psf, int calc_length)
         psf->binheader_writef("422", BHW4(MAT5_TYPE_COMP_USHORT), BHW2(samplerate), BHW2(0));
     };
 
-    datasize = psf->sf.frames * psf->sf.channels * psf->bytewidth;
+    datasize = psf->sf.frames * psf->sf.channels * psf->m_bytewidth;
 
     psf->binheader_writef("t484444", BHW4(MAT5_TYPE_ARRAY), BHW8(datasize + 64),
                          BHW4(MAT5_TYPE_UINT32), BHW4(8), BHW4(6), BHW4(0));
@@ -231,24 +231,24 @@ static int mat5_write_header(SF_PRIVATE *psf, int calc_length)
     psf->binheader_writef("44b", BHW4(MAT5_TYPE_SCHAR), BHW4(strlen(wd_name)), BHWv(wd_name),
                          BHWz(strlen(wd_name)));
 
-    datasize = psf->sf.frames * psf->sf.channels * psf->bytewidth;
+    datasize = psf->sf.frames * psf->sf.channels * psf->m_bytewidth;
     if (datasize > 0x7FFFFFFF)
         datasize = 0x7FFFFFFF;
 
     psf->binheader_writef("t48", BHW4(encoding), BHW8(datasize));
 
     /* Header construction complete so write it out. */
-    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
+    psf->fwrite(psf->m_header.ptr, psf->m_header.indx, 1);
 
-    if (psf->error)
-        return psf->error;
+    if (psf->m_error)
+        return psf->m_error;
 
-    psf->dataoffset = psf->header.indx;
+    psf->m_dataoffset = psf->m_header.indx;
 
     if (current > 0)
         psf->fseek(current, SEEK_SET);
 
-    return psf->error;
+    return psf->m_error;
 } /* mat5_write_header */
 
 static int mat5_read_header(SF_PRIVATE *psf)
@@ -274,13 +274,13 @@ static int mat5_read_header(SF_PRIVATE *psf)
 
     if (endian == MI_MARKER)
     {
-        psf->endian = psf->rwf_endian = SF_ENDIAN_BIG;
+        psf->m_endian = psf->m_rwf_endian = SF_ENDIAN_BIG;
         if (CPU_IS_LITTLE_ENDIAN)
             version = ENDSWAP_16(version);
     }
     else if (endian == IM_MARKER)
     {
-        psf->endian = psf->rwf_endian = SF_ENDIAN_LITTLE;
+        psf->m_endian = psf->m_rwf_endian = SF_ENDIAN_LITTLE;
         if (CPU_IS_BIG_ENDIAN)
             version = ENDSWAP_16(version);
     }
@@ -292,7 +292,7 @@ static int mat5_read_header(SF_PRIVATE *psf)
 
     psf->log_printf("Version : 0x%04X\n", version);
     psf->log_printf("Endian  : 0x%04X => %s\n", endian,
-                   (psf->endian == SF_ENDIAN_LITTLE) ? "Little" : "Big");
+                   (psf->m_endian == SF_ENDIAN_LITTLE) ? "Little" : "Big");
 
     /*========================================================*/
     psf->binheader_readf("44", &type, &size);
@@ -477,38 +477,38 @@ skip_samplerate:
     psf->sf.channels = rows;
     psf->sf.frames = cols;
 
-    psf->sf.format = psf->endian | SF_FORMAT_MAT5;
+    psf->sf.format = psf->m_endian | SF_FORMAT_MAT5;
 
     switch (type)
     {
     case MAT5_TYPE_DOUBLE:
         psf->log_printf("Data type : double\n");
         psf->sf.format |= SF_FORMAT_DOUBLE;
-        psf->bytewidth = 8;
+        psf->m_bytewidth = 8;
         break;
 
     case MAT5_TYPE_FLOAT:
         psf->log_printf("Data type : float\n");
         psf->sf.format |= SF_FORMAT_FLOAT;
-        psf->bytewidth = 4;
+        psf->m_bytewidth = 4;
         break;
 
     case MAT5_TYPE_INT32:
         psf->log_printf("Data type : 32 bit PCM\n");
         psf->sf.format |= SF_FORMAT_PCM_32;
-        psf->bytewidth = 4;
+        psf->m_bytewidth = 4;
         break;
 
     case MAT5_TYPE_INT16:
         psf->log_printf("Data type : 16 bit PCM\n");
         psf->sf.format |= SF_FORMAT_PCM_16;
-        psf->bytewidth = 2;
+        psf->m_bytewidth = 2;
         break;
 
     case MAT5_TYPE_UCHAR:
         psf->log_printf("Data type : unsigned 8 bit PCM\n");
         psf->sf.format |= SF_FORMAT_PCM_U8;
-        psf->bytewidth = 1;
+        psf->m_bytewidth = 1;
         break;
 
     default:
@@ -516,8 +516,8 @@ skip_samplerate:
         return SFE_UNIMPLEMENTED;
     };
 
-    psf->dataoffset = psf->ftell();
-    psf->datalength = psf->filelength - psf->dataoffset;
+    psf->m_dataoffset = psf->ftell();
+    psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
 
     return 0;
 } /* mat5_read_header */

@@ -58,14 +58,14 @@ int xi_open(SF_PRIVATE *psf)
     XI_PRIVATE *pxi;
     int subformat, error = 0;
 
-    if (psf->codec_data)
-        pxi = (XI_PRIVATE *)psf->codec_data;
+    if (psf->m_codec_data)
+        pxi = (XI_PRIVATE *)psf->m_codec_data;
     else if ((pxi = (XI_PRIVATE *)calloc(1, sizeof(XI_PRIVATE))) == NULL)
         return SFE_MALLOC_FAILED;
 
-    psf->codec_data = pxi;
+    psf->m_codec_data = pxi;
 
-    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->m_mode == SFM_READ || (psf->m_mode == SFM_RDWR && psf->m_filelength > 0))
     {
         if ((error = xi_read_header(psf)))
             return error;
@@ -73,12 +73,12 @@ int xi_open(SF_PRIVATE *psf)
 
     subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_XI)
             return SFE_BAD_OPEN_FORMAT;
 
-        psf->endian = SF_ENDIAN_LITTLE;
+        psf->m_endian = SF_ENDIAN_LITTLE;
         psf->sf.channels = 1; /* Always mono */
         psf->sf.samplerate = 44100; /* Always */
 
@@ -93,7 +93,7 @@ int xi_open(SF_PRIVATE *psf)
         pxi->sample_flags = (subformat == SF_FORMAT_DPCM_16) ? 16 : 0;
 
         if (xi_write_header(psf, SF_FALSE))
-            return psf->error;
+            return psf->m_error;
 
         psf->write_header = xi_write_header;
     };
@@ -103,7 +103,7 @@ int xi_open(SF_PRIVATE *psf)
 
     psf->sf.seekable = SF_FALSE;
 
-    psf->blockwidth = psf->bytewidth * psf->sf.channels;
+    psf->m_blockwidth = psf->m_bytewidth * psf->sf.channels;
 
     switch (subformat)
     {
@@ -152,14 +152,14 @@ static size_t dpcm_write_d2dles(SF_PRIVATE *psf, const double *ptr, size_t len);
 
 static int dpcm_init(SF_PRIVATE *psf)
 {
-    if (psf->bytewidth == 0 || psf->sf.channels == 0)
+    if (psf->m_bytewidth == 0 || psf->sf.channels == 0)
         return SFE_INTERNAL;
 
-    psf->blockwidth = psf->bytewidth * psf->sf.channels;
+    psf->m_blockwidth = psf->m_bytewidth * psf->sf.channels;
 
-    if (psf->file_mode == SFM_READ || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_READ || psf->m_mode == SFM_RDWR)
     {
-        switch (psf->bytewidth)
+        switch (psf->m_bytewidth)
         {
         case 1:
             psf->read_short = dpcm_read_dsc2s;
@@ -179,9 +179,9 @@ static int dpcm_init(SF_PRIVATE *psf)
         };
     };
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
-        switch (psf->bytewidth)
+        switch (psf->m_bytewidth)
         {
         case 1:
             psf->write_short = dpcm_write_s2dsc;
@@ -201,10 +201,10 @@ static int dpcm_init(SF_PRIVATE *psf)
         };
     };
 
-    psf->filelength = psf->get_filelen();
-    psf->datalength =
-        (psf->dataend) ? psf->dataend - psf->dataoffset : psf->filelength - psf->dataoffset;
-    psf->sf.frames = psf->datalength / psf->blockwidth;
+    psf->m_filelength = psf->get_filelen();
+    psf->m_datalength =
+        (psf->m_dataend) ? psf->m_dataend - psf->m_dataoffset : psf->m_filelength - psf->m_dataoffset;
+    psf->sf.frames = psf->m_datalength / psf->m_blockwidth;
 
     return 0;
 }
@@ -215,36 +215,36 @@ static sf_count_t dpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
     XI_PRIVATE *pxi;
     size_t total, bufferlen, len;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return SFE_INTERNAL;
 
-    if (psf->datalength < 0 || psf->dataoffset < 0)
+    if (psf->m_datalength < 0 || psf->m_dataoffset < 0)
     {
-        psf->error = SFE_BAD_SEEK;
+        psf->m_error = SFE_BAD_SEEK;
         return PSF_SEEK_ERROR;
     };
 
     if (offset == 0)
     {
-        psf->fseek(psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->m_dataoffset, SEEK_SET);
         pxi->last_16 = 0;
         return 0;
     };
 
     if (offset < 0 || offset > psf->sf.frames)
     {
-        psf->error = SFE_BAD_SEEK;
+        psf->m_error = SFE_BAD_SEEK;
         return PSF_SEEK_ERROR;
     };
 
     if (mode != SFM_READ)
     {
         /* What to do about write??? */
-        psf->error = SFE_BAD_SEEK;
+        psf->m_error = SFE_BAD_SEEK;
         return PSF_SEEK_ERROR;
     };
 
-    psf->fseek(psf->dataoffset, SEEK_SET);
+    psf->fseek(psf->m_dataoffset, SEEK_SET);
 
     if ((SF_CODEC(psf->sf.format)) == SF_FORMAT_DPCM_16)
     {
@@ -276,14 +276,14 @@ static int xi_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     sf_count_t current;
     const char *string;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return SFE_INTERNAL;
 
     current = psf->ftell();
 
     /* Reset the current header length to zero. */
-    psf->header.ptr[0] = 0;
-    psf->header.indx = 0;
+    psf->m_header.ptr[0] = 0;
+    psf->m_header.indx = 0;
     psf->fseek(0, SEEK_SET);
 
     string = "Extended Instrument: ";
@@ -319,17 +319,17 @@ static int xi_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     psf->binheader_writef("b", BHWv(pxi->sample_name), BHWz(sizeof(pxi->sample_name)));
 
     /* Header construction complete so write it out. */
-    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
+    psf->fwrite(psf->m_header.ptr, psf->m_header.indx, 1);
 
-    if (psf->error)
-        return psf->error;
+    if (psf->m_error)
+        return psf->m_error;
 
-    psf->dataoffset = psf->header.indx;
+    psf->m_dataoffset = psf->m_header.indx;
 
     if (current > 0)
         psf->fseek(current, SEEK_SET);
 
-    return psf->error;
+    return psf->m_error;
 }
 
 static int xi_read_header(SF_PRIVATE *psf)
@@ -402,10 +402,10 @@ static int xi_read_header(SF_PRIVATE *psf)
     if (sample_count > MAX_XI_SAMPLES)
         return SFE_XI_EXCESS_SAMPLES;
 
-    if (psf->instrument == NULL && (psf->instrument = psf_instrument_alloc()) == NULL)
+    if (psf->m_instrument == NULL && (psf->m_instrument = psf_instrument_alloc()) == NULL)
         return SFE_MALLOC_FAILED;
 
-    psf->instrument->basenote = 0;
+    psf->m_instrument->basenote = 0;
     /* Log all data for each sample. */
     for (k = 0; k < sample_count; k++)
     {
@@ -435,14 +435,14 @@ static int xi_read_header(SF_PRIVATE *psf)
         psf->log_printf("  pan     : %u\n  note    : %d\n  namelen : %d\n", buffer[3] & 0xFF,
                        buffer[4], buffer[5]);
 
-        psf->instrument->basenote = buffer[4];
+        psf->m_instrument->basenote = buffer[4];
         if (buffer[2] & 1)
         {
-            psf->instrument->loop_count = 1;
-            psf->instrument->loops[0].mode =
+            psf->m_instrument->loop_count = 1;
+            psf->m_instrument->loops[0].mode =
                 (buffer[2] & 2) ? SF_LOOP_ALTERNATING : SF_LOOP_FORWARD;
-            psf->instrument->loops[0].start = loop_begin;
-            psf->instrument->loops[0].end = loop_end;
+            psf->m_instrument->loops[0].start = loop_begin;
+            psf->m_instrument->loops[0].end = loop_end;
         };
 
         if (k != 0)
@@ -451,12 +451,12 @@ static int xi_read_header(SF_PRIVATE *psf)
         if (buffer[2] & 16)
         {
             psf->sf.format = SF_FORMAT_XI | SF_FORMAT_DPCM_16;
-            psf->bytewidth = 2;
+            psf->m_bytewidth = 2;
         }
         else
         {
             psf->sf.format = SF_FORMAT_XI | SF_FORMAT_DPCM_8;
-            psf->bytewidth = 1;
+            psf->m_bytewidth = 1;
         };
     };
 
@@ -473,40 +473,40 @@ static int xi_read_header(SF_PRIVATE *psf)
         return SFE_XI_EXCESS_SAMPLES;
     };
 
-    psf->datalength = sample_sizes[0];
+    psf->m_datalength = sample_sizes[0];
 
-    psf->dataoffset = psf->ftell();
-    if (psf->dataoffset < 0)
+    psf->m_dataoffset = psf->ftell();
+    if (psf->m_dataoffset < 0)
     {
-        psf->log_printf("*** Bad Data Offset : %D\n", psf->dataoffset);
+        psf->log_printf("*** Bad Data Offset : %D\n", psf->m_dataoffset);
         return SFE_BAD_OFFSET;
     };
-    psf->log_printf("Data Offset : %D\n", psf->dataoffset);
+    psf->log_printf("Data Offset : %D\n", psf->m_dataoffset);
 
-    if (psf->dataoffset + psf->datalength > psf->filelength)
+    if (psf->m_dataoffset + psf->m_datalength > psf->m_filelength)
     {
         psf->log_printf(
                        "*** File seems to be truncated. Should be at "
                        "least %D bytes long.\n",
-                       psf->dataoffset + sample_sizes[0]);
-        psf->datalength = psf->filelength - psf->dataoffset;
+                       psf->m_dataoffset + sample_sizes[0]);
+        psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
     };
 
-    if (psf->fseek(psf->dataoffset, SEEK_SET) != psf->dataoffset)
+    if (psf->fseek(psf->m_dataoffset, SEEK_SET) != psf->m_dataoffset)
         return SFE_BAD_SEEK;
 
-    psf->endian = SF_ENDIAN_LITTLE;
+    psf->m_endian = SF_ENDIAN_LITTLE;
     psf->sf.channels = 1; /* Always mono */
     psf->sf.samplerate = 44100; /* Always */
 
-    psf->blockwidth = psf->sf.channels * psf->bytewidth;
+    psf->m_blockwidth = psf->sf.channels * psf->m_bytewidth;
 
-    if (!psf->sf.frames && psf->blockwidth)
-        psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth;
+    if (!psf->sf.frames && psf->m_blockwidth)
+        psf->sf.frames = (psf->m_filelength - psf->m_dataoffset) / psf->m_blockwidth;
 
-    psf->instrument->gain = 1;
-    psf->instrument->velocity_lo = psf->instrument->key_lo = 0;
-    psf->instrument->velocity_hi = psf->instrument->key_hi = 127;
+    psf->m_instrument->gain = 1;
+    psf->m_instrument->velocity_lo = psf->m_instrument->key_lo = 0;
+    psf->m_instrument->velocity_hi = psf->m_instrument->key_hi = 127;
 
     return 0;
 }
@@ -533,7 +533,7 @@ static size_t dpcm_read_dsc2s(SF_PRIVATE *psf, short *ptr, size_t len)
     size_t bufferlen, readcount;
     size_t total = 0;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
@@ -560,7 +560,7 @@ static size_t dpcm_read_dsc2i(SF_PRIVATE *psf, int *ptr, size_t len)
     size_t bufferlen, readcount;
     size_t total = 0;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
@@ -588,10 +588,10 @@ static size_t dpcm_read_dsc2f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x80) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? 1.0 / ((float)0x80) : 1.0);
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
 
@@ -618,10 +618,10 @@ static size_t dpcm_read_dsc2d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
-    normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x80) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? 1.0 / ((double)0x80) : 1.0;
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
 
@@ -647,7 +647,7 @@ static size_t dpcm_read_dles2s(SF_PRIVATE *psf, short *ptr, size_t len)
     size_t bufferlen, readcount;
     size_t total = 0;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
     bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -674,7 +674,7 @@ static size_t dpcm_read_dles2i(SF_PRIVATE *psf, int *ptr, size_t len)
     size_t bufferlen, readcount;
     size_t total = 0;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
     bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -702,10 +702,10 @@ static size_t dpcm_read_dles2f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
 
     bufferlen = ARRAY_LEN(ubuf.sbuf);
 
@@ -732,10 +732,10 @@ static size_t dpcm_read_dles2d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
-    normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x8000) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? 1.0 / ((double)0x8000) : 1.0;
 
     bufferlen = ARRAY_LEN(ubuf.sbuf);
 
@@ -775,7 +775,7 @@ static size_t dpcm_write_s2dsc(SF_PRIVATE *psf, const short *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
@@ -802,7 +802,7 @@ static size_t dpcm_write_i2dsc(SF_PRIVATE *psf, const int *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
@@ -830,10 +830,10 @@ static size_t dpcm_write_f2dsc(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x7F) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? (1.0 * 0x7F) : 1.0);
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
 
@@ -860,10 +860,10 @@ static size_t dpcm_write_d2dsc(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
-    normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7F) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? (1.0 * 0x7F) : 1.0;
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
 
@@ -889,7 +889,7 @@ static size_t dpcm_write_s2dles(SF_PRIVATE *psf, const short *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
     bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -916,7 +916,7 @@ static size_t dpcm_write_i2dles(SF_PRIVATE *psf, const int *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
     bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -944,10 +944,10 @@ static size_t dpcm_write_f2dles(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0);
 
     bufferlen = ARRAY_LEN(ubuf.sbuf);
 
@@ -974,10 +974,10 @@ static size_t dpcm_write_d2dles(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if ((pxi = (XI_PRIVATE *)psf->codec_data) == NULL)
+    if ((pxi = (XI_PRIVATE *)psf->m_codec_data) == NULL)
         return 0;
 
-    normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0;
 
     bufferlen = ARRAY_LEN(ubuf.sbuf);
 

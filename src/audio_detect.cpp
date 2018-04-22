@@ -58,7 +58,7 @@ int audio_detect(SF_PRIVATE *psf, struct AUDIO_DETECT *ad, const unsigned char *
                     vote.le_float, vote.be_float, vote.le_int_24_32, vote.be_int_24_32);
 
     if (0)
-        puts(psf->parselog.buf);
+        puts(psf->m_parselog.buf);
 
     if (ad->endianness == SF_ENDIAN_LITTLE && vote.le_float > (3 * datalen) / 4)
     {

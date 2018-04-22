@@ -64,7 +64,7 @@ int ircam_open(SF_PRIVATE *psf)
     int subformat;
     int error = SFE_NO_ERROR;
 
-    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->m_mode == SFM_READ || (psf->m_mode == SFM_RDWR && psf->m_filelength > 0))
     {
         if ((error = ircam_read_header(psf)))
             return error;
@@ -72,16 +72,16 @@ int ircam_open(SF_PRIVATE *psf)
 
     subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_IRCAM)
             return SFE_BAD_OPEN_FORMAT;
 
-        psf->endian = SF_ENDIAN(psf->sf.format);
-        if (psf->endian == 0 || psf->endian == SF_ENDIAN_CPU)
-            psf->endian = (CPU_IS_BIG_ENDIAN) ? SF_ENDIAN_BIG : SF_ENDIAN_LITTLE;
+        psf->m_endian = SF_ENDIAN(psf->sf.format);
+        if (psf->m_endian == 0 || psf->m_endian == SF_ENDIAN_CPU)
+            psf->m_endian = (CPU_IS_BIG_ENDIAN) ? SF_ENDIAN_BIG : SF_ENDIAN_LITTLE;
 
-        psf->dataoffset = IRCAM_DATA_OFFSET;
+        psf->m_dataoffset = IRCAM_DATA_OFFSET;
 
         if ((error = ircam_write_header(psf, SF_FALSE)))
             return error;
@@ -133,7 +133,7 @@ static int ircam_read_header(SF_PRIVATE *psf)
         return SFE_IRCAM_NO_MARKER;
     };
 
-    psf->endian = SF_ENDIAN_LITTLE;
+    psf->m_endian = SF_ENDIAN_LITTLE;
 
     if (psf->sf.channels > SF_MAX_CHANNELS)
     {
@@ -147,7 +147,7 @@ static int ircam_read_header(SF_PRIVATE *psf)
             return SFE_IRCAM_BAD_CHANNELS;
         };
 
-        psf->endian = SF_ENDIAN_BIG;
+        psf->m_endian = SF_ENDIAN_BIG;
     };
 
     psf->log_printf("marker: 0x%X\n", marker);
@@ -163,36 +163,36 @@ static int ircam_read_header(SF_PRIVATE *psf)
     switch (encoding)
     {
     case IRCAM_PCM_16:
-        psf->bytewidth = 2;
-        psf->blockwidth = psf->sf.channels * psf->bytewidth;
+        psf->m_bytewidth = 2;
+        psf->m_blockwidth = psf->sf.channels * psf->m_bytewidth;
 
         psf->sf.format = SF_FORMAT_IRCAM | SF_FORMAT_PCM_16;
         break;
 
     case IRCAM_PCM_32:
-        psf->bytewidth = 4;
-        psf->blockwidth = psf->sf.channels * psf->bytewidth;
+        psf->m_bytewidth = 4;
+        psf->m_blockwidth = psf->sf.channels * psf->m_bytewidth;
 
         psf->sf.format = SF_FORMAT_IRCAM | SF_FORMAT_PCM_32;
         break;
 
     case IRCAM_FLOAT:
-        psf->bytewidth = 4;
-        psf->blockwidth = psf->sf.channels * psf->bytewidth;
+        psf->m_bytewidth = 4;
+        psf->m_blockwidth = psf->sf.channels * psf->m_bytewidth;
 
         psf->sf.format = SF_FORMAT_IRCAM | SF_FORMAT_FLOAT;
         break;
 
     case IRCAM_ALAW:
-        psf->bytewidth = 1;
-        psf->blockwidth = psf->sf.channels * psf->bytewidth;
+        psf->m_bytewidth = 1;
+        psf->m_blockwidth = psf->sf.channels * psf->m_bytewidth;
 
         psf->sf.format = SF_FORMAT_IRCAM | SF_FORMAT_ALAW;
         break;
 
     case IRCAM_ULAW:
-        psf->bytewidth = 1;
-        psf->blockwidth = psf->sf.channels * psf->bytewidth;
+        psf->m_bytewidth = 1;
+        psf->m_blockwidth = psf->sf.channels * psf->m_bytewidth;
 
         psf->sf.format = SF_FORMAT_IRCAM | SF_FORMAT_ULAW;
         break;
@@ -202,7 +202,7 @@ static int ircam_read_header(SF_PRIVATE *psf)
         break;
     };
 
-    if (psf->endian == SF_ENDIAN_BIG)
+    if (psf->m_endian == SF_ENDIAN_BIG)
         psf->sf.format |= SF_ENDIAN_BIG;
     else
         psf->sf.format |= SF_ENDIAN_LITTLE;
@@ -210,11 +210,11 @@ static int ircam_read_header(SF_PRIVATE *psf)
     if (error)
         return error;
 
-    psf->dataoffset = IRCAM_DATA_OFFSET;
-    psf->datalength = psf->filelength - psf->dataoffset;
+    psf->m_dataoffset = IRCAM_DATA_OFFSET;
+    psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
 
-    if (psf->sf.frames == 0 && psf->blockwidth)
-        psf->sf.frames = psf->datalength / psf->blockwidth;
+    if (psf->sf.frames == 0 && psf->m_blockwidth)
+        psf->sf.frames = psf->m_datalength / psf->m_blockwidth;
 
     psf->log_printf("  Samples     : %d\n", psf->sf.frames);
 
@@ -245,14 +245,14 @@ static int ircam_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
         return SFE_BAD_OPEN_FORMAT;
 
     /* Reset the current header length to zero. */
-    psf->header.ptr[0] = 0;
-    psf->header.indx = 0;
+    psf->m_header.ptr[0] = 0;
+    psf->m_header.indx = 0;
 
     psf->fseek(0, SEEK_SET);
 
     samplerate = (float)psf->sf.samplerate;
 
-    switch (psf->endian)
+    switch (psf->m_endian)
     {
     case SF_ENDIAN_BIG:
         psf->binheader_writef("Emf", BHWm(IRCAM_02B_MARKER), BHWf(samplerate));
@@ -268,18 +268,18 @@ static int ircam_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
         return SFE_BAD_OPEN_FORMAT;
     };
 
-    psf->binheader_writef("z", BHWz((size_t)(IRCAM_DATA_OFFSET - psf->header.indx)));
+    psf->binheader_writef("z", BHWz((size_t)(IRCAM_DATA_OFFSET - psf->m_header.indx)));
 
     /* Header construction complete so write it out. */
-    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
+    psf->fwrite(psf->m_header.ptr, psf->m_header.indx, 1);
 
-    if (psf->error)
-        return psf->error;
+    if (psf->m_error)
+        return psf->m_error;
 
     if (current > 0)
         psf->fseek(current, SEEK_SET);
 
-    return psf->error;
+    return psf->m_error;
 }
 
 static int get_encoding(int subformat)

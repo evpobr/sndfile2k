@@ -70,12 +70,12 @@ int ogg_read_first_page(SF_PRIVATE *psf, OGG_PRIVATE *odata)
     */
 
     /* Avoid seeking if the file has just been opened. */
-    if (psf->ftell() == psf->header.indx)
+    if (psf->ftell() == psf->m_header.indx)
     {
         // Grab the part of the header that has already been read.
-        memcpy(buffer, psf->header.ptr, psf->header.indx);
-        bytes = psf->header.indx;
-        bytes += psf->fread(buffer + psf->header.indx, 1, 4096 - psf->header.indx);
+        memcpy(buffer, psf->m_header.ptr, psf->m_header.indx);
+        bytes = psf->m_header.indx;
+        bytes += psf->fread(buffer + psf->m_header.indx, 1, 4096 - psf->m_header.indx);
     }
     else
     {
@@ -133,13 +133,13 @@ int ogg_open(SF_PRIVATE *psf)
     sf_count_t pos = psf->ftell();
     int error = 0;
 
-    psf->container_data = odata;
+    psf->m_container_data = odata;
     psf->container_close = ogg_close;
 
-    if (psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_RDWR)
         return SFE_BAD_MODE_RW;
 
-    if (psf->file_mode == SFM_READ)
+    if (psf->m_mode == SFM_READ)
         if ((error = ogg_stream_classify(psf, odata)) != 0)
             return error;
 
@@ -156,8 +156,8 @@ int ogg_open(SF_PRIVATE *psf)
         ogg_sync_clear(&odata->osync);
         ogg_stream_clear(&odata->ostream);
         psf->fseek(pos, SEEK_SET);
-        free(psf->container_data);
-        psf->container_data = NULL;
+        free(psf->m_container_data);
+        psf->m_container_data = NULL;
         psf->container_close = NULL;
         return flac_open(psf);
 
@@ -180,7 +180,7 @@ int ogg_open(SF_PRIVATE *psf)
 
 static int ogg_close(SF_PRIVATE *psf)
 {
-    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
+    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
 
     ogg_sync_clear(&odata->osync);
     ogg_stream_clear(&odata->ostream);

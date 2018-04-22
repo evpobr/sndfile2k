@@ -39,7 +39,7 @@ int pvf_open(SF_PRIVATE *psf)
     int subformat;
     int error = 0;
 
-    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->m_mode == SFM_READ || (psf->m_mode == SFM_RDWR && psf->m_filelength > 0))
     {
         if ((error = pvf_read_header(psf)))
             return error;
@@ -47,22 +47,22 @@ int pvf_open(SF_PRIVATE *psf)
 
     subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_PVF)
             return SFE_BAD_OPEN_FORMAT;
 
-        psf->endian = SF_ENDIAN_BIG;
+        psf->m_endian = SF_ENDIAN_BIG;
 
         if (pvf_write_header(psf, SF_FALSE))
-            return psf->error;
+            return psf->m_error;
 
         psf->write_header = pvf_write_header;
     };
 
     psf->container_close = pvf_close;
 
-    psf->blockwidth = psf->bytewidth * psf->sf.channels;
+    psf->m_blockwidth = psf->m_bytewidth * psf->sf.channels;
 
     switch (subformat)
     {
@@ -91,28 +91,28 @@ static int pvf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     current = psf->ftell();
 
     /* Reset the current header length to zero. */
-    psf->header.ptr[0] = 0;
-    psf->header.indx = 0;
+    psf->m_header.ptr[0] = 0;
+    psf->m_header.indx = 0;
 
     psf->fseek(0, SEEK_SET);
 
-    snprintf((char *)psf->header.ptr, psf->header.len, "PVF1\n%d %d %d\n", psf->sf.channels,
-             psf->sf.samplerate, psf->bytewidth * 8);
+    snprintf((char *)psf->m_header.ptr, psf->m_header.len, "PVF1\n%d %d %d\n", psf->sf.channels,
+             psf->sf.samplerate, psf->m_bytewidth * 8);
 
-    psf->header.indx = strlen((char *)psf->header.ptr);
+    psf->m_header.indx = strlen((char *)psf->m_header.ptr);
 
     /* Header construction complete so write it out. */
-    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
+    psf->fwrite(psf->m_header.ptr, psf->m_header.indx, 1);
 
-    if (psf->error)
-        return psf->error;
+    if (psf->m_error)
+        return psf->m_error;
 
-    psf->dataoffset = psf->header.indx;
+    psf->m_dataoffset = psf->m_header.indx;
 
     if (current > 0)
         psf->fseek(current, SEEK_SET);
 
-    return psf->error;
+    return psf->m_error;
 }
 
 static int pvf_read_header(SF_PRIVATE *psf)
@@ -144,32 +144,32 @@ static int pvf_read_header(SF_PRIVATE *psf)
     {
     case 8:
         psf->sf.format = SF_FORMAT_PVF | SF_FORMAT_PCM_S8;
-        psf->bytewidth = 1;
+        psf->m_bytewidth = 1;
         break;
 
     case 16:
         psf->sf.format = SF_FORMAT_PVF | SF_FORMAT_PCM_16;
-        psf->bytewidth = 2;
+        psf->m_bytewidth = 2;
         break;
     case 32:
         psf->sf.format = SF_FORMAT_PVF | SF_FORMAT_PCM_32;
-        psf->bytewidth = 4;
+        psf->m_bytewidth = 4;
         break;
 
     default:
         return SFE_PVF_BAD_BITWIDTH;
     };
 
-    psf->dataoffset = psf->ftell();
-    psf->log_printf(" Data Offset : %D\n", psf->dataoffset);
+    psf->m_dataoffset = psf->ftell();
+    psf->log_printf(" Data Offset : %D\n", psf->m_dataoffset);
 
-    psf->endian = SF_ENDIAN_BIG;
+    psf->m_endian = SF_ENDIAN_BIG;
 
-    psf->datalength = psf->filelength - psf->dataoffset;
-    psf->blockwidth = psf->sf.channels * psf->bytewidth;
+    psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
+    psf->m_blockwidth = psf->sf.channels * psf->m_bytewidth;
 
-    if (!psf->sf.frames && psf->blockwidth)
-        psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth;
+    if (!psf->sf.frames && psf->m_blockwidth)
+        psf->sf.frames = (psf->m_filelength - psf->m_dataoffset) / psf->m_blockwidth;
 
     return 0;
 }

@@ -254,13 +254,13 @@ double psf_calc_signal_max(SF_PRIVATE *psf, int normalize)
     // If the file is not seekable, there is nothing we can do.
     if (!psf->sf.seekable)
     {
-        psf->error = SFE_NOT_SEEKABLE;
+        psf->m_error = SFE_NOT_SEEKABLE;
         return 0.0;
     };
 
     if (!psf->read_double)
     {
-        psf->error = SFE_UNIMPLEMENTED;
+        psf->m_error = SFE_UNIMPLEMENTED;
         return 0.0;
     };
 
@@ -306,10 +306,10 @@ int psf_calc_max_all_channels(SF_PRIVATE *psf, double *peaks, int normalize)
 
     // If the file is not seekable, there is nothing we can do.
     if (!psf->sf.seekable)
-        return (psf->error = SFE_NOT_SEEKABLE);
+        return (psf->m_error = SFE_NOT_SEEKABLE);
 
     if (!psf->read_double)
-        return (psf->error = SFE_UNIMPLEMENTED);
+        return (psf->m_error = SFE_UNIMPLEMENTED);
 
     save_state = sf_command((SNDFILE *)psf, SFC_GET_NORM_DOUBLE, NULL, 0);
     sf_command((SNDFILE *)psf, SFC_SET_NORM_DOUBLE, NULL, normalize);
@@ -348,13 +348,13 @@ int psf_get_signal_max(SF_PRIVATE *psf, double *peak)
 {
     int k;
 
-    if (psf->peak_info == NULL)
+    if (psf->m_peak_info == NULL)
         return SF_FALSE;
 
-    peak[0] = psf->peak_info->peaks[0].value;
+    peak[0] = psf->m_peak_info->peaks[0].value;
 
     for (k = 1; k < psf->sf.channels; k++)
-        peak[0] = std::max(peak[0], psf->peak_info->peaks[k].value);
+        peak[0] = std::max(peak[0], psf->m_peak_info->peaks[k].value);
 
     return SF_TRUE;
 }
@@ -363,11 +363,11 @@ int psf_get_max_all_channels(SF_PRIVATE *psf, double *peaks)
 {
     int k;
 
-    if (psf->peak_info == NULL)
+    if (psf->m_peak_info == NULL)
         return SF_FALSE;
 
     for (k = 0; k < psf->sf.channels; k++)
-        peaks[k] = psf->peak_info->peaks[k].value;
+        peaks[k] = psf->m_peak_info->peaks[k].value;
 
     return SF_TRUE;
 }

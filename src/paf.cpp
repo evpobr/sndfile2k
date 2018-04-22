@@ -85,9 +85,9 @@ int paf_open(SF_PRIVATE *psf)
 {
     int subformat, error, endian;
 
-    psf->dataoffset = PAF_HEADER_LENGTH;
+    psf->m_dataoffset = PAF_HEADER_LENGTH;
 
-    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->m_mode == SFM_READ || (psf->m_mode == SFM_RDWR && psf->m_filelength > 0))
     {
         if ((error = paf_read_header(psf)))
             return error;
@@ -95,7 +95,7 @@ int paf_open(SF_PRIVATE *psf)
 
     subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_PAF)
             return SFE_BAD_OPEN_FORMAT;
@@ -103,10 +103,10 @@ int paf_open(SF_PRIVATE *psf)
         endian = SF_ENDIAN(psf->sf.format);
 
         /* PAF is by default big endian. */
-        psf->endian = SF_ENDIAN_BIG;
+        psf->m_endian = SF_ENDIAN_BIG;
 
         if (endian == SF_ENDIAN_LITTLE || (CPU_IS_LITTLE_ENDIAN && (endian == SF_ENDIAN_CPU)))
-            psf->endian = SF_ENDIAN_LITTLE;
+            psf->m_endian = SF_ENDIAN_LITTLE;
 
         if ((error = paf_write_header(psf, SF_FALSE)))
             return error;
@@ -117,12 +117,12 @@ int paf_open(SF_PRIVATE *psf)
     switch (subformat)
     {
     case SF_FORMAT_PCM_S8:
-        psf->bytewidth = 1;
+        psf->m_bytewidth = 1;
         error = pcm_init(psf);
         break;
 
     case SF_FORMAT_PCM_16:
-        psf->bytewidth = 2;
+        psf->m_bytewidth = 2;
         error = pcm_init(psf);
         break;
 
@@ -143,7 +143,7 @@ static int paf_read_header(SF_PRIVATE *psf)
     PAF_FMT paf_fmt;
     int marker;
 
-    if (psf->filelength < PAF_HEADER_LENGTH)
+    if (psf->m_filelength < PAF_HEADER_LENGTH)
         return SFE_PAF_SHORT_HEADER;
 
     memset(&paf_fmt, 0, sizeof(paf_fmt));
@@ -182,20 +182,20 @@ static int paf_read_header(SF_PRIVATE *psf)
     if (paf_fmt.endianness)
     {
         psf->log_printf("Little\n", paf_fmt.endianness);
-        psf->endian = SF_ENDIAN_LITTLE;
+        psf->m_endian = SF_ENDIAN_LITTLE;
     }
     else
     {
         psf->log_printf("Big\n", paf_fmt.endianness);
-        psf->endian = SF_ENDIAN_BIG;
+        psf->m_endian = SF_ENDIAN_BIG;
     };
 
     if (paf_fmt.channels < 1 || paf_fmt.channels > SF_MAX_CHANNELS)
         return SFE_PAF_BAD_CHANNELS;
 
-    psf->datalength = psf->filelength - psf->dataoffset;
+    psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
 
-	psf->binheader_seekf(psf->dataoffset, SF_SEEK_SET);
+	psf->binheader_seekf(psf->m_dataoffset, SF_SEEK_SET);
 
     psf->sf.samplerate = paf_fmt.samplerate;
     psf->sf.channels = paf_fmt.channels;
@@ -212,33 +212,33 @@ static int paf_read_header(SF_PRIVATE *psf)
     {
     case PAF_PCM_S8:
         psf->log_printf("8 bit linear PCM\n");
-        psf->bytewidth = 1;
+        psf->m_bytewidth = 1;
 
         psf->sf.format |= SF_FORMAT_PCM_S8;
 
-        psf->blockwidth = psf->bytewidth * psf->sf.channels;
-        psf->sf.frames = psf->datalength / psf->blockwidth;
+        psf->m_blockwidth = psf->m_bytewidth * psf->sf.channels;
+        psf->sf.frames = psf->m_datalength / psf->m_blockwidth;
         break;
 
     case PAF_PCM_16:
         psf->log_printf("16 bit linear PCM\n");
-        psf->bytewidth = 2;
+        psf->m_bytewidth = 2;
 
         psf->sf.format |= SF_FORMAT_PCM_16;
 
-        psf->blockwidth = psf->bytewidth * psf->sf.channels;
-        psf->sf.frames = psf->datalength / psf->blockwidth;
+        psf->m_blockwidth = psf->m_bytewidth * psf->sf.channels;
+        psf->sf.frames = psf->m_datalength / psf->m_blockwidth;
         break;
 
     case PAF_PCM_24:
         psf->log_printf("24 bit linear PCM\n");
-        psf->bytewidth = 3;
+        psf->m_bytewidth = 3;
 
         psf->sf.format |= SF_FORMAT_PCM_24;
 
-        psf->blockwidth = 0;
+        psf->m_blockwidth = 0;
         psf->sf.frames =
-            PAF24_SAMPLES_PER_BLOCK * psf->datalength / (PAF24_BLOCK_SIZE * psf->sf.channels);
+            PAF24_SAMPLES_PER_BLOCK * psf->m_datalength / (PAF24_BLOCK_SIZE * psf->sf.channels);
         break;
 
     default:
@@ -279,7 +279,7 @@ static int paf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     if (psf->ftell() >= PAF_HEADER_LENGTH)
         return 0;
 
-    psf->dataoffset = PAF_HEADER_LENGTH;
+    psf->m_dataoffset = PAF_HEADER_LENGTH;
 
     switch (SF_CODEC(psf->sf.format))
     {
@@ -300,10 +300,10 @@ static int paf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     };
 
     /* Reset the current header length to zero. */
-    psf->header.ptr[0] = 0;
-    psf->header.indx = 0;
+    psf->m_header.ptr[0] = 0;
+    psf->m_header.indx = 0;
 
-    if (psf->endian == SF_ENDIAN_BIG)
+    if (psf->m_endian == SF_ENDIAN_BIG)
     {
         /* Marker, version, endianness, samplerate */
         psf->binheader_writef("Em444", BHWm(PAF_MARKER), BHW4(0), BHW4(0),
@@ -311,7 +311,7 @@ static int paf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
         /* format, channels, source */
         psf->binheader_writef("E444", BHW4(paf_format), BHW4(psf->sf.channels), BHW4(0));
     }
-    else if (psf->endian == SF_ENDIAN_LITTLE)
+    else if (psf->m_endian == SF_ENDIAN_LITTLE)
     {
         /* Marker, version, endianness, samplerate */
         psf->binheader_writef("em444", BHWm(FAP_MARKER), BHW4(0), BHW4(1),
@@ -321,11 +321,11 @@ static int paf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     };
 
     /* Zero fill to dataoffset. */
-    psf->binheader_writef("z", BHWz((size_t)(psf->dataoffset - psf->header.indx)));
+    psf->binheader_writef("z", BHWz((size_t)(psf->m_dataoffset - psf->m_header.indx)));
 
-    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
+    psf->fwrite(psf->m_header.ptr, psf->m_header.indx, 1);
 
-    return psf->error;
+    return psf->m_error;
 }
 
 /*
@@ -358,12 +358,12 @@ static int paf24_init(SF_PRIVATE *psf)
 	 * Not exatly sure why this needs to be here but the tests
 	 * fail without it.
 	 */
-    psf->last_op = 0;
+    psf->m_last_op = 0;
 
-    if (!(psf->codec_data = calloc(1, paf24size)))
+    if (!(psf->m_codec_data = calloc(1, paf24size)))
         return SFE_MALLOC_FAILED;
 
-    ppaf24 = (PAF24_PRIVATE *)psf->codec_data;
+    ppaf24 = (PAF24_PRIVATE *)psf->m_codec_data;
 
     ppaf24->channels = psf->sf.channels;
     ppaf24->samples = ppaf24->data;
@@ -371,7 +371,7 @@ static int paf24_init(SF_PRIVATE *psf)
 
     ppaf24->blocksize = PAF24_BLOCK_SIZE * ppaf24->channels;
 
-    if (psf->file_mode == SFM_READ || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_READ || psf->m_mode == SFM_RDWR)
     {
         paf24_read_block(psf, ppaf24); /* Read first block. */
 
@@ -381,7 +381,7 @@ static int paf24_init(SF_PRIVATE *psf)
         psf->read_double = paf24_read_d;
     };
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         psf->write_short = paf24_write_s;
         psf->write_int = paf24_write_i;
@@ -392,20 +392,20 @@ static int paf24_init(SF_PRIVATE *psf)
     psf->seek_from_start = paf24_seek;
     psf->container_close = paf24_close;
 
-    psf->filelength = psf->get_filelen();
-    psf->datalength = psf->filelength - psf->dataoffset;
+    psf->m_filelength = psf->get_filelen();
+    psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
 
-    if (psf->datalength % PAF24_BLOCK_SIZE)
+    if (psf->m_datalength % PAF24_BLOCK_SIZE)
     {
-        if (psf->file_mode == SFM_READ)
+        if (psf->m_mode == SFM_READ)
             psf->log_printf("*** Warning : file seems to be truncated.\n");
-        ppaf24->max_blocks = psf->datalength / ppaf24->blocksize + 1;
+        ppaf24->max_blocks = psf->m_datalength / ppaf24->blocksize + 1;
     }
     else
-        ppaf24->max_blocks = psf->datalength / ppaf24->blocksize;
+        ppaf24->max_blocks = psf->m_datalength / ppaf24->blocksize;
 
     ppaf24->read_block = 0;
-    if (psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_RDWR)
         ppaf24->write_block = ppaf24->max_blocks;
     else
         ppaf24->write_block = 0;
@@ -421,13 +421,13 @@ static sf_count_t paf24_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
     PAF24_PRIVATE *ppaf24;
     int newblock, newsample;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
     {
-        psf->error = SFE_INTERNAL;
+        psf->m_error = SFE_INTERNAL;
         return PSF_SEEK_ERROR;
     };
 
-    ppaf24 = (PAF24_PRIVATE *)psf->codec_data;
+    ppaf24 = (PAF24_PRIVATE *)psf->m_codec_data;
 
     if (mode == SFM_READ && ppaf24->write_count > 0)
         paf24_write_block(psf, ppaf24);
@@ -438,10 +438,10 @@ static sf_count_t paf24_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
     switch (mode)
     {
     case SFM_READ:
-        if (psf->last_op == SFM_WRITE && ppaf24->write_count)
+        if (psf->m_last_op == SFM_WRITE && ppaf24->write_count)
             paf24_write_block(psf, ppaf24);
 
-        psf->fseek(psf->dataoffset + newblock * ppaf24->blocksize, SEEK_SET);
+        psf->fseek(psf->m_dataoffset + newblock * ppaf24->blocksize, SEEK_SET);
         ppaf24->read_block = newblock;
         paf24_read_block(psf, ppaf24);
         ppaf24->read_count = newsample;
@@ -450,21 +450,21 @@ static sf_count_t paf24_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
     case SFM_WRITE:
         if (offset > ppaf24->sample_count)
         {
-            psf->error = SFE_BAD_SEEK;
+            psf->m_error = SFE_BAD_SEEK;
             return PSF_SEEK_ERROR;
         };
 
-        if (psf->last_op == SFM_WRITE && ppaf24->write_count)
+        if (psf->m_last_op == SFM_WRITE && ppaf24->write_count)
             paf24_write_block(psf, ppaf24);
 
-        psf->fseek(psf->dataoffset + newblock * ppaf24->blocksize, SEEK_SET);
+        psf->fseek(psf->m_dataoffset + newblock * ppaf24->blocksize, SEEK_SET);
         ppaf24->write_block = newblock;
         paf24_read_block(psf, ppaf24);
         ppaf24->write_count = newsample;
         break;
 
     default:
-        psf->error = SFE_BAD_SEEK;
+        psf->m_error = SFE_BAD_SEEK;
         return PSF_SEEK_ERROR;
     };
 
@@ -475,12 +475,12 @@ static int paf24_close(SF_PRIVATE *psf)
 {
     PAF24_PRIVATE *ppaf24;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
 
-    ppaf24 = (PAF24_PRIVATE *)psf->codec_data;
+    ppaf24 = (PAF24_PRIVATE *)psf->m_codec_data;
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         if (ppaf24->write_count > 0)
             paf24_write_block(psf, ppaf24);
@@ -508,8 +508,8 @@ static int paf24_read_block(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
         psf->log_printf("*** Warning : short read (%d != %d).\n", k, ppaf24->blocksize);
 
     /* Do endian swapping if necessary. */
-    if ((CPU_IS_BIG_ENDIAN && psf->endian == SF_ENDIAN_LITTLE) ||
-        (CPU_IS_LITTLE_ENDIAN && psf->endian == SF_ENDIAN_BIG))
+    if ((CPU_IS_BIG_ENDIAN && psf->m_endian == SF_ENDIAN_LITTLE) ||
+        (CPU_IS_LITTLE_ENDIAN && psf->m_endian == SF_ENDIAN_BIG))
         endswap_int_array(ppaf24->block, 8 * ppaf24->channels);
 
     /* Unpack block. */
@@ -559,9 +559,9 @@ static size_t paf24_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     size_t k, bufferlen, readcount, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    ppaf24 = (PAF24_PRIVATE *)psf->codec_data;
+    ppaf24 = (PAF24_PRIVATE *)psf->m_codec_data;
 
     iptr = ubuf.ibuf;
     bufferlen = ARRAY_LEN(ubuf.ibuf);
@@ -582,9 +582,9 @@ static size_t paf24_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     PAF24_PRIVATE *ppaf24;
     size_t total;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    ppaf24 = (PAF24_PRIVATE *)psf->codec_data;
+    ppaf24 = (PAF24_PRIVATE *)psf->m_codec_data;
 
     total = paf24_read(psf, ppaf24, ptr, len);
 
@@ -600,11 +600,11 @@ static size_t paf24_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    ppaf24 = (PAF24_PRIVATE *)psf->codec_data;
+    ppaf24 = (PAF24_PRIVATE *)psf->m_codec_data;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 / 0x80000000) : (1.0 / 0x100));
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? (1.0 / 0x80000000) : (1.0 / 0x100));
 
     iptr = ubuf.ibuf;
     bufferlen = ARRAY_LEN(ubuf.ibuf);
@@ -629,11 +629,11 @@ static size_t paf24_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    ppaf24 = (PAF24_PRIVATE *)psf->codec_data;
+    ppaf24 = (PAF24_PRIVATE *)psf->m_codec_data;
 
-    normfact = (psf->norm_double == SF_TRUE) ? (1.0 / 0x80000000) : (1.0 / 0x100);
+    normfact = (psf->m_norm_double == SF_TRUE) ? (1.0 / 0x80000000) : (1.0 / 0x100);
 
     iptr = ubuf.ibuf;
     bufferlen = ARRAY_LEN(ubuf.ibuf);
@@ -670,7 +670,7 @@ static int paf24_write_block(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
         };
 
         /* Do endian swapping if necessary. */
-        if (psf->endian == SF_ENDIAN_BIG)
+        if (psf->m_endian == SF_ENDIAN_BIG)
             endswap_int_array(ppaf24->block, 8 * ppaf24->channels);
     }
     else if (CPU_IS_BIG_ENDIAN)
@@ -686,7 +686,7 @@ static int paf24_write_block(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
             cptr[1] = nextsample >> 8;
             cptr[2] = nextsample >> 16;
         };
-        if (psf->endian == SF_ENDIAN_LITTLE)
+        if (psf->m_endian == SF_ENDIAN_LITTLE)
             endswap_int_array(ppaf24->block, 8 * ppaf24->channels);
     };
 
@@ -737,9 +737,9 @@ static size_t paf24_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
     size_t k, bufferlen, writecount = 0, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    ppaf24 = (PAF24_PRIVATE *)psf->codec_data;
+    ppaf24 = (PAF24_PRIVATE *)psf->m_codec_data;
 
     iptr = ubuf.ibuf;
     bufferlen = ARRAY_LEN(ubuf.ibuf);
@@ -763,9 +763,9 @@ static size_t paf24_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
     size_t writecount, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    ppaf24 = (PAF24_PRIVATE *)psf->codec_data;
+    ppaf24 = (PAF24_PRIVATE *)psf->m_codec_data;
 
     while (len > 0)
     {
@@ -791,11 +791,11 @@ static size_t paf24_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    ppaf24 = (PAF24_PRIVATE *)psf->codec_data;
+    ppaf24 = (PAF24_PRIVATE *)psf->m_codec_data;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : (1.0 / 0x100));
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : (1.0 / 0x100));
 
     iptr = ubuf.ibuf;
     bufferlen = ARRAY_LEN(ubuf.ibuf);
@@ -823,11 +823,11 @@ static size_t paf24_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    ppaf24 = (PAF24_PRIVATE *)psf->codec_data;
+    ppaf24 = (PAF24_PRIVATE *)psf->m_codec_data;
 
-    normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : (1.0 / 0x100);
+    normfact = (psf->m_norm_double == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : (1.0 / 0x100);
 
     iptr = ubuf.ibuf;
     bufferlen = ARRAY_LEN(ubuf.ibuf);

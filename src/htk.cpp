@@ -40,7 +40,7 @@ int htk_open(SF_PRIVATE *psf)
     int subformat;
     int error = 0;
 
-    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->m_mode == SFM_READ || (psf->m_mode == SFM_RDWR && psf->m_filelength > 0))
     {
         if ((error = htk_read_header(psf)))
             return error;
@@ -48,22 +48,22 @@ int htk_open(SF_PRIVATE *psf)
 
     subformat = SF_CODEC(psf->sf.format);
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_HTK)
             return SFE_BAD_OPEN_FORMAT;
 
-        psf->endian = SF_ENDIAN_BIG;
+        psf->m_endian = SF_ENDIAN_BIG;
 
         if (htk_write_header(psf, SF_FALSE))
-            return psf->error;
+            return psf->m_error;
 
         psf->write_header = htk_write_header;
     };
 
     psf->container_close = htk_close;
 
-    psf->blockwidth = psf->bytewidth * psf->sf.channels;
+    psf->m_blockwidth = psf->m_bytewidth * psf->sf.channels;
 
     switch (subformat)
     {
@@ -80,7 +80,7 @@ int htk_open(SF_PRIVATE *psf)
 
 static int htk_close(SF_PRIVATE *psf)
 {
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
         htk_write_header(psf, SF_TRUE);
 
     return 0;
@@ -94,15 +94,15 @@ static int htk_write_header(SF_PRIVATE *psf, int calc_length)
     current = psf->ftell();
 
     if (calc_length)
-        psf->filelength = psf->get_filelen();
+        psf->m_filelength = psf->get_filelen();
 
     /* Reset the current header length to zero. */
-    psf->header.ptr[0] = 0;
-    psf->header.indx = 0;
+    psf->m_header.ptr[0] = 0;
+    psf->m_header.indx = 0;
     psf->fseek(0, SEEK_SET);
 
-    if (psf->filelength > 12)
-        sample_count = (psf->filelength - 12) / 2;
+    if (psf->m_filelength > 12)
+        sample_count = (psf->m_filelength - 12) / 2;
     else
         sample_count = 0;
 
@@ -111,17 +111,17 @@ static int htk_write_header(SF_PRIVATE *psf, int calc_length)
     psf->binheader_writef("E444", BHW4(sample_count), BHW4(sample_period), BHW4(0x20000));
 
     /* Header construction complete so write it out. */
-    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
+    psf->fwrite(psf->m_header.ptr, psf->m_header.indx, 1);
 
-    if (psf->error)
-        return psf->error;
+    if (psf->m_error)
+        return psf->m_error;
 
-    psf->dataoffset = psf->header.indx;
+    psf->m_dataoffset = psf->m_header.indx;
 
     if (current > 0)
         psf->fseek(current, SEEK_SET);
 
-    return psf->error;
+    return psf->m_error;
 }
 
 /*
@@ -174,7 +174,7 @@ static int htk_read_header(SF_PRIVATE *psf)
 	psf->binheader_seekf(0, SF_SEEK_SET);
     psf->binheader_readf("E444", &sample_count, &sample_period, &marker);
 
-    if (2 * sample_count + 12 != psf->filelength)
+    if (2 * sample_count + 12 != psf->m_filelength)
         return SFE_HTK_BAD_FILE_LEN;
 
     if (marker != 0x20000)
@@ -201,18 +201,18 @@ static int htk_read_header(SF_PRIVATE *psf)
     };
 
     psf->sf.format = SF_FORMAT_HTK | SF_FORMAT_PCM_16;
-    psf->bytewidth = 2;
+    psf->m_bytewidth = 2;
 
     /* HTK always has a 12 byte header. */
-    psf->dataoffset = 12;
-    psf->endian = SF_ENDIAN_BIG;
+    psf->m_dataoffset = 12;
+    psf->m_endian = SF_ENDIAN_BIG;
 
-    psf->datalength = psf->filelength - psf->dataoffset;
+    psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
 
-    psf->blockwidth = psf->sf.channels * psf->bytewidth;
+    psf->m_blockwidth = psf->sf.channels * psf->m_bytewidth;
 
-    if (!psf->sf.frames && psf->blockwidth)
-        psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth;
+    if (!psf->sf.frames && psf->m_blockwidth)
+        psf->sf.frames = (psf->m_filelength - psf->m_dataoffset) / psf->m_blockwidth;
 
     return 0;
 }

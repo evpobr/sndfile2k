@@ -98,9 +98,9 @@ int sds_open(SF_PRIVATE *psf)
 
     if (!(psds = (SDS_PRIVATE *)calloc(1, sizeof(SDS_PRIVATE))))
         return SFE_MALLOC_FAILED;
-    psf->codec_data = psds;
+    psf->m_codec_data = psds;
 
-    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->m_mode == SFM_READ || (psf->m_mode == SFM_RDWR && psf->m_filelength > 0))
     {
         if ((error = sds_read_header(psf, psds)))
             return error;
@@ -109,10 +109,10 @@ int sds_open(SF_PRIVATE *psf)
     if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_SDS)
         return SFE_BAD_OPEN_FORMAT;
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         if (sds_write_header(psf, SF_FALSE))
-            return psf->error;
+            return psf->m_error;
 
         psf->write_header = sds_write_header;
 
@@ -126,18 +126,18 @@ int sds_open(SF_PRIVATE *psf)
     psf->seek_from_start = sds_seek;
     psf->byterate = sds_byterate;
 
-    psf->blockwidth = 0;
+    psf->m_blockwidth = 0;
 
     return error;
 }
 
 static int sds_close(SF_PRIVATE *psf)
 {
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         SDS_PRIVATE *psds;
 
-        if ((psds = (SDS_PRIVATE *)psf->codec_data) == NULL)
+        if ((psds = (SDS_PRIVATE *)psf->m_codec_data) == NULL)
         {
             psf->log_printf("*** Bad psf->codec_data ptr.\n");
             return SFE_INTERNAL;
@@ -159,7 +159,7 @@ static int sds_close(SF_PRIVATE *psf)
 static int sds_init(SF_PRIVATE *psf, SDS_PRIVATE *psds)
 {
     if (psds->bitwidth < 8 || psds->bitwidth > 28)
-        return (psf->error = SFE_SDS_BAD_BIT_WIDTH);
+        return (psf->m_error = SFE_SDS_BAD_BIT_WIDTH);
 
     if (psds->bitwidth < 14)
     {
@@ -180,7 +180,7 @@ static int sds_init(SF_PRIVATE *psf, SDS_PRIVATE *psds)
         psds->samplesperblock = SDS_AUDIO_BYTES_PER_BLOCK / 4;
     };
 
-    if (psf->file_mode == SFM_READ || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_READ || psf->m_mode == SFM_RDWR)
     {
         psf->read_short = sds_read_s;
         psf->read_int = sds_read_i;
@@ -191,7 +191,7 @@ static int sds_init(SF_PRIVATE *psf, SDS_PRIVATE *psds)
         psds->reader(psf, psds);
     };
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         psf->write_short = sds_write_s;
         psf->write_int = sds_write_i;
@@ -276,14 +276,14 @@ static int sds_read_header(SF_PRIVATE *psf, SDS_PRIVATE *psds)
                    "     Loop Type : %d\n",
                    sustain_loop_start, sustain_loop_end, loop_type);
 
-    psf->dataoffset = SDS_DATA_OFFSET;
-    psf->datalength = psf->filelength - psf->dataoffset;
+    psf->m_dataoffset = SDS_DATA_OFFSET;
+    psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
 
     bytesread += psf->binheader_readf("1", &byte);
     if (byte != 0xF7)
         psf->log_printf("bad end : %X\n", byte & 0xFF);
 
-    for (blockcount = 0; bytesread < psf->filelength; blockcount++)
+    for (blockcount = 0; bytesread < psf->m_filelength; blockcount++)
     {
         bytesread += psf->fread(&marker, 1, 2);
 
@@ -345,7 +345,7 @@ static int sds_write_header(SF_PRIVATE *psf, int calc_length)
     int samp_period, data_length, sustain_loop_start, sustain_loop_end;
     unsigned char loop_type = 0;
 
-    if ((psds = (SDS_PRIVATE *)psf->codec_data) == NULL)
+    if ((psds = (SDS_PRIVATE *)psf->m_codec_data) == NULL)
     {
         psf->log_printf("*** Bad psf->codec_data ptr.\n");
         return SFE_INTERNAL;
@@ -370,8 +370,8 @@ static int sds_write_header(SF_PRIVATE *psf, int calc_length)
     };
 
     /* Reset the current header length to zero. */
-    psf->header.ptr[0] = 0;
-    psf->header.indx = 0;
+    psf->m_header.ptr[0] = 0;
+    psf->m_header.indx = 0;
 
     psf->fseek(0, SEEK_SET);
 
@@ -404,18 +404,18 @@ static int sds_write_header(SF_PRIVATE *psf, int calc_length)
                          BHW3(sustain_loop_end), BHW1(loop_type), BHW1(0xF7));
 
     /* Header construction complete so write it out. */
-    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
+    psf->fwrite(psf->m_header.ptr, psf->m_header.indx, 1);
 
-    if (psf->error)
-        return psf->error;
+    if (psf->m_error)
+        return psf->m_error;
 
-    psf->dataoffset = psf->header.indx;
-    psf->datalength = psds->write_block * SDS_BLOCK_SIZE;
+    psf->m_dataoffset = psf->m_header.indx;
+    psf->m_datalength = psds->write_block * SDS_BLOCK_SIZE;
 
     if (current > 0)
         psf->fseek(current, SEEK_SET);
 
-    return psf->error;
+    return psf->m_error;
 }
 
 static int sds_2byte_read(SF_PRIVATE *psf, SDS_PRIVATE *psds)
@@ -577,9 +577,9 @@ static size_t sds_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     size_t k, bufferlen, readcount, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    psds = (SDS_PRIVATE *)psf->codec_data;
+    psds = (SDS_PRIVATE *)psf->m_codec_data;
 
     iptr = ubuf.ibuf;
     bufferlen = ARRAY_LEN(ubuf.ibuf);
@@ -601,9 +601,9 @@ static size_t sds_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     SDS_PRIVATE *psds;
     size_t total;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    psds = (SDS_PRIVATE *)psf->codec_data;
+    psds = (SDS_PRIVATE *)psf->m_codec_data;
 
     total = sds_read(psf, psds, ptr, len);
 
@@ -619,11 +619,11 @@ static size_t sds_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    psds = (SDS_PRIVATE *)psf->codec_data;
+    psds = (SDS_PRIVATE *)psf->m_codec_data;
 
-    if (psf->norm_float == SF_TRUE)
+    if (psf->m_norm_float == SF_TRUE)
         normfact = 1.0 / 0x80000000;
     else
         normfact = (float)(1.0 / (1 << psds->bitwidth));
@@ -652,11 +652,11 @@ static size_t sds_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    psds = (SDS_PRIVATE *)psf->codec_data;
+    psds = (SDS_PRIVATE *)psf->m_codec_data;
 
-    if (psf->norm_double == SF_TRUE)
+    if (psf->m_norm_double == SF_TRUE)
         normfact = 1.0 / 0x80000000;
     else
         normfact = 1.0 / (1 << psds->bitwidth);
@@ -708,21 +708,21 @@ static sf_count_t sds_seek(SF_PRIVATE *psf, int mode, sf_count_t seek_from_start
     sf_count_t file_offset;
     int newblock, newsample;
 
-    if ((psds = (SDS_PRIVATE *)psf->codec_data) == NULL)
+    if ((psds = (SDS_PRIVATE *)psf->m_codec_data) == NULL)
     {
-        psf->error = SFE_INTERNAL;
+        psf->m_error = SFE_INTERNAL;
         return PSF_SEEK_ERROR;
     };
 
-    if (psf->datalength < 0 || psf->dataoffset < 0)
+    if (psf->m_datalength < 0 || psf->m_dataoffset < 0)
     {
-        psf->error = SFE_BAD_SEEK;
+        psf->m_error = SFE_BAD_SEEK;
         return PSF_SEEK_ERROR;
     };
 
     if (seek_from_start < 0 || seek_from_start > psf->sf.frames)
     {
-        psf->error = SFE_BAD_SEEK;
+        psf->m_error = SFE_BAD_SEEK;
         return PSF_SEEK_ERROR;
     };
 
@@ -737,15 +737,15 @@ static sf_count_t sds_seek(SF_PRIVATE *psf, int mode, sf_count_t seek_from_start
     case SFM_READ:
         if (newblock > psds->total_blocks)
         {
-            psf->error = SFE_BAD_SEEK;
+            psf->m_error = SFE_BAD_SEEK;
             return PSF_SEEK_ERROR;
         };
 
-        file_offset = psf->dataoffset + newblock * SDS_BLOCK_SIZE;
+        file_offset = psf->m_dataoffset + newblock * SDS_BLOCK_SIZE;
 
         if (psf->fseek(file_offset, SEEK_SET) != file_offset)
         {
-            psf->error = SFE_SEEK_FAILED;
+            psf->m_error = SFE_SEEK_FAILED;
             return PSF_SEEK_ERROR;
         };
 
@@ -757,15 +757,15 @@ static sf_count_t sds_seek(SF_PRIVATE *psf, int mode, sf_count_t seek_from_start
     case SFM_WRITE:
         if (newblock > psds->total_blocks)
         {
-            psf->error = SFE_BAD_SEEK;
+            psf->m_error = SFE_BAD_SEEK;
             return PSF_SEEK_ERROR;
         };
 
-        file_offset = psf->dataoffset + newblock * SDS_BLOCK_SIZE;
+        file_offset = psf->m_dataoffset + newblock * SDS_BLOCK_SIZE;
 
         if (psf->fseek(file_offset, SEEK_SET) != file_offset)
         {
-            psf->error = SFE_SEEK_FAILED;
+            psf->m_error = SFE_SEEK_FAILED;
             return PSF_SEEK_ERROR;
         };
 
@@ -775,7 +775,7 @@ static sf_count_t sds_seek(SF_PRIVATE *psf, int mode, sf_count_t seek_from_start
         break;
 
     default:
-        psf->error = SFE_BAD_SEEK;
+        psf->m_error = SFE_BAD_SEEK;
         return PSF_SEEK_ERROR;
         break;
     };
@@ -785,8 +785,8 @@ static sf_count_t sds_seek(SF_PRIVATE *psf, int mode, sf_count_t seek_from_start
 
 static int sds_byterate(SF_PRIVATE *psf)
 {
-    if (psf->file_mode == SFM_READ)
-        return (psf->datalength * psf->sf.samplerate) / psf->sf.frames;
+    if (psf->m_mode == SFM_READ)
+        return (psf->m_datalength * psf->sf.samplerate) / psf->sf.frames;
 
     return -1;
 }
@@ -928,9 +928,9 @@ static size_t sds_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
     size_t k, bufferlen, writecount, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    psds = (SDS_PRIVATE *)psf->codec_data;
+    psds = (SDS_PRIVATE *)psf->m_codec_data;
     psds->total_written += len;
 
     iptr = ubuf.ibuf;
@@ -953,9 +953,9 @@ static size_t sds_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
     SDS_PRIVATE *psds;
     size_t total;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    psds = (SDS_PRIVATE *)psf->codec_data;
+    psds = (SDS_PRIVATE *)psf->m_codec_data;
     psds->total_written += len;
 
     total = sds_write(psf, psds, ptr, len);
@@ -972,12 +972,12 @@ static size_t sds_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    psds = (SDS_PRIVATE *)psf->codec_data;
+    psds = (SDS_PRIVATE *)psf->m_codec_data;
     psds->total_written += len;
 
-    if (psf->norm_float == SF_TRUE)
+    if (psf->m_norm_float == SF_TRUE)
         normfact = 1.0 * 0x80000000;
     else
         normfact = (float)(1.0 * (1 << psds->bitwidth));
@@ -1006,12 +1006,12 @@ static size_t sds_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    psds = (SDS_PRIVATE *)psf->codec_data;
+    psds = (SDS_PRIVATE *)psf->m_codec_data;
     psds->total_written += len;
 
-    if (psf->norm_double == SF_TRUE)
+    if (psf->m_norm_double == SF_TRUE)
         normfact = 1.0 * 0x80000000;
     else
         normfact = 1.0 * (1 << psds->bitwidth);

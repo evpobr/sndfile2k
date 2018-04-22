@@ -310,10 +310,10 @@ static sf_count_t psf_get_filelen_fd(int fd)
 static void psf_log_syserr(SF_PRIVATE *psf, int error)
 {
 	/* Only log an error if no error has been set yet. */
-	if (psf->error == 0)
+	if (psf->m_error == 0)
 	{
-		psf->error = SFE_SYSTEM;
-		snprintf(psf->syserr, sizeof(psf->syserr), "System error : %s.", strerror(error));
+		psf->m_error = SFE_SYSTEM;
+		snprintf(psf->m_syserr, sizeof(psf->m_syserr), "System error : %s.", strerror(error));
 	};
 
 	return;

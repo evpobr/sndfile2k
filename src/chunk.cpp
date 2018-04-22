@@ -39,7 +39,7 @@ static int64_t hash_of_str(const char *str)
 
 SF_CHUNK_ITERATOR *psf_get_chunk_iterator(SF_PRIVATE *psf, const char *marker_str)
 {
-    const struct READ_CHUNKS *pchk = &psf->rchunks;
+    const struct READ_CHUNKS *pchk = &psf->m_rchunks;
     int idx;
 
     if (marker_str)
@@ -50,14 +50,14 @@ SF_CHUNK_ITERATOR *psf_get_chunk_iterator(SF_PRIVATE *psf, const char *marker_st
     if (idx < 0)
         return NULL;
 
-    if (psf->iterator == NULL)
+    if (psf->m_iterator == NULL)
     {
-        psf->iterator = (SF_CHUNK_ITERATOR *)calloc(1, sizeof(SF_CHUNK_ITERATOR));
-        if (psf->iterator == NULL)
+        psf->m_iterator = (SF_CHUNK_ITERATOR *)calloc(1, sizeof(SF_CHUNK_ITERATOR));
+        if (psf->m_iterator == NULL)
             return NULL;
     };
 
-    psf->iterator->sndfile = (SNDFILE *)psf;
+    psf->m_iterator->sndfile = (SNDFILE *)psf;
 
     if (marker_str)
     {
@@ -77,14 +77,14 @@ SF_CHUNK_ITERATOR *psf_get_chunk_iterator(SF_PRIVATE *psf, const char *marker_st
 
         hash = marker_len > 4 ? hash_of_str(marker_str) : u.marker;
 
-        memcpy(psf->iterator->id, marker_str, marker_len);
-        psf->iterator->id_size = marker_len;
-        psf->iterator->hash = hash;
+        memcpy(psf->m_iterator->id, marker_str, marker_len);
+        psf->m_iterator->id_size = marker_len;
+        psf->m_iterator->hash = hash;
     }
 
-    psf->iterator->current = idx;
+    psf->m_iterator->current = idx;
 
-    return psf->iterator;
+    return psf->m_iterator;
 }
 
 SF_CHUNK_ITERATOR *psf_next_chunk_iterator(const struct READ_CHUNKS *pchk, SF_CHUNK_ITERATOR *iterator)

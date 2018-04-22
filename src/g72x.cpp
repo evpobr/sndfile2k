@@ -79,7 +79,7 @@ int g72x_init(SF_PRIVATE *psf)
     G72x_PRIVATE *pg72x;
     int bitspersample, bytesperblock, codec;
 
-    if (psf->codec_data != NULL)
+    if (psf->m_codec_data != NULL)
     {
         psf->log_printf("*** psf->codec_data is not NULL.\n");
         return SFE_INTERNAL;
@@ -93,7 +93,7 @@ int g72x_init(SF_PRIVATE *psf)
     if ((pg72x = (G72x_PRIVATE *)calloc(1, sizeof(G72x_PRIVATE))) == NULL)
         return SFE_MALLOC_FAILED;
 
-    psf->codec_data = (void *)pg72x;
+    psf->m_codec_data = (void *)pg72x;
 
     pg72x->block_curr = 0;
     pg72x->sample_curr = 0;
@@ -122,15 +122,15 @@ int g72x_init(SF_PRIVATE *psf)
         return SFE_UNIMPLEMENTED;
     };
 
-    psf->filelength = psf->get_filelen();
-    if (psf->filelength < psf->dataoffset)
-        psf->filelength = psf->dataoffset;
+    psf->m_filelength = psf->get_filelen();
+    if (psf->m_filelength < psf->m_dataoffset)
+        psf->m_filelength = psf->m_dataoffset;
 
-    psf->datalength = psf->filelength - psf->dataoffset;
-    if (psf->dataend > 0)
-        psf->datalength -= psf->filelength - psf->dataend;
+    psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
+    if (psf->m_dataend > 0)
+        psf->m_datalength -= psf->m_filelength - psf->m_dataend;
 
-    if (psf->file_mode == SFM_READ)
+    if (psf->m_mode == SFM_READ)
     {
         pg72x->priv = g72x_reader_init(codec, &(pg72x->blocksize), &(pg72x->samplesperblock));
         if (pg72x->priv == NULL)
@@ -145,22 +145,22 @@ int g72x_init(SF_PRIVATE *psf)
 
         psf->seek_from_start = g72x_seek;
 
-        if (psf->datalength % pg72x->blocksize)
+        if (psf->m_datalength % pg72x->blocksize)
         {
             psf->log_printf("*** Odd psf->datalength (%D) should be a multiple of %d\n",
-                           psf->datalength, pg72x->blocksize);
-            pg72x->blocks_total = (psf->datalength / pg72x->blocksize) + 1;
+                           psf->m_datalength, pg72x->blocksize);
+            pg72x->blocks_total = (psf->m_datalength / pg72x->blocksize) + 1;
         }
         else
         {
-            pg72x->blocks_total = psf->datalength / pg72x->blocksize;
+            pg72x->blocks_total = psf->m_datalength / pg72x->blocksize;
         }
 
         psf->sf.frames = pg72x->blocks_total * pg72x->samplesperblock;
 
         psf_g72x_decode_block(psf, pg72x);
     }
-    else if (psf->file_mode == SFM_WRITE)
+    else if (psf->m_mode == SFM_WRITE)
     {
         pg72x->priv = g72x_writer_init(codec, &(pg72x->blocksize), &(pg72x->samplesperblock));
         if (pg72x->priv == NULL)
@@ -173,15 +173,15 @@ int g72x_init(SF_PRIVATE *psf)
         psf->write_float = g72x_write_f;
         psf->write_double = g72x_write_d;
 
-        if (psf->datalength % pg72x->blocksize)
-            pg72x->blocks_total = (psf->datalength / pg72x->blocksize) + 1;
+        if (psf->m_datalength % pg72x->blocksize)
+            pg72x->blocks_total = (psf->m_datalength / pg72x->blocksize) + 1;
         else
-            pg72x->blocks_total = psf->datalength / pg72x->blocksize;
+            pg72x->blocks_total = psf->m_datalength / pg72x->blocksize;
 
-        if (psf->datalength > 0)
-            psf->sf.frames = (8 * psf->datalength) / bitspersample;
+        if (psf->m_datalength > 0)
+            psf->sf.frames = (8 * psf->m_datalength) / bitspersample;
 
-        if ((psf->sf.frames * bitspersample) / 8 != psf->datalength)
+        if ((psf->sf.frames * bitspersample) / 8 != psf->m_datalength)
             psf->log_printf("*** Warning : weird psf->datalength.\n");
     };
 
@@ -245,9 +245,9 @@ static size_t g72x_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     size_t readcount, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pg72x = (G72x_PRIVATE *)psf->codec_data;
+    pg72x = (G72x_PRIVATE *)psf->m_codec_data;
 
     while (len > 0)
     {
@@ -273,9 +273,9 @@ static size_t g72x_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     size_t k, bufferlen, readcount = 0, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pg72x = (G72x_PRIVATE *)psf->codec_data;
+    pg72x = (G72x_PRIVATE *)psf->m_codec_data;
 
     sptr = ubuf.sbuf;
     bufferlen = SF_BUFFER_LEN / sizeof(short);
@@ -305,11 +305,11 @@ static size_t g72x_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pg72x = (G72x_PRIVATE *)psf->codec_data;
+    pg72x = (G72x_PRIVATE *)psf->m_codec_data;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
 
     sptr = ubuf.sbuf;
     bufferlen = SF_BUFFER_LEN / sizeof(short);
@@ -338,11 +338,11 @@ static size_t g72x_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pg72x = (G72x_PRIVATE *)psf->codec_data;
+    pg72x = (G72x_PRIVATE *)psf->m_codec_data;
 
-    normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x8000) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? 1.0 / ((double)0x8000) : 1.0;
 
     sptr = ubuf.sbuf;
     bufferlen = SF_BUFFER_LEN / sizeof(short);
@@ -422,9 +422,9 @@ static size_t g72x_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
     size_t writecount, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pg72x = (G72x_PRIVATE *)psf->codec_data;
+    pg72x = (G72x_PRIVATE *)psf->m_codec_data;
 
     while (len > 0)
     {
@@ -449,9 +449,9 @@ static size_t g72x_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
     size_t k, bufferlen, writecount = 0, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pg72x = (G72x_PRIVATE *)psf->codec_data;
+    pg72x = (G72x_PRIVATE *)psf->m_codec_data;
 
     sptr = ubuf.sbuf;
     bufferlen = SF_BUFFER_LEN / sizeof(short);
@@ -479,11 +479,11 @@ static size_t g72x_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pg72x = (G72x_PRIVATE *)psf->codec_data;
+    pg72x = (G72x_PRIVATE *)psf->m_codec_data;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x8000) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? (1.0 * 0x8000) : 1.0);
 
     sptr = ubuf.sbuf;
     bufferlen = SF_BUFFER_LEN / sizeof(short);
@@ -512,11 +512,11 @@ static size_t g72x_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pg72x = (G72x_PRIVATE *)psf->codec_data;
+    pg72x = (G72x_PRIVATE *)psf->m_codec_data;
 
-    normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x8000) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? (1.0 * 0x8000) : 1.0;
 
     sptr = ubuf.sbuf;
     bufferlen = SF_BUFFER_LEN / sizeof(short);
@@ -540,9 +540,9 @@ static int g72x_close(SF_PRIVATE *psf)
 {
     G72x_PRIVATE *pg72x;
 
-    pg72x = (G72x_PRIVATE *)psf->codec_data;
+    pg72x = (G72x_PRIVATE *)psf->m_codec_data;
 
-    if (psf->file_mode == SFM_WRITE)
+    if (psf->m_mode == SFM_WRITE)
     {
         /*	If a block has been partially assembled, write it out
 		**	as the final block.

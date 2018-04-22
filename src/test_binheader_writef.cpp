@@ -44,7 +44,7 @@ void test_binheader_writef(void)
 
         psf->binheader_writef("Ep", BHWp(buffer));
 
-        if ((psf->header.indx & 1) != 0)
+        if ((psf->m_header.indx & 1) != 0)
             errors = 1;
     };
 

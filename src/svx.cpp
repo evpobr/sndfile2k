@@ -79,32 +79,32 @@ int svx_open(SF_PRIVATE *psf)
 {
     int error;
 
-    if (psf->file_mode == SFM_READ || (psf->file_mode == SFM_RDWR && psf->filelength > 0))
+    if (psf->m_mode == SFM_READ || (psf->m_mode == SFM_RDWR && psf->m_filelength > 0))
     {
         if ((error = svx_read_header(psf)))
             return error;
 
-        psf->endian = SF_ENDIAN_BIG; /* All SVX files are big endian. */
+        psf->m_endian = SF_ENDIAN_BIG; /* All SVX files are big endian. */
 
-        psf->blockwidth = psf->sf.channels * psf->bytewidth;
-        if (psf->blockwidth)
-            psf->sf.frames = psf->datalength / psf->blockwidth;
+        psf->m_blockwidth = psf->sf.channels * psf->m_bytewidth;
+        if (psf->m_blockwidth)
+            psf->sf.frames = psf->m_datalength / psf->m_blockwidth;
 
-        psf->fseek(psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->m_dataoffset, SEEK_SET);
     };
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         if ((SF_CONTAINER(psf->sf.format)) != SF_FORMAT_SVX)
             return SFE_BAD_OPEN_FORMAT;
 
-        psf->endian = SF_ENDIAN(psf->sf.format);
+        psf->m_endian = SF_ENDIAN(psf->sf.format);
 
-        if (psf->endian == SF_ENDIAN_LITTLE ||
-            (CPU_IS_LITTLE_ENDIAN && psf->endian == SF_ENDIAN_CPU))
+        if (psf->m_endian == SF_ENDIAN_LITTLE ||
+            (CPU_IS_LITTLE_ENDIAN && psf->m_endian == SF_ENDIAN_CPU))
             return SFE_BAD_ENDIAN;
 
-        psf->endian = SF_ENDIAN_BIG; /* All SVX files are big endian. */
+        psf->m_endian = SF_ENDIAN_BIG; /* All SVX files are big endian. */
 
         error = svx_write_header(psf, SF_FALSE);
         if (error)
@@ -128,7 +128,7 @@ static int svx_read_header(SF_PRIVATE *psf)
     int filetype = 0, parsestage = 0, done = 0;
     int bytecount = 0, channels;
 
-    if (psf->filelength > INT64_C(0xffffffff))
+    if (psf->m_filelength > INT64_C(0xffffffff))
         psf->log_printf("Warning : filelength > 0xffffffff. This is bad!!!!\n");
 
     memset(&vhdr, 0, sizeof(vhdr));
@@ -149,9 +149,9 @@ static int svx_read_header(SF_PRIVATE *psf)
             if (parsestage)
                 return SFE_SVX_NO_FORM;
 
-            if (chunk_size != psf->filelength - 2 * sizeof(chunk_size))
+            if (chunk_size != psf->m_filelength - 2 * sizeof(chunk_size))
                 psf->log_printf("FORM : %u (should be %u)\n", chunk_size,
-                               (uint32_t)psf->filelength - 2 * sizeof(chunk_size));
+                               (uint32_t)psf->m_filelength - 2 * sizeof(chunk_size));
             else
                 psf->log_printf("FORM : %u\n", chunk_size);
             parsestage |= HAVE_FORM;
@@ -201,12 +201,12 @@ static int svx_read_header(SF_PRIVATE *psf)
             if (filetype == SVX8_MARKER)
             {
                 psf->sf.format |= SF_FORMAT_PCM_S8;
-                psf->bytewidth = 1;
+                psf->m_bytewidth = 1;
             }
             else if (filetype == SV16_MARKER)
             {
                 psf->sf.format |= SF_FORMAT_PCM_16;
-                psf->bytewidth = 2;
+                psf->m_bytewidth = 2;
             };
 
             parsestage |= HAVE_VHDR;
@@ -216,27 +216,27 @@ static int svx_read_header(SF_PRIVATE *psf)
             if (!(parsestage & HAVE_VHDR))
                 return SFE_SVX_NO_BODY;
 
-            psf->datalength = chunk_size;
+            psf->m_datalength = chunk_size;
 
-            psf->dataoffset = psf->ftell();
-            if (psf->dataoffset < 0)
+            psf->m_dataoffset = psf->ftell();
+            if (psf->m_dataoffset < 0)
                 return SFE_SVX_NO_BODY;
 
-            if (psf->datalength > psf->filelength - psf->dataoffset)
+            if (psf->m_datalength > psf->m_filelength - psf->m_dataoffset)
             {
-                psf->log_printf(" BODY : %D (should be %D)\n", psf->datalength,
-                               psf->filelength - psf->dataoffset);
-                psf->datalength = psf->filelength - psf->dataoffset;
+                psf->log_printf(" BODY : %D (should be %D)\n", psf->m_datalength,
+                               psf->m_filelength - psf->m_dataoffset);
+                psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
             }
             else
-                psf->log_printf(" BODY : %D\n", psf->datalength);
+                psf->log_printf(" BODY : %D\n", psf->m_datalength);
 
             parsestage |= HAVE_BODY;
 
             if (!psf->sf.seekable)
                 break;
 
-            psf->fseek(psf->datalength, SEEK_CUR);
+            psf->fseek(psf->m_datalength, SEEK_CUR);
             break;
 
         case NAME_MARKER:
@@ -246,13 +246,13 @@ static int svx_read_header(SF_PRIVATE *psf)
 
             psf->log_printf(" %M : %u\n", marker, chunk_size);
 
-            if (strlen(psf->_path) != chunk_size)
+            if (strlen(psf->m_path) != chunk_size)
             {
-                if (chunk_size > sizeof(psf->_path) - 1)
+                if (chunk_size > sizeof(psf->m_path) - 1)
                     return SFE_SVX_BAD_NAME_LENGTH;
 
-                psf->binheader_readf("b", psf->_path, chunk_size);
-                psf->_path[chunk_size] = 0;
+                psf->binheader_readf("b", psf->m_path, chunk_size);
+                psf->m_path[chunk_size] = 0;
             }
             else
                 psf->binheader_seekf(chunk_size, SF_SEEK_CUR);
@@ -334,14 +334,14 @@ static int svx_read_header(SF_PRIVATE *psf)
         if (!psf->sf.seekable && (parsestage & HAVE_BODY))
             break;
 
-        if (psf->ftell() >= psf->filelength - SIGNED_SIZEOF(chunk_size))
+        if (psf->ftell() >= psf->m_filelength - SIGNED_SIZEOF(chunk_size))
             break;
     }; /* while (1) */
 
     if (vhdr.compression)
         return SFE_SVX_BAD_COMP;
 
-    if (psf->dataoffset <= 0)
+    if (psf->m_dataoffset <= 0)
         return SFE_SVX_NO_DATA;
 
     return 0;
@@ -349,7 +349,7 @@ static int svx_read_header(SF_PRIVATE *psf)
 
 static int svx_close(SF_PRIVATE *psf)
 {
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
         svx_write_header(psf, SF_TRUE);
 
     return 0;
@@ -364,25 +364,25 @@ static int svx_write_header(SF_PRIVATE *psf, int calc_length)
 
     if (calc_length)
     {
-        psf->filelength = psf->get_filelen();
+        psf->m_filelength = psf->get_filelen();
 
-        psf->datalength = psf->filelength - psf->dataoffset;
+        psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
 
-        if (psf->dataend)
-            psf->datalength -= psf->filelength - psf->dataend;
+        if (psf->m_dataend)
+            psf->m_datalength -= psf->m_filelength - psf->m_dataend;
 
-        psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels);
+        psf->sf.frames = psf->m_datalength / (psf->m_bytewidth * psf->sf.channels);
     };
 
-    psf->header.ptr[0] = 0;
-    psf->header.indx = 0;
+    psf->m_header.ptr[0] = 0;
+    psf->m_header.indx = 0;
     psf->fseek(0, SEEK_SET);
 
     /* FORM marker and FORM size. */
     psf->binheader_writef("Etm8", BHWm(FORM_MARKER),
-                         BHW8((psf->filelength < 8) ? psf->filelength * 0 : psf->filelength - 8));
+                         BHW8((psf->m_filelength < 8) ? psf->m_filelength * 0 : psf->m_filelength - 8));
 
-    psf->binheader_writef("m", BHWm((psf->bytewidth == 1) ? SVX8_MARKER : SV16_MARKER));
+    psf->binheader_writef("m", BHWm((psf->m_bytewidth == 1) ? SVX8_MARKER : SV16_MARKER));
 
     /* VHDR chunk. */
     psf->binheader_writef("Em4", BHWm(VHDR_MARKER), BHW4(sizeof(VHDR_CHUNK)));
@@ -391,12 +391,12 @@ static int svx_write_header(SF_PRIVATE *psf, int calc_length)
     /* VHDR : samplesPerSec, octave, compression */
     psf->binheader_writef("E211", BHW2(psf->sf.samplerate), BHW1(1), BHW1(0));
     /* VHDR : volume */
-    psf->binheader_writef("E4", BHW4((psf->bytewidth == 1) ? 0xFF : 0xFFFF));
+    psf->binheader_writef("E4", BHW4((psf->m_bytewidth == 1) ? 0xFF : 0xFFFF));
 
     if (psf->sf.channels == 2)
         psf->binheader_writef("Em44", BHWm(CHAN_MARKER), BHW4(4), BHW4(6));
 
-    string file_path = psf->_path;
+    string file_path = psf->m_path;
     string file_name = file_path.substr(file_path.find_last_of("/\\") + 1);
     /* Filename and annotation strings. */
     psf->binheader_writef("Emsms", BHWm(NAME_MARKER), BHWs(file_name.c_str()), BHWm(ANNO_MARKER),
@@ -404,17 +404,17 @@ static int svx_write_header(SF_PRIVATE *psf, int calc_length)
 
     /* BODY marker and size. */
     psf->binheader_writef("Etm8", BHWm(BODY_MARKER),
-                         BHW8((psf->datalength < 0) ? psf->datalength * 0 : psf->datalength));
+                         BHW8((psf->m_datalength < 0) ? psf->m_datalength * 0 : psf->m_datalength));
 
-    psf->fwrite(psf->header.ptr, psf->header.indx, 1);
+    psf->fwrite(psf->m_header.ptr, psf->m_header.indx, 1);
 
-    if (psf->error)
-        return psf->error;
+    if (psf->m_error)
+        return psf->m_error;
 
-    psf->dataoffset = psf->header.indx;
+    psf->m_dataoffset = psf->m_header.indx;
 
     if (current > 0)
         psf->fseek(current, SEEK_SET);
 
-    return psf->error;
+    return psf->m_error;
 }

@@ -35,7 +35,7 @@ static size_t ulaw_write_d2ulaw(SF_PRIVATE *psf, const double *ptr, size_t len);
 
 int ulaw_init(SF_PRIVATE *psf)
 {
-    if (psf->file_mode == SFM_READ || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_READ || psf->m_mode == SFM_RDWR)
     {
         psf->read_short = ulaw_read_ulaw2s;
         psf->read_int = ulaw_read_ulaw2i;
@@ -43,7 +43,7 @@ int ulaw_init(SF_PRIVATE *psf)
         psf->read_double = ulaw_read_ulaw2d;
     };
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
         psf->write_short = ulaw_write_s2ulaw;
         psf->write_int = ulaw_write_i2ulaw;
@@ -51,16 +51,16 @@ int ulaw_init(SF_PRIVATE *psf)
         psf->write_double = ulaw_write_d2ulaw;
     };
 
-    psf->bytewidth = 1;
-    psf->blockwidth = psf->sf.channels;
+    psf->m_bytewidth = 1;
+    psf->m_blockwidth = psf->sf.channels;
 
-    if (psf->filelength > psf->dataoffset)
-        psf->datalength =
-            (psf->dataend) ? psf->dataend - psf->dataoffset : psf->filelength - psf->dataoffset;
+    if (psf->m_filelength > psf->m_dataoffset)
+        psf->m_datalength =
+            (psf->m_dataend) ? psf->m_dataend - psf->m_dataoffset : psf->m_filelength - psf->m_dataoffset;
     else
-        psf->datalength = 0;
+        psf->m_datalength = 0;
 
-    psf->sf.frames = psf->blockwidth > 0 ? psf->datalength / psf->blockwidth : 0;
+    psf->sf.frames = psf->m_blockwidth > 0 ? psf->m_datalength / psf->m_blockwidth : 0;
 
     return 0;
 }
@@ -745,7 +745,7 @@ static size_t ulaw_read_ulaw2f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
 
@@ -771,7 +771,7 @@ static size_t ulaw_read_ulaw2d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    normfact = (psf->norm_double) ? 1.0 / ((double)0x8000) : 1.0;
+    normfact = (psf->m_norm_double) ? 1.0 / ((double)0x8000) : 1.0;
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
 
     while (len > 0)
@@ -843,7 +843,7 @@ static size_t ulaw_write_f2ulaw(SF_PRIVATE *psf, const float *ptr, size_t len)
     float normfact;
 
     /* Factor in a divide by 4. */
-    normfact = (float)((psf->norm_float == SF_TRUE) ? (0.25 * 0x7FFF) : 0.25);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? (0.25 * 0x7FFF) : 0.25);
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
 
@@ -870,7 +870,7 @@ static size_t ulaw_write_d2ulaw(SF_PRIVATE *psf, const double *ptr, size_t len)
     double normfact;
 
     /* Factor in a divide by 4. */
-    normfact = (psf->norm_double) ? (0.25 * 0x7FFF) : 0.25;
+    normfact = (psf->m_norm_double) ? (0.25 * 0x7FFF) : 0.25;
 
     bufferlen = ARRAY_LEN(ubuf.ucbuf);
 

@@ -69,7 +69,7 @@ static void conversion_test(char endian)
     memset(psf, 0, sizeof(sf_private));
 
     SF_INFO sfinfo = { 0 };
-    psf->file_mode = SFM_WRITE;
+    psf->m_mode = SFM_WRITE;
     if (psf->open(filename, SFM_WRITE, &sfinfo) != 0)
     {
         printf("\n\nError : failed to open file '%s' for write.\n\n", filename);
@@ -77,7 +77,7 @@ static void conversion_test(char endian)
     };
 
     psf->binheader_writef(format_str, i8, i16, i24, i32, i64);
-    psf->fwrite(psf->header.ptr, 1, psf->header.indx);
+    psf->fwrite(psf->m_header.ptr, 1, psf->m_header.indx);
     sf_close(psf);
 
     memset(psf, 0, sizeof(sf_private));

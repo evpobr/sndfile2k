@@ -97,14 +97,14 @@ int float32_init(SF_PRIVATE *psf)
 
     float_caps = float32_get_capability(psf);
 
-    psf->blockwidth = sizeof(float) * psf->sf.channels;
+    psf->m_blockwidth = sizeof(float) * psf->sf.channels;
 
-    if (psf->file_mode == SFM_READ || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_READ || psf->m_mode == SFM_RDWR)
     {
-        switch (psf->endian + float_caps)
+        switch (psf->m_endian + float_caps)
         {
         case (SF_ENDIAN_BIG + FLOAT_CAN_RW_BE):
-            psf->data_endswap = SF_FALSE;
+            psf->m_data_endswap = SF_FALSE;
             psf->read_short = host_read_f2s;
             psf->read_int = host_read_f2i;
             psf->read_float = host_read_f;
@@ -112,7 +112,7 @@ int float32_init(SF_PRIVATE *psf)
             break;
 
         case (SF_ENDIAN_LITTLE + FLOAT_CAN_RW_LE):
-            psf->data_endswap = SF_FALSE;
+            psf->m_data_endswap = SF_FALSE;
             psf->read_short = host_read_f2s;
             psf->read_int = host_read_f2i;
             psf->read_float = host_read_f;
@@ -120,7 +120,7 @@ int float32_init(SF_PRIVATE *psf)
             break;
 
         case (SF_ENDIAN_BIG + FLOAT_CAN_RW_LE):
-            psf->data_endswap = SF_TRUE;
+            psf->m_data_endswap = SF_TRUE;
             psf->read_short = host_read_f2s;
             psf->read_int = host_read_f2i;
             psf->read_float = host_read_f;
@@ -128,7 +128,7 @@ int float32_init(SF_PRIVATE *psf)
             break;
 
         case (SF_ENDIAN_LITTLE + FLOAT_CAN_RW_BE):
-            psf->data_endswap = SF_TRUE;
+            psf->m_data_endswap = SF_TRUE;
             psf->read_short = host_read_f2s;
             psf->read_int = host_read_f2i;
             psf->read_float = host_read_f;
@@ -137,7 +137,7 @@ int float32_init(SF_PRIVATE *psf)
 
         case (SF_ENDIAN_BIG + FLOAT_BROKEN_LE):
             /* When the CPU is not IEEE compatible. */
-            psf->data_endswap = SF_TRUE;
+            psf->m_data_endswap = SF_TRUE;
             psf->read_short = replace_read_f2s;
             psf->read_int = replace_read_f2i;
             psf->read_float = replace_read_f;
@@ -145,7 +145,7 @@ int float32_init(SF_PRIVATE *psf)
             break;
 
         case (SF_ENDIAN_LITTLE + FLOAT_BROKEN_LE):
-            psf->data_endswap = SF_FALSE;
+            psf->m_data_endswap = SF_FALSE;
             psf->read_short = replace_read_f2s;
             psf->read_int = replace_read_f2i;
             psf->read_float = replace_read_f;
@@ -153,7 +153,7 @@ int float32_init(SF_PRIVATE *psf)
             break;
 
         case (SF_ENDIAN_BIG + FLOAT_BROKEN_BE):
-            psf->data_endswap = SF_FALSE;
+            psf->m_data_endswap = SF_FALSE;
             psf->read_short = replace_read_f2s;
             psf->read_int = replace_read_f2i;
             psf->read_float = replace_read_f;
@@ -161,7 +161,7 @@ int float32_init(SF_PRIVATE *psf)
             break;
 
         case (SF_ENDIAN_LITTLE + FLOAT_BROKEN_BE):
-            psf->data_endswap = SF_TRUE;
+            psf->m_data_endswap = SF_TRUE;
             psf->read_short = replace_read_f2s;
             psf->read_int = replace_read_f2i;
             psf->read_float = replace_read_f;
@@ -173,12 +173,12 @@ int float32_init(SF_PRIVATE *psf)
         };
     };
 
-    if (psf->file_mode == SFM_WRITE || psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
-        switch (psf->endian + float_caps)
+        switch (psf->m_endian + float_caps)
         {
         case (SF_ENDIAN_LITTLE + FLOAT_CAN_RW_LE):
-            psf->data_endswap = SF_FALSE;
+            psf->m_data_endswap = SF_FALSE;
             psf->write_short = host_write_s2f;
             psf->write_int = host_write_i2f;
             psf->write_float = host_write_f;
@@ -186,7 +186,7 @@ int float32_init(SF_PRIVATE *psf)
             break;
 
         case (SF_ENDIAN_BIG + FLOAT_CAN_RW_BE):
-            psf->data_endswap = SF_FALSE;
+            psf->m_data_endswap = SF_FALSE;
             psf->write_short = host_write_s2f;
             psf->write_int = host_write_i2f;
             psf->write_float = host_write_f;
@@ -194,7 +194,7 @@ int float32_init(SF_PRIVATE *psf)
             break;
 
         case (SF_ENDIAN_BIG + FLOAT_CAN_RW_LE):
-            psf->data_endswap = SF_TRUE;
+            psf->m_data_endswap = SF_TRUE;
             psf->write_short = host_write_s2f;
             psf->write_int = host_write_i2f;
             psf->write_float = host_write_f;
@@ -202,7 +202,7 @@ int float32_init(SF_PRIVATE *psf)
             break;
 
         case (SF_ENDIAN_LITTLE + FLOAT_CAN_RW_BE):
-            psf->data_endswap = SF_TRUE;
+            psf->m_data_endswap = SF_TRUE;
             psf->write_short = host_write_s2f;
             psf->write_int = host_write_i2f;
             psf->write_float = host_write_f;
@@ -211,7 +211,7 @@ int float32_init(SF_PRIVATE *psf)
 
         /* When the CPU is not IEEE compatible. */
         case (SF_ENDIAN_BIG + FLOAT_BROKEN_LE):
-            psf->data_endswap = SF_TRUE;
+            psf->m_data_endswap = SF_TRUE;
             psf->write_short = replace_write_s2f;
             psf->write_int = replace_write_i2f;
             psf->write_float = replace_write_f;
@@ -219,7 +219,7 @@ int float32_init(SF_PRIVATE *psf)
             break;
 
         case (SF_ENDIAN_LITTLE + FLOAT_BROKEN_LE):
-            psf->data_endswap = SF_FALSE;
+            psf->m_data_endswap = SF_FALSE;
             psf->write_short = replace_write_s2f;
             psf->write_int = replace_write_i2f;
             psf->write_float = replace_write_f;
@@ -227,7 +227,7 @@ int float32_init(SF_PRIVATE *psf)
             break;
 
         case (SF_ENDIAN_BIG + FLOAT_BROKEN_BE):
-            psf->data_endswap = SF_FALSE;
+            psf->m_data_endswap = SF_FALSE;
             psf->write_short = replace_write_s2f;
             psf->write_int = replace_write_i2f;
             psf->write_float = replace_write_f;
@@ -235,7 +235,7 @@ int float32_init(SF_PRIVATE *psf)
             break;
 
         case (SF_ENDIAN_LITTLE + FLOAT_BROKEN_BE):
-            psf->data_endswap = SF_TRUE;
+            psf->m_data_endswap = SF_TRUE;
             psf->write_short = replace_write_s2f;
             psf->write_int = replace_write_i2f;
             psf->write_float = replace_write_f;
@@ -247,15 +247,15 @@ int float32_init(SF_PRIVATE *psf)
         };
     };
 
-    if (psf->filelength > psf->dataoffset)
+    if (psf->m_filelength > psf->m_dataoffset)
     {
-        psf->datalength =
-            (psf->dataend > 0) ? psf->dataend - psf->dataoffset : psf->filelength - psf->dataoffset;
+        psf->m_datalength =
+            (psf->m_dataend > 0) ? psf->m_dataend - psf->m_dataoffset : psf->m_filelength - psf->m_dataoffset;
     }
     else
-        psf->datalength = 0;
+        psf->m_datalength = 0;
 
-    psf->sf.frames = psf->blockwidth > 0 ? psf->datalength / psf->blockwidth : 0;
+    psf->sf.frames = psf->m_blockwidth > 0 ? psf->m_datalength / psf->m_blockwidth : 0;
 
     return 0;
 }
@@ -405,11 +405,11 @@ static void float32_peak_update(SF_PRIVATE *psf, const float *buffer, size_t cou
                 position = k;
             };
 
-        if (fmaxval > psf->peak_info->peaks[chan].value)
+        if (fmaxval > psf->m_peak_info->peaks[chan].value)
         {
-            psf->peak_info->peaks[chan].value = fmaxval;
-            psf->peak_info->peaks[chan].position =
-                psf->write_current + indx + (position / psf->sf.channels);
+            psf->m_peak_info->peaks[chan].value = fmaxval;
+            psf->m_peak_info->peaks[chan].position =
+                psf->m_write_current + indx + (position / psf->sf.channels);
         };
     };
 
@@ -427,7 +427,7 @@ static int float32_get_capability(SF_PRIVATE *psf)
 
     data.f = (float)1.23456789; /* Some abitrary value. */
 
-    if (!psf->ieee_replace)
+    if (!psf->m_ieee_replace)
     {
         /* If this test is true ints and floats are compatible and little endian. */
         if (data.c[0] == 0x52 && data.c[1] == 0x06 && data.c[2] == 0x9e && data.c[3] == 0x3f)
@@ -538,9 +538,9 @@ static size_t host_read_f2s(SF_PRIVATE *psf, short *ptr, size_t len)
     size_t total = 0;
     float scale;
 
-    convert = (psf->add_clipping) ? f2s_clip_array : f2s_array;
+    convert = (psf->m_add_clipping) ? f2s_clip_array : f2s_array;
     bufferlen = ARRAY_LEN(ubuf.fbuf);
-    scale = (float)((psf->float_int_mult == 0) ? 1.0 : 0x7FFF / psf->float_max);
+    scale = (float)((psf->m_float_int_mult == 0) ? 1.0 : 0x7FFF / psf->m_float_max);
 
     while (len > 0)
     {
@@ -549,7 +549,7 @@ static size_t host_read_f2s(SF_PRIVATE *psf, short *ptr, size_t len)
         readcount = psf->fread(ubuf.fbuf, sizeof(float), bufferlen);
 
         /* Fix me : Need lef2s_array */
-        if (psf->data_endswap == SF_TRUE)
+        if (psf->m_data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, readcount);
 
         convert(ubuf.fbuf, readcount, ptr + total, scale);
@@ -570,9 +570,9 @@ static size_t host_read_f2i(SF_PRIVATE *psf, int *ptr, size_t len)
     size_t total = 0;
     float scale;
 
-    convert = (psf->add_clipping) ? f2i_clip_array : f2i_array;
+    convert = (psf->m_add_clipping) ? f2i_clip_array : f2i_array;
     bufferlen = ARRAY_LEN(ubuf.fbuf);
-    scale = (float)((psf->float_int_mult == 0) ? 1.0 : 0x7FFFFFFF / psf->float_max);
+    scale = (float)((psf->m_float_int_mult == 0) ? 1.0 : 0x7FFFFFFF / psf->m_float_max);
 
     while (len > 0)
     {
@@ -580,7 +580,7 @@ static size_t host_read_f2i(SF_PRIVATE *psf, int *ptr, size_t len)
             bufferlen = len;
         readcount = psf->fread(ubuf.fbuf, sizeof(float), bufferlen);
 
-        if (psf->data_endswap == SF_TRUE)
+        if (psf->m_data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
         convert(ubuf.fbuf, readcount, ptr + total, scale);
@@ -599,7 +599,7 @@ static size_t host_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t bufferlen, readcount;
     size_t total = 0;
 
-    if (psf->data_endswap != SF_TRUE)
+    if (psf->m_data_endswap != SF_TRUE)
         return psf->fread(ptr, sizeof(float), len);
 
     bufferlen = ARRAY_LEN(ubuf.fbuf);
@@ -635,7 +635,7 @@ static size_t host_read_f2d(SF_PRIVATE *psf, double *ptr, size_t len)
             bufferlen = len;
         readcount = psf->fread(ubuf.fbuf, sizeof(float), bufferlen);
 
-        if (psf->data_endswap == SF_TRUE)
+        if (psf->m_data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
         /* Fix me : Need lef2d_array */
@@ -657,7 +657,7 @@ static size_t host_write_s2f(SF_PRIVATE *psf, const short *ptr, size_t len)
     float scale;
 
     /* Erik */
-    scale = (float)((psf->scale_int_float == 0) ? 1.0 : 1.0 / 0x8000);
+    scale = (float)((psf->m_scale_int_float == 0) ? 1.0 : 1.0 / 0x8000);
     bufferlen = ARRAY_LEN(ubuf.fbuf);
 
     while (len > 0)
@@ -666,10 +666,10 @@ static size_t host_write_s2f(SF_PRIVATE *psf, const short *ptr, size_t len)
             bufferlen = len;
         s2f_array(ptr + total, ubuf.fbuf, bufferlen, scale);
 
-        if (psf->peak_info)
+        if (psf->m_peak_info)
             float32_peak_update(psf, ubuf.fbuf, bufferlen, total / psf->sf.channels);
 
-        if (psf->data_endswap == SF_TRUE)
+        if (psf->m_data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
         writecount = psf->fwrite(ubuf.fbuf, sizeof(float), bufferlen);
@@ -689,7 +689,7 @@ static size_t host_write_i2f(SF_PRIVATE *psf, const int *ptr, size_t len)
     size_t total = 0;
     float scale;
 
-    scale = (float)((psf->scale_int_float == 0) ? 1.0 : 1.0 / (8.0 * 0x10000000));
+    scale = (float)((psf->m_scale_int_float == 0) ? 1.0 : 1.0 / (8.0 * 0x10000000));
     bufferlen = ARRAY_LEN(ubuf.fbuf);
 
     while (len > 0)
@@ -698,10 +698,10 @@ static size_t host_write_i2f(SF_PRIVATE *psf, const int *ptr, size_t len)
             bufferlen = len;
         i2f_array(ptr + total, ubuf.fbuf, bufferlen, scale);
 
-        if (psf->peak_info)
+        if (psf->m_peak_info)
             float32_peak_update(psf, ubuf.fbuf, bufferlen, total / psf->sf.channels);
 
-        if (psf->data_endswap == SF_TRUE)
+        if (psf->m_data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
         writecount = psf->fwrite(ubuf.fbuf, sizeof(float), bufferlen);
@@ -720,10 +720,10 @@ static size_t host_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t bufferlen, writecount;
     size_t total = 0;
 
-    if (psf->peak_info)
+    if (psf->m_peak_info)
         float32_peak_update(psf, ptr, len, 0);
 
-    if (psf->data_endswap != SF_TRUE)
+    if (psf->m_data_endswap != SF_TRUE)
         return psf->fwrite(ptr, sizeof(float), len);
 
     bufferlen = ARRAY_LEN(ubuf.fbuf);
@@ -760,10 +760,10 @@ static size_t host_write_d2f(SF_PRIVATE *psf, const double *ptr, size_t len)
 
         d2f_array(ptr + total, ubuf.fbuf, bufferlen);
 
-        if (psf->peak_info)
+        if (psf->m_peak_info)
             float32_peak_update(psf, ubuf.fbuf, bufferlen, total / psf->sf.channels);
 
-        if (psf->data_endswap == SF_TRUE)
+        if (psf->m_data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
         writecount = psf->fwrite(ubuf.fbuf, sizeof(float), bufferlen);
@@ -784,7 +784,7 @@ static size_t replace_read_f2s(SF_PRIVATE *psf, short *ptr, size_t len)
     float scale;
 
     bufferlen = ARRAY_LEN(ubuf.fbuf);
-    scale = (float)((psf->float_int_mult == 0) ? 1.0 : 0x7FFF / psf->float_max);
+    scale = (float)((psf->m_float_int_mult == 0) ? 1.0 : 0x7FFF / psf->m_float_max);
 
     while (len > 0)
     {
@@ -792,7 +792,7 @@ static size_t replace_read_f2s(SF_PRIVATE *psf, short *ptr, size_t len)
             bufferlen = len;
         readcount = psf->fread(ubuf.fbuf, sizeof(float), bufferlen);
 
-        if (psf->data_endswap == SF_TRUE)
+        if (psf->m_data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
         bf2f_array(ubuf.fbuf, bufferlen);
@@ -815,7 +815,7 @@ static size_t replace_read_f2i(SF_PRIVATE *psf, int *ptr, size_t len)
     float scale;
 
     bufferlen = ARRAY_LEN(ubuf.fbuf);
-    scale = (float)((psf->float_int_mult == 0) ? 1.0 : 0x7FFF / psf->float_max);
+    scale = (float)((psf->m_float_int_mult == 0) ? 1.0 : 0x7FFF / psf->m_float_max);
 
     while (len > 0)
     {
@@ -823,7 +823,7 @@ static size_t replace_read_f2i(SF_PRIVATE *psf, int *ptr, size_t len)
             bufferlen = len;
         readcount = psf->fread(ubuf.fbuf, sizeof(float), bufferlen);
 
-        if (psf->data_endswap == SF_TRUE)
+        if (psf->m_data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
         bf2f_array(ubuf.fbuf, bufferlen);
@@ -854,7 +854,7 @@ static size_t replace_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
             bufferlen = len;
         readcount = psf->fread(ubuf.fbuf, sizeof(float), bufferlen);
 
-        if (psf->data_endswap == SF_TRUE)
+        if (psf->m_data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
         bf2f_array(ubuf.fbuf, bufferlen);
@@ -884,7 +884,7 @@ static size_t replace_read_f2d(SF_PRIVATE *psf, double *ptr, size_t len)
             bufferlen = len;
         readcount = psf->fread(ubuf.fbuf, sizeof(float), bufferlen);
 
-        if (psf->data_endswap == SF_TRUE)
+        if (psf->m_data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
         bf2f_array(ubuf.fbuf, bufferlen);
@@ -906,7 +906,7 @@ static size_t replace_write_s2f(SF_PRIVATE *psf, const short *ptr, size_t len)
     size_t total = 0;
     float scale;
 
-    scale = (float)((psf->scale_int_float == 0) ? 1.0 : 1.0 / 0x8000);
+    scale = (float)((psf->m_scale_int_float == 0) ? 1.0 : 1.0 / 0x8000);
     bufferlen = ARRAY_LEN(ubuf.fbuf);
 
     while (len > 0)
@@ -915,12 +915,12 @@ static size_t replace_write_s2f(SF_PRIVATE *psf, const short *ptr, size_t len)
             bufferlen = len;
         s2f_array(ptr + total, ubuf.fbuf, bufferlen, scale);
 
-        if (psf->peak_info)
+        if (psf->m_peak_info)
             float32_peak_update(psf, ubuf.fbuf, bufferlen, total / psf->sf.channels);
 
         f2bf_array(ubuf.fbuf, bufferlen);
 
-        if (psf->data_endswap == SF_TRUE)
+        if (psf->m_data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
         writecount = psf->fwrite(ubuf.fbuf, sizeof(float), bufferlen);
@@ -940,7 +940,7 @@ static size_t replace_write_i2f(SF_PRIVATE *psf, const int *ptr, size_t len)
     size_t total = 0;
     float scale;
 
-    scale = (float)((psf->scale_int_float == 0) ? 1.0 : 1.0 / (8.0 * 0x10000000));
+    scale = (float)((psf->m_scale_int_float == 0) ? 1.0 : 1.0 / (8.0 * 0x10000000));
     bufferlen = ARRAY_LEN(ubuf.fbuf);
 
     while (len > 0)
@@ -949,12 +949,12 @@ static size_t replace_write_i2f(SF_PRIVATE *psf, const int *ptr, size_t len)
             bufferlen = len;
         i2f_array(ptr + total, ubuf.fbuf, bufferlen, scale);
 
-        if (psf->peak_info)
+        if (psf->m_peak_info)
             float32_peak_update(psf, ubuf.fbuf, bufferlen, total / psf->sf.channels);
 
         f2bf_array(ubuf.fbuf, bufferlen);
 
-        if (psf->data_endswap == SF_TRUE)
+        if (psf->m_data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
         writecount = psf->fwrite(ubuf.fbuf, sizeof(float), bufferlen);
@@ -974,7 +974,7 @@ static size_t replace_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t total = 0;
 
     /* FIX THIS */
-    if (psf->peak_info)
+    if (psf->m_peak_info)
         float32_peak_update(psf, ptr, len, 0);
 
     bufferlen = ARRAY_LEN(ubuf.fbuf);
@@ -988,7 +988,7 @@ static size_t replace_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
 
         f2bf_array(ubuf.fbuf, bufferlen);
 
-        if (psf->data_endswap == SF_TRUE)
+        if (psf->m_data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
         writecount = psf->fwrite(ubuf.fbuf, sizeof(float), bufferlen);
@@ -1015,12 +1015,12 @@ static size_t replace_write_d2f(SF_PRIVATE *psf, const double *ptr, size_t len)
             bufferlen = len;
         d2f_array(ptr + total, ubuf.fbuf, bufferlen);
 
-        if (psf->peak_info)
+        if (psf->m_peak_info)
             float32_peak_update(psf, ubuf.fbuf, bufferlen, total / psf->sf.channels);
 
         f2bf_array(ubuf.fbuf, bufferlen);
 
-        if (psf->data_endswap == SF_TRUE)
+        if (psf->m_data_endswap == SF_TRUE)
             endswap_int_array(ubuf.ibuf, bufferlen);
 
         writecount = psf->fwrite(ubuf.fbuf, sizeof(float), bufferlen);

@@ -84,13 +84,13 @@ int gsm610_init(SF_PRIVATE *psf)
     GSM610_PRIVATE *pgsm610;
     int true_flag = 1;
 
-    if (psf->codec_data != NULL)
+    if (psf->m_codec_data != NULL)
     {
         psf->log_printf("*** psf->codec_data is not NULL.\n");
         return SFE_INTERNAL;
     };
 
-    if (psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_RDWR)
         return SFE_BAD_MODE_RW;
 
     psf->sf.seekable = SF_FALSE;
@@ -98,7 +98,7 @@ int gsm610_init(SF_PRIVATE *psf)
     if ((pgsm610 = (GSM610_PRIVATE *)calloc(1, sizeof(GSM610_PRIVATE))) == NULL)
         return SFE_MALLOC_FAILED;
 
-    psf->codec_data = pgsm610;
+    psf->m_codec_data = pgsm610;
 
     memset(pgsm610, 0, sizeof(GSM610_PRIVATE));
 
@@ -139,11 +139,11 @@ int gsm610_init(SF_PRIVATE *psf)
         break;
     };
 
-    if (psf->file_mode == SFM_READ)
+    if (psf->m_mode == SFM_READ)
     {
-        if (psf->datalength % pgsm610->blocksize == 0)
-            pgsm610->blocks = psf->datalength / pgsm610->blocksize;
-        else if (psf->datalength % pgsm610->blocksize == 1 &&
+        if (psf->m_datalength % pgsm610->blocksize == 0)
+            pgsm610->blocks = psf->m_datalength / pgsm610->blocksize;
+        else if (psf->m_datalength % pgsm610->blocksize == 1 &&
                  pgsm610->blocksize == GSM610_BLOCKSIZE)
         {
             /*
@@ -153,17 +153,17 @@ int gsm610_init(SF_PRIVATE *psf)
 			 * chunk. The SSND chunk then gets padded on write which means that
 			 * when it is read the datalength is too big by 1.
 			 */
-            pgsm610->blocks = psf->datalength / pgsm610->blocksize;
+            pgsm610->blocks = psf->m_datalength / pgsm610->blocksize;
         }
         else
         {
             psf->log_printf("*** Warning : data chunk seems to be truncated.\n");
-            pgsm610->blocks = psf->datalength / pgsm610->blocksize + 1;
+            pgsm610->blocks = psf->m_datalength / pgsm610->blocksize + 1;
         };
 
         psf->sf.frames = pgsm610->samplesperblock * pgsm610->blocks;
 
-        psf->fseek(psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->m_dataoffset, SEEK_SET);
 
         pgsm610->decode_block(psf, pgsm610); /* Read first block. */
 
@@ -173,7 +173,7 @@ int gsm610_init(SF_PRIVATE *psf)
         psf->read_double = gsm610_read_d;
     };
 
-    if (psf->file_mode == SFM_WRITE)
+    if (psf->m_mode == SFM_WRITE)
     {
         pgsm610->blockcount = 0;
         pgsm610->samplecount = 0;
@@ -188,8 +188,8 @@ int gsm610_init(SF_PRIVATE *psf)
 
     psf->seek_from_start = gsm610_seek;
 
-    psf->filelength = psf->get_filelen();
-    psf->datalength = psf->filelength - psf->dataoffset;
+    psf->m_filelength = psf->get_filelen();
+    psf->m_datalength = psf->m_filelength - psf->m_dataoffset;
 
     return 0;
 }
@@ -287,9 +287,9 @@ static size_t gsm610_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     size_t readcount, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pgsm610 = (GSM610_PRIVATE *)psf->codec_data;
+    pgsm610 = (GSM610_PRIVATE *)psf->m_codec_data;
 
     while (len > 0)
     {
@@ -315,9 +315,9 @@ static size_t gsm610_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     size_t k, bufferlen, readcount = 0, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pgsm610 = (GSM610_PRIVATE *)psf->codec_data;
+    pgsm610 = (GSM610_PRIVATE *)psf->m_codec_data;
 
     sptr = ubuf.sbuf;
     bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -343,11 +343,11 @@ static size_t gsm610_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pgsm610 = (GSM610_PRIVATE *)psf->codec_data;
+    pgsm610 = (GSM610_PRIVATE *)psf->m_codec_data;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? 1.0 / ((float)0x8000) : 1.0);
 
     sptr = ubuf.sbuf;
     bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -373,11 +373,11 @@ static size_t gsm610_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double)0x8000) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? 1.0 / ((double)0x8000) : 1.0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pgsm610 = (GSM610_PRIVATE *)psf->codec_data;
+    pgsm610 = (GSM610_PRIVATE *)psf->m_codec_data;
 
     sptr = ubuf.sbuf;
     bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -399,13 +399,13 @@ static sf_count_t gsm610_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offs
     GSM610_PRIVATE *pgsm610;
     int newblock, newsample;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pgsm610 = (GSM610_PRIVATE *)psf->codec_data;
+    pgsm610 = (GSM610_PRIVATE *)psf->m_codec_data;
 
-    if (psf->dataoffset < 0)
+    if (psf->m_dataoffset < 0)
     {
-        psf->error = SFE_BAD_SEEK;
+        psf->m_error = SFE_BAD_SEEK;
         return PSF_SEEK_ERROR;
     };
 
@@ -413,7 +413,7 @@ static sf_count_t gsm610_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offs
     {
         int true_flag = 1;
 
-        psf->fseek(psf->dataoffset, SEEK_SET);
+        psf->fseek(psf->m_dataoffset, SEEK_SET);
         pgsm610->blockcount = 0;
 
         gsm_init(pgsm610->gsm_data);
@@ -428,18 +428,18 @@ static sf_count_t gsm610_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offs
 
     if (offset < 0 || offset > pgsm610->blocks * pgsm610->samplesperblock)
     {
-        psf->error = SFE_BAD_SEEK;
+        psf->m_error = SFE_BAD_SEEK;
         return PSF_SEEK_ERROR;
     };
 
     newblock = offset / pgsm610->samplesperblock;
     newsample = offset % pgsm610->samplesperblock;
 
-    if (psf->file_mode == SFM_READ)
+    if (psf->m_mode == SFM_READ)
     {
-        if (psf->read_current != newblock * pgsm610->samplesperblock + newsample)
+        if (psf->m_read_current != newblock * pgsm610->samplesperblock + newsample)
         {
-            psf->fseek(psf->dataoffset + newblock * pgsm610->samplesperblock, SEEK_SET);
+            psf->fseek(psf->m_dataoffset + newblock * pgsm610->samplesperblock, SEEK_SET);
             pgsm610->blockcount = newblock;
             pgsm610->decode_block(psf, pgsm610);
             pgsm610->samplecount = newsample;
@@ -449,7 +449,7 @@ static sf_count_t gsm610_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offs
     };
 
     /* What to do about write??? */
-    psf->error = SFE_BAD_SEEK;
+    psf->m_error = SFE_BAD_SEEK;
     return PSF_SEEK_ERROR;
 }
 
@@ -526,9 +526,9 @@ static size_t gsm610_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
     size_t writecount, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pgsm610 = (GSM610_PRIVATE *)psf->codec_data;
+    pgsm610 = (GSM610_PRIVATE *)psf->m_codec_data;
 
     while (len > 0)
     {
@@ -554,9 +554,9 @@ static size_t gsm610_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
     size_t k, bufferlen, writecount = 0, count;
     size_t total = 0;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pgsm610 = (GSM610_PRIVATE *)psf->codec_data;
+    pgsm610 = (GSM610_PRIVATE *)psf->m_codec_data;
 
     sptr = ubuf.sbuf;
     bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -582,11 +582,11 @@ static size_t gsm610_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     size_t total = 0;
     float normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pgsm610 = (GSM610_PRIVATE *)psf->codec_data;
+    pgsm610 = (GSM610_PRIVATE *)psf->m_codec_data;
 
-    normfact = (float)((psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0);
+    normfact = (float)((psf->m_norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0);
 
     sptr = ubuf.sbuf;
     bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -612,11 +612,11 @@ static size_t gsm610_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
     size_t total = 0;
     double normfact;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
-    pgsm610 = (GSM610_PRIVATE *)psf->codec_data;
+    pgsm610 = (GSM610_PRIVATE *)psf->m_codec_data;
 
-    normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0;
+    normfact = (psf->m_norm_double == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0;
 
     sptr = ubuf.sbuf;
     bufferlen = ARRAY_LEN(ubuf.sbuf);
@@ -637,12 +637,12 @@ static int gsm610_close(SF_PRIVATE *psf)
 {
     GSM610_PRIVATE *pgsm610;
 
-    if (psf->codec_data == NULL)
+    if (psf->m_codec_data == NULL)
         return 0;
 
-    pgsm610 = (GSM610_PRIVATE *)psf->codec_data;
+    pgsm610 = (GSM610_PRIVATE *)psf->m_codec_data;
 
-    if (psf->file_mode == SFM_WRITE)
+    if (psf->m_mode == SFM_WRITE)
     {
         /*
 		 * If a block has been partially assembled, write it out

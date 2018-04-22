@@ -127,8 +127,8 @@ typedef struct
 
 static int vorbis_read_header(SF_PRIVATE *psf, int log_data)
 {
-    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
-    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
+    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
+    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->m_codec_data;
     char *buffer;
     int bytes;
     int i;
@@ -302,8 +302,8 @@ static int vorbis_read_header(SF_PRIVATE *psf, int log_data)
 
 static int vorbis_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
 {
-    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
-    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
+    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
+    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->m_codec_data;
     int k, ret;
 
     vorbis_info_init(&vdata->vinfo);
@@ -334,10 +334,10 @@ static int vorbis_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     {
         const char *name;
 
-        if (psf->strings.data[k].type == 0)
+        if (psf->m_strings.data[k].type == 0)
             break;
 
-        switch (psf->strings.data[k].type)
+        switch (psf->m_strings.data[k].type)
         {
         case SF_STR_TITLE:
             name = "TITLE";
@@ -375,7 +375,7 @@ static int vorbis_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
         };
 
         vorbis_comment_add_tag(&vdata->vcomment, name,
-                               psf->strings.storage + psf->strings.data[k].offset);
+                               psf->m_strings.storage + psf->m_strings.data[k].offset);
     };
 
     /* set up the analysis state and auxiliary encoding storage */
@@ -426,8 +426,8 @@ static int vorbis_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
 
 static int vorbis_close(SF_PRIVATE *psf)
 {
-    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
-    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
+    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
+    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->m_codec_data;
 
     if (odata == NULL || vdata == NULL)
         return 0;
@@ -436,9 +436,9 @@ static int vorbis_close(SF_PRIVATE *psf)
 	 * followed by another [chained].
 	 */
 
-    if (psf->file_mode == SFM_WRITE)
+    if (psf->m_mode == SFM_WRITE)
     {
-        if (psf->write_current <= 0)
+        if (psf->m_write_current <= 0)
             vorbis_write_header(psf, 0);
 
         vorbis_analysis_wrote(&vdata->vdsp, 0);
@@ -490,7 +490,7 @@ static int vorbis_close(SF_PRIVATE *psf)
 
 int ogg_vorbis_open(SF_PRIVATE *psf)
 {
-    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
+    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
     VORBIS_PRIVATE *vdata;
     int error = 0;
 
@@ -501,14 +501,14 @@ int ogg_vorbis_open(SF_PRIVATE *psf)
     };
 
     vdata = (VORBIS_PRIVATE *)calloc(1, sizeof(VORBIS_PRIVATE));
-    psf->codec_data = vdata;
+    psf->m_codec_data = vdata;
 
-    if (psf->file_mode == SFM_RDWR)
+    if (psf->m_mode == SFM_RDWR)
         return SFE_BAD_MODE_RW;
 
     psf->log_printf("Vorbis library version : %s\n", vorbis_version_string());
 
-    if (psf->file_mode == SFM_READ)
+    if (psf->m_mode == SFM_READ)
     {
         /*
         ** First page of the ogg stream is already loaded by the ogg container
@@ -525,7 +525,7 @@ int ogg_vorbis_open(SF_PRIVATE *psf)
     };
 
     psf->codec_close = vorbis_close;
-    if (psf->file_mode == SFM_WRITE)
+    if (psf->m_mode == SFM_WRITE)
     {
         /* Set the default vorbis quality here. */
         vdata->quality = 0.4;
@@ -537,7 +537,7 @@ int ogg_vorbis_open(SF_PRIVATE *psf)
         psf->write_double = vorbis_write_d;
 
         psf->sf.frames = SF_COUNT_MAX; /* Unknown really */
-        psf->strings.flags = SF_STR_ALLOW_START;
+        psf->m_strings.flags = SF_STR_ALLOW_START;
     };
 
     psf->seek_from_start = vorbis_seek;
@@ -548,8 +548,8 @@ int ogg_vorbis_open(SF_PRIVATE *psf)
     psf->sf.format = SF_FORMAT_OGG | SF_FORMAT_VORBIS;
     psf->sf.sections = 1;
 
-    psf->datalength = 1;
-    psf->dataoffset = 0;
+    psf->m_datalength = 1;
+    psf->m_dataoffset = 0;
     /* End FIXME. */
 
     return error;
@@ -557,7 +557,7 @@ int ogg_vorbis_open(SF_PRIVATE *psf)
 
 static size_t vorbis_command(SF_PRIVATE *psf, int command, void *data, size_t datasize)
 {
-    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
+    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->m_codec_data;
 
     switch (command)
     {
@@ -565,7 +565,7 @@ static size_t vorbis_command(SF_PRIVATE *psf, int command, void *data, size_t da
         if (data == NULL || datasize != sizeof(double))
             return SF_FALSE;
 
-        if (psf->have_written)
+        if (psf->m_have_written)
             return SF_FALSE;
 
         vdata->quality = 1.0 - *((double *)data);
@@ -595,9 +595,9 @@ static int vorbis_rshort(SF_PRIVATE *psf, int samples, void *vptr, int off, int 
 {
     short *ptr = (short *)vptr + off;
     int i = 0, j, n;
-    if (psf->float_int_mult)
+    if (psf->m_float_int_mult)
     {
-        float inverse = (float)(1.0 / psf->float_max);
+        float inverse = (float)(1.0 / psf->m_float_max);
         for (j = 0; j < samples; j++)
             for (n = 0; n < channels; n++)
                 ptr[i++] = (short)lrintf((pcm[n][j] * inverse) * 32767.0f);
@@ -616,9 +616,9 @@ static int vorbis_rint(SF_PRIVATE *psf, int samples, void *vptr, int off, int ch
     int *ptr = (int *)vptr + off;
     int i = 0, j, n;
 
-    if (psf->float_int_mult)
+    if (psf->m_float_int_mult)
     {
-        float inverse = (float)(1.0 / psf->float_max);
+        float inverse = (float)(1.0 / psf->m_float_max);
         for (j = 0; j < samples; j++)
             for (n = 0; n < channels; n++)
                 ptr[i++] = lrintf((pcm[n][j] * inverse) * 2147483647.0f);
@@ -656,8 +656,8 @@ static int vorbis_rdouble(SF_PRIVATE *UNUSED(psf), int samples, void *vptr, int 
 
 static size_t vorbis_read_sample(SF_PRIVATE *psf, void *ptr, size_t lens, convert_func *transfn)
 {
-    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
-    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
+    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->m_codec_data;
+    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
     size_t len, samples, i = 0;
     float **pcm;
     int result = 0;
@@ -817,8 +817,8 @@ static void vorbis_write_samples(SF_PRIVATE *psf, OGG_PRIVATE *odata, VORBIS_PRI
 static size_t vorbis_write_s(SF_PRIVATE *psf, const short *ptr, size_t lens)
 {
     size_t i, m, j = 0;
-    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
-    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
+    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
+    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->m_codec_data;
     size_t in_frames = lens / psf->sf.channels;
     float **buffer = vorbis_analysis_buffer(&vdata->vdsp, in_frames);
     for (i = 0; i < in_frames; i++)
@@ -833,8 +833,8 @@ static size_t vorbis_write_s(SF_PRIVATE *psf, const short *ptr, size_t lens)
 static size_t vorbis_write_i(SF_PRIVATE *psf, const int *ptr, size_t lens)
 {
     size_t i, m, j = 0;
-    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
-    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
+    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
+    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->m_codec_data;
     int in_frames = lens / psf->sf.channels;
     float **buffer = vorbis_analysis_buffer(&vdata->vdsp, in_frames);
     for (i = 0; i < in_frames; i++)
@@ -849,8 +849,8 @@ static size_t vorbis_write_i(SF_PRIVATE *psf, const int *ptr, size_t lens)
 static size_t vorbis_write_f(SF_PRIVATE *psf, const float *ptr, size_t lens)
 {
     size_t i, m, j = 0;
-    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
-    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
+    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
+    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->m_codec_data;
     size_t in_frames = lens / psf->sf.channels;
     float **buffer = vorbis_analysis_buffer(&vdata->vdsp, in_frames);
     for (i = 0; i < in_frames; i++)
@@ -865,8 +865,8 @@ static size_t vorbis_write_f(SF_PRIVATE *psf, const float *ptr, size_t lens)
 static size_t vorbis_write_d(SF_PRIVATE *psf, const double *ptr, size_t lens)
 {
     size_t i, m, j = 0;
-    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
-    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
+    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
+    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->m_codec_data;
     size_t in_frames = lens / psf->sf.channels;
     float **buffer = vorbis_analysis_buffer(&vdata->vdsp, in_frames);
     for (i = 0; i < in_frames; i++)
@@ -880,19 +880,19 @@ static size_t vorbis_write_d(SF_PRIVATE *psf, const double *ptr, size_t lens)
 
 static sf_count_t vorbis_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offset)
 {
-    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->container_data;
-    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->codec_data;
+    OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
+    VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->m_codec_data;
 
     if (odata == NULL || vdata == NULL)
         return 0;
 
     if (offset < 0)
     {
-        psf->error = SFE_BAD_SEEK;
+        psf->m_error = SFE_BAD_SEEK;
         return ((sf_count_t)-1);
     };
 
-    if (psf->file_mode == SFM_READ)
+    if (psf->m_mode == SFM_READ)
     {
         sf_count_t target = offset - vdata->loc;
 
@@ -925,8 +925,8 @@ static sf_count_t vorbis_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offs
 
 static int vorbis_byterate(SF_PRIVATE *psf)
 {
-    if (psf->file_mode == SFM_READ)
-        return (psf->datalength * psf->sf.samplerate) / psf->sf.frames;
+    if (psf->m_mode == SFM_READ)
+        return (psf->m_datalength * psf->sf.samplerate) / psf->sf.frames;
 
     return -1;
 }
@@ -1193,9 +1193,9 @@ static sf_count_t vorbis_length(SF_PRIVATE *psf)
     psf->fseek(0, SEEK_SET);
     length = vorbis_length_aux(psf);
 
-    if ((error = ogg_read_first_page(psf, (OGG_PRIVATE *)psf->container_data)) != 0 ||
+    if ((error = ogg_read_first_page(psf, (OGG_PRIVATE *)psf->m_container_data)) != 0 ||
         (error = vorbis_read_header(psf, 0)) != 0)
-        psf->error = error;
+        psf->m_error = error;
 
     return length;
 }
