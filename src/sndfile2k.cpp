@@ -634,10 +634,10 @@ int sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo,
 
 int sf_close(SNDFILE *sndfile)
 {
-    if (!VALIDATE_SNDFILE_AND_ASSIGN_PSF(sndfile, true))
-        return 0;
+    if (VALIDATE_SNDFILE_AND_ASSIGN_PSF(sndfile, true))
+        delete sndfile;
 
-    delete sndfile;
+    return 0;
 } /* sf_close */
 
 void sf_write_sync(SNDFILE *sndfile)
@@ -711,7 +711,7 @@ const char *sf_strerror(SNDFILE *sndfile)
 int sf_error(SNDFILE *sndfile)
 {
     if (sndfile == NULL)
-        return sf_errno;
+        return SFE_BAD_FILE_PTR;
 
     if (!VALIDATE_SNDFILE_AND_ASSIGN_PSF(sndfile, false))
         return 0;
@@ -731,7 +731,7 @@ int sf_perror(SNDFILE *sndfile)
 
     if (sndfile == NULL)
     {
-        errnum = sf_errno;
+        errnum = SFE_BAD_FILE_PTR;
     }
     else
     {
@@ -757,7 +757,7 @@ int sf_error_str(SNDFILE *sndfile, char *str, size_t maxlen)
         return SFE_INTERNAL;
 
     if (sndfile == NULL)
-        errnum = sf_errno;
+        errnum = SFE_BAD_FILE_PTR;
     else
     {
         if (!VALIDATE_SNDFILE_AND_ASSIGN_PSF(sndfile, false))
