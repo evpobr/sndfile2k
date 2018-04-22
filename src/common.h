@@ -400,7 +400,7 @@ struct SF_PRIVATE
     SF_INSTRUMENT *m_instrument = nullptr;
 
     /* Channel map data (if present) : an array of ints. */
-    int *m_channel_map = nullptr;
+    std::vector<int> m_channel_map;
 
     sf_count_t m_filelength = 0; /* Overall length of file. */
 

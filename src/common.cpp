@@ -162,7 +162,7 @@ void SF_PRIVATE::close()
     free(m_loop_info);
     free(m_instrument);
     m_cues.clear();
-    free(m_channel_map);
+    m_channel_map.clear();
     free(m_format_desc);
     free(m_strings.storage);
 

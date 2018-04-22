@@ -1310,7 +1310,7 @@ static size_t wav_command(SF_PRIVATE *psf, int command, void *UNUSED(data), size
         return wpriv->wavex_ambisonic;
 
     case SFC_SET_CHANNEL_MAP_INFO:
-        wpriv->wavex_channelmask = wavlike_gen_channel_mask(psf->m_channel_map, psf->sf.channels);
+        wpriv->wavex_channelmask = wavlike_gen_channel_mask(psf->m_channel_map.data(), psf->sf.channels);
         return (wpriv->wavex_channelmask != 0);
 
     default:

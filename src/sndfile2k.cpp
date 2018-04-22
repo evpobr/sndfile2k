@@ -1507,7 +1507,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
         return sndfile->m_data_endswap;
 
     case SFC_GET_CHANNEL_MAP_INFO:
-        if (sndfile->m_channel_map == NULL)
+        if (sndfile->m_channel_map.empty())
             return SF_FALSE;
 
         if (data == NULL || datasize != SIGNED_SIZEOF(sndfile->m_channel_map[0]) * sndfile->sf.channels)
@@ -1516,7 +1516,7 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
             return SF_FALSE;
         };
 
-        memcpy(data, sndfile->m_channel_map, datasize);
+        memcpy(data, sndfile->m_channel_map.data(), datasize);
         return SF_TRUE;
 
     case SFC_SET_CHANNEL_MAP_INFO:
@@ -1544,14 +1544,8 @@ int sf_command(SNDFILE *sndfile, int command, void *data, int datasize)
             };
         };
 
-        free(sndfile->m_channel_map);
-        if ((sndfile->m_channel_map = (int *)malloc(datasize)) == NULL)
-        {
-            sndfile->m_error = SFE_MALLOC_FAILED;
-            return SF_FALSE;
-        };
-
-        memcpy(sndfile->m_channel_map, data, datasize);
+        sndfile->m_channel_map.resize(datasize);
+        memcpy(sndfile->m_channel_map.data(), data, datasize);
 
         /*
 		**	Pass the command down to the container's command handler.
