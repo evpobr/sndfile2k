@@ -359,7 +359,7 @@ static int xi_read_header(SF_PRIVATE *psf)
         buffer[k] = 0;
 
     psf->log_printf("Extended Instrument : %s\n", buffer);
-    psf_store_string(psf, SF_STR_TITLE, buffer);
+    psf->store_string(SF_STR_TITLE, buffer);
 
     psf->binheader_readf("be2", buffer, 20, &version);
     buffer[19] = 0;
@@ -368,7 +368,7 @@ static int xi_read_header(SF_PRIVATE *psf)
 
     psf->log_printf("Software : %s\nVersion  : %d.%02d\n", buffer, version / 256,
                    version % 256);
-    psf_store_string(psf, SF_STR_SOFTWARE, buffer);
+    psf->store_string(SF_STR_SOFTWARE, buffer);
 
     /*
 	 * Jump note numbers (96), volume envelope (48), pan envelope (48),

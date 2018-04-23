@@ -905,35 +905,35 @@ static int caf_read_strings(SF_PRIVATE *psf, sf_count_t chunk_size)
         switch (hash)
         {
         case 0xC4861943: /* 'title' */
-            psf_store_string(psf, SF_STR_TITLE, value);
+            psf->store_string(SF_STR_TITLE, value);
             break;
         case 0xAD47A394: /* 'software' */
-            psf_store_string(psf, SF_STR_SOFTWARE, value);
+            psf->store_string(SF_STR_SOFTWARE, value);
             break;
         case 0x5D178E2A: /* 'copyright' */
-            psf_store_string(psf, SF_STR_COPYRIGHT, value);
+            psf->store_string(SF_STR_COPYRIGHT, value);
             break;
         case 0x60E4D0C8: /* 'artist' */
-            psf_store_string(psf, SF_STR_ARTIST, value);
+            psf->store_string(SF_STR_ARTIST, value);
             break;
         case 0x83B5D16A: /* 'genre' */
-            psf_store_string(psf, SF_STR_GENRE, value);
+            psf->store_string(SF_STR_GENRE, value);
             break;
         case 0x15E5FC88: /* 'comment' */
         case 0x7C297D5B: /* 'comments' */
-            psf_store_string(psf, SF_STR_COMMENT, value);
+            psf->store_string(SF_STR_COMMENT, value);
             break;
         case 0x24A7C347: /* 'tracknumber' */
-            psf_store_string(psf, SF_STR_TRACKNUMBER, value);
+            psf->store_string(SF_STR_TRACKNUMBER, value);
             break;
         case 0x50A31EB7: /* 'date' */
-            psf_store_string(psf, SF_STR_DATE, value);
+            psf->store_string(SF_STR_DATE, value);
             break;
         case 0x6583545A: /* 'album' */
-            psf_store_string(psf, SF_STR_ALBUM, value);
+            psf->store_string(SF_STR_ALBUM, value);
             break;
         case 0xE7C64B6C: /* 'license' */
-            psf_store_string(psf, SF_STR_LICENSE, value);
+            psf->store_string(SF_STR_LICENSE, value);
             break;
         default:
             psf->log_printf(" Unhandled hash 0x%x : /* '%s' */\n", hash, key);
@@ -987,7 +987,7 @@ static void caf_write_strings(SF_PRIVATE *psf, int location)
         if (psf->m_strings.data[k].flags != location)
             continue;
 
-        if ((cptr = psf_get_string(psf, psf->m_strings.data[k].type)) == NULL)
+        if ((cptr = psf->get_string(psf->m_strings.data[k].type)) == NULL)
             continue;
 
         switch (psf->m_strings.data[k].type)

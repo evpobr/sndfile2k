@@ -518,6 +518,13 @@ struct SF_PRIVATE
     void fsync();
 
     int ftruncate(sf_count_t len);
+
+    // Functions in strings.cpp
+
+    const char *get_string(int str_type);
+    int set_string(int str_type, const char *str);
+    int store_string(int str_type, const char *str);
+    int location_string_count(int location);
 };
 
 enum
@@ -766,13 +773,6 @@ int psf_calc_max_all_channels(SF_PRIVATE *psf, double *peaks, int normalize);
 
 int psf_get_signal_max(SF_PRIVATE *psf, double *peak);
 int psf_get_max_all_channels(SF_PRIVATE *psf, double *peaks);
-
-/* Functions in strings.c. */
-
-const char *psf_get_string(SF_PRIVATE *psf, int str_type);
-int psf_set_string(SF_PRIVATE *psf, int str_type, const char *str);
-int psf_store_string(SF_PRIVATE *psf, int str_type, const char *str);
-int psf_location_string_count(const SF_PRIVATE *psf, int location);
 
 /* Default seek function. Use for PCM and float encoded data. */
 sf_count_t psf_default_seek(SF_PRIVATE *psf, int mode, sf_count_t samples_from_start);

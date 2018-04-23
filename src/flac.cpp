@@ -499,7 +499,7 @@ static void sf_flac_meta_get_vorbiscomments(SF_PRIVATE *psf, const FLAC__StreamM
             value = cptr + 1;
 
         psf->log_printf("  %-12s : %s\n", tags[k].tag, value);
-        psf_store_string(psf, tags[k].type, value);
+        psf->store_string(tags[k].type, value);
     };
 
     return;

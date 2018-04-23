@@ -622,7 +622,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
             psf_sanitize_string(cptr, chunk_size);
 
             psf->log_printf(" %M : %s\n", marker, cptr);
-            psf_store_string(psf, SF_STR_COPYRIGHT, cptr);
+            psf->store_string(SF_STR_COPYRIGHT, cptr);
             chunk_size += chunk_size & 1;
             break;
 
@@ -639,7 +639,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
             psf->binheader_readf("b", cptr, chunk_size + (chunk_size & 1));
             cptr[chunk_size] = 0;
             psf->log_printf(" %M : %s\n", marker, cptr);
-            psf_store_string(psf, SF_STR_ARTIST, cptr);
+            psf->store_string(SF_STR_ARTIST, cptr);
             chunk_size += chunk_size & 1;
             break;
 
@@ -710,7 +710,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
 
             psf->log_printf(" %M : %d\n  AppSig : %M\n  Name   : %s\n", marker, chunk_size,
                            appl_marker, cptr);
-            psf_store_string(psf, SF_STR_SOFTWARE, cptr);
+            psf->store_string(SF_STR_SOFTWARE, cptr);
             chunk_size += chunk_size & 1;
         };
         break;
@@ -728,7 +728,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
             psf->binheader_readf("b", cptr, chunk_size + (chunk_size & 1));
             cptr[chunk_size] = 0;
             psf->log_printf(" %M : %s\n", marker, cptr);
-            psf_store_string(psf, SF_STR_TITLE, cptr);
+            psf->store_string(SF_STR_TITLE, cptr);
             chunk_size += chunk_size & 1;
             break;
 
@@ -745,7 +745,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
             psf->binheader_readf("b", cptr, chunk_size + (chunk_size & 1));
             cptr[chunk_size] = 0;
             psf->log_printf(" %M : %s\n", marker, cptr);
-            psf_store_string(psf, SF_STR_COMMENT, cptr);
+            psf->store_string(SF_STR_COMMENT, cptr);
             chunk_size += chunk_size & 1;
             break;
 

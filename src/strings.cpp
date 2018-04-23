@@ -27,7 +27,7 @@
 
 #define STRINGS_DEBUG (0)
 
-int psf_store_string(SF_PRIVATE *psf, int str_type, const char *str)
+int SF_PRIVATE::store_string(int str_type, const char *str)
 {
     char new_str[128];
     size_t str_len;
@@ -39,11 +39,11 @@ int psf_store_string(SF_PRIVATE *psf, int str_type, const char *str)
     str_len = strlen(str);
 
     /* A few extra checks for write mode. */
-    if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
+    if (m_mode == SFM_WRITE || m_mode == SFM_RDWR)
     {
-        if ((psf->m_strings.flags & SF_STR_ALLOW_START) == 0)
+        if ((m_strings.flags & SF_STR_ALLOW_START) == 0)
             return SFE_STR_NO_SUPPORT;
-        if (psf->m_have_written && (psf->m_strings.flags & SF_STR_ALLOW_END) == 0)
+        if (m_have_written && (m_strings.flags & SF_STR_ALLOW_END) == 0)
             return SFE_STR_NO_SUPPORT;
         /* Only allow zero length strings for software. */
         if (str_type != SF_STR_SOFTWARE && str_len == 0)
@@ -54,18 +54,18 @@ int psf_store_string(SF_PRIVATE *psf, int str_type, const char *str)
     for (k = 0; k < SF_MAX_STRINGS; k++)
     {
         /* If we find a matching entry clear it. */
-        if (psf->m_strings.data[k].type == str_type)
-            psf->m_strings.data[k].type = -1;
+        if (m_strings.data[k].type == str_type)
+            m_strings.data[k].type = -1;
 
-        if (psf->m_strings.data[k].type == 0)
+        if (m_strings.data[k].type == 0)
             break;
     };
 
     /* Determine flags */
     str_flags = SF_STR_LOCATE_START;
-    if (psf->m_mode == SFM_RDWR || psf->m_have_written)
+    if (m_mode == SFM_RDWR || m_have_written)
     {
-        if ((psf->m_strings.flags & SF_STR_ALLOW_END) == 0)
+        if ((m_strings.flags & SF_STR_ALLOW_END) == 0)
             return SFE_STR_NO_ADD_END;
         str_flags = SF_STR_LOCATE_END;
     };
@@ -74,27 +74,27 @@ int psf_store_string(SF_PRIVATE *psf, int str_type, const char *str)
     if (k >= SF_MAX_STRINGS)
         return SFE_STR_MAX_COUNT;
 
-    if (k == 0 && psf->m_strings.storage_used != 0)
+    if (k == 0 && m_strings.storage_used != 0)
     {
-        psf->log_printf("SFE_STR_WEIRD : k == 0 && psf->strings.storage_used != 0\n");
+        log_printf("SFE_STR_WEIRD : k == 0 && m_strings.storage_used != 0\n");
         return SFE_STR_WEIRD;
     };
 
-    if (k != 0 && psf->m_strings.storage_used == 0)
+    if (k != 0 && m_strings.storage_used == 0)
     {
-        psf->log_printf("SFE_STR_WEIRD : k != 0 && psf->strings.storage_used == 0\n");
+        log_printf("SFE_STR_WEIRD : k != 0 && m_strings.storage_used == 0\n");
         return SFE_STR_WEIRD;
     };
 
     /* Special case for the first string. */
     if (k == 0)
-        psf->m_strings.storage_used = 0;
+        m_strings.storage_used = 0;
 
     switch (str_type)
     {
     case SF_STR_SOFTWARE:
         /* In write mode, want to append libsndfile-version to string. */
-        if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
+        if (m_mode == SFM_WRITE || m_mode == SFM_RDWR)
         {
             if (strstr(str, PACKAGE_NAME) == NULL)
             {
@@ -127,72 +127,70 @@ int psf_store_string(SF_PRIVATE *psf, int str_type, const char *str)
         break;
 
     default:
-        psf->log_printf("%s : SFE_STR_BAD_TYPE\n", __func__);
+        log_printf("%s : SFE_STR_BAD_TYPE\n", __func__);
         return SFE_STR_BAD_TYPE;
     };
 
     /* Plus one to catch string terminator. */
     str_len = strlen(str) + 1;
 
-    if (psf->m_strings.storage_used + str_len + 1 > psf->m_strings.storage_len)
+    if (m_strings.storage_used + str_len + 1 > m_strings.storage_len)
     {
-        char *temp = psf->m_strings.storage;
-        size_t newlen = 2 * psf->m_strings.storage_len + str_len + 1;
+        char *temp = m_strings.storage;
+        size_t newlen = 2 * m_strings.storage_len + str_len + 1;
 
         newlen = newlen < 256 ? 256 : newlen;
 
-        if ((psf->m_strings.storage = (char *)realloc(temp, newlen)) == NULL)
+        if ((m_strings.storage = (char *)realloc(temp, newlen)) == NULL)
         {
-            psf->m_strings.storage = temp;
+            m_strings.storage = temp;
             return SFE_MALLOC_FAILED;
         };
 
-        psf->m_strings.storage_len = newlen;
+        m_strings.storage_len = newlen;
     };
 
-    psf->m_strings.data[k].type = str_type;
-    psf->m_strings.data[k].offset = psf->m_strings.storage_used;
-    psf->m_strings.data[k].flags = str_flags;
+    m_strings.data[k].type = str_type;
+    m_strings.data[k].offset = m_strings.storage_used;
+    m_strings.data[k].flags = str_flags;
 
-    memcpy(psf->m_strings.storage + psf->m_strings.storage_used, str, str_len);
-    psf->m_strings.storage_used += str_len;
+    memcpy(m_strings.storage + m_strings.storage_used, str, str_len);
+    m_strings.storage_used += str_len;
 
-    psf->m_strings.flags |= str_flags;
+    m_strings.flags |= str_flags;
 
 #if STRINGS_DEBUG
-    printf("storage_used         : %zd / %zd\n", psf->strings.storage_used,
-           psf->strings.storage_len);
-    psf_hexdump(psf->strings.storage, psf->strings.storage_used);
+    printf("storage_used         : %zd / %zd\n", m_strings.storage_used,
+           m_strings.storage_len);
+    psf_hexdump(m_strings.storage, m_strings.storage_used);
 #endif
 
     return 0;
 }
 
-int psf_set_string(SF_PRIVATE *psf, int str_type, const char *str)
+int SF_PRIVATE::set_string(int str_type, const char *str)
 {
-    if (psf->m_mode == SFM_READ)
+    if (m_mode == SFM_READ)
         return SFE_STR_NOT_WRITE;
 
-    return psf_store_string(psf, str_type, str);
+    return store_string(str_type, str);
 }
 
-const char *psf_get_string(SF_PRIVATE *psf, int str_type)
+const char *SF_PRIVATE::get_string(int str_type)
 {
-    int k;
-
-    for (k = 0; k < SF_MAX_STRINGS; k++)
-        if (str_type == psf->m_strings.data[k].type)
-            return psf->m_strings.storage + psf->m_strings.data[k].offset;
+    for (int k = 0; k < SF_MAX_STRINGS; k++)
+        if (str_type == m_strings.data[k].type)
+            return m_strings.storage + m_strings.data[k].offset;
 
     return NULL;
 }
 
-int psf_location_string_count(const SF_PRIVATE *psf, int location)
+int SF_PRIVATE::location_string_count(int location)
 {
-    int k, count = 0;
+    int count = 0;
 
-    for (k = 0; k < SF_MAX_STRINGS; k++)
-        if (psf->m_strings.data[k].type > 0 && psf->m_strings.data[k].flags & location)
+    for (int k = 0; k < SF_MAX_STRINGS; k++)
+        if (m_strings.data[k].type > 0 && m_strings.data[k].flags & location)
             count++;
 
     return count;

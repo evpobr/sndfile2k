@@ -182,7 +182,7 @@ static int vorbis_read_header(SF_PRIVATE *psf, int log_data)
             dd = vorbis_comment_query(&vdata->vcomment, vorbis_metatypes[k].name, 0);
             if (dd == NULL)
                 continue;
-            psf_store_string(psf, vorbis_metatypes[k].id, dd);
+            psf->store_string(vorbis_metatypes[k].id, dd);
         };
     };
 
@@ -270,7 +270,7 @@ static int vorbis_read_header(SF_PRIVATE *psf, int log_data)
                 printed_metadata_msg = 1;
             };
 
-            psf_store_string(psf, vorbis_metatypes[k].id, dd);
+            psf->store_string(vorbis_metatypes[k].id, dd);
             psf->log_printf("  %-10s : %s\n", vorbis_metatypes[k].name, dd);
         };
 

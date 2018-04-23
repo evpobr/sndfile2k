@@ -1703,7 +1703,7 @@ const char *sf_get_string(SNDFILE *sndfile, int str_type)
     if (psf->m_Magick != SNDFILE_MAGICK)
         return NULL;
 
-    return psf_get_string(psf, str_type);
+    return psf->get_string(str_type);
 } /* sf_get_string */
 
 int sf_set_string(SNDFILE *sndfile, int str_type, const char *str)
@@ -1711,7 +1711,7 @@ int sf_set_string(SNDFILE *sndfile, int str_type, const char *str)
     if (!VALIDATE_SNDFILE_AND_ASSIGN_PSF(sndfile, true))
         return 0;
 
-    return psf_set_string(sndfile, str_type, str);
+    return sndfile->set_string(str_type, str);
 }
 
 int sf_current_byterate(SNDFILE *sndfile)

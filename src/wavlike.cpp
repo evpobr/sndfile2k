@@ -929,31 +929,31 @@ int wavlike_subchunk_parse(SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
         switch (chunk)
         {
         case ISFT_MARKER:
-            psf_store_string(psf, SF_STR_SOFTWARE, buffer);
+            psf->store_string(SF_STR_SOFTWARE, buffer);
             break;
         case ICOP_MARKER:
-            psf_store_string(psf, SF_STR_COPYRIGHT, buffer);
+            psf->store_string(SF_STR_COPYRIGHT, buffer);
             break;
         case INAM_MARKER:
-            psf_store_string(psf, SF_STR_TITLE, buffer);
+            psf->store_string(SF_STR_TITLE, buffer);
             break;
         case IART_MARKER:
-            psf_store_string(psf, SF_STR_ARTIST, buffer);
+            psf->store_string(SF_STR_ARTIST, buffer);
             break;
         case ICMT_MARKER:
-            psf_store_string(psf, SF_STR_COMMENT, buffer);
+            psf->store_string(SF_STR_COMMENT, buffer);
             break;
         case ICRD_MARKER:
-            psf_store_string(psf, SF_STR_DATE, buffer);
+            psf->store_string(SF_STR_DATE, buffer);
             break;
         case IGNR_MARKER:
-            psf_store_string(psf, SF_STR_GENRE, buffer);
+            psf->store_string(SF_STR_GENRE, buffer);
             break;
         case IPRD_MARKER:
-            psf_store_string(psf, SF_STR_ALBUM, buffer);
+            psf->store_string(SF_STR_ALBUM, buffer);
             break;
         case ITRK_MARKER:
-            psf_store_string(psf, SF_STR_TRACKNUMBER, buffer);
+            psf->store_string(SF_STR_TRACKNUMBER, buffer);
             break;
         };
     };
@@ -973,7 +973,7 @@ void wavlike_write_strings(SF_PRIVATE *psf, int location)
 {
     int k, prev_head_index, saved_head_index;
 
-    if (psf_location_string_count(psf, location) == 0)
+    if (psf->location_string_count(location) == 0)
         return;
 
     prev_head_index = psf->m_header.indx + 4;
