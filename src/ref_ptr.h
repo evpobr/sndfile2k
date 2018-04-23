@@ -7,14 +7,14 @@
 namespace sf
 {
 
-template <typename T>
-class sw_object_hide_ref : public T
+template <typename iface>
+class sw_object_hide_ref : public iface
 {
     unsigned long ref();
     void unref();
 };
 
-template <typename T>
+template <typename iface>
 class ref_ptr
 {
 public:
@@ -48,7 +48,7 @@ public:
         internal_unref();
     }
 
-    T * operator->() const noexcept
+    iface * operator->() const noexcept
     {
         return m_ptr;
     }
@@ -90,43 +90,43 @@ public:
         internal_unref();
     }
 
-    T * get() const noexcept
+    iface * get() const noexcept
     {
         return m_ptr;
     }
 
-    T * detach() noexcept
+    iface * detach() noexcept
     {
-        T *temp = m_ptr;
+        iface *temp = m_ptr;
         m_ptr = nullptr;
         return temp;
     }
 
-    void copy(T *other) noexcept
+    void copy(iface *other) noexcept
     {
         internal_copy(other);
     }
 
-    void attach(T *other) noexcept
+    void attach(iface *other) noexcept
     {
         internal_unref();
         m_ptr = other;
     }
 
-    T ** get_address_of() noexcept
+    iface ** get_address_of() noexcept
     {
         assert(m_ptr == nullptr);
         return &m_ptr;
     }
 
-    void copy_to(T ** other) const noexcept
+    void copy_to(iface ** other) const noexcept
     {
         internal_ref();
         *other = m_ptr;
     }
 
 private:
-    T * m_ptr = nullptr;
+    iface * m_ptr = nullptr;
 
     void internal_ref() const noexcept
     {
@@ -138,7 +138,7 @@ private:
 
     void internal_unref() noexcept
     {
-        T * temp = m_ptr;
+        iface * temp = m_ptr;
         if (temp)
         {
             m_ptr = nullptr;
@@ -146,7 +146,7 @@ private:
         }
     }
 
-    void internal_copy(T * other) noexcept
+    void internal_copy(iface * other) noexcept
     {
         if (m_ptr != other)
         {
@@ -169,7 +169,7 @@ private:
 
     void internal_swap(ref_ptr & other) noexcept
     {
-        T * temp = m_ptr;
+        iface * temp = m_ptr;
         m_ptr = other.m_ptr;
         other.m_ptr = temp;
     }
