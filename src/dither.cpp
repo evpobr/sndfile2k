@@ -56,26 +56,6 @@
 #define SFE_DITHER_BAD_PTR (666)
 #define SFE_DITHER_BAD_TYPE (667)
 
-typedef struct
-{
-    int read_short_dither_bits, read_int_dither_bits;
-    int write_short_dither_bits, write_int_dither_bits;
-    double read_float_dither_scale, read_double_dither_bits;
-    double write_float_dither_scale, write_double_dither_bits;
-
-    size_t (*read_short)(SF_PRIVATE *psf, short *ptr, size_t len);
-    size_t (*read_int)(SF_PRIVATE *psf, int *ptr, size_t len);
-    size_t (*read_float)(SF_PRIVATE *psf, float *ptr, size_t len);
-    size_t (*read_double)(SF_PRIVATE *psf, double *ptr, size_t len);
-
-    size_t (*write_short)(SF_PRIVATE *psf, const short *ptr, size_t len);
-    size_t (*write_int)(SF_PRIVATE *psf, const int *ptr, size_t len);
-    size_t (*write_float)(SF_PRIVATE *psf, const float *ptr, size_t len);
-    size_t (*write_double)(SF_PRIVATE *psf, const double *ptr, size_t len);
-
-    double buffer[SF_BUFFER_LEN / sizeof(double)];
-} DITHER_DATA;
-
 static size_t dither_read_short(SF_PRIVATE *psf, short *ptr, size_t len);
 static size_t dither_read_int(SF_PRIVATE *psf, int *ptr, size_t len);
 

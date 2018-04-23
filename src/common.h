@@ -308,6 +308,8 @@ typedef union
     unsigned char ucbuf[SF_BUFFER_LEN / sizeof(signed char)];
 } BUF_UNION;
 
+struct DITHER_DATA;
+
 struct SF_PRIVATE
 {
     bool m_is_open = false;
@@ -410,7 +412,7 @@ struct SF_PRIVATE
     int m_blockwidth = 0; /* Size in bytes of one set of interleaved samples. */
     int m_bytewidth = 0; /* Size in bytes of one sample (one channel). */
 
-    void *m_dither = nullptr;
+    DITHER_DATA *m_dither = nullptr;
     void *m_interleave = nullptr;
 
     int m_last_op = SFM_READ; /* Last operation; either SFM_READ or SFM_WRITE */
@@ -855,6 +857,26 @@ int vox_adpcm_init(SF_PRIVATE *psf);
 int flac_init(SF_PRIVATE *psf);
 int g72x_init(SF_PRIVATE *psf);
 int alac_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *info);
+
+struct DITHER_DATA
+{
+    int read_short_dither_bits, read_int_dither_bits;
+    int write_short_dither_bits, write_int_dither_bits;
+    double read_float_dither_scale, read_double_dither_bits;
+    double write_float_dither_scale, write_double_dither_bits;
+
+    size_t (*read_short)(SF_PRIVATE *psf, short *ptr, size_t len);
+    size_t (*read_int)(SF_PRIVATE *psf, int *ptr, size_t len);
+    size_t (*read_float)(SF_PRIVATE *psf, float *ptr, size_t len);
+    size_t (*read_double)(SF_PRIVATE *psf, double *ptr, size_t len);
+
+    size_t (*write_short)(SF_PRIVATE *psf, const short *ptr, size_t len);
+    size_t (*write_int)(SF_PRIVATE *psf, const int *ptr, size_t len);
+    size_t (*write_float)(SF_PRIVATE *psf, const float *ptr, size_t len);
+    size_t (*write_double)(SF_PRIVATE *psf, const double *ptr, size_t len);
+
+    double buffer[SF_BUFFER_LEN / sizeof(double)];
+};
 
 int dither_init(SF_PRIVATE *psf, int mode);
 
