@@ -309,6 +309,7 @@ typedef union
 } BUF_UNION;
 
 struct DITHER_DATA;
+struct INTERLEAVE_DATA;
 
 struct SF_PRIVATE
 {
@@ -413,7 +414,7 @@ struct SF_PRIVATE
     int m_bytewidth = 0; /* Size in bytes of one sample (one channel). */
 
     DITHER_DATA *m_dither = nullptr;
-    void *m_interleave = nullptr;
+    INTERLEAVE_DATA *m_interleave = nullptr;
 
     int m_last_op = SFM_READ; /* Last operation; either SFM_READ or SFM_WRITE */
     sf_count_t m_read_current = 0;
@@ -884,6 +885,18 @@ int wavlike_ima_init(SF_PRIVATE *psf, int blockalign, int samplesperblock);
 int wavlike_msadpcm_init(SF_PRIVATE *psf, int blockalign, int samplesperblock);
 
 int aiff_ima_init(SF_PRIVATE *psf, int blockalign, int samplesperblock);
+
+struct INTERLEAVE_DATA
+{
+    double buffer[SF_BUFFER_LEN / sizeof(double)];
+
+    sf_count_t channel_len;
+
+    size_t (*read_short)(SF_PRIVATE *, short *ptr, size_t len);
+    size_t (*read_int)(SF_PRIVATE *, int *ptr, size_t len);
+    size_t (*read_float)(SF_PRIVATE *, float *ptr, size_t len);
+    size_t (*read_double)(SF_PRIVATE *, double *ptr, size_t len);
+};
 
 int interleave_init(SF_PRIVATE *psf);
 

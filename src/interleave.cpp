@@ -25,18 +25,6 @@
 
 #define INTERLEAVE_CHANNELS (6)
 
-typedef struct
-{
-    double buffer[SF_BUFFER_LEN / sizeof(double)];
-
-    sf_count_t channel_len;
-
-    size_t (*read_short)(SF_PRIVATE *, short *ptr, size_t len);
-    size_t (*read_int)(SF_PRIVATE *, int *ptr, size_t len);
-    size_t (*read_float)(SF_PRIVATE *, float *ptr, size_t len);
-    size_t (*read_double)(SF_PRIVATE *, double *ptr, size_t len);
-} INTERLEAVE_DATA;
-
 static size_t interleave_read_short(SF_PRIVATE *psf, short *ptr, size_t len);
 static size_t interleave_read_int(SF_PRIVATE *psf, int *ptr, size_t len);
 static size_t interleave_read_float(SF_PRIVATE *psf, float *ptr, size_t len);
