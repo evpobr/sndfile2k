@@ -176,7 +176,7 @@ int SF_PRIVATE::set_string(int str_type, const char *str)
     return store_string(str_type, str);
 }
 
-const char *SF_PRIVATE::get_string(int str_type)
+const char *SF_PRIVATE::get_string(int str_type) const
 {
     for (int k = 0; k < SF_MAX_STRINGS; k++)
         if (str_type == m_strings.data[k].type)

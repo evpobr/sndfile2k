@@ -827,7 +827,7 @@ int flac_open(SF_PRIVATE *psf)
     psf->seek_from_start = flac_seek;
     psf->byterate = flac_byterate;
 
-    psf->command = flac_command;
+    psf->on_command = flac_command;
 
     switch (subformat)
     {

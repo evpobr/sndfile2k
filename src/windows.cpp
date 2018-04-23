@@ -278,7 +278,8 @@ int sf_wchar_open(const wchar_t *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFIL
             sfinfo->seekable = 0;
         };
 
-        *sndfile = psf;
+        *sndfile = static_cast<SNDFILE *>(psf);
+        psf->ref();
 
         return SF_ERR_NO_ERROR;
     }

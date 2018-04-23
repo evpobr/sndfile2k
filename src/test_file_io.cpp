@@ -51,28 +51,28 @@ static void test_tell_or_die(SF_PRIVATE *psf, sf_count_t expected_position, int 
 
 static void file_open_test(const char *filename)
 {
-    SF_PRIVATE *psf;
-    int error;
+    //ISndFile *psf;
+    //int error;
 
-    print_test_name("Testing file open");
+    //print_test_name("Testing file open");
 
-    /* Ensure that the file doesn't already exist. */
-    if (unlink(filename) != 0 && errno != ENOENT)
-    {
-        printf("\n\nLine %d: unlink failed (%d) : %s\n\n", __LINE__, errno, strerror(errno));
-        exit(1);
-    };
+    ///* Ensure that the file doesn't already exist. */
+    //if (unlink(filename) != 0 && errno != ENOENT)
+    //{
+    //    printf("\n\nLine %d: unlink failed (%d) : %s\n\n", __LINE__, errno, strerror(errno));
+    //    exit(1);
+    //};
 
-    /* Test that open for read fails if the file doesn't exist. */
-    SF_INFO sfinfo = { 0 };
-    sf_open(filename, SFM_READ, &sfinfo, &psf);
-    if (psf)
-    {
-        printf("\n\nLine %d: psf->fopen() should have failed.\n\n", __LINE__);
-        exit(1);
-    };
+    ///* Test that open for read fails if the file doesn't exist. */
+    //SF_INFO sfinfo = { 0 };
+    //sf_open(filename, SFM_READ, &sfinfo, &psf);
+    //if (psf)
+    //{
+    //    printf("\n\nLine %d: psf->fopen() should have failed.\n\n", __LINE__);
+    //    exit(1);
+    //};
 
-    sf_close(psf);
+    //sf_close(psf);
 
     ///* Test file open in write mode. */
     //psf->file_mode = SFM_WRITE;

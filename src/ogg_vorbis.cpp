@@ -541,7 +541,7 @@ int ogg_vorbis_open(SF_PRIVATE *psf)
     };
 
     psf->seek_from_start = vorbis_seek;
-    psf->command = vorbis_command;
+    psf->on_command = vorbis_command;
     psf->byterate = vorbis_byterate;
 
     /* FIXME, FIXME, FIXME : Hack these here for now and correct later. */

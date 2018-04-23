@@ -29,10 +29,8 @@
 #include <sys/types.h>
 #endif
 
-#ifndef SNDFILE2_H
-#include "sndfile2k/sndfile2k.h"
+#include "sndfile2k/sndfile2k.hpp"
 #include "ref_ptr.h"
-#endif
 
 #include <vector>
 #include <memory>
@@ -311,11 +309,60 @@ typedef union
 struct DITHER_DATA;
 struct INTERLEAVE_DATA;
 
-struct SF_PRIVATE
+struct SF_PRIVATE: public ISndFile
 {
     bool m_is_open = false;
+    unsigned long m_ref = 0;
 
     SF_PRIVATE();
+
+    unsigned long ref() final;
+    void unref() final;
+
+	sf_count_t getFrames(void) const override;
+	int getFormat(void) const override;
+	int getChannels(void) const override;
+	int getSamplerate(void) const override;
+
+	int getError(void) const override;
+	const char *getErrorString(void) const override;
+
+	int command(int cmd, void *data, int datasize) override;
+
+	sf_count_t seek(sf_count_t frames, int whence) override;
+
+	void writeSync(void) override;
+
+	int setString(int str_type, const char *str) override;
+	const char *getString(int str_type) const override;
+
+	sf_count_t readShortSamples(short *ptr, sf_count_t items) override;
+	sf_count_t readIntSamples(int *ptr, sf_count_t items) override;
+	sf_count_t readFloatSamples(float *ptr, sf_count_t items) override;
+	sf_count_t readDoubleSamples(double *ptr, sf_count_t items) override;
+	sf_count_t writeShortSamples(const short *ptr, sf_count_t items) override;
+	sf_count_t writeIntSamples(const int *ptr, sf_count_t items) override;
+	sf_count_t writeFroatSamples(const float *ptr, sf_count_t items) override;
+	sf_count_t writeDoubleSamples(const double *ptr, sf_count_t items) override;
+	sf_count_t readShortFrames(short *ptr, sf_count_t frames) override;
+	sf_count_t readIntFrames(int *ptr, sf_count_t frames) override;
+	sf_count_t readFloatFrames(float *ptr, sf_count_t frames) override;
+	sf_count_t readDoubleFrames(double *ptr, sf_count_t frames) override;
+	sf_count_t writeShortFrames(const short *ptr, sf_count_t frames) override;
+	sf_count_t writeIntFrames(const int *ptr, sf_count_t frames) override;
+	sf_count_t writeFloatFrames(const float *ptr, sf_count_t frames) override;
+	sf_count_t writeDoubleFrames(const double *ptr, sf_count_t frames) override;
+
+    int getCurrentByterate() const override;
+
+	sf_count_t readRaw(void *ptr, sf_count_t bytes) override;
+	sf_count_t writeRaw(const void *ptr, sf_count_t bytes) override;
+
+    int setChunk(const SF_CHUNK_INFO *chunk_info) override;
+    SF_CHUNK_ITERATOR *getChunkIterator(const SF_CHUNK_INFO *chunk_info) override;
+    SF_CHUNK_ITERATOR *getNextChunkIterator(SF_CHUNK_ITERATOR *iterator) override;
+    int getChunkSize(const SF_CHUNK_ITERATOR *it, SF_CHUNK_INFO *chunk_info) override;
+    int getChunkData(const SF_CHUNK_ITERATOR *it, SF_CHUNK_INFO *chunk_info) override;
 
     int open(const char *filename, SF_FILEMODE mode, SF_INFO *sfinfo);
     int open(sf::ref_ptr<SF_STREAM> &stream, SF_FILEMODE mode, SF_INFO *sfinfo);
@@ -453,7 +500,7 @@ struct SF_PRIVATE
 
     sf_count_t (*seek_from_start)(struct SF_PRIVATE *, int mode, sf_count_t samples_from_start) = nullptr;
     int (*write_header)(struct SF_PRIVATE *, int calc_length) = nullptr;
-    size_t (*command)(struct SF_PRIVATE *, int command, void *data, size_t datasize) = nullptr;
+    size_t (*on_command)(struct SF_PRIVATE *, int command, void *data, size_t datasize) = nullptr;
     int (*byterate)(struct SF_PRIVATE *) = nullptr;
 
     /*
@@ -524,7 +571,7 @@ struct SF_PRIVATE
 
     // Functions in strings.cpp
 
-    const char *get_string(int str_type);
+    const char *get_string(int str_type) const;
     int set_string(int str_type, const char *str);
     int store_string(int str_type, const char *str);
     int location_string_count(int location);

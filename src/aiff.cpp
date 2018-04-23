@@ -301,7 +301,7 @@ int aiff_open(SF_PRIVATE *psf)
     };
 
     psf->container_close = aiff_close;
-    psf->command = aiff_command;
+    psf->on_command = aiff_command;
 
     switch (SF_CODEC(psf->sf.format))
     {

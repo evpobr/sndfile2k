@@ -209,7 +209,7 @@ int wav_open(SF_PRIVATE *psf)
     };
 
     psf->container_close = wav_close;
-    psf->command = wav_command;
+    psf->on_command = wav_command;
 
     switch (subformat)
     {

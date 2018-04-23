@@ -171,7 +171,7 @@ int caf_open(SF_PRIVATE *psf)
     };
 
     psf->container_close = caf_close;
-    psf->command = caf_command;
+    psf->on_command = caf_command;
 
     switch (subformat)
     {

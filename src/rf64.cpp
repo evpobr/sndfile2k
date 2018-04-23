@@ -121,7 +121,7 @@ int rf64_open(SF_PRIVATE *psf)
     };
 
     psf->container_close = rf64_close;
-    psf->command = rf64_command;
+    psf->on_command = rf64_command;
 
     switch (subformat)
     {

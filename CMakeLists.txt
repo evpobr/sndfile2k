@@ -28,6 +28,10 @@ include(GNUInstallDirs)
 include(FeatureSummary)
 include(CMakeDependentOption)
 include(CPack)
+if(BUILD_TESTING)
+  include(CTest)
+  enable_testing()
+endif()
 
 #
 # Options
@@ -134,10 +138,6 @@ endif()
 #
 
 if(BUILD_TESTING)
-
-  include(CTest)
-
-  enable_testing()
 
   add_subdirectory(tests)
 

@@ -155,7 +155,8 @@ public:
 
     sf_count_t seek(sf_count_t offset, int whence) override
     {
-        LARGE_INTEGER liDistanceToMove { .QuadPart = offset };
+        LARGE_INTEGER liDistanceToMove;
+        liDistanceToMove.QuadPart = offset;
         LARGE_INTEGER liNewFilePointer = { 0 };
 
         BOOL fRet = ::SetFilePointerEx(
