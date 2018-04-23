@@ -18,6 +18,8 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#ifndef _WIN32
+
 #include "config.h"
 
 #include "common.h"
@@ -318,3 +320,5 @@ static void psf_log_syserr(SF_PRIVATE *psf, int error)
 
 	return;
 }
+
+#endif

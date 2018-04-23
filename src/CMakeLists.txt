@@ -50,7 +50,7 @@ set(COMMON
   ref_ptr.h
 )
 if(WIN32 OR CYGWIN)
-  list(APPEND COMMON windows.cpp)
+  list(APPEND COMMON windows.cpp file_io_win32.cpp)
 endif()
 
 # File specific sources
