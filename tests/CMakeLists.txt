@@ -143,18 +143,6 @@ target_link_libraries(locale_test PRIVATE
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 add_test(NAME locale_test COMMAND $<TARGET_FILE:locale_test>)
 
-### cpp_test
-
-add_executable(cpp_test cpp_test.cpp utils.cpp utils.h)
-target_include_directories(cpp_test
-  PRIVATE
-    ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_BINARY_DIR}/src)
-target_link_libraries(cpp_test PRIVATE
-  sndfile2k
-  $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
-add_test(NAME cpp_test COMMAND $<TARGET_FILE:cpp_test>)
-
 ### external_libs_test
 
 add_executable(external_libs_test external_libs_test.cpp utils.cpp utils.h)
@@ -540,7 +528,6 @@ set(SNDFILE_TEST_TARGETS
   headerless_test
   rdwr_test
   locale_test
-  cpp_test
   external_libs_test
   format_check_test
   channel_test
