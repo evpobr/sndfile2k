@@ -36,7 +36,7 @@
 
 #if (ENABLE_EXPERIMENTAL_CODE == 0)
 
-int txw_open(SF_PRIVATE *psf)
+int txw_open(SndFile *psf)
 {
     if (psf)
         return SFE_UNIMPLEMENTED;

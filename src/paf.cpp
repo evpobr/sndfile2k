@@ -57,22 +57,22 @@ typedef struct
     int data[];
 } PAF24_PRIVATE;
 
-static int paf24_init(SF_PRIVATE *psf);
+static int paf24_init(SndFile *psf);
 
-static int paf_read_header(SF_PRIVATE *psf);
-static int paf_write_header(SF_PRIVATE *psf, int calc_length);
+static int paf_read_header(SndFile *psf);
+static int paf_write_header(SndFile *psf, int calc_length);
 
-static size_t paf24_read_s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t paf24_read_i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t paf24_read_f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t paf24_read_d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t paf24_read_s(SndFile *psf, short *ptr, size_t len);
+static size_t paf24_read_i(SndFile *psf, int *ptr, size_t len);
+static size_t paf24_read_f(SndFile *psf, float *ptr, size_t len);
+static size_t paf24_read_d(SndFile *psf, double *ptr, size_t len);
 
-static size_t paf24_write_s(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t paf24_write_i(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t paf24_write_f(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t paf24_write_d(SF_PRIVATE *psf, const double *ptr, size_t len);
+static size_t paf24_write_s(SndFile *psf, const short *ptr, size_t len);
+static size_t paf24_write_i(SndFile *psf, const int *ptr, size_t len);
+static size_t paf24_write_f(SndFile *psf, const float *ptr, size_t len);
+static size_t paf24_write_d(SndFile *psf, const double *ptr, size_t len);
 
-static sf_count_t paf24_seek(SF_PRIVATE *psf, int mode, sf_count_t offset);
+static sf_count_t paf24_seek(SndFile *psf, int mode, sf_count_t offset);
 
 enum
 {
@@ -81,7 +81,7 @@ enum
     PAF_PCM_S8 = 2
 };
 
-int paf_open(SF_PRIVATE *psf)
+int paf_open(SndFile *psf)
 {
     int subformat, error, endian;
 
@@ -138,7 +138,7 @@ int paf_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int paf_read_header(SF_PRIVATE *psf)
+static int paf_read_header(SndFile *psf)
 {
     PAF_FMT paf_fmt;
     int marker;
@@ -271,7 +271,7 @@ static int paf_read_header(SF_PRIVATE *psf)
     return 0;
 }
 
-static int paf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
+static int paf_write_header(SndFile *psf, int UNUSED(calc_length))
 {
     int paf_format;
 
@@ -342,11 +342,11 @@ static int paf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
  * The code below attempts to gain efficiency while maintaining readability.
  */
 
-static int paf24_read_block(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24);
-static int paf24_write_block(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24);
-static int paf24_close(SF_PRIVATE *psf);
+static int paf24_read_block(SndFile *psf, PAF24_PRIVATE *ppaf24);
+static int paf24_write_block(SndFile *psf, PAF24_PRIVATE *ppaf24);
+static int paf24_close(SndFile *psf);
 
-static int paf24_init(SF_PRIVATE *psf)
+static int paf24_init(SndFile *psf)
 {
     PAF24_PRIVATE *ppaf24;
     int paf24size;
@@ -416,7 +416,7 @@ static int paf24_init(SF_PRIVATE *psf)
     return 0;
 }
 
-static sf_count_t paf24_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
+static sf_count_t paf24_seek(SndFile *psf, int mode, sf_count_t offset)
 {
     PAF24_PRIVATE *ppaf24;
     int newblock, newsample;
@@ -471,7 +471,7 @@ static sf_count_t paf24_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
     return newblock * PAF24_SAMPLES_PER_BLOCK + newsample;
 }
 
-static int paf24_close(SF_PRIVATE *psf)
+static int paf24_close(SndFile *psf)
 {
     PAF24_PRIVATE *ppaf24;
 
@@ -489,7 +489,7 @@ static int paf24_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static int paf24_read_block(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
+static int paf24_read_block(SndFile *psf, PAF24_PRIVATE *ppaf24)
 {
     int k, channel;
     unsigned char *cptr;
@@ -524,7 +524,7 @@ static int paf24_read_block(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
     return 1;
 }
 
-static size_t paf24_read(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24, int *ptr, size_t len)
+static size_t paf24_read(SndFile *psf, PAF24_PRIVATE *ppaf24, int *ptr, size_t len)
 {
     size_t count, total = 0;
 
@@ -551,7 +551,7 @@ static size_t paf24_read(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24, int *ptr, size_
     return total;
 }
 
-static size_t paf24_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t paf24_read_s(SndFile *psf, short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     PAF24_PRIVATE *ppaf24;
@@ -577,7 +577,7 @@ static size_t paf24_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t paf24_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t paf24_read_i(SndFile *psf, int *ptr, size_t len)
 {
     PAF24_PRIVATE *ppaf24;
     size_t total;
@@ -591,7 +591,7 @@ static size_t paf24_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t paf24_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t paf24_read_f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     PAF24_PRIVATE *ppaf24;
@@ -620,7 +620,7 @@ static size_t paf24_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t paf24_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t paf24_read_d(SndFile *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     PAF24_PRIVATE *ppaf24;
@@ -649,7 +649,7 @@ static size_t paf24_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static int paf24_write_block(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
+static int paf24_write_block(SndFile *psf, PAF24_PRIVATE *ppaf24)
 {
     int k, nextsample, channel;
     unsigned char *cptr;
@@ -706,7 +706,7 @@ static int paf24_write_block(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
     return 1;
 }
 
-static size_t paf24_write(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24, const int *ptr, size_t len)
+static size_t paf24_write(SndFile *psf, PAF24_PRIVATE *ppaf24, const int *ptr, size_t len)
 {
     size_t count, total = 0;
 
@@ -729,7 +729,7 @@ static size_t paf24_write(SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24, const int *ptr
     return total;
 }
 
-static size_t paf24_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t paf24_write_s(SndFile *psf, const short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     PAF24_PRIVATE *ppaf24;
@@ -757,7 +757,7 @@ static size_t paf24_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t paf24_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t paf24_write_i(SndFile *psf, const int *ptr, size_t len)
 {
     PAF24_PRIVATE *ppaf24;
     size_t writecount, count;
@@ -782,7 +782,7 @@ static size_t paf24_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t paf24_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t paf24_write_f(SndFile *psf, const float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     PAF24_PRIVATE *ppaf24;
@@ -814,7 +814,7 @@ static size_t paf24_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     return total;
 }
 
-static size_t paf24_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t paf24_write_d(SndFile *psf, const double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     PAF24_PRIVATE *ppaf24;

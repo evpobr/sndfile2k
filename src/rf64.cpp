@@ -65,20 +65,20 @@
 
 #define RIFF_DOWNGRADE_BYTES ((sf_count_t)0xffffffff)
 
-static int rf64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock);
-static int rf64_write_header(SF_PRIVATE *psf, int calc_length);
-static int rf64_write_tailer(SF_PRIVATE *psf);
-static int rf64_close(SF_PRIVATE *psf);
-static size_t rf64_command(SF_PRIVATE *psf, int command, void *UNUSED(data), size_t datasize);
+static int rf64_read_header(SndFile *psf, int *blockalign, int *framesperblock);
+static int rf64_write_header(SndFile *psf, int calc_length);
+static int rf64_write_tailer(SndFile *psf);
+static int rf64_close(SndFile *psf);
+static size_t rf64_command(SndFile *psf, int command, void *UNUSED(data), size_t datasize);
 
-static int rf64_set_chunk(SF_PRIVATE *psf, const SF_CHUNK_INFO *chunk_info);
-static SF_CHUNK_ITERATOR *rf64_next_chunk_iterator(SF_PRIVATE *psf, SF_CHUNK_ITERATOR *iterator);
-static int rf64_get_chunk_size(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
+static int rf64_set_chunk(SndFile *psf, const SF_CHUNK_INFO *chunk_info);
+static SF_CHUNK_ITERATOR *rf64_next_chunk_iterator(SndFile *psf, SF_CHUNK_ITERATOR *iterator);
+static int rf64_get_chunk_size(SndFile *psf, const SF_CHUNK_ITERATOR *iterator,
                                SF_CHUNK_INFO *chunk_info);
-static int rf64_get_chunk_data(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
+static int rf64_get_chunk_data(SndFile *psf, const SF_CHUNK_ITERATOR *iterator,
                                SF_CHUNK_INFO *chunk_info);
 
-int rf64_open(SF_PRIVATE *psf)
+int rf64_open(SndFile *psf)
 {
     WAVLIKE_PRIVATE *wpriv;
     int subformat, error = 0;
@@ -170,7 +170,7 @@ enum
 
 #define HAVE_CHUNK(CHUNK) ((parsestage & CHUNK) != 0)
 
-static int rf64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
+static int rf64_read_header(SndFile *psf, int *blockalign, int *framesperblock)
 {
     WAVLIKE_PRIVATE *wpriv;
     WAV_FMT *wav_fmt;
@@ -541,7 +541,7 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM = {
 static const EXT_SUBFORMAT MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT = {
     0x00000003, 0x0721, 0x11d3, {0x86, 0x44, 0xC8, 0xC1, 0xCA, 0x00, 0x00, 0x00}};
 
-static int rf64_write_fmt_chunk(SF_PRIVATE *psf)
+static int rf64_write_fmt_chunk(SndFile *psf)
 {
     WAVLIKE_PRIVATE *wpriv;
     int subformat, fmt_size;
@@ -668,7 +668,7 @@ static int rf64_write_fmt_chunk(SF_PRIVATE *psf)
     return 0;
 }
 
-static int rf64_write_header(SF_PRIVATE *psf, int calc_length)
+static int rf64_write_header(SndFile *psf, int calc_length)
 {
     sf_count_t current, pad_size;
     int error = 0, has_data = SF_FALSE, add_fact_chunk = 0;
@@ -815,7 +815,7 @@ static int rf64_write_header(SF_PRIVATE *psf, int calc_length)
     return psf->m_error;
 }
 
-static int rf64_write_tailer(SF_PRIVATE *psf)
+static int rf64_write_tailer(SndFile *psf)
 {
     /* Reset the current header buffer length to zero. */
     psf->m_header.ptr[0] = 0;
@@ -845,7 +845,7 @@ static int rf64_write_tailer(SF_PRIVATE *psf)
     return 0;
 }
 
-static int rf64_close(SF_PRIVATE *psf)
+static int rf64_close(SndFile *psf)
 {
     if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
@@ -856,7 +856,7 @@ static int rf64_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static size_t rf64_command(SF_PRIVATE *psf, int command, void *UNUSED(data), size_t datasize)
+static size_t rf64_command(SndFile *psf, int command, void *UNUSED(data), size_t datasize)
 {
     WAVLIKE_PRIVATE *wpriv;
 
@@ -896,17 +896,17 @@ static size_t rf64_command(SF_PRIVATE *psf, int command, void *UNUSED(data), siz
     return 0;
 }
 
-static int rf64_set_chunk(SF_PRIVATE *psf, const SF_CHUNK_INFO *chunk_info)
+static int rf64_set_chunk(SndFile *psf, const SF_CHUNK_INFO *chunk_info)
 {
     return psf_save_write_chunk(&psf->m_wchunks, chunk_info);
 }
 
-static SF_CHUNK_ITERATOR *rf64_next_chunk_iterator(SF_PRIVATE *psf, SF_CHUNK_ITERATOR *iterator)
+static SF_CHUNK_ITERATOR *rf64_next_chunk_iterator(SndFile *psf, SF_CHUNK_ITERATOR *iterator)
 {
     return psf_next_chunk_iterator(&psf->m_rchunks, iterator);
 }
 
-static int rf64_get_chunk_size(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
+static int rf64_get_chunk_size(SndFile *psf, const SF_CHUNK_ITERATOR *iterator,
                                SF_CHUNK_INFO *chunk_info)
 {
     int indx;
@@ -919,7 +919,7 @@ static int rf64_get_chunk_size(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterato
     return SFE_NO_ERROR;
 }
 
-static int rf64_get_chunk_data(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
+static int rf64_get_chunk_data(SndFile *psf, const SF_CHUNK_ITERATOR *iterator,
                                SF_CHUNK_INFO *chunk_info)
 {
     int indx;

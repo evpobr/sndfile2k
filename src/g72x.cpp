@@ -53,28 +53,28 @@ typedef struct
     short samples[G72x_BLOCK_SIZE];
 } G72x_PRIVATE;
 
-static int psf_g72x_decode_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x);
-static int psf_g72x_encode_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x);
+static int psf_g72x_decode_block(SndFile *psf, G72x_PRIVATE *pg72x);
+static int psf_g72x_encode_block(SndFile *psf, G72x_PRIVATE *pg72x);
 
-static size_t g72x_read_s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t g72x_read_i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t g72x_read_f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t g72x_read_d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t g72x_read_s(SndFile *psf, short *ptr, size_t len);
+static size_t g72x_read_i(SndFile *psf, int *ptr, size_t len);
+static size_t g72x_read_f(SndFile *psf, float *ptr, size_t len);
+static size_t g72x_read_d(SndFile *psf, double *ptr, size_t len);
 
-static size_t g72x_write_s(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t g72x_write_i(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t g72x_write_f(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t g72x_write_d(SF_PRIVATE *psf, const double *ptr, size_t len);
+static size_t g72x_write_s(SndFile *psf, const short *ptr, size_t len);
+static size_t g72x_write_i(SndFile *psf, const int *ptr, size_t len);
+static size_t g72x_write_f(SndFile *psf, const float *ptr, size_t len);
+static size_t g72x_write_d(SndFile *psf, const double *ptr, size_t len);
 
-static sf_count_t g72x_seek(SF_PRIVATE *psf, int mode, sf_count_t offset);
+static sf_count_t g72x_seek(SndFile *psf, int mode, sf_count_t offset);
 
-static int g72x_close(SF_PRIVATE *psf);
+static int g72x_close(SndFile *psf);
 
 /*
  * WAV G721 Reader initialisation function.
  */
 
-int g72x_init(SF_PRIVATE *psf)
+int g72x_init(SndFile *psf)
 {
     G72x_PRIVATE *pg72x;
     int bitspersample, bytesperblock, codec;
@@ -190,7 +190,7 @@ int g72x_init(SF_PRIVATE *psf)
     return 0;
 }
 
-static int psf_g72x_decode_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x)
+static int psf_g72x_decode_block(SndFile *psf, G72x_PRIVATE *pg72x)
 {
     size_t k;
 
@@ -212,7 +212,7 @@ static int psf_g72x_decode_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x)
     return 1;
 }
 
-static size_t g72x_read_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x, short *ptr, size_t len)
+static size_t g72x_read_block(SndFile *psf, G72x_PRIVATE *pg72x, short *ptr, size_t len)
 {
     size_t count, total = 0, indx = 0;
 
@@ -239,7 +239,7 @@ static size_t g72x_read_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x, short *ptr, 
     return total;
 }
 
-static size_t g72x_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t g72x_read_s(SndFile *psf, short *ptr, size_t len)
 {
     G72x_PRIVATE *pg72x;
     size_t readcount, count;
@@ -265,7 +265,7 @@ static size_t g72x_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t g72x_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t g72x_read_i(SndFile *psf, int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     G72x_PRIVATE *pg72x;
@@ -296,7 +296,7 @@ static size_t g72x_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t g72x_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t g72x_read_f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     G72x_PRIVATE *pg72x;
@@ -329,7 +329,7 @@ static size_t g72x_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t g72x_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t g72x_read_d(SndFile *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     G72x_PRIVATE *pg72x;
@@ -362,7 +362,7 @@ static size_t g72x_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static sf_count_t g72x_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t UNUSED(offset))
+static sf_count_t g72x_seek(SndFile *psf, int UNUSED(mode), sf_count_t UNUSED(offset))
 {
     psf->log_printf("seek unsupported\n");
 
@@ -373,7 +373,7 @@ static sf_count_t g72x_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t UNUSED
     return 0;
 }
 
-static int psf_g72x_encode_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x)
+static int psf_g72x_encode_block(SndFile *psf, G72x_PRIVATE *pg72x)
 {
     int k;
 
@@ -393,7 +393,7 @@ static int psf_g72x_encode_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x)
     return 1;
 }
 
-static int g72x_write_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x, const short *ptr, int len)
+static int g72x_write_block(SndFile *psf, G72x_PRIVATE *pg72x, const short *ptr, int len)
 {
     int count, total = 0, indx = 0;
 
@@ -416,7 +416,7 @@ static int g72x_write_block(SF_PRIVATE *psf, G72x_PRIVATE *pg72x, const short *p
     return total;
 }
 
-static size_t g72x_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t g72x_write_s(SndFile *psf, const short *ptr, size_t len)
 {
     G72x_PRIVATE *pg72x;
     size_t writecount, count;
@@ -441,7 +441,7 @@ static size_t g72x_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t g72x_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t g72x_write_i(SndFile *psf, const int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     G72x_PRIVATE *pg72x;
@@ -470,7 +470,7 @@ static size_t g72x_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t g72x_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t g72x_write_f(SndFile *psf, const float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     G72x_PRIVATE *pg72x;
@@ -503,7 +503,7 @@ static size_t g72x_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     return total;
 }
 
-static size_t g72x_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t g72x_write_d(SndFile *psf, const double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     G72x_PRIVATE *pg72x;
@@ -536,7 +536,7 @@ static size_t g72x_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
     return total;
 }
 
-static int g72x_close(SF_PRIVATE *psf)
+static int g72x_close(SndFile *psf)
 {
     G72x_PRIVATE *pg72x;
 

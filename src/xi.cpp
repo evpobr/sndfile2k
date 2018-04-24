@@ -46,14 +46,14 @@ typedef struct
     short last_16;
 } XI_PRIVATE;
 
-static int xi_close(SF_PRIVATE *psf);
-static int xi_write_header(SF_PRIVATE *psf, int calc_length);
-static int xi_read_header(SF_PRIVATE *psf);
-static int dpcm_init(SF_PRIVATE *psf);
+static int xi_close(SndFile *psf);
+static int xi_write_header(SndFile *psf, int calc_length);
+static int xi_read_header(SndFile *psf);
+static int dpcm_init(SndFile *psf);
 
-static sf_count_t dpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset);
+static sf_count_t dpcm_seek(SndFile *psf, int mode, sf_count_t offset);
 
-int xi_open(SF_PRIVATE *psf)
+int xi_open(SndFile *psf)
 {
     XI_PRIVATE *pxi;
     int subformat, error = 0;
@@ -122,7 +122,7 @@ int xi_open(SF_PRIVATE *psf)
 /*------------------------------------------------------------------------------
 */
 
-static int xi_close(SF_PRIVATE *UNUSED(psf))
+static int xi_close(SndFile *UNUSED(psf))
 {
     return 0;
 }
@@ -130,27 +130,27 @@ static int xi_close(SF_PRIVATE *UNUSED(psf))
 /*==============================================================================
 */
 
-static size_t dpcm_read_dsc2s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t dpcm_read_dsc2i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t dpcm_read_dsc2f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t dpcm_read_dsc2d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t dpcm_read_dsc2s(SndFile *psf, short *ptr, size_t len);
+static size_t dpcm_read_dsc2i(SndFile *psf, int *ptr, size_t len);
+static size_t dpcm_read_dsc2f(SndFile *psf, float *ptr, size_t len);
+static size_t dpcm_read_dsc2d(SndFile *psf, double *ptr, size_t len);
 
-static size_t dpcm_write_s2dsc(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t dpcm_write_i2dsc(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t dpcm_write_f2dsc(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t dpcm_write_d2dsc(SF_PRIVATE *psf, const double *ptr, size_t len);
+static size_t dpcm_write_s2dsc(SndFile *psf, const short *ptr, size_t len);
+static size_t dpcm_write_i2dsc(SndFile *psf, const int *ptr, size_t len);
+static size_t dpcm_write_f2dsc(SndFile *psf, const float *ptr, size_t len);
+static size_t dpcm_write_d2dsc(SndFile *psf, const double *ptr, size_t len);
 
-static size_t dpcm_read_dles2s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t dpcm_read_dles2i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t dpcm_read_dles2f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t dpcm_read_dles2d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t dpcm_read_dles2s(SndFile *psf, short *ptr, size_t len);
+static size_t dpcm_read_dles2i(SndFile *psf, int *ptr, size_t len);
+static size_t dpcm_read_dles2f(SndFile *psf, float *ptr, size_t len);
+static size_t dpcm_read_dles2d(SndFile *psf, double *ptr, size_t len);
 
-static size_t dpcm_write_s2dles(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t dpcm_write_i2dles(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t dpcm_write_f2dles(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t dpcm_write_d2dles(SF_PRIVATE *psf, const double *ptr, size_t len);
+static size_t dpcm_write_s2dles(SndFile *psf, const short *ptr, size_t len);
+static size_t dpcm_write_i2dles(SndFile *psf, const int *ptr, size_t len);
+static size_t dpcm_write_f2dles(SndFile *psf, const float *ptr, size_t len);
+static size_t dpcm_write_d2dles(SndFile *psf, const double *ptr, size_t len);
 
-static int dpcm_init(SF_PRIVATE *psf)
+static int dpcm_init(SndFile *psf)
 {
     if (psf->m_bytewidth == 0 || psf->sf.channels == 0)
         return SFE_INTERNAL;
@@ -209,7 +209,7 @@ static int dpcm_init(SF_PRIVATE *psf)
     return 0;
 }
 
-static sf_count_t dpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
+static sf_count_t dpcm_seek(SndFile *psf, int mode, sf_count_t offset)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;
@@ -270,7 +270,7 @@ static sf_count_t dpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
     return offset;
 }
 
-static int xi_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
+static int xi_write_header(SndFile *psf, int UNUSED(calc_length))
 {
     XI_PRIVATE *pxi;
     sf_count_t current;
@@ -332,7 +332,7 @@ static int xi_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     return psf->m_error;
 }
 
-static int xi_read_header(SF_PRIVATE *psf)
+static int xi_read_header(SndFile *psf)
 {
     char buffer[64], name[32];
     short version, fade_out, sample_count;
@@ -526,7 +526,7 @@ static void dles2i_array(XI_PRIVATE *pxi, short *src, size_t count, int *dest);
 static void dles2f_array(XI_PRIVATE *pxi, short *src, size_t count, float *dest, float normfact);
 static void dles2d_array(XI_PRIVATE *pxi, short *src, size_t count, double *dest, double normfact);
 
-static size_t dpcm_read_dsc2s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t dpcm_read_dsc2s(SndFile *psf, short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;
@@ -553,7 +553,7 @@ static size_t dpcm_read_dsc2s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t dpcm_read_dsc2i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t dpcm_read_dsc2i(SndFile *psf, int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;
@@ -580,7 +580,7 @@ static size_t dpcm_read_dsc2i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t dpcm_read_dsc2f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t dpcm_read_dsc2f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;
@@ -610,7 +610,7 @@ static size_t dpcm_read_dsc2f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t dpcm_read_dsc2d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t dpcm_read_dsc2d(SndFile *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;
@@ -640,7 +640,7 @@ static size_t dpcm_read_dsc2d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static size_t dpcm_read_dles2s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t dpcm_read_dles2s(SndFile *psf, short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;
@@ -667,7 +667,7 @@ static size_t dpcm_read_dles2s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t dpcm_read_dles2i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t dpcm_read_dles2i(SndFile *psf, int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;
@@ -694,7 +694,7 @@ static size_t dpcm_read_dles2i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t dpcm_read_dles2f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t dpcm_read_dles2f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;
@@ -724,7 +724,7 @@ static size_t dpcm_read_dles2f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t dpcm_read_dles2d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t dpcm_read_dles2d(SndFile *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;
@@ -768,7 +768,7 @@ static void f2dles_array(XI_PRIVATE *pxi, const float *src, short *dest, size_t 
 static void d2dles_array(XI_PRIVATE *pxi, const double *src, short *dest, size_t count,
                          double normfact);
 
-static size_t dpcm_write_s2dsc(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t dpcm_write_s2dsc(SndFile *psf, const short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;
@@ -795,7 +795,7 @@ static size_t dpcm_write_s2dsc(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t dpcm_write_i2dsc(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t dpcm_write_i2dsc(SndFile *psf, const int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;
@@ -822,7 +822,7 @@ static size_t dpcm_write_i2dsc(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t dpcm_write_f2dsc(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t dpcm_write_f2dsc(SndFile *psf, const float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;
@@ -852,7 +852,7 @@ static size_t dpcm_write_f2dsc(SF_PRIVATE *psf, const float *ptr, size_t len)
     return total;
 }
 
-static size_t dpcm_write_d2dsc(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t dpcm_write_d2dsc(SndFile *psf, const double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;
@@ -882,7 +882,7 @@ static size_t dpcm_write_d2dsc(SF_PRIVATE *psf, const double *ptr, size_t len)
     return total;
 }
 
-static size_t dpcm_write_s2dles(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t dpcm_write_s2dles(SndFile *psf, const short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;
@@ -909,7 +909,7 @@ static size_t dpcm_write_s2dles(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t dpcm_write_i2dles(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t dpcm_write_i2dles(SndFile *psf, const int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;
@@ -936,7 +936,7 @@ static size_t dpcm_write_i2dles(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t dpcm_write_f2dles(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t dpcm_write_f2dles(SndFile *psf, const float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;
@@ -966,7 +966,7 @@ static size_t dpcm_write_f2dles(SF_PRIVATE *psf, const float *ptr, size_t len)
     return total;
 }
 
-static size_t dpcm_write_d2dles(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t dpcm_write_d2dles(SndFile *psf, const double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     XI_PRIVATE *pxi;

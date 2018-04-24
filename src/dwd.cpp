@@ -29,7 +29,7 @@
 
 #if (ENABLE_EXPERIMENTAL_CODE == 0)
 
-int dwd_open(SF_PRIVATE *psf)
+int dwd_open(SndFile *psf)
 {
     if (psf)
         return SFE_UNIMPLEMENTED;

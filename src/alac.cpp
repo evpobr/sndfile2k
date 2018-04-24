@@ -78,36 +78,36 @@ typedef struct
 
 } ALAC_PRIVATE;
 
-static int alac_reader_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *info);
-static int alac_writer_init(SF_PRIVATE *psf);
+static int alac_reader_init(SndFile *psf, const struct ALAC_DECODER_INFO *info);
+static int alac_writer_init(SndFile *psf);
 
-static sf_count_t alac_reader_calc_frames(SF_PRIVATE *psf, ALAC_PRIVATE *plac);
+static sf_count_t alac_reader_calc_frames(SndFile *psf, ALAC_PRIVATE *plac);
 
-static size_t alac_read_s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t alac_read_i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t alac_read_f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t alac_read_d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t alac_read_s(SndFile *psf, short *ptr, size_t len);
+static size_t alac_read_i(SndFile *psf, int *ptr, size_t len);
+static size_t alac_read_f(SndFile *psf, float *ptr, size_t len);
+static size_t alac_read_d(SndFile *psf, double *ptr, size_t len);
 
-static size_t alac_write_s(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t alac_write_i(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t alac_write_f(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t alac_write_d(SF_PRIVATE *psf, const double *ptr, size_t len);
+static size_t alac_write_s(SndFile *psf, const short *ptr, size_t len);
+static size_t alac_write_i(SndFile *psf, const int *ptr, size_t len);
+static size_t alac_write_f(SndFile *psf, const float *ptr, size_t len);
+static size_t alac_write_d(SndFile *psf, const double *ptr, size_t len);
 
-static sf_count_t alac_seek(SF_PRIVATE *psf, int mode, sf_count_t offset);
+static sf_count_t alac_seek(SndFile *psf, int mode, sf_count_t offset);
 
-static int alac_close(SF_PRIVATE *psf);
-static int alac_byterate(SF_PRIVATE *psf);
+static int alac_close(SndFile *psf);
+static int alac_byterate(SndFile *psf);
 
-static int alac_decode_block(SF_PRIVATE *psf, ALAC_PRIVATE *plac);
+static int alac_decode_block(SndFile *psf, ALAC_PRIVATE *plac);
 static int alac_encode_block(ALAC_PRIVATE *plac);
 
-static uint32_t alac_kuki_read(SF_PRIVATE *psf, uint32_t kuki_offset, uint8_t *kuki,
+static uint32_t alac_kuki_read(SndFile *psf, uint32_t kuki_offset, uint8_t *kuki,
                                size_t kuki_maxlen);
 
 static PAKT_INFO *alac_pakt_alloc(uint32_t initial_count);
-static PAKT_INFO *alac_pakt_read_decode(SF_PRIVATE *psf, uint32_t pakt_offset);
+static PAKT_INFO *alac_pakt_read_decode(SndFile *psf, uint32_t pakt_offset);
 static PAKT_INFO *alac_pakt_append(PAKT_INFO *info, uint32_t value);
-static uint8_t *alac_pakt_encode(const SF_PRIVATE *psf, uint32_t *pakt_size);
+static uint8_t *alac_pakt_encode(const SndFile *psf, uint32_t *pakt_size);
 static sf_count_t alac_pakt_block_offset(const PAKT_INFO *info, uint32_t block);
 
 static const char *alac_error_string(int error);
@@ -116,7 +116,7 @@ static const char *alac_error_string(int error);
  * ALAC Reader initialisation function.
  */
 
-int alac_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *info)
+int alac_init(SndFile *psf, const struct ALAC_DECODER_INFO *info)
 {
     int error;
 
@@ -173,7 +173,7 @@ void alac_get_desc_chunk_items(int subformat, uint32_t *fmt_flags, uint32_t *fra
     *frames_per_packet = ALAC_FRAME_LENGTH;
 }
 
-static int alac_close(SF_PRIVATE *psf)
+static int alac_close(SndFile *psf)
 {
     ALAC_PRIVATE *plac;
     BUF_UNION ubuf;
@@ -237,7 +237,7 @@ static int alac_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static int alac_byterate(SF_PRIVATE *psf)
+static int alac_byterate(SndFile *psf)
 {
     if (psf->m_mode == SFM_READ)
         return (psf->m_datalength * psf->sf.samplerate) / psf->sf.frames;
@@ -249,7 +249,7 @@ static int alac_byterate(SF_PRIVATE *psf)
  * ALAC initialisation Functions.
  */
 
-static int alac_reader_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *info)
+static int alac_reader_init(SndFile *psf, const struct ALAC_DECODER_INFO *info)
 {
     ALAC_PRIVATE *plac;
     uint32_t kuki_size;
@@ -333,7 +333,7 @@ static int alac_reader_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *inf
     return 0;
 }
 
-static int alac_writer_init(SF_PRIVATE *psf)
+static int alac_writer_init(SndFile *psf)
 {
     ALAC_PRIVATE *plac;
     uint32_t alac_format_flags = 0;
@@ -406,7 +406,7 @@ static inline uint32_t alac_reader_next_packet_size(PAKT_INFO *info)
     return info->packet_size[info->current++];
 }
 
-static sf_count_t alac_reader_calc_frames(SF_PRIVATE *psf, ALAC_PRIVATE *plac)
+static sf_count_t alac_reader_calc_frames(SndFile *psf, ALAC_PRIVATE *plac)
 {
     sf_count_t frames = 0;
     uint32_t current_pos = 1, blocks = 0;
@@ -434,7 +434,7 @@ static sf_count_t alac_reader_calc_frames(SF_PRIVATE *psf, ALAC_PRIVATE *plac)
     return frames;
 }
 
-static int alac_decode_block(SF_PRIVATE *psf, ALAC_PRIVATE *plac)
+static int alac_decode_block(SndFile *psf, ALAC_PRIVATE *plac)
 {
     ALAC_DECODER *pdec = &plac->decoder;
     uint32_t packet_size;
@@ -492,7 +492,7 @@ static int alac_encode_block(ALAC_PRIVATE *plac)
  * ALAC read functions.
  */
 
-static size_t alac_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t alac_read_s(SndFile *psf, short *ptr, size_t len)
 {
     ALAC_PRIVATE *plac;
     int *iptr;
@@ -524,7 +524,7 @@ static size_t alac_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t alac_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t alac_read_i(SndFile *psf, int *ptr, size_t len)
 {
     ALAC_PRIVATE *plac;
     int *iptr;
@@ -556,7 +556,7 @@ static size_t alac_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t alac_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t alac_read_f(SndFile *psf, float *ptr, size_t len)
 {
     ALAC_PRIVATE *plac;
     int *iptr;
@@ -591,7 +591,7 @@ static size_t alac_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t alac_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t alac_read_d(SndFile *psf, double *ptr, size_t len)
 {
     ALAC_PRIVATE *plac;
     int *iptr;
@@ -626,7 +626,7 @@ static size_t alac_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static sf_count_t alac_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
+static sf_count_t alac_seek(SndFile *psf, int mode, sf_count_t offset)
 {
     ALAC_PRIVATE *plac;
     int newblock, newsample;
@@ -682,7 +682,7 @@ static sf_count_t alac_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
  * ALAC Write Functions.
  */
 
-static size_t alac_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t alac_write_s(SndFile *psf, const short *ptr, size_t len)
 {
     ALAC_PRIVATE *plac;
     int *iptr;
@@ -714,7 +714,7 @@ static size_t alac_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t alac_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t alac_write_i(SndFile *psf, const int *ptr, size_t len)
 {
     ALAC_PRIVATE *plac;
     int *iptr;
@@ -746,7 +746,7 @@ static size_t alac_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t alac_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t alac_write_f(SndFile *psf, const float *ptr, size_t len)
 {
     ALAC_PRIVATE *plac;
     void (*convert)(const float *, int *t, size_t, int);
@@ -780,7 +780,7 @@ static size_t alac_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     return total;
 }
 
-static size_t alac_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t alac_write_d(SndFile *psf, const double *ptr, size_t len)
 {
     ALAC_PRIVATE *plac;
     void (*convert)(const double *, int *t, size_t, int);
@@ -852,7 +852,7 @@ static PAKT_INFO *alac_pakt_append(PAKT_INFO *info, uint32_t value)
     return info;
 }
 
-static PAKT_INFO *alac_pakt_read_decode(SF_PRIVATE *psf, uint32_t UNUSED(pakt_offset))
+static PAKT_INFO *alac_pakt_read_decode(SndFile *psf, uint32_t UNUSED(pakt_offset))
 {
     SF_CHUNK_INFO chunk_info;
     PAKT_INFO *info = NULL;
@@ -929,7 +929,7 @@ FreeExit:
     return NULL;
 }
 
-static uint8_t *alac_pakt_encode(const SF_PRIVATE *psf, uint32_t *pakt_size_out)
+static uint8_t *alac_pakt_encode(const SndFile *psf, uint32_t *pakt_size_out)
 {
     const ALAC_PRIVATE *plac;
     const PAKT_INFO *info;
@@ -1004,7 +1004,7 @@ static sf_count_t alac_pakt_block_offset(const PAKT_INFO *info, uint32_t block)
     return offset;
 }
 
-static uint32_t alac_kuki_read(SF_PRIVATE *psf, uint32_t kuki_offset, uint8_t *kuki,
+static uint32_t alac_kuki_read(SndFile *psf, uint32_t kuki_offset, uint8_t *kuki,
                                size_t kuki_maxlen)
 {
     uint32_t marker;

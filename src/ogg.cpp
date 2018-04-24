@@ -38,11 +38,11 @@
 
 #include "ogg.h"
 
-static int ogg_close(SF_PRIVATE *psf);
-static int ogg_stream_classify(SF_PRIVATE *psf, OGG_PRIVATE *odata);
-static int ogg_page_classify(SF_PRIVATE *psf, const ogg_page *og);
+static int ogg_close(SndFile *psf);
+static int ogg_stream_classify(SndFile *psf, OGG_PRIVATE *odata);
+static int ogg_page_classify(SndFile *psf, const ogg_page *og);
 
-int ogg_read_first_page(SF_PRIVATE *psf, OGG_PRIVATE *odata)
+int ogg_read_first_page(SndFile *psf, OGG_PRIVATE *odata)
 {
     char *buffer;
     int bytes;
@@ -127,7 +127,7 @@ int ogg_read_first_page(SF_PRIVATE *psf, OGG_PRIVATE *odata)
     return 0;
 }
 
-int ogg_open(SF_PRIVATE *psf)
+int ogg_open(SndFile *psf)
 {
     OGG_PRIVATE *odata = (OGG_PRIVATE *)calloc(1, sizeof(OGG_PRIVATE));
     sf_count_t pos = psf->ftell();
@@ -178,7 +178,7 @@ int ogg_open(SF_PRIVATE *psf)
     return SFE_INTERNAL;
 }
 
-static int ogg_close(SF_PRIVATE *psf)
+static int ogg_close(SndFile *psf)
 {
     OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
 
@@ -188,7 +188,7 @@ static int ogg_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static int ogg_stream_classify(SF_PRIVATE *psf, OGG_PRIVATE *odata)
+static int ogg_stream_classify(SndFile *psf, OGG_PRIVATE *odata)
 {
     int error;
 
@@ -239,7 +239,7 @@ static struct
     {"\001vorbis", "Vorbis", 7, OGG_VORBIS},
 };
 
-static int ogg_page_classify(SF_PRIVATE *psf, const ogg_page *og)
+static int ogg_page_classify(SndFile *psf, const ogg_page *og)
 {
     int k, len;
 

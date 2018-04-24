@@ -44,7 +44,7 @@ using namespace std;
 
 #define INITIAL_HEADER_SIZE (256)
 
-SF_PRIVATE::SF_PRIVATE()
+SndFile::SndFile()
 {
     m_unique_id = psf_rand_int32();
         m_header.ptr = (unsigned char *)calloc(1, INITIAL_HEADER_SIZE);
@@ -54,7 +54,7 @@ SF_PRIVATE::SF_PRIVATE()
     seek_from_start = psf_default_seek;
 }
 
-int SF_PRIVATE::open(const char *filename, SF_FILEMODE mode, SF_INFO *sfinfo)
+int SndFile::open(const char *filename, SF_FILEMODE mode, SF_INFO *sfinfo)
 {
     sf::ref_ptr<SF_STREAM> stream;
     m_error = psf_open_file_stream(filename, mode, stream.get_address_of());
@@ -64,7 +64,7 @@ int SF_PRIVATE::open(const char *filename, SF_FILEMODE mode, SF_INFO *sfinfo)
     return m_error;
 }
 
-int SF_PRIVATE::open(sf::ref_ptr<SF_STREAM> &stream, SF_FILEMODE mode, SF_INFO *sfinfo)
+int SndFile::open(sf::ref_ptr<SF_STREAM> &stream, SF_FILEMODE mode, SF_INFO *sfinfo)
 {
     if (m_is_open)
         return SFE_ALREADY_INITIALIZED;
@@ -130,12 +130,12 @@ int SF_PRIVATE::open(sf::ref_ptr<SF_STREAM> &stream, SF_FILEMODE mode, SF_INFO *
     return SFE_NO_ERROR;
 }
 
-bool SF_PRIVATE::is_open() const
+bool SndFile::is_open() const
 {
     return m_is_open;
 }
 
-void SF_PRIVATE::close()
+void SndFile::close()
 {
     if (codec_close)
     {
@@ -172,12 +172,12 @@ void SF_PRIVATE::close()
     m_is_open = false;
 }
 
-SF_PRIVATE::~SF_PRIVATE()
+SndFile::~SndFile()
 {
     close();
 }
 
-int SF_PRIVATE::bump_header_allocation(sf_count_t needed)
+int SndFile::bump_header_allocation(sf_count_t needed)
 {
     size_t newlen;
     size_t smallest = INITIAL_HEADER_SIZE;
@@ -219,7 +219,7 @@ int SF_PRIVATE::bump_header_allocation(sf_count_t needed)
  * parselog array.
  */
 
-void SF_PRIVATE::log_putchar(char ch)
+void SndFile::log_putchar(char ch)
 {
     if (m_parselog.indx < SIGNED_SIZEOF(m_parselog.buf) - 1)
     {
@@ -229,7 +229,7 @@ void SF_PRIVATE::log_putchar(char ch)
     return;
 }
 
-void SF_PRIVATE::log_printf(const char *format, ...)
+void SndFile::log_printf(const char *format, ...)
 {
     va_list ap;
     uint32_t u;
@@ -539,7 +539,7 @@ void SF_PRIVATE::log_printf(const char *format, ...)
 **  so an alternative vsnprintf can be provided.
 */
 
-void SF_PRIVATE::asciiheader_printf(const char *format, ...)
+void SndFile::asciiheader_printf(const char *format, ...)
 {
     va_list argptr;
 
@@ -605,7 +605,7 @@ void SF_PRIVATE::asciiheader_printf(const char *format, ...)
 ** seg. fault when asked to write an int or short to a non-int/short aligned address.
 */
 
-void SF_PRIVATE::header_put_byte(char x)
+void SndFile::header_put_byte(char x)
 {
     m_header.ptr[m_header.indx++] = x;
 }
@@ -620,7 +620,7 @@ void SF_PRIVATE::header_put_marker(int x)
 }
 
 #elif (CPU_IS_LITTLE_ENDIAN == 1)
-void SF_PRIVATE::header_put_marker(int x)
+void SndFile::header_put_marker(int x)
 {
     m_header.ptr[m_header.indx++] = x;
     m_header.ptr[m_header.indx++] = (x >> 8);
@@ -632,33 +632,33 @@ void SF_PRIVATE::header_put_marker(int x)
 #error "Cannot determine endian-ness of processor."
 #endif
 
-void SF_PRIVATE::header_put_be_short(int x)
+void SndFile::header_put_be_short(int x)
 {
     m_header.ptr[m_header.indx++] = (x >> 8);
     m_header.ptr[m_header.indx++] = x;
 }
 
-void SF_PRIVATE::header_put_le_short(int x)
+void SndFile::header_put_le_short(int x)
 {
     m_header.ptr[m_header.indx++] = x;
     m_header.ptr[m_header.indx++] = (x >> 8);
 }
 
-void SF_PRIVATE::header_put_be_3byte(int x) 
+void SndFile::header_put_be_3byte(int x) 
 {
     m_header.ptr[m_header.indx++] = (x >> 16);
     m_header.ptr[m_header.indx++] = (x >> 8);
     m_header.ptr[m_header.indx++] = x;
 }
 
-void SF_PRIVATE::header_put_le_3byte(int x)
+void SndFile::header_put_le_3byte(int x)
 {
     m_header.ptr[m_header.indx++] = x;
     m_header.ptr[m_header.indx++] = (x >> 8);
     m_header.ptr[m_header.indx++] = (x >> 16);
 }
 
-void SF_PRIVATE::header_put_be_int(int x)
+void SndFile::header_put_be_int(int x)
 {
     m_header.ptr[m_header.indx++] = (x >> 24);
     m_header.ptr[m_header.indx++] = (x >> 16);
@@ -666,7 +666,7 @@ void SF_PRIVATE::header_put_be_int(int x)
     m_header.ptr[m_header.indx++] = x;
 }
 
-void SF_PRIVATE::header_put_le_int(int x)
+void SndFile::header_put_le_int(int x)
 {
     m_header.ptr[m_header.indx++] = x;
     m_header.ptr[m_header.indx++] = (x >> 8);
@@ -674,7 +674,7 @@ void SF_PRIVATE::header_put_le_int(int x)
     m_header.ptr[m_header.indx++] = (x >> 24);
 }
 
-void SF_PRIVATE::header_put_be_8byte(sf_count_t x)
+void SndFile::header_put_be_8byte(sf_count_t x)
 {
     m_header.ptr[m_header.indx++] = (unsigned char)(x >> 56);
     m_header.ptr[m_header.indx++] = (unsigned char)(x >> 48);
@@ -686,7 +686,7 @@ void SF_PRIVATE::header_put_be_8byte(sf_count_t x)
     m_header.ptr[m_header.indx++] = (unsigned char)x;
 }
 
-void SF_PRIVATE::header_put_le_8byte(sf_count_t x)
+void SndFile::header_put_le_8byte(sf_count_t x)
 {
     m_header.ptr[m_header.indx++] = (unsigned char)x;
     m_header.ptr[m_header.indx++] = (unsigned char)(x >> 8);
@@ -698,7 +698,7 @@ void SF_PRIVATE::header_put_le_8byte(sf_count_t x)
     m_header.ptr[m_header.indx++] = (unsigned char)(x >> 56);
 }
 
-int SF_PRIVATE::binheader_writef(const char *format, ...)
+int SndFile::binheader_writef(const char *format, ...)
 {
     va_list argptr;
     sf_count_t countdata;
@@ -1003,7 +1003,7 @@ int SF_PRIVATE::binheader_writef(const char *format, ...)
      (((sf_count_t)(ptr)[4]) << 24) | (((sf_count_t)(ptr)[5]) << 16) | \
      (((sf_count_t)(ptr)[6]) << 8) | ((ptr)[7]))
 
-size_t SF_PRIVATE::header_read(void *ptr, size_t bytes)
+size_t SndFile::header_read(void *ptr, size_t bytes)
 {
     size_t count = 0;
 
@@ -1027,7 +1027,7 @@ size_t SF_PRIVATE::header_read(void *ptr, size_t bytes)
     return bytes;
 }
 
-int SF_PRIVATE::header_gets(char *ptr, int bufsize)
+int SndFile::header_gets(char *ptr, int bufsize)
 {
     if (m_header.indx + bufsize >= m_header.len && bump_header_allocation(bufsize))
         return 0;
@@ -1056,7 +1056,7 @@ int SF_PRIVATE::header_gets(char *ptr, int bufsize)
     return k;
 }
 
-void SF_PRIVATE::binheader_seekf(sf_count_t position, SF_SEEK_MODE whence)
+void SndFile::binheader_seekf(sf_count_t position, SF_SEEK_MODE whence)
 {
 	switch (whence)
 	{
@@ -1114,7 +1114,7 @@ void SF_PRIVATE::binheader_seekf(sf_count_t position, SF_SEEK_MODE whence)
 	return;
 }
 
-int SF_PRIVATE::binheader_readf(char const *format, ...)
+int SndFile::binheader_readf(char const *format, ...)
 {
     va_list argptr;
     sf_count_t *countptr, countdata;
@@ -1293,7 +1293,7 @@ int SF_PRIVATE::binheader_readf(char const *format, ...)
     return byte_count;
 }
 
-sf_count_t psf_default_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t samples_from_start)
+sf_count_t psf_default_seek(SndFile *psf, int UNUSED(mode), sf_count_t samples_from_start)
 {
     if (!(psf->m_blockwidth && psf->m_dataoffset >= 0))
     {
@@ -1355,7 +1355,7 @@ void psf_hexdump(const void *ptr, int len)
     puts("");
 }
 
-void SF_PRIVATE::log_SF_INFO()
+void SndFile::log_SF_INFO()
 {
     log_printf("---------------------------------\n");
 
@@ -1585,7 +1585,7 @@ void psf_strlcpy_crlf(char *dest, const char *src, size_t destmax, size_t srcmax
     *dest = 0;
 }
 
-sf_count_t psf_decode_frame_count(SF_PRIVATE *psf)
+sf_count_t psf_decode_frame_count(SndFile *psf)
 {
     sf_count_t count, readlen, total = 0;
     BUF_UNION ubuf;
@@ -1887,19 +1887,19 @@ FILE *psf_open_tmpfile(char *fname, size_t fnamelen)
     return NULL;
 }
 
-sf_count_t SF_PRIVATE::get_filelen()
+sf_count_t SndFile::get_filelen()
 {
     assert(m_stream);
 
     return m_stream->get_filelen();
 }
 
-int SF_PRIVATE::file_valid()
+int SndFile::file_valid()
 {
     return (m_stream) ? SF_TRUE : SF_FALSE;
 }
 
-sf_count_t SF_PRIVATE::fseek(sf_count_t offset, int whence)
+sf_count_t SndFile::fseek(sf_count_t offset, int whence)
 {
     if (m_stream)
         return m_stream->seek(offset, whence);
@@ -1907,7 +1907,7 @@ sf_count_t SF_PRIVATE::fseek(sf_count_t offset, int whence)
         return -1;
 }
 
-size_t SF_PRIVATE::fread(void *ptr, size_t bytes, size_t items)
+size_t SndFile::fread(void *ptr, size_t bytes, size_t items)
 {
     assert(m_stream);
 
@@ -1921,7 +1921,7 @@ size_t SF_PRIVATE::fread(void *ptr, size_t bytes, size_t items)
         return 0;
 }
 
-size_t SF_PRIVATE::fwrite(const void *ptr, size_t bytes, size_t items)
+size_t SndFile::fwrite(const void *ptr, size_t bytes, size_t items)
 {
     if (!ptr)
         return 0;
@@ -1933,20 +1933,20 @@ size_t SF_PRIVATE::fwrite(const void *ptr, size_t bytes, size_t items)
         return 0;
 }
 
-sf_count_t SF_PRIVATE::ftell()
+sf_count_t SndFile::ftell()
 {
     assert(m_stream);
 
     return m_stream->tell();
 }
 
-void SF_PRIVATE::fsync()
+void SndFile::fsync()
 {
     if (m_mode == SFM_WRITE || m_mode == SFM_RDWR)
         m_stream->flush();
 }
 
-int SF_PRIVATE::ftruncate(sf_count_t len)
+int SndFile::ftruncate(sf_count_t len)
 {
     return m_stream->set_filelen(len);
 }

@@ -273,8 +273,8 @@ static ErrorStruct SndfileErrors[] = {
 bool format_from_extension(const char *path, SF_INFO *sfinfo);
 bool guess_file_type(sf::ref_ptr<SF_STREAM> &stream, SF_INFO *sfinfo);
 int validate_sfinfo(SF_INFO *sfinfo);
-int validate_psf(SF_PRIVATE *psf);
-void save_header_info(SF_PRIVATE *psf);
+int validate_psf(SndFile *psf);
+void save_header_info(SndFile *psf);
 
 /*------------------------------------------------------------------------------
 ** Private (static) variables.
@@ -333,10 +333,10 @@ int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sndfi
         }
     };
     
-    SF_PRIVATE *psf = nullptr;
+    SndFile *psf = nullptr;
     try
     {
-        psf = new SF_PRIVATE();
+        psf = new SndFile();
 
         sf::ref_ptr<SF_STREAM> stream;
         int error = psf_open_file_stream(path, mode, stream.get_address_of());
@@ -648,7 +648,7 @@ const char *sf_error_number(int errnum)
 
 const char *sf_strerror(SNDFILE *sndfile)
 {
-    SF_PRIVATE *psf = NULL;
+    SndFile *psf = NULL;
     int errnum;
 
     if (sndfile == NULL)
@@ -659,7 +659,7 @@ const char *sf_strerror(SNDFILE *sndfile)
     }
     else
     {
-        psf = (SF_PRIVATE *)sndfile;
+        psf = (SndFile *)sndfile;
 
         if (psf->m_Magick != SNDFILE_MAGICK)
             return "sf_strerror : Bad magic number.";
@@ -1586,7 +1586,7 @@ int validate_sfinfo(SF_INFO *sfinfo)
     return 1;
 }
 
-int validate_psf(SF_PRIVATE *psf)
+int validate_psf(SndFile *psf)
 {
     if (psf->m_datalength < 0)
     {
@@ -1607,7 +1607,7 @@ int validate_psf(SF_PRIVATE *psf)
     return 1;
 }
 
-void save_header_info(SF_PRIVATE *psf)
+void save_header_info(SndFile *psf)
 {
     snprintf(sf_parselog, sizeof(sf_parselog), "%s", psf->m_parselog.buf);
 }
@@ -1987,7 +1987,7 @@ int sf_get_chunk_data(const SF_CHUNK_ITERATOR *iterator, SF_CHUNK_INFO *chunk_in
     return sndfile->getChunkData(iterator, chunk_info);
 }
 
-unsigned long SF_PRIVATE::ref()
+unsigned long SndFile::ref()
 {
     m_error = SFE_NO_ERROR;
 
@@ -1998,7 +1998,7 @@ unsigned long SF_PRIVATE::ref()
     return ref_counter;
 }
 
-void SF_PRIVATE::unref()
+void SndFile::unref()
 {
     m_error = SFE_NO_ERROR;
 
@@ -2007,37 +2007,37 @@ void SF_PRIVATE::unref()
         delete this;
 }
 
-sf_count_t SF_PRIVATE::getFrames(void) const
+sf_count_t SndFile::getFrames(void) const
 {
     return sf.frames;
 }
 
-int SF_PRIVATE::getFormat(void) const
+int SndFile::getFormat(void) const
 {
     return sf.format;
 }
 
-int SF_PRIVATE::getChannels(void) const
+int SndFile::getChannels(void) const
 {
     return sf.channels;
 }
 
-int SF_PRIVATE::getSamplerate(void) const
+int SndFile::getSamplerate(void) const
 {
     return sf.samplerate;
 }
 
-int SF_PRIVATE::getError(void) const
+int SndFile::getError(void) const
 {
     return m_error;
 }
 
-const char *SF_PRIVATE::getErrorString(void) const
+const char *SndFile::getErrorString(void) const
 {
     return sf_error_number(m_error);
 }
 
-int SF_PRIVATE::command(int command, void *data, int datasize)
+int SndFile::command(int command, void *data, int datasize)
 {
     m_error = SFE_NO_ERROR;
 
@@ -2489,7 +2489,7 @@ int SF_PRIVATE::command(int command, void *data, int datasize)
     return 0;
 }
 
-sf_count_t SF_PRIVATE::seek(sf_count_t frames, int whence)
+sf_count_t SndFile::seek(sf_count_t frames, int whence)
 {
     m_error = SFE_NO_ERROR;
 
@@ -2612,26 +2612,26 @@ sf_count_t SF_PRIVATE::seek(sf_count_t frames, int whence)
     return PSF_SEEK_ERROR;
 }
 
-void SF_PRIVATE::writeSync(void)
+void SndFile::writeSync(void)
 {
     m_error = SFE_NO_ERROR;
 
     fsync();
 };
 
-int SF_PRIVATE::setString(int str_type, const char *str)
+int SndFile::setString(int str_type, const char *str)
 {
     m_error = SFE_NO_ERROR;
 
     return set_string(str_type, str);
 };
 
-const char *SF_PRIVATE::getString(int str_type) const
+const char *SndFile::getString(int str_type) const
 {
     return get_string(str_type);
 };
 
-sf_count_t SF_PRIVATE::readShortSamples(short *ptr, sf_count_t items)
+sf_count_t SndFile::readShortSamples(short *ptr, sf_count_t items)
 {
     m_error = SFE_NO_ERROR;
 
@@ -2693,7 +2693,7 @@ sf_count_t SF_PRIVATE::readShortSamples(short *ptr, sf_count_t items)
     return count;
 };
 
-sf_count_t SF_PRIVATE::readIntSamples(int *ptr, sf_count_t items)
+sf_count_t SndFile::readIntSamples(int *ptr, sf_count_t items)
 {
     m_error = SFE_NO_ERROR;
 
@@ -2753,7 +2753,7 @@ sf_count_t SF_PRIVATE::readIntSamples(int *ptr, sf_count_t items)
     return count;
 }
 
-sf_count_t SF_PRIVATE::readFloatSamples(float *ptr, sf_count_t items)
+sf_count_t SndFile::readFloatSamples(float *ptr, sf_count_t items)
 {
     m_error = SFE_NO_ERROR;
 
@@ -2815,7 +2815,7 @@ sf_count_t SF_PRIVATE::readFloatSamples(float *ptr, sf_count_t items)
     return count;
 }
 
-sf_count_t SF_PRIVATE::readDoubleSamples(double *ptr, sf_count_t items)
+sf_count_t SndFile::readDoubleSamples(double *ptr, sf_count_t items)
 {
     m_error = SFE_NO_ERROR;
 
@@ -2877,7 +2877,7 @@ sf_count_t SF_PRIVATE::readDoubleSamples(double *ptr, sf_count_t items)
     return count;
 }
 
-sf_count_t SF_PRIVATE::writeShortSamples(const short *ptr, sf_count_t items)
+sf_count_t SndFile::writeShortSamples(const short *ptr, sf_count_t items)
 {
     m_error = SFE_NO_ERROR;
 
@@ -2939,7 +2939,7 @@ sf_count_t SF_PRIVATE::writeShortSamples(const short *ptr, sf_count_t items)
     return count;
 }
 
-sf_count_t SF_PRIVATE::writeIntSamples(const int *ptr, sf_count_t items)
+sf_count_t SndFile::writeIntSamples(const int *ptr, sf_count_t items)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3001,7 +3001,7 @@ sf_count_t SF_PRIVATE::writeIntSamples(const int *ptr, sf_count_t items)
     return count;
 }
 
-sf_count_t SF_PRIVATE::writeFroatSamples(const float *ptr, sf_count_t items)
+sf_count_t SndFile::writeFroatSamples(const float *ptr, sf_count_t items)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3063,7 +3063,7 @@ sf_count_t SF_PRIVATE::writeFroatSamples(const float *ptr, sf_count_t items)
     return count;
 }
 
-sf_count_t SF_PRIVATE::writeDoubleSamples(const double *ptr, sf_count_t items)
+sf_count_t SndFile::writeDoubleSamples(const double *ptr, sf_count_t items)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3125,7 +3125,7 @@ sf_count_t SF_PRIVATE::writeDoubleSamples(const double *ptr, sf_count_t items)
     return count;
 }
 
-sf_count_t SF_PRIVATE::readShortFrames(short *ptr, sf_count_t frames)
+sf_count_t SndFile::readShortFrames(short *ptr, sf_count_t frames)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3181,7 +3181,7 @@ sf_count_t SF_PRIVATE::readShortFrames(short *ptr, sf_count_t frames)
     return count / sf.channels;
 }
 
-sf_count_t SF_PRIVATE::readIntFrames(int *ptr, sf_count_t frames)
+sf_count_t SndFile::readIntFrames(int *ptr, sf_count_t frames)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3237,7 +3237,7 @@ sf_count_t SF_PRIVATE::readIntFrames(int *ptr, sf_count_t frames)
     return count / sf.channels;
 }
 
-sf_count_t SF_PRIVATE::readFloatFrames(float *ptr, sf_count_t frames)
+sf_count_t SndFile::readFloatFrames(float *ptr, sf_count_t frames)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3293,7 +3293,7 @@ sf_count_t SF_PRIVATE::readFloatFrames(float *ptr, sf_count_t frames)
     return count / sf.channels;
 }
 
-sf_count_t SF_PRIVATE::readDoubleFrames(double *ptr, sf_count_t frames)
+sf_count_t SndFile::readDoubleFrames(double *ptr, sf_count_t frames)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3349,7 +3349,7 @@ sf_count_t SF_PRIVATE::readDoubleFrames(double *ptr, sf_count_t frames)
     return count / sf.channels;
 }
 
-sf_count_t SF_PRIVATE::writeShortFrames(const short *ptr, sf_count_t frames)
+sf_count_t SndFile::writeShortFrames(const short *ptr, sf_count_t frames)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3405,7 +3405,7 @@ sf_count_t SF_PRIVATE::writeShortFrames(const short *ptr, sf_count_t frames)
     return count / sf.channels;
 }
 
-sf_count_t SF_PRIVATE::writeIntFrames(const int *ptr, sf_count_t frames)
+sf_count_t SndFile::writeIntFrames(const int *ptr, sf_count_t frames)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3461,7 +3461,7 @@ sf_count_t SF_PRIVATE::writeIntFrames(const int *ptr, sf_count_t frames)
     return count / sf.channels;
 }
 
-sf_count_t SF_PRIVATE::writeFloatFrames(const float *ptr, sf_count_t frames)
+sf_count_t SndFile::writeFloatFrames(const float *ptr, sf_count_t frames)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3517,7 +3517,7 @@ sf_count_t SF_PRIVATE::writeFloatFrames(const float *ptr, sf_count_t frames)
     return count / sf.channels;
 }
 
-sf_count_t SF_PRIVATE::writeDoubleFrames(const double *ptr, sf_count_t frames)
+sf_count_t SndFile::writeDoubleFrames(const double *ptr, sf_count_t frames)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3573,14 +3573,14 @@ sf_count_t SF_PRIVATE::writeDoubleFrames(const double *ptr, sf_count_t frames)
     return count / sf.channels;
 }
 
-int SF_PRIVATE::getCurrentByterate() const
+int SndFile::getCurrentByterate() const
 {
     /* This should cover all PCM and floating point formats. */
     if (m_bytewidth)
         return sf.samplerate * sf.channels * m_bytewidth;
 
     if (byterate)
-        return byterate(const_cast<SF_PRIVATE *>(this));
+        return byterate(const_cast<SndFile *>(this));
 
     switch (SF_CODEC(sf.format))
     {
@@ -3617,7 +3617,7 @@ int SF_PRIVATE::getCurrentByterate() const
     return -1;
 }
 
-sf_count_t SF_PRIVATE::readRaw(void *ptr, sf_count_t bytes)
+sf_count_t SndFile::readRaw(void *ptr, sf_count_t bytes)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3671,7 +3671,7 @@ sf_count_t SF_PRIVATE::readRaw(void *ptr, sf_count_t bytes)
     return count;
 }
 
-sf_count_t SF_PRIVATE::writeRaw(const void *ptr, sf_count_t bytes)
+sf_count_t SndFile::writeRaw(const void *ptr, sf_count_t bytes)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3731,7 +3731,7 @@ sf_count_t SF_PRIVATE::writeRaw(const void *ptr, sf_count_t bytes)
     return count;
 }
 
-int SF_PRIVATE::setChunk(const SF_CHUNK_INFO *chunk_info)
+int SndFile::setChunk(const SF_CHUNK_INFO *chunk_info)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3742,12 +3742,12 @@ int SF_PRIVATE::setChunk(const SF_CHUNK_INFO *chunk_info)
     }
 
     if (set_chunk != nullptr)
-        return set_chunk(const_cast<SF_PRIVATE *>(this), chunk_info);
+        return set_chunk(const_cast<SndFile *>(this), chunk_info);
 
     return SFE_BAD_CHUNK_FORMAT;
 }
 
-SF_CHUNK_ITERATOR *SF_PRIVATE::getChunkIterator(const SF_CHUNK_INFO *chunk_info)
+SF_CHUNK_ITERATOR *SndFile::getChunkIterator(const SF_CHUNK_INFO *chunk_info)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3757,7 +3757,7 @@ SF_CHUNK_ITERATOR *SF_PRIVATE::getChunkIterator(const SF_CHUNK_INFO *chunk_info)
     return psf_get_chunk_iterator(this, NULL);
 }
 
-SF_CHUNK_ITERATOR *SF_PRIVATE::getNextChunkIterator(SF_CHUNK_ITERATOR *iterator)
+SF_CHUNK_ITERATOR *SndFile::getNextChunkIterator(SF_CHUNK_ITERATOR *iterator)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3772,7 +3772,7 @@ SF_CHUNK_ITERATOR *SF_PRIVATE::getNextChunkIterator(SF_CHUNK_ITERATOR *iterator)
     return NULL;
 }
 
-int SF_PRIVATE::getChunkSize(const SF_CHUNK_ITERATOR *it, SF_CHUNK_INFO *chunk_info)
+int SndFile::getChunkSize(const SF_CHUNK_ITERATOR *it, SF_CHUNK_INFO *chunk_info)
 {
     m_error = SFE_NO_ERROR;
 
@@ -3790,7 +3790,7 @@ int SF_PRIVATE::getChunkSize(const SF_CHUNK_ITERATOR *it, SF_CHUNK_INFO *chunk_i
     return SFE_BAD_CHUNK_FORMAT;
 }
 
-int SF_PRIVATE::getChunkData(const SF_CHUNK_ITERATOR *it, SF_CHUNK_INFO *chunk_info)
+int SndFile::getChunkData(const SF_CHUNK_ITERATOR *it, SF_CHUNK_INFO *chunk_info)
 {
     m_error = SFE_NO_ERROR;
 

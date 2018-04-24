@@ -38,8 +38,8 @@ bool guess_file_type(sf::ref_ptr<SF_STREAM> &stream, SF_INFO *sfinfo);
 bool format_from_extension(const char *path, SF_INFO *sfinfo);
 
 int validate_sfinfo(SF_INFO *sfinfo);
-int validate_psf(SF_PRIVATE *psf);
-void save_header_info(SF_PRIVATE *psf);
+int validate_psf(SndFile *psf);
+void save_header_info(SndFile *psf);
 
 int sf_wchar_open(const wchar_t *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sndfile)
 {
@@ -77,10 +77,10 @@ int sf_wchar_open(const wchar_t *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFIL
         }
 };
 
-    SF_PRIVATE *psf = nullptr;
+    SndFile *psf = nullptr;
     try
     {
-        psf = new SF_PRIVATE();
+        psf = new SndFile();
 
         sf::ref_ptr<SF_STREAM> stream;
         int error = psf_open_file_stream(path, mode, stream.get_address_of());

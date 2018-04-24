@@ -25,14 +25,14 @@
 
 #define INTERLEAVE_CHANNELS (6)
 
-static size_t interleave_read_short(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t interleave_read_int(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t interleave_read_float(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t interleave_read_double(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t interleave_read_short(SndFile *psf, short *ptr, size_t len);
+static size_t interleave_read_int(SndFile *psf, int *ptr, size_t len);
+static size_t interleave_read_float(SndFile *psf, float *ptr, size_t len);
+static size_t interleave_read_double(SndFile *psf, double *ptr, size_t len);
 
-static sf_count_t interleave_seek(SF_PRIVATE *, int mode, sf_count_t samples_from_start);
+static sf_count_t interleave_seek(SndFile *, int mode, sf_count_t samples_from_start);
 
-int interleave_init(SF_PRIVATE *psf)
+int interleave_init(SndFile *psf)
 {
     INTERLEAVE_DATA *pdata;
 
@@ -72,7 +72,7 @@ int interleave_init(SF_PRIVATE *psf)
     return 0;
 }
 
-static size_t interleave_read_short(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t interleave_read_short(SndFile *psf, short *ptr, size_t len)
 {
     INTERLEAVE_DATA *pdata;
     sf_count_t offset, templen;
@@ -125,7 +125,7 @@ static size_t interleave_read_short(SF_PRIVATE *psf, short *ptr, size_t len)
     return len;
 }
 
-static size_t interleave_read_int(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t interleave_read_int(SndFile *psf, int *ptr, size_t len)
 {
     INTERLEAVE_DATA *pdata;
     sf_count_t offset, templen;
@@ -178,7 +178,7 @@ static size_t interleave_read_int(SF_PRIVATE *psf, int *ptr, size_t len)
     return len;
 }
 
-static size_t interleave_read_float(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t interleave_read_float(SndFile *psf, float *ptr, size_t len)
 {
     INTERLEAVE_DATA *pdata;
     sf_count_t offset, templen;
@@ -235,7 +235,7 @@ static size_t interleave_read_float(SF_PRIVATE *psf, float *ptr, size_t len)
     return len;
 }
 
-static size_t interleave_read_double(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t interleave_read_double(SndFile *psf, double *ptr, size_t len)
 {
     INTERLEAVE_DATA *pdata;
     sf_count_t offset, templen;
@@ -288,7 +288,7 @@ static size_t interleave_read_double(SF_PRIVATE *psf, double *ptr, size_t len)
     return len;
 }
 
-static sf_count_t interleave_seek(SF_PRIVATE *UNUSED(psf), int UNUSED(mode),
+static sf_count_t interleave_seek(SndFile *UNUSED(psf), int UNUSED(mode),
                                   sf_count_t samples_from_start)
 {
     /*

@@ -27,7 +27,7 @@
 
 #define STRINGS_DEBUG (0)
 
-int SF_PRIVATE::store_string(int str_type, const char *str)
+int SndFile::store_string(int str_type, const char *str)
 {
     char new_str[128];
     size_t str_len;
@@ -168,7 +168,7 @@ int SF_PRIVATE::store_string(int str_type, const char *str)
     return 0;
 }
 
-int SF_PRIVATE::set_string(int str_type, const char *str)
+int SndFile::set_string(int str_type, const char *str)
 {
     if (m_mode == SFM_READ)
         return SFE_STR_NOT_WRITE;
@@ -176,7 +176,7 @@ int SF_PRIVATE::set_string(int str_type, const char *str)
     return store_string(str_type, str);
 }
 
-const char *SF_PRIVATE::get_string(int str_type) const
+const char *SndFile::get_string(int str_type) const
 {
     for (int k = 0; k < SF_MAX_STRINGS; k++)
         if (str_type == m_strings.data[k].type)
@@ -185,7 +185,7 @@ const char *SF_PRIVATE::get_string(int str_type) const
     return NULL;
 }
 
-int SF_PRIVATE::location_string_count(int location)
+int SndFile::location_string_count(int location)
 {
     int count = 0;
 

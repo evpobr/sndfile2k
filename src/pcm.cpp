@@ -34,77 +34,77 @@ typedef void tribyte;
 
 #define SIZEOF_TRIBYTE (3)
 
-static size_t pcm_read_sc2s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t pcm_read_uc2s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t pcm_read_bes2s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t pcm_read_les2s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t pcm_read_bet2s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t pcm_read_let2s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t pcm_read_bei2s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t pcm_read_lei2s(SF_PRIVATE *psf, short *ptr, size_t len);
+static size_t pcm_read_sc2s(SndFile *psf, short *ptr, size_t len);
+static size_t pcm_read_uc2s(SndFile *psf, short *ptr, size_t len);
+static size_t pcm_read_bes2s(SndFile *psf, short *ptr, size_t len);
+static size_t pcm_read_les2s(SndFile *psf, short *ptr, size_t len);
+static size_t pcm_read_bet2s(SndFile *psf, short *ptr, size_t len);
+static size_t pcm_read_let2s(SndFile *psf, short *ptr, size_t len);
+static size_t pcm_read_bei2s(SndFile *psf, short *ptr, size_t len);
+static size_t pcm_read_lei2s(SndFile *psf, short *ptr, size_t len);
 
-static size_t pcm_read_sc2i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t pcm_read_uc2i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t pcm_read_bes2i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t pcm_read_les2i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t pcm_read_bet2i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t pcm_read_let2i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t pcm_read_bei2i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t pcm_read_lei2i(SF_PRIVATE *psf, int *ptr, size_t len);
+static size_t pcm_read_sc2i(SndFile *psf, int *ptr, size_t len);
+static size_t pcm_read_uc2i(SndFile *psf, int *ptr, size_t len);
+static size_t pcm_read_bes2i(SndFile *psf, int *ptr, size_t len);
+static size_t pcm_read_les2i(SndFile *psf, int *ptr, size_t len);
+static size_t pcm_read_bet2i(SndFile *psf, int *ptr, size_t len);
+static size_t pcm_read_let2i(SndFile *psf, int *ptr, size_t len);
+static size_t pcm_read_bei2i(SndFile *psf, int *ptr, size_t len);
+static size_t pcm_read_lei2i(SndFile *psf, int *ptr, size_t len);
 
-static size_t pcm_read_sc2f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t pcm_read_uc2f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t pcm_read_bes2f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t pcm_read_les2f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t pcm_read_bet2f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t pcm_read_let2f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t pcm_read_bei2f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t pcm_read_lei2f(SF_PRIVATE *psf, float *ptr, size_t len);
+static size_t pcm_read_sc2f(SndFile *psf, float *ptr, size_t len);
+static size_t pcm_read_uc2f(SndFile *psf, float *ptr, size_t len);
+static size_t pcm_read_bes2f(SndFile *psf, float *ptr, size_t len);
+static size_t pcm_read_les2f(SndFile *psf, float *ptr, size_t len);
+static size_t pcm_read_bet2f(SndFile *psf, float *ptr, size_t len);
+static size_t pcm_read_let2f(SndFile *psf, float *ptr, size_t len);
+static size_t pcm_read_bei2f(SndFile *psf, float *ptr, size_t len);
+static size_t pcm_read_lei2f(SndFile *psf, float *ptr, size_t len);
 
-static size_t pcm_read_sc2d(SF_PRIVATE *psf, double *ptr, size_t len);
-static size_t pcm_read_uc2d(SF_PRIVATE *psf, double *ptr, size_t len);
-static size_t pcm_read_bes2d(SF_PRIVATE *psf, double *ptr, size_t len);
-static size_t pcm_read_les2d(SF_PRIVATE *psf, double *ptr, size_t len);
-static size_t pcm_read_bet2d(SF_PRIVATE *psf, double *ptr, size_t len);
-static size_t pcm_read_let2d(SF_PRIVATE *psf, double *ptr, size_t len);
-static size_t pcm_read_bei2d(SF_PRIVATE *psf, double *ptr, size_t len);
-static size_t pcm_read_lei2d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t pcm_read_sc2d(SndFile *psf, double *ptr, size_t len);
+static size_t pcm_read_uc2d(SndFile *psf, double *ptr, size_t len);
+static size_t pcm_read_bes2d(SndFile *psf, double *ptr, size_t len);
+static size_t pcm_read_les2d(SndFile *psf, double *ptr, size_t len);
+static size_t pcm_read_bet2d(SndFile *psf, double *ptr, size_t len);
+static size_t pcm_read_let2d(SndFile *psf, double *ptr, size_t len);
+static size_t pcm_read_bei2d(SndFile *psf, double *ptr, size_t len);
+static size_t pcm_read_lei2d(SndFile *psf, double *ptr, size_t len);
 
-static size_t pcm_write_s2sc(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t pcm_write_s2uc(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t pcm_write_s2bes(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t pcm_write_s2les(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t pcm_write_s2bet(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t pcm_write_s2let(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t pcm_write_s2bei(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t pcm_write_s2lei(SF_PRIVATE *psf, const short *ptr, size_t len);
+static size_t pcm_write_s2sc(SndFile *psf, const short *ptr, size_t len);
+static size_t pcm_write_s2uc(SndFile *psf, const short *ptr, size_t len);
+static size_t pcm_write_s2bes(SndFile *psf, const short *ptr, size_t len);
+static size_t pcm_write_s2les(SndFile *psf, const short *ptr, size_t len);
+static size_t pcm_write_s2bet(SndFile *psf, const short *ptr, size_t len);
+static size_t pcm_write_s2let(SndFile *psf, const short *ptr, size_t len);
+static size_t pcm_write_s2bei(SndFile *psf, const short *ptr, size_t len);
+static size_t pcm_write_s2lei(SndFile *psf, const short *ptr, size_t len);
 
-static size_t pcm_write_i2sc(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t pcm_write_i2uc(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t pcm_write_i2bes(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t pcm_write_i2les(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t pcm_write_i2bet(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t pcm_write_i2let(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t pcm_write_i2bei(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t pcm_write_i2lei(SF_PRIVATE *psf, const int *ptr, size_t len);
+static size_t pcm_write_i2sc(SndFile *psf, const int *ptr, size_t len);
+static size_t pcm_write_i2uc(SndFile *psf, const int *ptr, size_t len);
+static size_t pcm_write_i2bes(SndFile *psf, const int *ptr, size_t len);
+static size_t pcm_write_i2les(SndFile *psf, const int *ptr, size_t len);
+static size_t pcm_write_i2bet(SndFile *psf, const int *ptr, size_t len);
+static size_t pcm_write_i2let(SndFile *psf, const int *ptr, size_t len);
+static size_t pcm_write_i2bei(SndFile *psf, const int *ptr, size_t len);
+static size_t pcm_write_i2lei(SndFile *psf, const int *ptr, size_t len);
 
-static size_t pcm_write_f2sc(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t pcm_write_f2uc(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t pcm_write_f2bes(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t pcm_write_f2les(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t pcm_write_f2bet(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t pcm_write_f2let(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t pcm_write_f2bei(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t pcm_write_f2lei(SF_PRIVATE *psf, const float *ptr, size_t len);
+static size_t pcm_write_f2sc(SndFile *psf, const float *ptr, size_t len);
+static size_t pcm_write_f2uc(SndFile *psf, const float *ptr, size_t len);
+static size_t pcm_write_f2bes(SndFile *psf, const float *ptr, size_t len);
+static size_t pcm_write_f2les(SndFile *psf, const float *ptr, size_t len);
+static size_t pcm_write_f2bet(SndFile *psf, const float *ptr, size_t len);
+static size_t pcm_write_f2let(SndFile *psf, const float *ptr, size_t len);
+static size_t pcm_write_f2bei(SndFile *psf, const float *ptr, size_t len);
+static size_t pcm_write_f2lei(SndFile *psf, const float *ptr, size_t len);
 
-static size_t pcm_write_d2sc(SF_PRIVATE *psf, const double *ptr, size_t len);
-static size_t pcm_write_d2uc(SF_PRIVATE *psf, const double *ptr, size_t len);
-static size_t pcm_write_d2bes(SF_PRIVATE *psf, const double *ptr, size_t len);
-static size_t pcm_write_d2les(SF_PRIVATE *psf, const double *ptr, size_t len);
-static size_t pcm_write_d2bet(SF_PRIVATE *psf, const double *ptr, size_t len);
-static size_t pcm_write_d2let(SF_PRIVATE *psf, const double *ptr, size_t len);
-static size_t pcm_write_d2bei(SF_PRIVATE *psf, const double *ptr, size_t len);
-static size_t pcm_write_d2lei(SF_PRIVATE *psf, const double *ptr, size_t len);
+static size_t pcm_write_d2sc(SndFile *psf, const double *ptr, size_t len);
+static size_t pcm_write_d2uc(SndFile *psf, const double *ptr, size_t len);
+static size_t pcm_write_d2bes(SndFile *psf, const double *ptr, size_t len);
+static size_t pcm_write_d2les(SndFile *psf, const double *ptr, size_t len);
+static size_t pcm_write_d2bet(SndFile *psf, const double *ptr, size_t len);
+static size_t pcm_write_d2let(SndFile *psf, const double *ptr, size_t len);
+static size_t pcm_write_d2bei(SndFile *psf, const double *ptr, size_t len);
+static size_t pcm_write_d2lei(SndFile *psf, const double *ptr, size_t len);
 
 enum
 {
@@ -113,7 +113,7 @@ enum
     SF_CHARS_UNSIGNED = 201
 };
 
-int pcm_init(SF_PRIVATE *psf)
+int pcm_init(SndFile *psf)
 {
     int chars = 0;
 
@@ -777,7 +777,7 @@ static inline void i2bet_array(const int *src, tribyte *dest, size_t count)
     };
 }
 
-static size_t pcm_read_sc2s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t pcm_read_sc2s(SndFile *psf, short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -800,7 +800,7 @@ static size_t pcm_read_sc2s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_uc2s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t pcm_read_uc2s(SndFile *psf, short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -823,7 +823,7 @@ static size_t pcm_read_uc2s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_bes2s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t pcm_read_bes2s(SndFile *psf, short *ptr, size_t len)
 {
     size_t total;
 
@@ -834,7 +834,7 @@ static size_t pcm_read_bes2s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_les2s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t pcm_read_les2s(SndFile *psf, short *ptr, size_t len)
 {
     size_t total;
 
@@ -845,7 +845,7 @@ static size_t pcm_read_les2s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_bet2s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t pcm_read_bet2s(SndFile *psf, short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -868,7 +868,7 @@ static size_t pcm_read_bet2s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_let2s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t pcm_read_let2s(SndFile *psf, short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -891,7 +891,7 @@ static size_t pcm_read_let2s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_bei2s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t pcm_read_bei2s(SndFile *psf, short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -914,7 +914,7 @@ static size_t pcm_read_bei2s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_lei2s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t pcm_read_lei2s(SndFile *psf, short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -937,7 +937,7 @@ static size_t pcm_read_lei2s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_sc2i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t pcm_read_sc2i(SndFile *psf, int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -960,7 +960,7 @@ static size_t pcm_read_sc2i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_uc2i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t pcm_read_uc2i(SndFile *psf, int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -983,7 +983,7 @@ static size_t pcm_read_uc2i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_bes2i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t pcm_read_bes2i(SndFile *psf, int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1006,7 +1006,7 @@ static size_t pcm_read_bes2i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_les2i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t pcm_read_les2i(SndFile *psf, int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1029,7 +1029,7 @@ static size_t pcm_read_les2i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_bet2i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t pcm_read_bet2i(SndFile *psf, int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1052,7 +1052,7 @@ static size_t pcm_read_bet2i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_let2i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t pcm_read_let2i(SndFile *psf, int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1075,7 +1075,7 @@ static size_t pcm_read_let2i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_bei2i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t pcm_read_bei2i(SndFile *psf, int *ptr, size_t len)
 {
     size_t total;
 
@@ -1086,7 +1086,7 @@ static size_t pcm_read_bei2i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_lei2i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t pcm_read_lei2i(SndFile *psf, int *ptr, size_t len)
 {
     size_t total;
 
@@ -1097,7 +1097,7 @@ static size_t pcm_read_lei2i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_sc2f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t pcm_read_sc2f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1123,7 +1123,7 @@ static size_t pcm_read_sc2f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_uc2f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t pcm_read_uc2f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1149,7 +1149,7 @@ static size_t pcm_read_uc2f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_bes2f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t pcm_read_bes2f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1175,7 +1175,7 @@ static size_t pcm_read_bes2f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_les2f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t pcm_read_les2f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1201,7 +1201,7 @@ static size_t pcm_read_les2f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_bet2f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t pcm_read_bet2f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1228,7 +1228,7 @@ static size_t pcm_read_bet2f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_let2f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t pcm_read_let2f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1255,7 +1255,7 @@ static size_t pcm_read_let2f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_bei2f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t pcm_read_bei2f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1281,7 +1281,7 @@ static size_t pcm_read_bei2f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_lei2f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t pcm_read_lei2f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1307,7 +1307,7 @@ static size_t pcm_read_lei2f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_sc2d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t pcm_read_sc2d(SndFile *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1333,7 +1333,7 @@ static size_t pcm_read_sc2d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_uc2d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t pcm_read_uc2d(SndFile *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1359,7 +1359,7 @@ static size_t pcm_read_uc2d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_bes2d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t pcm_read_bes2d(SndFile *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1385,7 +1385,7 @@ static size_t pcm_read_bes2d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_les2d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t pcm_read_les2d(SndFile *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1411,7 +1411,7 @@ static size_t pcm_read_les2d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_bet2d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t pcm_read_bet2d(SndFile *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1437,7 +1437,7 @@ static size_t pcm_read_bet2d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_let2d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t pcm_read_let2d(SndFile *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1464,7 +1464,7 @@ static size_t pcm_read_let2d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_bei2d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t pcm_read_bei2d(SndFile *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1490,7 +1490,7 @@ static size_t pcm_read_bei2d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_read_lei2d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t pcm_read_lei2d(SndFile *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -1516,7 +1516,7 @@ static size_t pcm_read_lei2d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_write_s2sc(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t pcm_write_s2sc(SndFile *psf, const short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1539,7 +1539,7 @@ static size_t pcm_write_s2sc(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_write_s2uc(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t pcm_write_s2uc(SndFile *psf, const short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1562,7 +1562,7 @@ static size_t pcm_write_s2uc(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_write_s2bes(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t pcm_write_s2bes(SndFile *psf, const short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1588,7 +1588,7 @@ static size_t pcm_write_s2bes(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_write_s2les(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t pcm_write_s2les(SndFile *psf, const short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1614,7 +1614,7 @@ static size_t pcm_write_s2les(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_write_s2bet(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t pcm_write_s2bet(SndFile *psf, const short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1637,7 +1637,7 @@ static size_t pcm_write_s2bet(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_write_s2let(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t pcm_write_s2let(SndFile *psf, const short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1660,7 +1660,7 @@ static size_t pcm_write_s2let(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_write_s2bei(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t pcm_write_s2bei(SndFile *psf, const short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1683,7 +1683,7 @@ static size_t pcm_write_s2bei(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_write_s2lei(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t pcm_write_s2lei(SndFile *psf, const short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1706,7 +1706,7 @@ static size_t pcm_write_s2lei(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_write_i2sc(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t pcm_write_i2sc(SndFile *psf, const int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1729,7 +1729,7 @@ static size_t pcm_write_i2sc(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_write_i2uc(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t pcm_write_i2uc(SndFile *psf, const int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1752,7 +1752,7 @@ static size_t pcm_write_i2uc(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_write_i2bes(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t pcm_write_i2bes(SndFile *psf, const int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1775,7 +1775,7 @@ static size_t pcm_write_i2bes(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_write_i2les(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t pcm_write_i2les(SndFile *psf, const int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1798,7 +1798,7 @@ static size_t pcm_write_i2les(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_write_i2bet(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t pcm_write_i2bet(SndFile *psf, const int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1821,7 +1821,7 @@ static size_t pcm_write_i2bet(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_write_i2let(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t pcm_write_i2let(SndFile *psf, const int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1844,7 +1844,7 @@ static size_t pcm_write_i2let(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_write_i2bei(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t pcm_write_i2bei(SndFile *psf, const int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1870,7 +1870,7 @@ static size_t pcm_write_i2bei(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t pcm_write_i2lei(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t pcm_write_i2lei(SndFile *psf, const int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1934,7 +1934,7 @@ static void f2sc_clip_array(const float *src, signed char *dest, int count, int 
     };
 }
 
-static size_t pcm_write_f2sc(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t pcm_write_f2sc(SndFile *psf, const float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const float *, signed char *, int, int);
@@ -1997,7 +1997,7 @@ static void f2uc_clip_array(const float *src, unsigned char *dest, size_t count,
     };
 }
 
-static size_t pcm_write_f2uc(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t pcm_write_f2uc(SndFile *psf, const float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const float *, unsigned char *, size_t, int);
@@ -2074,7 +2074,7 @@ static void f2bes_clip_array(const float *src, short *dest, size_t count, int no
     };
 }
 
-static size_t pcm_write_f2bes(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t pcm_write_f2bes(SndFile *psf, const float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const float *, short *t, size_t, int);
@@ -2151,7 +2151,7 @@ static void f2les_clip_array(const float *src, short *dest, size_t count, int no
     };
 }
 
-static size_t pcm_write_f2les(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t pcm_write_f2les(SndFile *psf, const float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const float *, short *t, size_t, int);
@@ -2232,7 +2232,7 @@ static void f2let_clip_array(const float *src, tribyte *dest, size_t count, int 
     };
 }
 
-static size_t pcm_write_f2let(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t pcm_write_f2let(SndFile *psf, const float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const float *, tribyte *, size_t, int);
@@ -2313,7 +2313,7 @@ static void f2bet_clip_array(const float *src, tribyte *dest, size_t count, int 
     };
 }
 
-static size_t pcm_write_f2bet(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t pcm_write_f2bet(SndFile *psf, const float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const float *, tribyte *, size_t, int);
@@ -2397,7 +2397,7 @@ static void f2bei_clip_array(const float *src, int *dest, size_t count, int norm
     };
 }
 
-static size_t pcm_write_f2bei(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t pcm_write_f2bei(SndFile *psf, const float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const float *, int *, size_t, int);
@@ -2482,7 +2482,7 @@ static void f2lei_clip_array(const float *src, int *dest, size_t count, int norm
     };
 }
 
-static size_t pcm_write_f2lei(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t pcm_write_f2lei(SndFile *psf, const float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const float *, int *, size_t, int);
@@ -2545,7 +2545,7 @@ static void d2sc_clip_array(const double *src, signed char *dest, size_t count, 
     };
 }
 
-static size_t pcm_write_d2sc(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t pcm_write_d2sc(SndFile *psf, const double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const double *, signed char *, size_t, int);
@@ -2608,7 +2608,7 @@ static void d2uc_clip_array(const double *src, unsigned char *dest, size_t count
     };
 }
 
-static size_t pcm_write_d2uc(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t pcm_write_d2uc(SndFile *psf, const double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const double *, unsigned char *, size_t, int);
@@ -2685,7 +2685,7 @@ static void d2bes_clip_array(const double *src, short *dest, size_t count, int n
     };
 }
 
-static size_t pcm_write_d2bes(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t pcm_write_d2bes(SndFile *psf, const double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const double *, short *, size_t, int);
@@ -2762,7 +2762,7 @@ static void d2les_clip_array(const double *src, short *dest, size_t count, int n
     };
 }
 
-static size_t pcm_write_d2les(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t pcm_write_d2les(SndFile *psf, const double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const double *, short *, size_t, int);
@@ -2843,7 +2843,7 @@ static void d2let_clip_array(const double *src, tribyte *dest, size_t count, int
     };
 }
 
-static size_t pcm_write_d2let(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t pcm_write_d2let(SndFile *psf, const double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const double *, tribyte *, size_t, int);
@@ -2924,7 +2924,7 @@ static void d2bet_clip_array(const double *src, tribyte *dest, size_t count, int
     };
 }
 
-static size_t pcm_write_d2bet(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t pcm_write_d2bet(SndFile *psf, const double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const double *, tribyte *, size_t, int);
@@ -3009,7 +3009,7 @@ static void d2bei_clip_array(const double *src, int *dest, size_t count, int nor
     };
 }
 
-static size_t pcm_write_d2bei(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t pcm_write_d2bei(SndFile *psf, const double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const double *, int *, size_t, int);
@@ -3094,7 +3094,7 @@ static void d2lei_clip_array(const double *src, int *dest, size_t count, int nor
     };
 }
 
-static size_t pcm_write_d2lei(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t pcm_write_d2lei(SndFile *psf, const double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const double *, int *, size_t, int);

@@ -63,9 +63,9 @@ typedef struct
     SND_DATA_BLOCKS blocks[VOC_MAX_SECTIONS];
 } VOC_DATA;
 
-static int voc_close(SF_PRIVATE *psf);
-static int voc_write_header(SF_PRIVATE *psf, int calc_length);
-static int voc_read_header(SF_PRIVATE *psf);
+static int voc_close(SndFile *psf);
+static int voc_write_header(SndFile *psf, int calc_length);
+static int voc_read_header(SndFile *psf);
 
 static const char *voc_encoding2str(int encoding);
 
@@ -90,7 +90,7 @@ static int voc_multi_read_uc2d(SF_PRIVATE *psf, double *ptr, int len);
 static int voc_multi_read_les2d(SF_PRIVATE *psf, double *ptr, int len);
 #endif
 
-int voc_open(SF_PRIVATE *psf)
+int voc_open(SndFile *psf)
 {
     int subformat, error = 0;
 
@@ -141,7 +141,7 @@ int voc_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int voc_read_header(SF_PRIVATE *psf)
+static int voc_read_header(SndFile *psf)
 {
     VOC_DATA *pvoc;
     char creative[20];
@@ -434,7 +434,7 @@ static int voc_read_header(SF_PRIVATE *psf)
     return 0;
 }
 
-static int voc_write_header(SF_PRIVATE *psf, int calc_length)
+static int voc_write_header(SndFile *psf, int calc_length)
 {
     sf_count_t current;
     int rate_const, subformat;
@@ -563,7 +563,7 @@ static int voc_write_header(SF_PRIVATE *psf, int calc_length)
     return psf->m_error;
 }
 
-static int voc_close(SF_PRIVATE *psf)
+static int voc_close(SndFile *psf)
 {
     if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {

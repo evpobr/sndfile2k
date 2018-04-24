@@ -37,7 +37,7 @@ static int64_t hash_of_str(const char *str)
     return marker;
 }
 
-SF_CHUNK_ITERATOR *psf_get_chunk_iterator(SF_PRIVATE *psf, const char *marker_str)
+SF_CHUNK_ITERATOR *psf_get_chunk_iterator(SndFile *psf, const char *marker_str)
 {
     const struct READ_CHUNKS *pchk = &psf->m_rchunks;
     int idx;

@@ -38,7 +38,7 @@
 #define WAV_CART_MIN_CHUNK_SIZE (2048)
 #define WAV_CART_MAX_CHUNK_SIZE (0xffffffff)
 
-static int exif_subchunk_parse(SF_PRIVATE *psf, uint32_t length);
+static int exif_subchunk_parse(SndFile *psf, uint32_t length);
 
 // Known WAVEFORMATEXTENSIBLE GUIDS.
 static const EXT_SUBFORMAT MSGUID_SUBTYPE_PCM = {
@@ -108,7 +108,7 @@ static int wavex_guid_equal(const EXT_SUBFORMAT *first, const EXT_SUBFORMAT *sec
     return !memcmp(first, second, sizeof(EXT_SUBFORMAT));
 }
 
-int wavlike_read_fmt_chunk(SF_PRIVATE *psf, int fmtsize)
+int wavlike_read_fmt_chunk(SndFile *psf, int fmtsize)
 {
     WAVLIKE_PRIVATE *wpriv;
     WAV_FMT *wav_fmt;
@@ -521,7 +521,7 @@ int wavlike_read_fmt_chunk(SF_PRIVATE *psf, int fmtsize)
     return 0;
 }
 
-void wavlike_write_guid(SF_PRIVATE *psf, const EXT_SUBFORMAT *subformat)
+void wavlike_write_guid(SndFile *psf, const EXT_SUBFORMAT *subformat)
 {
     psf->binheader_writef("422b", BHW4(subformat->esf_field1), BHW2(subformat->esf_field2),
                          BHW2(subformat->esf_field3), BHWv(subformat->esf_field4), BHWz(8));
@@ -556,7 +556,7 @@ int wavlike_gen_channel_mask(const int *chan_map, int channels)
     return mask;
 }
 
-void wavlike_analyze(SF_PRIVATE *psf)
+void wavlike_analyze(SndFile *psf)
 {
     unsigned char buffer[4096];
 	struct AUDIO_DETECT ad;
@@ -770,7 +770,7 @@ int wavlike_srate2blocksize(int srate_chan_product)
     return 2048;
 }
 
-int wavlike_subchunk_parse(SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
+int wavlike_subchunk_parse(SndFile *psf, int chunk, uint32_t chunk_length)
 {
     sf_count_t current_pos;
     char buffer[2048];
@@ -969,7 +969,7 @@ cleanup_subchunk_parse:
     return 0;
 }
 
-void wavlike_write_strings(SF_PRIVATE *psf, int location)
+void wavlike_write_strings(SndFile *psf, int location)
 {
     int k, prev_head_index, saved_head_index;
 
@@ -1045,7 +1045,7 @@ void wavlike_write_strings(SF_PRIVATE *psf, int location)
     psf->m_header.indx = saved_head_index;
 }
 
-int wavlike_read_peak_chunk(SF_PRIVATE *psf, size_t chunk_size)
+int wavlike_read_peak_chunk(SndFile *psf, size_t chunk_size)
 {
     char buffer[256];
     uint32_t uk;
@@ -1092,7 +1092,7 @@ int wavlike_read_peak_chunk(SF_PRIVATE *psf, size_t chunk_size)
     return 0;
 }
 
-void wavlike_write_peak_chunk(SF_PRIVATE *psf)
+void wavlike_write_peak_chunk(SndFile *psf)
 {
     int k;
 
@@ -1107,7 +1107,7 @@ void wavlike_write_peak_chunk(SF_PRIVATE *psf)
                              BHW8(psf->m_peak_info->peaks[k].position));
 }
 
-static int exif_fill_and_sink(SF_PRIVATE *psf, char *buf, size_t bufsz, size_t toread)
+static int exif_fill_and_sink(SndFile *psf, char *buf, size_t bufsz, size_t toread)
 {
     size_t bytesread = 0;
 
@@ -1131,7 +1131,7 @@ static int exif_fill_and_sink(SF_PRIVATE *psf, char *buf, size_t bufsz, size_t t
  * Exif specification for audio files, at JEITA CP-3451 Exif 2.2 section 5
  * (Exif Audio File Specification) http://www.exif.org/Exif2-2.PDF
  */
-static int exif_subchunk_parse(SF_PRIVATE *psf, uint32_t length)
+static int exif_subchunk_parse(SndFile *psf, uint32_t length)
 {
     uint32_t marker, dword, vmajor = -1, vminor = -1, bytesread = 0;
     char buf[4096];
@@ -1210,7 +1210,7 @@ static int exif_subchunk_parse(SF_PRIVATE *psf, uint32_t length)
     return bytesread;
 }
 
-void wavlike_write_custom_chunks(SF_PRIVATE *psf)
+void wavlike_write_custom_chunks(SndFile *psf)
 {
     uint32_t k;
 

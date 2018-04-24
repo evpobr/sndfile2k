@@ -76,24 +76,24 @@
 
 #include <algorithm>
 
-typedef int convert_func(SF_PRIVATE *psf, int, void *, int, int, float **);
+typedef int convert_func(SndFile *psf, int, void *, int, int, float **);
 
-static int vorbis_read_header(SF_PRIVATE *psf, int log_data);
-static int vorbis_write_header(SF_PRIVATE *psf, int calc_length);
-static int vorbis_close(SF_PRIVATE *psf);
-static size_t vorbis_command(SF_PRIVATE *psf, int command, void *data, size_t datasize);
-static int vorbis_byterate(SF_PRIVATE *psf);
-static sf_count_t vorbis_seek(SF_PRIVATE *psf, int mode, sf_count_t offset);
-static size_t vorbis_read_s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t vorbis_read_i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t vorbis_read_f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t vorbis_read_d(SF_PRIVATE *psf, double *ptr, size_t len);
-static size_t vorbis_write_s(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t vorbis_write_i(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t vorbis_write_f(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t vorbis_write_d(SF_PRIVATE *psf, const double *ptr, size_t len);
-static size_t vorbis_read_sample(SF_PRIVATE *psf, void *ptr, size_t lens, convert_func *transfn);
-static sf_count_t vorbis_length(SF_PRIVATE *psf);
+static int vorbis_read_header(SndFile *psf, int log_data);
+static int vorbis_write_header(SndFile *psf, int calc_length);
+static int vorbis_close(SndFile *psf);
+static size_t vorbis_command(SndFile *psf, int command, void *data, size_t datasize);
+static int vorbis_byterate(SndFile *psf);
+static sf_count_t vorbis_seek(SndFile *psf, int mode, sf_count_t offset);
+static size_t vorbis_read_s(SndFile *psf, short *ptr, size_t len);
+static size_t vorbis_read_i(SndFile *psf, int *ptr, size_t len);
+static size_t vorbis_read_f(SndFile *psf, float *ptr, size_t len);
+static size_t vorbis_read_d(SndFile *psf, double *ptr, size_t len);
+static size_t vorbis_write_s(SndFile *psf, const short *ptr, size_t len);
+static size_t vorbis_write_i(SndFile *psf, const int *ptr, size_t len);
+static size_t vorbis_write_f(SndFile *psf, const float *ptr, size_t len);
+static size_t vorbis_write_d(SndFile *psf, const double *ptr, size_t len);
+static size_t vorbis_read_sample(SndFile *psf, void *ptr, size_t lens, convert_func *transfn);
+static sf_count_t vorbis_length(SndFile *psf);
 
 typedef struct
 {
@@ -125,7 +125,7 @@ typedef struct
     double quality;
 } VORBIS_PRIVATE;
 
-static int vorbis_read_header(SF_PRIVATE *psf, int log_data)
+static int vorbis_read_header(SndFile *psf, int log_data)
 {
     OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->m_codec_data;
@@ -300,7 +300,7 @@ static int vorbis_read_header(SF_PRIVATE *psf, int log_data)
     return 0;
 }
 
-static int vorbis_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
+static int vorbis_write_header(SndFile *psf, int UNUSED(calc_length))
 {
     OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->m_codec_data;
@@ -424,7 +424,7 @@ static int vorbis_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     return 0;
 }
 
-static int vorbis_close(SF_PRIVATE *psf)
+static int vorbis_close(SndFile *psf)
 {
     OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->m_codec_data;
@@ -488,7 +488,7 @@ static int vorbis_close(SF_PRIVATE *psf)
     return 0;
 }
 
-int ogg_vorbis_open(SF_PRIVATE *psf)
+int ogg_vorbis_open(SndFile *psf)
 {
     OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
     VORBIS_PRIVATE *vdata;
@@ -555,7 +555,7 @@ int ogg_vorbis_open(SF_PRIVATE *psf)
     return error;
 }
 
-static size_t vorbis_command(SF_PRIVATE *psf, int command, void *data, size_t datasize)
+static size_t vorbis_command(SndFile *psf, int command, void *data, size_t datasize)
 {
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->m_codec_data;
 
@@ -584,13 +584,13 @@ static size_t vorbis_command(SF_PRIVATE *psf, int command, void *data, size_t da
     return SF_FALSE;
 }
 
-static int vorbis_rnull(SF_PRIVATE *UNUSED(psf), int samples, void *UNUSED(vptr), int UNUSED(off),
+static int vorbis_rnull(SndFile *UNUSED(psf), int samples, void *UNUSED(vptr), int UNUSED(off),
                         int channels, float **UNUSED(pcm))
 {
     return samples * channels;
 }
 
-static int vorbis_rshort(SF_PRIVATE *psf, int samples, void *vptr, int off, int channels,
+static int vorbis_rshort(SndFile *psf, int samples, void *vptr, int off, int channels,
                          float **pcm)
 {
     short *ptr = (short *)vptr + off;
@@ -611,7 +611,7 @@ static int vorbis_rshort(SF_PRIVATE *psf, int samples, void *vptr, int off, int 
     return i;
 }
 
-static int vorbis_rint(SF_PRIVATE *psf, int samples, void *vptr, int off, int channels, float **pcm)
+static int vorbis_rint(SndFile *psf, int samples, void *vptr, int off, int channels, float **pcm)
 {
     int *ptr = (int *)vptr + off;
     int i = 0, j, n;
@@ -632,7 +632,7 @@ static int vorbis_rint(SF_PRIVATE *psf, int samples, void *vptr, int off, int ch
     return i;
 }
 
-static int vorbis_rfloat(SF_PRIVATE *UNUSED(psf), int samples, void *vptr, int off, int channels,
+static int vorbis_rfloat(SndFile *UNUSED(psf), int samples, void *vptr, int off, int channels,
                          float **pcm)
 {
     float *ptr = (float *)vptr + off;
@@ -643,7 +643,7 @@ static int vorbis_rfloat(SF_PRIVATE *UNUSED(psf), int samples, void *vptr, int o
     return i;
 }
 
-static int vorbis_rdouble(SF_PRIVATE *UNUSED(psf), int samples, void *vptr, int off, int channels,
+static int vorbis_rdouble(SndFile *UNUSED(psf), int samples, void *vptr, int off, int channels,
                           float **pcm)
 {
     double *ptr = (double *)vptr + off;
@@ -654,7 +654,7 @@ static int vorbis_rdouble(SF_PRIVATE *UNUSED(psf), int samples, void *vptr, int 
     return i;
 }
 
-static size_t vorbis_read_sample(SF_PRIVATE *psf, void *ptr, size_t lens, convert_func *transfn)
+static size_t vorbis_read_sample(SndFile *psf, void *ptr, size_t lens, convert_func *transfn)
 {
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->m_codec_data;
     OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
@@ -751,27 +751,27 @@ static size_t vorbis_read_sample(SF_PRIVATE *psf, void *ptr, size_t lens, conver
     return i;
 }
 
-static size_t vorbis_read_s(SF_PRIVATE *psf, short *ptr, size_t lens)
+static size_t vorbis_read_s(SndFile *psf, short *ptr, size_t lens)
 {
     return vorbis_read_sample(psf, (void *)ptr, lens, vorbis_rshort);
 }
 
-static size_t vorbis_read_i(SF_PRIVATE *psf, int *ptr, size_t lens)
+static size_t vorbis_read_i(SndFile *psf, int *ptr, size_t lens)
 {
     return vorbis_read_sample(psf, (void *)ptr, lens, vorbis_rint);
 }
 
-static size_t vorbis_read_f(SF_PRIVATE *psf, float *ptr, size_t lens)
+static size_t vorbis_read_f(SndFile *psf, float *ptr, size_t lens)
 {
     return vorbis_read_sample(psf, (void *)ptr, lens, vorbis_rfloat);
 }
 
-static size_t vorbis_read_d(SF_PRIVATE *psf, double *ptr, size_t lens)
+static size_t vorbis_read_d(SndFile *psf, double *ptr, size_t lens)
 {
     return vorbis_read_sample(psf, (void *)ptr, lens, vorbis_rdouble);
 }
 
-static void vorbis_write_samples(SF_PRIVATE *psf, OGG_PRIVATE *odata, VORBIS_PRIVATE *vdata,
+static void vorbis_write_samples(SndFile *psf, OGG_PRIVATE *odata, VORBIS_PRIVATE *vdata,
                                  int in_frames)
 {
     vorbis_analysis_wrote(&vdata->vdsp, in_frames);
@@ -814,7 +814,7 @@ static void vorbis_write_samples(SF_PRIVATE *psf, OGG_PRIVATE *odata, VORBIS_PRI
     vdata->loc += in_frames;
 }
 
-static size_t vorbis_write_s(SF_PRIVATE *psf, const short *ptr, size_t lens)
+static size_t vorbis_write_s(SndFile *psf, const short *ptr, size_t lens)
 {
     size_t i, m, j = 0;
     OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
@@ -830,7 +830,7 @@ static size_t vorbis_write_s(SF_PRIVATE *psf, const short *ptr, size_t lens)
     return lens;
 }
 
-static size_t vorbis_write_i(SF_PRIVATE *psf, const int *ptr, size_t lens)
+static size_t vorbis_write_i(SndFile *psf, const int *ptr, size_t lens)
 {
     size_t i, m, j = 0;
     OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
@@ -846,7 +846,7 @@ static size_t vorbis_write_i(SF_PRIVATE *psf, const int *ptr, size_t lens)
     return lens;
 }
 
-static size_t vorbis_write_f(SF_PRIVATE *psf, const float *ptr, size_t lens)
+static size_t vorbis_write_f(SndFile *psf, const float *ptr, size_t lens)
 {
     size_t i, m, j = 0;
     OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
@@ -862,7 +862,7 @@ static size_t vorbis_write_f(SF_PRIVATE *psf, const float *ptr, size_t lens)
     return lens;
 }
 
-static size_t vorbis_write_d(SF_PRIVATE *psf, const double *ptr, size_t lens)
+static size_t vorbis_write_d(SndFile *psf, const double *ptr, size_t lens)
 {
     size_t i, m, j = 0;
     OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
@@ -878,7 +878,7 @@ static size_t vorbis_write_d(SF_PRIVATE *psf, const double *ptr, size_t lens)
     return lens;
 }
 
-static sf_count_t vorbis_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offset)
+static sf_count_t vorbis_seek(SndFile *psf, int UNUSED(mode), sf_count_t offset)
 {
     OGG_PRIVATE *odata = (OGG_PRIVATE *)psf->m_container_data;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *)psf->m_codec_data;
@@ -923,7 +923,7 @@ static sf_count_t vorbis_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offs
     return 0;
 }
 
-static int vorbis_byterate(SF_PRIVATE *psf)
+static int vorbis_byterate(SndFile *psf)
 {
     if (psf->m_mode == SFM_READ)
         return (psf->m_datalength * psf->sf.samplerate) / psf->sf.frames;
@@ -1089,7 +1089,7 @@ static stream_processor *find_stream_processor(stream_set *set, ogg_page *page)
     return stream;
 }
 
-static int vorbis_length_get_next_page(SF_PRIVATE *psf, ogg_sync_state *osync, ogg_page *page)
+static int vorbis_length_get_next_page(SndFile *psf, ogg_sync_state *osync, ogg_page *page)
 {
     static const int CHUNK_SIZE = 4500;
 
@@ -1110,7 +1110,7 @@ static int vorbis_length_get_next_page(SF_PRIVATE *psf, ogg_sync_state *osync, o
     return 1;
 }
 
-static sf_count_t vorbis_length_aux(SF_PRIVATE *psf)
+static sf_count_t vorbis_length_aux(SndFile *psf)
 {
     ogg_sync_state osync;
     ogg_page page;
@@ -1182,7 +1182,7 @@ static sf_count_t vorbis_length_aux(SF_PRIVATE *psf)
     return len;
 }
 
-static sf_count_t vorbis_length(SF_PRIVATE *psf)
+static sf_count_t vorbis_length(SndFile *psf)
 {
     sf_count_t length;
     int error;

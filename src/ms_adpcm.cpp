@@ -80,28 +80,28 @@ static int AdaptCoeff2[WAVLIKE_MSADPCM_ADAPT_COEFF_COUNT] = {0, -256, 0, 64, 0, 
 **		14..n	packed bytecodes
 */
 
-static int msadpcm_decode_block(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms);
-static int msadpcm_read_block(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, short *ptr, size_t len);
+static int msadpcm_decode_block(SndFile *psf, MSADPCM_PRIVATE *pms);
+static int msadpcm_read_block(SndFile *psf, MSADPCM_PRIVATE *pms, short *ptr, size_t len);
 
-static int msadpcm_encode_block(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms);
-static int msadpcm_write_block(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, const short *ptr, size_t len);
+static int msadpcm_encode_block(SndFile *psf, MSADPCM_PRIVATE *pms);
+static int msadpcm_write_block(SndFile *psf, MSADPCM_PRIVATE *pms, const short *ptr, size_t len);
 
-static size_t msadpcm_read_s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t msadpcm_read_i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t msadpcm_read_f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t msadpcm_read_d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t msadpcm_read_s(SndFile *psf, short *ptr, size_t len);
+static size_t msadpcm_read_i(SndFile *psf, int *ptr, size_t len);
+static size_t msadpcm_read_f(SndFile *psf, float *ptr, size_t len);
+static size_t msadpcm_read_d(SndFile *psf, double *ptr, size_t len);
 
-static size_t msadpcm_write_s(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t msadpcm_write_i(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t msadpcm_write_f(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t msadpcm_write_d(SF_PRIVATE *psf, const double *ptr, size_t len);
+static size_t msadpcm_write_s(SndFile *psf, const short *ptr, size_t len);
+static size_t msadpcm_write_i(SndFile *psf, const int *ptr, size_t len);
+static size_t msadpcm_write_f(SndFile *psf, const float *ptr, size_t len);
+static size_t msadpcm_write_d(SndFile *psf, const double *ptr, size_t len);
 
-static sf_count_t msadpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset);
-static int msadpcm_close(SF_PRIVATE *psf);
+static sf_count_t msadpcm_seek(SndFile *psf, int mode, sf_count_t offset);
+static int msadpcm_close(SndFile *psf);
 
 static void choose_predictor(unsigned int channels, short *data, int *bpred, int *idelta);
 
-int wavlike_msadpcm_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
+int wavlike_msadpcm_init(SndFile *psf, int blockalign, int samplesperblock)
 {
     MSADPCM_PRIVATE *pms;
     unsigned int pmssize;
@@ -187,7 +187,7 @@ int wavlike_msadpcm_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
     return 0;
 }
 
-static inline short msadpcm_get_bpred(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, unsigned char value)
+static inline short msadpcm_get_bpred(SndFile *psf, MSADPCM_PRIVATE *pms, unsigned char value)
 {
     if (value >= WAVLIKE_MSADPCM_ADAPT_COEFF_COUNT)
     {
@@ -202,7 +202,7 @@ static inline short msadpcm_get_bpred(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, uns
     return value;
 }
 
-static int msadpcm_decode_block(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
+static int msadpcm_decode_block(SndFile *psf, MSADPCM_PRIVATE *pms)
 {
     int chan, k, blockindx, sampleindx;
     short bytecode, bpred[2], chan_idelta[2];
@@ -313,7 +313,7 @@ static int msadpcm_decode_block(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
     return 0;
 }
 
-static int msadpcm_read_block(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, short *ptr, size_t len)
+static int msadpcm_read_block(SndFile *psf, MSADPCM_PRIVATE *pms, short *ptr, size_t len)
 {
     size_t count, total = 0, indx = 0;
 
@@ -342,7 +342,7 @@ static int msadpcm_read_block(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, short *ptr,
     return total;
 }
 
-static size_t msadpcm_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t msadpcm_read_s(SndFile *psf, short *ptr, size_t len)
 {
     MSADPCM_PRIVATE *pms;
     size_t readcount, count;
@@ -368,7 +368,7 @@ static size_t msadpcm_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t msadpcm_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t msadpcm_read_i(SndFile *psf, int *ptr, size_t len)
 {
     MSADPCM_PRIVATE *pms;
     BUF_UNION ubuf;
@@ -399,7 +399,7 @@ static size_t msadpcm_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t msadpcm_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t msadpcm_read_f(SndFile *psf, float *ptr, size_t len)
 {
     MSADPCM_PRIVATE *pms;
     BUF_UNION ubuf;
@@ -432,7 +432,7 @@ static size_t msadpcm_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t msadpcm_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t msadpcm_read_d(SndFile *psf, double *ptr, size_t len)
 {
     MSADPCM_PRIVATE *pms;
     BUF_UNION ubuf;
@@ -466,7 +466,7 @@ static size_t msadpcm_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static sf_count_t msadpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
+static sf_count_t msadpcm_seek(SndFile *psf, int mode, sf_count_t offset)
 {
     MSADPCM_PRIVATE *pms;
     int newblock, newsample;
@@ -516,7 +516,7 @@ static sf_count_t msadpcm_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
     return newblock * pms->samplesperblock + newsample;
 }
 
-void wavlike_msadpcm_write_adapt_coeffs(SF_PRIVATE *psf)
+void wavlike_msadpcm_write_adapt_coeffs(SndFile *psf)
 {
     int k;
 
@@ -524,7 +524,7 @@ void wavlike_msadpcm_write_adapt_coeffs(SF_PRIVATE *psf)
         psf->binheader_writef("22", BHW2(AdaptCoeff1[k]), BHW2(AdaptCoeff2[k]));
 }
 
-static int msadpcm_encode_block(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
+static int msadpcm_encode_block(SndFile *psf, MSADPCM_PRIVATE *pms)
 {
     unsigned int blockindx;
     unsigned char byte;
@@ -654,7 +654,7 @@ static int msadpcm_encode_block(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
     return 1;
 }
 
-static int msadpcm_write_block(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, const short *ptr, size_t len)
+static int msadpcm_write_block(SndFile *psf, MSADPCM_PRIVATE *pms, const short *ptr, size_t len)
 {
     size_t count, total = 0, indx = 0;
 
@@ -678,7 +678,7 @@ static int msadpcm_write_block(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, const shor
     return total;
 }
 
-static size_t msadpcm_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t msadpcm_write_s(SndFile *psf, const short *ptr, size_t len)
 {
     MSADPCM_PRIVATE *pms;
     size_t writecount, count;
@@ -703,7 +703,7 @@ static size_t msadpcm_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t msadpcm_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t msadpcm_write_i(SndFile *psf, const int *ptr, size_t len)
 {
     MSADPCM_PRIVATE *pms;
     BUF_UNION ubuf;
@@ -731,7 +731,7 @@ static size_t msadpcm_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t msadpcm_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t msadpcm_write_f(SndFile *psf, const float *ptr, size_t len)
 {
     MSADPCM_PRIVATE *pms;
     BUF_UNION ubuf;
@@ -762,7 +762,7 @@ static size_t msadpcm_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     return total;
 }
 
-static size_t msadpcm_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t msadpcm_write_d(SndFile *psf, const double *ptr, size_t len)
 {
     MSADPCM_PRIVATE *pms;
     BUF_UNION ubuf;
@@ -793,7 +793,7 @@ static size_t msadpcm_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
     return total;
 }
 
-static int msadpcm_close(SF_PRIVATE *psf)
+static int msadpcm_close(SndFile *psf)
 {
     MSADPCM_PRIVATE *pms;
 

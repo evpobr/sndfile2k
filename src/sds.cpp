@@ -43,8 +43,8 @@ typedef struct tag_SDS_PRIVATE
     int bitwidth, frames;
     int samplesperblock, total_blocks;
 
-    int (*reader)(SF_PRIVATE *psf, struct tag_SDS_PRIVATE *psds);
-    int (*writer)(SF_PRIVATE *psf, struct tag_SDS_PRIVATE *psds);
+    int (*reader)(SndFile *psf, struct tag_SDS_PRIVATE *psds);
+    int (*writer)(SndFile *psf, struct tag_SDS_PRIVATE *psds);
 
     int read_block, read_count;
     unsigned char read_data[SDS_BLOCK_SIZE];
@@ -56,39 +56,39 @@ typedef struct tag_SDS_PRIVATE
     int write_samples[SDS_BLOCK_SIZE / 2]; /* Maximum samples per block */
 } SDS_PRIVATE;
 
-static int sds_close(SF_PRIVATE *psf);
+static int sds_close(SndFile *psf);
 
-static int sds_write_header(SF_PRIVATE *psf, int calc_length);
-static int sds_read_header(SF_PRIVATE *psf, SDS_PRIVATE *psds);
+static int sds_write_header(SndFile *psf, int calc_length);
+static int sds_read_header(SndFile *psf, SDS_PRIVATE *psds);
 
-static int sds_init(SF_PRIVATE *psf, SDS_PRIVATE *psds);
+static int sds_init(SndFile *psf, SDS_PRIVATE *psds);
 
-static size_t sds_read_s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t sds_read_i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t sds_read_f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t sds_read_d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t sds_read_s(SndFile *psf, short *ptr, size_t len);
+static size_t sds_read_i(SndFile *psf, int *ptr, size_t len);
+static size_t sds_read_f(SndFile *psf, float *ptr, size_t len);
+static size_t sds_read_d(SndFile *psf, double *ptr, size_t len);
 
-static size_t sds_write_s(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t sds_write_i(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t sds_write_f(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t sds_write_d(SF_PRIVATE *psf, const double *ptr, size_t len);
+static size_t sds_write_s(SndFile *psf, const short *ptr, size_t len);
+static size_t sds_write_i(SndFile *psf, const int *ptr, size_t len);
+static size_t sds_write_f(SndFile *psf, const float *ptr, size_t len);
+static size_t sds_write_d(SndFile *psf, const double *ptr, size_t len);
 
-static sf_count_t sds_seek(SF_PRIVATE *psf, int mode, sf_count_t offset);
-static int sds_byterate(SF_PRIVATE *psf);
+static sf_count_t sds_seek(SndFile *psf, int mode, sf_count_t offset);
+static int sds_byterate(SndFile *psf);
 
-static int sds_2byte_read(SF_PRIVATE *psf, SDS_PRIVATE *psds);
-static int sds_3byte_read(SF_PRIVATE *psf, SDS_PRIVATE *psds);
-static int sds_4byte_read(SF_PRIVATE *psf, SDS_PRIVATE *psds);
+static int sds_2byte_read(SndFile *psf, SDS_PRIVATE *psds);
+static int sds_3byte_read(SndFile *psf, SDS_PRIVATE *psds);
+static int sds_4byte_read(SndFile *psf, SDS_PRIVATE *psds);
 
-static size_t sds_read(SF_PRIVATE *psf, SDS_PRIVATE *psds, int *iptr, size_t readcount);
+static size_t sds_read(SndFile *psf, SDS_PRIVATE *psds, int *iptr, size_t readcount);
 
-static int sds_2byte_write(SF_PRIVATE *psf, SDS_PRIVATE *psds);
-static int sds_3byte_write(SF_PRIVATE *psf, SDS_PRIVATE *psds);
-static int sds_4byte_write(SF_PRIVATE *psf, SDS_PRIVATE *psds);
+static int sds_2byte_write(SndFile *psf, SDS_PRIVATE *psds);
+static int sds_3byte_write(SndFile *psf, SDS_PRIVATE *psds);
+static int sds_4byte_write(SndFile *psf, SDS_PRIVATE *psds);
 
-static size_t sds_write(SF_PRIVATE *psf, SDS_PRIVATE *psds, const int *iptr, size_t writecount);
+static size_t sds_write(SndFile *psf, SDS_PRIVATE *psds, const int *iptr, size_t writecount);
 
-int sds_open(SF_PRIVATE *psf)
+int sds_open(SndFile *psf)
 {
     SDS_PRIVATE *psds;
     int error = 0;
@@ -131,7 +131,7 @@ int sds_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int sds_close(SF_PRIVATE *psf)
+static int sds_close(SndFile *psf)
 {
     if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
@@ -156,7 +156,7 @@ static int sds_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static int sds_init(SF_PRIVATE *psf, SDS_PRIVATE *psds)
+static int sds_init(SndFile *psf, SDS_PRIVATE *psds)
 {
     if (psds->bitwidth < 8 || psds->bitwidth > 28)
         return (psf->m_error = SFE_SDS_BAD_BIT_WIDTH);
@@ -202,7 +202,7 @@ static int sds_init(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     return 0;
 }
 
-static int sds_read_header(SF_PRIVATE *psf, SDS_PRIVATE *psds)
+static int sds_read_header(SndFile *psf, SDS_PRIVATE *psds)
 {
     unsigned char channel, bitwidth, loop_type, byte;
     unsigned short sample_no, marker;
@@ -338,7 +338,7 @@ static int sds_read_header(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     return 0;
 }
 
-static int sds_write_header(SF_PRIVATE *psf, int calc_length)
+static int sds_write_header(SndFile *psf, int calc_length)
 {
     SDS_PRIVATE *psds;
     sf_count_t current;
@@ -418,7 +418,7 @@ static int sds_write_header(SF_PRIVATE *psf, int calc_length)
     return psf->m_error;
 }
 
-static int sds_2byte_read(SF_PRIVATE *psf, SDS_PRIVATE *psds)
+static int sds_2byte_read(SndFile *psf, SDS_PRIVATE *psds)
 {
     unsigned char *ucptr, checksum;
     unsigned int sample;
@@ -468,7 +468,7 @@ static int sds_2byte_read(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     return 1;
 }
 
-static int sds_3byte_read(SF_PRIVATE *psf, SDS_PRIVATE *psds)
+static int sds_3byte_read(SndFile *psf, SDS_PRIVATE *psds)
 {
     unsigned char *ucptr, checksum;
     unsigned int sample;
@@ -518,7 +518,7 @@ static int sds_3byte_read(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     return 1;
 }
 
-static int sds_4byte_read(SF_PRIVATE *psf, SDS_PRIVATE *psds)
+static int sds_4byte_read(SndFile *psf, SDS_PRIVATE *psds)
 {
     unsigned char *ucptr, checksum;
     uint32_t sample;
@@ -569,7 +569,7 @@ static int sds_4byte_read(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     return 1;
 }
 
-static size_t sds_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t sds_read_s(SndFile *psf, short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     SDS_PRIVATE *psds;
@@ -596,7 +596,7 @@ static size_t sds_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t sds_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t sds_read_i(SndFile *psf, int *ptr, size_t len)
 {
     SDS_PRIVATE *psds;
     size_t total;
@@ -610,7 +610,7 @@ static size_t sds_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t sds_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t sds_read_f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     SDS_PRIVATE *psds;
@@ -643,7 +643,7 @@ static size_t sds_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t sds_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t sds_read_d(SndFile *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     SDS_PRIVATE *psds;
@@ -676,7 +676,7 @@ static size_t sds_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static size_t sds_read(SF_PRIVATE *psf, SDS_PRIVATE *psds, int *ptr, size_t len)
+static size_t sds_read(SndFile *psf, SDS_PRIVATE *psds, int *ptr, size_t len)
 {
     size_t count, total = 0;
 
@@ -702,7 +702,7 @@ static size_t sds_read(SF_PRIVATE *psf, SDS_PRIVATE *psds, int *ptr, size_t len)
     return total;
 }
 
-static sf_count_t sds_seek(SF_PRIVATE *psf, int mode, sf_count_t seek_from_start)
+static sf_count_t sds_seek(SndFile *psf, int mode, sf_count_t seek_from_start)
 {
     SDS_PRIVATE *psds;
     sf_count_t file_offset;
@@ -783,7 +783,7 @@ static sf_count_t sds_seek(SF_PRIVATE *psf, int mode, sf_count_t seek_from_start
     return seek_from_start;
 }
 
-static int sds_byterate(SF_PRIVATE *psf)
+static int sds_byterate(SndFile *psf)
 {
     if (psf->m_mode == SFM_READ)
         return (psf->m_datalength * psf->sf.samplerate) / psf->sf.frames;
@@ -791,7 +791,7 @@ static int sds_byterate(SF_PRIVATE *psf)
     return -1;
 }
 
-static int sds_2byte_write(SF_PRIVATE *psf, SDS_PRIVATE *psds)
+static int sds_2byte_write(SndFile *psf, SDS_PRIVATE *psds)
 {
     unsigned char *ucptr, checksum;
     unsigned int sample;
@@ -833,7 +833,7 @@ static int sds_2byte_write(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     return 1;
 }
 
-static int sds_3byte_write(SF_PRIVATE *psf, SDS_PRIVATE *psds)
+static int sds_3byte_write(SndFile *psf, SDS_PRIVATE *psds)
 {
     unsigned char *ucptr, checksum;
     unsigned int sample;
@@ -876,7 +876,7 @@ static int sds_3byte_write(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     return 1;
 }
 
-static int sds_4byte_write(SF_PRIVATE *psf, SDS_PRIVATE *psds)
+static int sds_4byte_write(SndFile *psf, SDS_PRIVATE *psds)
 {
     unsigned char *ucptr, checksum;
     unsigned int sample;
@@ -920,7 +920,7 @@ static int sds_4byte_write(SF_PRIVATE *psf, SDS_PRIVATE *psds)
     return 1;
 }
 
-static size_t sds_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t sds_write_s(SndFile *psf, const short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     SDS_PRIVATE *psds;
@@ -948,7 +948,7 @@ static size_t sds_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t sds_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t sds_write_i(SndFile *psf, const int *ptr, size_t len)
 {
     SDS_PRIVATE *psds;
     size_t total;
@@ -963,7 +963,7 @@ static size_t sds_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t sds_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t sds_write_f(SndFile *psf, const float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     SDS_PRIVATE *psds;
@@ -997,7 +997,7 @@ static size_t sds_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     return total;
 }
 
-static size_t sds_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t sds_write_d(SndFile *psf, const double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     SDS_PRIVATE *psds;
@@ -1031,7 +1031,7 @@ static size_t sds_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
     return total;
 }
 
-static size_t sds_write(SF_PRIVATE *psf, SDS_PRIVATE *psds, const int *ptr, size_t len)
+static size_t sds_write(SndFile *psf, SDS_PRIVATE *psds, const int *ptr, size_t len)
 {
     size_t count, total = 0;
 

@@ -30,8 +30,8 @@
 
 typedef struct IMA_ADPCM_PRIVATE_tag
 {
-    int (*decode_block)(SF_PRIVATE *psf, struct IMA_ADPCM_PRIVATE_tag *pima);
-    int (*encode_block)(SF_PRIVATE *psf, struct IMA_ADPCM_PRIVATE_tag *pima);
+    int (*decode_block)(SndFile *psf, struct IMA_ADPCM_PRIVATE_tag *pima);
+    int (*encode_block)(SndFile *psf, struct IMA_ADPCM_PRIVATE_tag *pima);
 
     int channels, blocksize, samplesperblock, blocks;
     int blockcount, samplecount;
@@ -58,34 +58,34 @@ static int ima_step_size[89] = {
     3660,  4026,  4428,  4871,  5358,  5894,  6484,  7132,  7845,  8630,  9493, 10442, 11487,
     12635, 13899, 15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767};
 
-static int ima_reader_init(SF_PRIVATE *psf, int blockalign, int samplesperblock);
-static int ima_writer_init(SF_PRIVATE *psf, int blockalign);
+static int ima_reader_init(SndFile *psf, int blockalign, int samplesperblock);
+static int ima_writer_init(SndFile *psf, int blockalign);
 
-static size_t ima_read_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima, short *ptr, size_t len);
-static size_t ima_write_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima, const short *ptr,
+static size_t ima_read_block(SndFile *psf, IMA_ADPCM_PRIVATE *pima, short *ptr, size_t len);
+static size_t ima_write_block(SndFile *psf, IMA_ADPCM_PRIVATE *pima, const short *ptr,
                               size_t len);
 
-static size_t ima_read_s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t ima_read_i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t ima_read_f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t ima_read_d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t ima_read_s(SndFile *psf, short *ptr, size_t len);
+static size_t ima_read_i(SndFile *psf, int *ptr, size_t len);
+static size_t ima_read_f(SndFile *psf, float *ptr, size_t len);
+static size_t ima_read_d(SndFile *psf, double *ptr, size_t len);
 
-static size_t ima_write_s(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t ima_write_i(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t ima_write_f(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t ima_write_d(SF_PRIVATE *psf, const double *ptr, size_t len);
+static size_t ima_write_s(SndFile *psf, const short *ptr, size_t len);
+static size_t ima_write_i(SndFile *psf, const int *ptr, size_t len);
+static size_t ima_write_f(SndFile *psf, const float *ptr, size_t len);
+static size_t ima_write_d(SndFile *psf, const double *ptr, size_t len);
 
-static sf_count_t aiff_ima_seek(SF_PRIVATE *psf, int mode, sf_count_t offset);
-static sf_count_t wavlike_ima_seek(SF_PRIVATE *psf, int mode, sf_count_t offset);
+static sf_count_t aiff_ima_seek(SndFile *psf, int mode, sf_count_t offset);
+static sf_count_t wavlike_ima_seek(SndFile *psf, int mode, sf_count_t offset);
 
-static int ima_close(SF_PRIVATE *psf);
+static int ima_close(SndFile *psf);
 
-static int wavlike_ima_decode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima);
-static int wavlike_ima_encode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima);
+static int wavlike_ima_decode_block(SndFile *psf, IMA_ADPCM_PRIVATE *pima);
+static int wavlike_ima_encode_block(SndFile *psf, IMA_ADPCM_PRIVATE *pima);
 
 /*-static int aiff_ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock) ;-*/
-static int aiff_ima_decode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima);
-static int aiff_ima_encode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima);
+static int aiff_ima_decode_block(SndFile *psf, IMA_ADPCM_PRIVATE *pima);
+static int aiff_ima_encode_block(SndFile *psf, IMA_ADPCM_PRIVATE *pima);
 
 static inline int clamp_ima_step_index(int indx)
 {
@@ -97,7 +97,7 @@ static inline int clamp_ima_step_index(int indx)
     return indx;
 }
 
-int wavlike_ima_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
+int wavlike_ima_init(SndFile *psf, int blockalign, int samplesperblock)
 {
     int error;
 
@@ -124,7 +124,7 @@ int wavlike_ima_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
     return 0;
 }
 
-int aiff_ima_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
+int aiff_ima_init(SndFile *psf, int blockalign, int samplesperblock)
 {
     int error;
 
@@ -145,7 +145,7 @@ int aiff_ima_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
     return 0;
 }
 
-static int ima_close(SF_PRIVATE *psf)
+static int ima_close(SndFile *psf)
 {
     IMA_ADPCM_PRIVATE *pima;
 
@@ -166,7 +166,7 @@ static int ima_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static int ima_reader_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
+static int ima_reader_init(SndFile *psf, int blockalign, int samplesperblock)
 {
     IMA_ADPCM_PRIVATE *pima;
     int pimasize, count;
@@ -248,7 +248,7 @@ static int ima_reader_init(SF_PRIVATE *psf, int blockalign, int samplesperblock)
     return 0;
 }
 
-static int aiff_ima_decode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
+static int aiff_ima_decode_block(SndFile *psf, IMA_ADPCM_PRIVATE *pima)
 {
     unsigned char *blockdata;
     int chan, k, diff, bytecode, predictor;
@@ -326,7 +326,7 @@ static int aiff_ima_decode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
     return 1;
 }
 
-static int aiff_ima_encode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
+static int aiff_ima_encode_block(SndFile *psf, IMA_ADPCM_PRIVATE *pima)
 {
     int chan, k, step, diff, vpdiff, blockindx, indx;
     short bytecode, mask;
@@ -414,7 +414,7 @@ static int aiff_ima_encode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
     return 1;
 }
 
-static int wavlike_ima_decode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
+static int wavlike_ima_decode_block(SndFile *psf, IMA_ADPCM_PRIVATE *pima)
 {
     int chan, k, predictor, blockindx, indx, indxstart, diff;
     short step, bytecode, stepindx[2];
@@ -510,7 +510,7 @@ static int wavlike_ima_decode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
     return 1;
 }
 
-static int wavlike_ima_encode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
+static int wavlike_ima_encode_block(SndFile *psf, IMA_ADPCM_PRIVATE *pima)
 {
     int chan, k, step, diff, vpdiff, blockindx, indx, indxstart;
     short bytecode, mask;
@@ -606,7 +606,7 @@ static int wavlike_ima_encode_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
     return 1;
 }
 
-static size_t ima_read_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima, short *ptr, size_t len)
+static size_t ima_read_block(SndFile *psf, IMA_ADPCM_PRIVATE *pima, short *ptr, size_t len)
 {
     size_t count, total = 0, indx = 0;
 
@@ -634,7 +634,7 @@ static size_t ima_read_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima, short *pt
     return total;
 }
 
-static size_t ima_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t ima_read_s(SndFile *psf, short *ptr, size_t len)
 {
     IMA_ADPCM_PRIVATE *pima;
     size_t readcount, count;
@@ -659,7 +659,7 @@ static size_t ima_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t ima_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t ima_read_i(SndFile *psf, int *ptr, size_t len)
 {
     IMA_ADPCM_PRIVATE *pima;
     BUF_UNION ubuf;
@@ -688,7 +688,7 @@ static size_t ima_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t ima_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t ima_read_f(SndFile *psf, float *ptr, size_t len)
 {
     IMA_ADPCM_PRIVATE *pima;
     BUF_UNION ubuf;
@@ -720,7 +720,7 @@ static size_t ima_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t ima_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t ima_read_d(SndFile *psf, double *ptr, size_t len)
 {
     IMA_ADPCM_PRIVATE *pima;
     BUF_UNION ubuf;
@@ -752,7 +752,7 @@ static size_t ima_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static sf_count_t aiff_ima_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
+static sf_count_t aiff_ima_seek(SndFile *psf, int mode, sf_count_t offset)
 {
     IMA_ADPCM_PRIVATE *pima;
     int newblock, newsample, newblockaiff;
@@ -803,7 +803,7 @@ static sf_count_t aiff_ima_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
     return newblock * pima->samplesperblock + newsample;
 }
 
-static sf_count_t wavlike_ima_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
+static sf_count_t wavlike_ima_seek(SndFile *psf, int mode, sf_count_t offset)
 {
     IMA_ADPCM_PRIVATE *pima;
     int newblock, newsample;
@@ -853,7 +853,7 @@ static sf_count_t wavlike_ima_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
     return newblock * pima->samplesperblock + newsample;
 }
 
-static int ima_writer_init(SF_PRIVATE *psf, int blockalign)
+static int ima_writer_init(SndFile *psf, int blockalign)
 {
     IMA_ADPCM_PRIVATE *pima;
     int samplesperblock;
@@ -904,7 +904,7 @@ static int ima_writer_init(SF_PRIVATE *psf, int blockalign)
     return 0;
 }
 
-static size_t ima_write_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima, const short *ptr,
+static size_t ima_write_block(SndFile *psf, IMA_ADPCM_PRIVATE *pima, const short *ptr,
                               size_t len)
 {
     size_t count, total = 0, indx = 0;
@@ -929,7 +929,7 @@ static size_t ima_write_block(SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima, const sh
     return total;
 }
 
-static size_t ima_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t ima_write_s(SndFile *psf, const short *ptr, size_t len)
 {
     IMA_ADPCM_PRIVATE *pima;
     size_t writecount, count;
@@ -954,7 +954,7 @@ static size_t ima_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t ima_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t ima_write_i(SndFile *psf, const int *ptr, size_t len)
 {
     IMA_ADPCM_PRIVATE *pima;
     BUF_UNION ubuf;
@@ -983,7 +983,7 @@ static size_t ima_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t ima_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t ima_write_f(SndFile *psf, const float *ptr, size_t len)
 {
     IMA_ADPCM_PRIVATE *pima;
     BUF_UNION ubuf;
@@ -1015,7 +1015,7 @@ static size_t ima_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     return total;
 }
 
-static size_t ima_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t ima_write_d(SndFile *psf, const double *ptr, size_t len)
 {
     IMA_ADPCM_PRIVATE *pima;
     BUF_UNION ubuf;

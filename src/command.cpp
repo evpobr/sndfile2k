@@ -244,7 +244,7 @@ int psf_get_format_info(SF_FORMAT_INFO *data)
     return SFE_BAD_COMMAND_PARAM;
 }
 
-double psf_calc_signal_max(SF_PRIVATE *psf, int normalize)
+double psf_calc_signal_max(SndFile *psf, int normalize)
 {
     BUF_UNION ubuf;
     sf_count_t position;
@@ -296,7 +296,7 @@ double psf_calc_signal_max(SF_PRIVATE *psf, int normalize)
     return max_val;
 }
 
-int psf_calc_max_all_channels(SF_PRIVATE *psf, double *peaks, int normalize)
+int psf_calc_max_all_channels(SndFile *psf, double *peaks, int normalize)
 {
     BUF_UNION ubuf;
     sf_count_t position;
@@ -344,7 +344,7 @@ int psf_calc_max_all_channels(SF_PRIVATE *psf, double *peaks, int normalize)
     return 0;
 }
 
-int psf_get_signal_max(SF_PRIVATE *psf, double *peak)
+int psf_get_signal_max(SndFile *psf, double *peak)
 {
     int k;
 
@@ -359,7 +359,7 @@ int psf_get_signal_max(SF_PRIVATE *psf, double *peak)
     return SF_TRUE;
 }
 
-int psf_get_max_all_channels(SF_PRIVATE *psf, double *peaks)
+int psf_get_max_all_channels(SndFile *psf, double *peaks)
 {
     int k;
 

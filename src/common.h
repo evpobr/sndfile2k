@@ -309,12 +309,11 @@ typedef union
 struct DITHER_DATA;
 struct INTERLEAVE_DATA;
 
-struct SF_PRIVATE: public ISndFile
+class SndFile: public ISndFile
 {
-    bool m_is_open = false;
-    unsigned long m_ref = 0;
+public:
 
-    SF_PRIVATE();
+    SndFile();
 
     unsigned long ref() final;
     void unref() final;
@@ -369,7 +368,7 @@ struct SF_PRIVATE: public ISndFile
     bool is_open() const;
     void close();
 
-    ~SF_PRIVATE();
+    ~SndFile();
 
     /* Canary in a coal mine. */
     union canary
@@ -488,27 +487,27 @@ struct SF_PRIVATE: public ISndFile
     int m_ieee_replace = SF_FALSE;
 
     /* A set of file specific function pointers */
-    size_t (*read_short)(struct SF_PRIVATE *, short *ptr, size_t len) = nullptr;
-    size_t (*read_int)(struct SF_PRIVATE *, int *ptr, size_t len) = nullptr;
-    size_t (*read_float)(struct SF_PRIVATE *, float *ptr, size_t len) = nullptr;
-    size_t (*read_double)(struct SF_PRIVATE *, double *ptr, size_t len) = nullptr;
+    size_t (*read_short)(SndFile *, short *ptr, size_t len) = nullptr;
+    size_t (*read_int)(SndFile *, int *ptr, size_t len) = nullptr;
+    size_t (*read_float)(SndFile *, float *ptr, size_t len) = nullptr;
+    size_t (*read_double)(SndFile *, double *ptr, size_t len) = nullptr;
 
-    size_t (*write_short)(struct SF_PRIVATE *, const short *ptr, size_t len) = nullptr;
-    size_t (*write_int)(struct SF_PRIVATE *, const int *ptr, size_t len) = nullptr;
-    size_t (*write_float)(struct SF_PRIVATE *, const float *ptr, size_t len) = nullptr;
-    size_t (*write_double)(struct SF_PRIVATE *, const double *ptr, size_t len) = nullptr;
+    size_t (*write_short)(SndFile *, const short *ptr, size_t len) = nullptr;
+    size_t (*write_int)(SndFile *, const int *ptr, size_t len) = nullptr;
+    size_t (*write_float)(SndFile *, const float *ptr, size_t len) = nullptr;
+    size_t (*write_double)(SndFile *, const double *ptr, size_t len) = nullptr;
 
-    sf_count_t (*seek_from_start)(struct SF_PRIVATE *, int mode, sf_count_t samples_from_start) = nullptr;
-    int (*write_header)(struct SF_PRIVATE *, int calc_length) = nullptr;
-    size_t (*on_command)(struct SF_PRIVATE *, int command, void *data, size_t datasize) = nullptr;
-    int (*byterate)(struct SF_PRIVATE *) = nullptr;
+    sf_count_t (*seek_from_start)(SndFile *, int mode, sf_count_t samples_from_start) = nullptr;
+    int (*write_header)(SndFile *, int calc_length) = nullptr;
+    size_t (*on_command)(SndFile *, int command, void *data, size_t datasize) = nullptr;
+    int (*byterate)(SndFile *) = nullptr;
 
     /*
 	**	Separate close functions for the codec and the container.
 	**	The codec close function is always called first.
 	*/
-    int (*codec_close)(struct SF_PRIVATE *) = nullptr;
-    int (*container_close)(struct SF_PRIVATE *) = nullptr;
+    int (*codec_close)(SndFile *) = nullptr;
+    int (*container_close)(SndFile *) = nullptr;
 
     char *m_format_desc = nullptr;
 
@@ -518,12 +517,10 @@ struct SF_PRIVATE: public ISndFile
     struct READ_CHUNKS m_rchunks = {0};
 	struct WRITE_CHUNKS m_wchunks = {0};
 
-    int (*set_chunk)(struct SF_PRIVATE *, const SF_CHUNK_INFO *chunk_info) = nullptr;
-    SF_CHUNK_ITERATOR *(*next_chunk_iterator)(struct SF_PRIVATE *, SF_CHUNK_ITERATOR *iterator) = nullptr;
-    int (*get_chunk_size)(struct SF_PRIVATE *, const SF_CHUNK_ITERATOR *iterator,
-                          SF_CHUNK_INFO *chunk_info) = nullptr;
-    int (*get_chunk_data)(struct SF_PRIVATE *, const SF_CHUNK_ITERATOR *iterator,
-                          SF_CHUNK_INFO *chunk_info) = nullptr;
+    int (*set_chunk)(SndFile *, const SF_CHUNK_INFO *chunk_info) = nullptr;
+    SF_CHUNK_ITERATOR *(*next_chunk_iterator)(SndFile *, SF_CHUNK_ITERATOR *iterator) = nullptr;
+    int (*get_chunk_size)(SndFile *, const SF_CHUNK_ITERATOR *iterator, SF_CHUNK_INFO *chunk_info) = nullptr;
+    int (*get_chunk_data)(SndFile *, const SF_CHUNK_ITERATOR *iterator, SF_CHUNK_INFO *chunk_info) = nullptr;
 
     /* Functions for writing to the internal logging buffer. */
 
@@ -575,6 +572,10 @@ struct SF_PRIVATE: public ISndFile
     int set_string(int str_type, const char *str);
     int store_string(int str_type, const char *str);
     int location_string_count(int location);
+
+private:
+    bool m_is_open = false;
+    unsigned long m_ref = 0;
 };
 
 enum
@@ -795,13 +796,13 @@ int32_t psf_rand_int32(void);
 void append_snprintf(char *dest, size_t maxlen, const char *fmt, ...);
 void psf_strlcpy_crlf(char *dest, const char *src, size_t destmax, size_t srcmax);
 
-sf_count_t psf_decode_frame_count(SF_PRIVATE *psf);
+sf_count_t psf_decode_frame_count(SndFile *psf);
 
 /* Functions used in the write function for updating the peak chunk. */
 
-void peak_update_short(SF_PRIVATE *psf, short *ptr, size_t items);
-void peak_update_int(SF_PRIVATE *psf, int *ptr, size_t items);
-void peak_update_double(SF_PRIVATE *psf, double *ptr, size_t items);
+void peak_update_short(SndFile *psf, short *ptr, size_t items);
+void peak_update_int(SndFile *psf, int *ptr, size_t items);
+void peak_update_double(SndFile *psf, double *ptr, size_t items);
 
 /* Functions defined in command.c. */
 
@@ -816,18 +817,18 @@ int psf_get_format_major(SF_FORMAT_INFO *data);
 int psf_get_format_subtype_count(void);
 int psf_get_format_subtype(SF_FORMAT_INFO *data);
 
-void psf_generate_format_desc(SF_PRIVATE *psf);
+void psf_generate_format_desc(SndFile *psf);
 
-double psf_calc_signal_max(SF_PRIVATE *psf, int normalize);
-int psf_calc_max_all_channels(SF_PRIVATE *psf, double *peaks, int normalize);
+double psf_calc_signal_max(SndFile *psf, int normalize);
+int psf_calc_max_all_channels(SndFile *psf, double *peaks, int normalize);
 
-int psf_get_signal_max(SF_PRIVATE *psf, double *peak);
-int psf_get_max_all_channels(SF_PRIVATE *psf, double *peaks);
+int psf_get_signal_max(SndFile *psf, double *peak);
+int psf_get_max_all_channels(SndFile *psf, double *peaks);
 
 /* Default seek function. Use for PCM and float encoded data. */
-sf_count_t psf_default_seek(SF_PRIVATE *psf, int mode, sf_count_t samples_from_start);
+sf_count_t psf_default_seek(SndFile *psf, int mode, sf_count_t samples_from_start);
 
-int macos_guess_file_type(SF_PRIVATE *psf, const char *filename);
+int macos_guess_file_type(SndFile *psf, const char *filename);
 
 /*------------------------------------------------------------------------------------
 **	File I/O functions which will allow access to large files (> 2 Gig) on
@@ -836,7 +837,7 @@ int macos_guess_file_type(SF_PRIVATE *psf, const char *filename);
 
 #define SENSIBLE_SIZE (0x40000000)
 
-static void psf_log_syserr(SF_PRIVATE *psf, int error);
+static void psf_log_syserr(SndFile *psf, int error);
 
 SF_VIRTUAL_IO *psf_get_vio();
 int psf_open_file_stream(const char *filename, SF_FILEMODE mode, SF_STREAM **stream);
@@ -853,58 +854,58 @@ int psf_ferror (SF_PRIVATE *psf) ;
 ** Functions for reading and writing different file formats.
 */
 
-int aiff_open(SF_PRIVATE *psf);
-int au_open(SF_PRIVATE *psf);
-int avr_open(SF_PRIVATE *psf);
-int htk_open(SF_PRIVATE *psf);
-int ircam_open(SF_PRIVATE *psf);
-int mat4_open(SF_PRIVATE *psf);
-int mat5_open(SF_PRIVATE *psf);
-int nist_open(SF_PRIVATE *psf);
-int paf_open(SF_PRIVATE *psf);
-int pvf_open(SF_PRIVATE *psf);
-int raw_open(SF_PRIVATE *psf);
-int sds_open(SF_PRIVATE *psf);
-int svx_open(SF_PRIVATE *psf);
-int voc_open(SF_PRIVATE *psf);
-int w64_open(SF_PRIVATE *psf);
-int wav_open(SF_PRIVATE *psf);
-int xi_open(SF_PRIVATE *psf);
-int flac_open(SF_PRIVATE *psf);
-int caf_open(SF_PRIVATE *psf);
-int mpc2k_open(SF_PRIVATE *psf);
-int rf64_open(SF_PRIVATE *psf);
+int aiff_open(SndFile *psf);
+int au_open(SndFile *psf);
+int avr_open(SndFile *psf);
+int htk_open(SndFile *psf);
+int ircam_open(SndFile *psf);
+int mat4_open(SndFile *psf);
+int mat5_open(SndFile *psf);
+int nist_open(SndFile *psf);
+int paf_open(SndFile *psf);
+int pvf_open(SndFile *psf);
+int raw_open(SndFile *psf);
+int sds_open(SndFile *psf);
+int svx_open(SndFile *psf);
+int voc_open(SndFile *psf);
+int w64_open(SndFile *psf);
+int wav_open(SndFile *psf);
+int xi_open(SndFile *psf);
+int flac_open(SndFile *psf);
+int caf_open(SndFile *psf);
+int mpc2k_open(SndFile *psf);
+int rf64_open(SndFile *psf);
 
-int ogg_vorbis_open(SF_PRIVATE *psf);
-int ogg_speex_open(SF_PRIVATE *psf);
-int ogg_pcm_open(SF_PRIVATE *psf);
-int ogg_opus_open(SF_PRIVATE *psf);
-int ogg_open(SF_PRIVATE *psf);
+int ogg_vorbis_open(SndFile *psf);
+int ogg_speex_open(SndFile *psf);
+int ogg_pcm_open(SndFile *psf);
+int ogg_opus_open(SndFile *psf);
+int ogg_open(SndFile *psf);
 
 /* In progress. Do not currently work. */
 
-int mpeg_open(SF_PRIVATE *psf);
-int rx2_open(SF_PRIVATE *psf);
-int txw_open(SF_PRIVATE *psf);
-int wve_open(SF_PRIVATE *psf);
-int dwd_open(SF_PRIVATE *psf);
+int mpeg_open(SndFile *psf);
+int rx2_open(SndFile *psf);
+int txw_open(SndFile *psf);
+int wve_open(SndFile *psf);
+int dwd_open(SndFile *psf);
 
 /*------------------------------------------------------------------------------------
 **	Init functions for a number of common data encodings.
 */
 
-int pcm_init(SF_PRIVATE *psf);
-int ulaw_init(SF_PRIVATE *psf);
-int alaw_init(SF_PRIVATE *psf);
-int float32_init(SF_PRIVATE *psf);
-int double64_init(SF_PRIVATE *psf);
-int dwvw_init(SF_PRIVATE *psf, int bitwidth);
-int gsm610_init(SF_PRIVATE *psf);
-int nms_adpcm_init(SF_PRIVATE *psf);
-int vox_adpcm_init(SF_PRIVATE *psf);
-int flac_init(SF_PRIVATE *psf);
-int g72x_init(SF_PRIVATE *psf);
-int alac_init(SF_PRIVATE *psf, const struct ALAC_DECODER_INFO *info);
+int pcm_init(SndFile *psf);
+int ulaw_init(SndFile *psf);
+int alaw_init(SndFile *psf);
+int float32_init(SndFile *psf);
+int double64_init(SndFile *psf);
+int dwvw_init(SndFile *psf, int bitwidth);
+int gsm610_init(SndFile *psf);
+int nms_adpcm_init(SndFile *psf);
+int vox_adpcm_init(SndFile *psf);
+int flac_init(SndFile *psf);
+int g72x_init(SndFile *psf);
+int alac_init(SndFile *psf, const struct ALAC_DECODER_INFO *info);
 
 struct DITHER_DATA
 {
@@ -913,25 +914,25 @@ struct DITHER_DATA
     double read_float_dither_scale, read_double_dither_bits;
     double write_float_dither_scale, write_double_dither_bits;
 
-    size_t (*read_short)(SF_PRIVATE *psf, short *ptr, size_t len);
-    size_t (*read_int)(SF_PRIVATE *psf, int *ptr, size_t len);
-    size_t (*read_float)(SF_PRIVATE *psf, float *ptr, size_t len);
-    size_t (*read_double)(SF_PRIVATE *psf, double *ptr, size_t len);
+    size_t (*read_short)(SndFile *psf, short *ptr, size_t len);
+    size_t (*read_int)(SndFile *psf, int *ptr, size_t len);
+    size_t (*read_float)(SndFile *psf, float *ptr, size_t len);
+    size_t (*read_double)(SndFile *psf, double *ptr, size_t len);
 
-    size_t (*write_short)(SF_PRIVATE *psf, const short *ptr, size_t len);
-    size_t (*write_int)(SF_PRIVATE *psf, const int *ptr, size_t len);
-    size_t (*write_float)(SF_PRIVATE *psf, const float *ptr, size_t len);
-    size_t (*write_double)(SF_PRIVATE *psf, const double *ptr, size_t len);
+    size_t (*write_short)(SndFile *psf, const short *ptr, size_t len);
+    size_t (*write_int)(SndFile *psf, const int *ptr, size_t len);
+    size_t (*write_float)(SndFile *psf, const float *ptr, size_t len);
+    size_t (*write_double)(SndFile *psf, const double *ptr, size_t len);
 
     double buffer[SF_BUFFER_LEN / sizeof(double)];
 };
 
-int dither_init(SF_PRIVATE *psf, int mode);
+int dither_init(SndFile *psf, int mode);
 
-int wavlike_ima_init(SF_PRIVATE *psf, int blockalign, int samplesperblock);
-int wavlike_msadpcm_init(SF_PRIVATE *psf, int blockalign, int samplesperblock);
+int wavlike_ima_init(SndFile *psf, int blockalign, int samplesperblock);
+int wavlike_msadpcm_init(SndFile *psf, int blockalign, int samplesperblock);
 
-int aiff_ima_init(SF_PRIVATE *psf, int blockalign, int samplesperblock);
+int aiff_ima_init(SndFile *psf, int blockalign, int samplesperblock);
 
 struct INTERLEAVE_DATA
 {
@@ -939,19 +940,19 @@ struct INTERLEAVE_DATA
 
     sf_count_t channel_len;
 
-    size_t (*read_short)(SF_PRIVATE *, short *ptr, size_t len);
-    size_t (*read_int)(SF_PRIVATE *, int *ptr, size_t len);
-    size_t (*read_float)(SF_PRIVATE *, float *ptr, size_t len);
-    size_t (*read_double)(SF_PRIVATE *, double *ptr, size_t len);
+    size_t (*read_short)(SndFile *, short *ptr, size_t len);
+    size_t (*read_int)(SndFile *, int *ptr, size_t len);
+    size_t (*read_float)(SndFile *, float *ptr, size_t len);
+    size_t (*read_double)(SndFile *, double *ptr, size_t len);
 };
 
-int interleave_init(SF_PRIVATE *psf);
+int interleave_init(SndFile *psf);
 
 /*------------------------------------------------------------------------------------
 ** Chunk logging functions.
 */
 
-SF_CHUNK_ITERATOR *psf_get_chunk_iterator(SF_PRIVATE *psf, const char *marker_str);
+SF_CHUNK_ITERATOR *psf_get_chunk_iterator(SndFile *psf, const char *marker_str);
 SF_CHUNK_ITERATOR *psf_next_chunk_iterator(const struct READ_CHUNKS *pchk, SF_CHUNK_ITERATOR *iterator);
 int psf_store_read_chunk_u32(struct READ_CHUNKS *pchk, uint32_t marker, sf_count_t offset, uint32_t len);
 int psf_store_read_chunk_str(struct READ_CHUNKS *pchk, const char *marker, sf_count_t offset,
@@ -1006,7 +1007,7 @@ void *psf_memset(void *s, int c, sf_count_t n);
 
 SF_CUE_POINT *psf_cues_dup(const SF_CUE_POINT *cues, uint32_t cue_count);
 SF_CUE_POINT *psf_cues_alloc(uint32_t cue_count);
-void psf_get_cues(SF_PRIVATE *psf, void *data, size_t datasize);
+void psf_get_cues(SndFile *psf, void *data, size_t datasize);
 
 SF_INSTRUMENT *psf_instrument_alloc(void);
 
@@ -1021,8 +1022,8 @@ struct AUDIO_DETECT
     int endianness;
 };
 
-int audio_detect(SF_PRIVATE *psf, struct AUDIO_DETECT *ad, const unsigned char *data, int datalen);
-int id3_skip(SF_PRIVATE *psf);
+int audio_detect(SndFile *psf, struct AUDIO_DETECT *ad, const unsigned char *data, int datalen);
+int id3_skip(SndFile *psf);
 
 void alac_get_desc_chunk_items(int subformat, uint32_t *fmt_flags, uint32_t *frames_per_packet);
 

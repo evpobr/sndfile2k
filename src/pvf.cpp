@@ -29,12 +29,12 @@
 
 #define PVF1_MARKER (MAKE_MARKER('P', 'V', 'F', '1'))
 
-static int pvf_close(SF_PRIVATE *psf);
+static int pvf_close(SndFile *psf);
 
-static int pvf_write_header(SF_PRIVATE *psf, int calc_length);
-static int pvf_read_header(SF_PRIVATE *psf);
+static int pvf_write_header(SndFile *psf, int calc_length);
+static int pvf_read_header(SndFile *psf);
 
-int pvf_open(SF_PRIVATE *psf)
+int pvf_open(SndFile *psf)
 {
     int subformat;
     int error = 0;
@@ -79,12 +79,12 @@ int pvf_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int pvf_close(SF_PRIVATE *UNUSED(psf))
+static int pvf_close(SndFile *UNUSED(psf))
 {
     return 0;
 }
 
-static int pvf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
+static int pvf_write_header(SndFile *psf, int UNUSED(calc_length))
 {
     sf_count_t current;
 
@@ -115,7 +115,7 @@ static int pvf_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     return psf->m_error;
 }
 
-static int pvf_read_header(SF_PRIVATE *psf)
+static int pvf_read_header(SndFile *psf)
 {
     char buffer[32];
     int marker, channels, samplerate, bitwidth;

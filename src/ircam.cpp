@@ -51,15 +51,15 @@ enum
     IRCAM_PCM_32 = 0x40004
 };
 
-static int ircam_close(SF_PRIVATE *psf);
-static int ircam_write_header(SF_PRIVATE *psf, int calc_length);
-static int ircam_read_header(SF_PRIVATE *psf);
+static int ircam_close(SndFile *psf);
+static int ircam_write_header(SndFile *psf, int calc_length);
+static int ircam_read_header(SndFile *psf);
 
 static int get_encoding(int subformat);
 
 static const char *get_encoding_str(int encoding);
 
-int ircam_open(SF_PRIVATE *psf)
+int ircam_open(SndFile *psf)
 {
     int subformat;
     int error = SFE_NO_ERROR;
@@ -117,7 +117,7 @@ int ircam_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int ircam_read_header(SF_PRIVATE *psf)
+static int ircam_read_header(SndFile *psf)
 {
     unsigned int marker, encoding;
     float samplerate;
@@ -223,14 +223,14 @@ static int ircam_read_header(SF_PRIVATE *psf)
     return 0;
 }
 
-static int ircam_close(SF_PRIVATE *psf)
+static int ircam_close(SndFile *psf)
 {
     psf->log_printf("close\n");
 
     return 0;
 }
 
-static int ircam_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
+static int ircam_write_header(SndFile *psf, int UNUSED(calc_length))
 {
     int encoding;
     float samplerate;

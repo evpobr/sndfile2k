@@ -97,23 +97,23 @@ struct CAF_PRIVATE
  * Private static functions.
  */
 
-static int caf_close(SF_PRIVATE *psf);
-static int caf_read_header(SF_PRIVATE *psf);
-static int caf_write_header(SF_PRIVATE *psf, int calc_length);
-static int caf_write_tailer(SF_PRIVATE *psf);
-static size_t caf_command(SF_PRIVATE *psf, int command, void *data, size_t datasize);
-static int caf_read_chanmap(SF_PRIVATE *psf, sf_count_t chunk_size);
-static int caf_read_strings(SF_PRIVATE *psf, sf_count_t chunk_size);
-static void caf_write_strings(SF_PRIVATE *psf, int location);
+static int caf_close(SndFile *psf);
+static int caf_read_header(SndFile *psf);
+static int caf_write_header(SndFile *psf, int calc_length);
+static int caf_write_tailer(SndFile *psf);
+static size_t caf_command(SndFile *psf, int command, void *data, size_t datasize);
+static int caf_read_chanmap(SndFile *psf, sf_count_t chunk_size);
+static int caf_read_strings(SndFile *psf, sf_count_t chunk_size);
+static void caf_write_strings(SndFile *psf, int location);
 
-static int caf_set_chunk(SF_PRIVATE *psf, const SF_CHUNK_INFO *chunk_info);
-static SF_CHUNK_ITERATOR *caf_next_chunk_iterator(SF_PRIVATE *psf, SF_CHUNK_ITERATOR *iterator);
-static int caf_get_chunk_size(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
+static int caf_set_chunk(SndFile *psf, const SF_CHUNK_INFO *chunk_info);
+static SF_CHUNK_ITERATOR *caf_next_chunk_iterator(SndFile *psf, SF_CHUNK_ITERATOR *iterator);
+static int caf_get_chunk_size(SndFile *psf, const SF_CHUNK_ITERATOR *iterator,
                               SF_CHUNK_INFO *chunk_info);
-static int caf_get_chunk_data(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
+static int caf_get_chunk_data(SndFile *psf, const SF_CHUNK_ITERATOR *iterator,
                               SF_CHUNK_INFO *chunk_info);
 
-int caf_open(SF_PRIVATE *psf)
+int caf_open(SndFile *psf)
 {
     struct CAF_PRIVATE *pcaf;
     int subformat, format, error = 0;
@@ -216,7 +216,7 @@ int caf_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int caf_close(SF_PRIVATE *psf)
+static int caf_close(SndFile *psf)
 {
     if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
@@ -227,7 +227,7 @@ static int caf_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static size_t caf_command(SF_PRIVATE *psf, int command, void *UNUSED(data), size_t UNUSED(datasize))
+static size_t caf_command(SndFile *psf, int command, void *UNUSED(data), size_t UNUSED(datasize))
 {
 	struct CAF_PRIVATE *pcaf;
 
@@ -247,7 +247,7 @@ static size_t caf_command(SF_PRIVATE *psf, int command, void *UNUSED(data), size
     return 0;
 }
 
-static int decode_desc_chunk(SF_PRIVATE *psf, const struct DESC_CHUNK *desc)
+static int decode_desc_chunk(SndFile *psf, const struct DESC_CHUNK *desc)
 {
     int format = SF_FORMAT_CAF;
 
@@ -346,7 +346,7 @@ static int decode_desc_chunk(SF_PRIVATE *psf, const struct DESC_CHUNK *desc)
     return 0;
 }
 
-static int caf_read_header(SF_PRIVATE *psf)
+static int caf_read_header(SndFile *psf)
 {
 	struct CAF_PRIVATE *pcaf;
     BUF_UNION ubuf;
@@ -605,7 +605,7 @@ static int caf_read_header(SF_PRIVATE *psf)
     return 0;
 }
 
-static int caf_write_header(SF_PRIVATE *psf, int calc_length)
+static int caf_write_header(SndFile *psf, int calc_length)
 {
     BUF_UNION ubuf;
 	struct CAF_PRIVATE *pcaf;
@@ -806,7 +806,7 @@ static int caf_write_header(SF_PRIVATE *psf, int calc_length)
     return psf->m_error;
 }
 
-static int caf_write_tailer(SF_PRIVATE *psf)
+static int caf_write_tailer(SndFile *psf)
 {
     /* Reset the current header buffer length to zero. */
     psf->m_header.ptr[0] = 0;
@@ -836,7 +836,7 @@ static int caf_write_tailer(SF_PRIVATE *psf)
     return 0;
 }
 
-static int caf_read_chanmap(SF_PRIVATE *psf, sf_count_t chunk_size)
+static int caf_read_chanmap(SndFile *psf, sf_count_t chunk_size)
 {
     const AIFF_CAF_CHANNEL_MAP *map_info;
     unsigned channel_bitmap, channel_decriptions, bytesread;
@@ -879,7 +879,7 @@ static uint32_t string_hash32(const char *str)
     return hash;
 }
 
-static int caf_read_strings(SF_PRIVATE *psf, sf_count_t chunk_size)
+static int caf_read_strings(SndFile *psf, sf_count_t chunk_size)
 {
     char *buf;
     char *key, *value;
@@ -971,7 +971,7 @@ static uint32_t put_key_value(struct put_buffer *buf, const char *key, const cha
     return 1;
 }
 
-static void caf_write_strings(SF_PRIVATE *psf, int location)
+static void caf_write_strings(SndFile *psf, int location)
 {
     struct put_buffer buf;
     const char *cptr;
@@ -1035,17 +1035,17 @@ static void caf_write_strings(SF_PRIVATE *psf, int location)
                          BHWv(buf.s), BHWz(buf.index));
 }
 
-static int caf_set_chunk(SF_PRIVATE *psf, const SF_CHUNK_INFO *chunk_info)
+static int caf_set_chunk(SndFile *psf, const SF_CHUNK_INFO *chunk_info)
 {
     return psf_save_write_chunk(&psf->m_wchunks, chunk_info);
 }
 
-static SF_CHUNK_ITERATOR *caf_next_chunk_iterator(SF_PRIVATE *psf, SF_CHUNK_ITERATOR *iterator)
+static SF_CHUNK_ITERATOR *caf_next_chunk_iterator(SndFile *psf, SF_CHUNK_ITERATOR *iterator)
 {
     return psf_next_chunk_iterator(&psf->m_rchunks, iterator);
 }
 
-static int caf_get_chunk_size(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
+static int caf_get_chunk_size(SndFile *psf, const SF_CHUNK_ITERATOR *iterator,
                               SF_CHUNK_INFO *chunk_info)
 {
     int indx;
@@ -1058,7 +1058,7 @@ static int caf_get_chunk_size(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator
     return SFE_NO_ERROR;
 }
 
-static int caf_get_chunk_data(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
+static int caf_get_chunk_data(SndFile *psf, const SF_CHUNK_ITERATOR *iterator,
                               SF_CHUNK_INFO *chunk_info)
 {
     int indx;

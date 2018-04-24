@@ -63,12 +63,12 @@ typedef struct
     char name[32];
 } MAT5_MATRIX;
 
-static int mat5_close(SF_PRIVATE *psf);
+static int mat5_close(SndFile *psf);
 
-static int mat5_write_header(SF_PRIVATE *psf, int calc_length);
-static int mat5_read_header(SF_PRIVATE *psf);
+static int mat5_write_header(SndFile *psf, int calc_length);
+static int mat5_read_header(SndFile *psf);
 
-int mat5_open(SF_PRIVATE *psf)
+int mat5_open(SndFile *psf)
 {
     int subformat, error = 0;
 
@@ -124,7 +124,7 @@ int mat5_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int mat5_close(SF_PRIVATE *psf)
+static int mat5_close(SndFile *psf)
 {
     if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
         mat5_write_header(psf, SF_TRUE);
@@ -135,7 +135,7 @@ static int mat5_close(SF_PRIVATE *psf)
 /*------------------------------------------------------------------------------
 */
 
-static int mat5_write_header(SF_PRIVATE *psf, int calc_length)
+static int mat5_write_header(SndFile *psf, int calc_length)
 {
     static const char *filename =
         "MATLAB 5.0 MAT-file, written by " PACKAGE_NAME "-" PACKAGE_VERSION ", ";
@@ -251,7 +251,7 @@ static int mat5_write_header(SF_PRIVATE *psf, int calc_length)
     return psf->m_error;
 } /* mat5_write_header */
 
-static int mat5_read_header(SF_PRIVATE *psf)
+static int mat5_read_header(SndFile *psf)
 {
     char buffer[256], name[32];
     short version, endian;

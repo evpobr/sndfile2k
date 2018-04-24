@@ -447,7 +447,7 @@ duration = audio_samples / rate
 
 #else /* ENABLE_EXPERIMENTAL_CODE && HAVE_XIPH_CODECS */
 
-int ogg_speex_open(SF_PRIVATE *psf)
+int ogg_speex_open(SndFile *psf)
 {
     psf->log_printf("This version of libsndfile was compiled without Ogg/Speex support.\n");
     return SFE_UNIMPLEMENTED;
