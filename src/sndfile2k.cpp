@@ -32,6 +32,7 @@
 #include "ref_ptr.h"
 
 #include <algorithm>
+#include <memory>
 
 #ifdef __APPLE__
 /*
