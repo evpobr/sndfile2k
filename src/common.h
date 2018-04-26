@@ -309,18 +309,6 @@ typedef union
 struct DITHER_DATA;
 struct INTERLEAVE_DATA;
 
-struct parselog_buffer
-{
-    char buf[SF_PARSELOG_LEN];
-    int indx;
-};
-
-struct header_storage
-{
-    unsigned char *ptr;
-    sf_count_t indx, end, len;
-};
-
 class SndFile: public ISndFile
 {
 public:
@@ -391,9 +379,17 @@ public:
     /* parselog and indx should only be changed within the logging functions
 	** of common.c
 	*/
-    parselog_buffer m_parselog = {0};
+    struct parselog_buffer
+    {
+        char buf[SF_PARSELOG_LEN];
+        int indx;
+    } m_parselog = {};
 
-    header_storage m_header = {0};
+    struct header_storage
+    {
+        unsigned char *ptr;
+        sf_count_t indx, end, len;
+    } m_header = {};
 
     int m_rwf_endian = SF_ENDIAN_LITTLE; /* Header endian-ness flag. */
 
@@ -407,7 +403,7 @@ public:
         size_t storage_len;
         size_t storage_used;
         uint32_t flags;
-    } m_strings = {0};
+    } m_strings = {};
 
     /* Guard value. If this changes the buffers above have overflowed. */
     int m_Magick = SNDFILE_MAGICK;
@@ -431,7 +427,7 @@ public:
     /* True if clipping must be performed on float->int conversions. */
     bool m_add_clipping = false;
 
-    SF_INFO sf = {0};
+    SF_INFO sf = {};
 
     bool m_have_written = false; /* Has a single write been done to the file? */
     std::unique_ptr<PEAK_INFO> m_peak_info = nullptr;
@@ -472,8 +468,8 @@ public:
 	*/
     void *m_codec_data = nullptr;
 
-    SF_DITHER_INFO m_write_dither = {0};
-    SF_DITHER_INFO m_read_dither = {0};
+    SF_DITHER_INFO m_write_dither = {};
+    SF_DITHER_INFO m_read_dither = {};
 
     int m_norm_double = SF_TRUE;
     int m_norm_float = SF_TRUE;
@@ -510,8 +506,8 @@ public:
     /* Chunk get/set. */
     SF_CHUNK_ITERATOR *m_iterator = nullptr;
 
-    struct READ_CHUNKS m_rchunks = {0};
-	struct WRITE_CHUNKS m_wchunks = {0};
+    READ_CHUNKS m_rchunks = {};
+	WRITE_CHUNKS m_wchunks = {};
 
     int (*set_chunk)(SndFile *, const SF_CHUNK_INFO *chunk_info) = nullptr;
     SF_CHUNK_ITERATOR *(*next_chunk_iterator)(SndFile *, SF_CHUNK_ITERATOR *iterator) = nullptr;
