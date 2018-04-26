@@ -23,7 +23,8 @@
 
 #include "test_main.h"
 
-#include "nms_adpcm.cpp"
+#include "common.h"
+#include "nms_adpcm.h"
 
 static const short pcm_data_src[] = {
     505,    743,   805,   409,   101,    -552,   -709,   -679,  -624,  -1174,  -1050, 32,    -401,  -769,  -679,  47,    -3273,

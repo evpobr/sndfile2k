@@ -35,7 +35,7 @@ void test_binheader_writef(void)
 
     print_test_name("Testing binheader_writef");
 
-    SF_PRIVATE *psf = new SF_PRIVATE();
+    auto psf = new SndFile();
 
     for (k = 0; errors == 0 && k < 10; k++)
     {

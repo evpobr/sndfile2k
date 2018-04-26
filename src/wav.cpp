@@ -122,24 +122,24 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_PVOCEX =
 };
 #endif
 
-static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock);
-static int wav_write_header(SF_PRIVATE *psf, int calc_length);
+static int wav_read_header(SndFile *psf, int *blockalign, int *framesperblock);
+static int wav_write_header(SndFile *psf, int calc_length);
 
-static int wav_write_tailer(SF_PRIVATE *psf);
-static size_t wav_command(SF_PRIVATE *psf, int command, void *data, size_t datasize);
-static int wav_close(SF_PRIVATE *psf);
+static int wav_write_tailer(SndFile *psf);
+static size_t wav_command(SndFile *psf, int command, void *data, size_t datasize);
+static int wav_close(SndFile *psf);
 
-static int wav_read_smpl_chunk(SF_PRIVATE *psf, uint32_t chunklen);
-static int wav_read_acid_chunk(SF_PRIVATE *psf, uint32_t chunklen);
+static int wav_read_smpl_chunk(SndFile *psf, uint32_t chunklen);
+static int wav_read_acid_chunk(SndFile *psf, uint32_t chunklen);
 
-static int wav_set_chunk(SF_PRIVATE *psf, const SF_CHUNK_INFO *chunk_info);
-static SF_CHUNK_ITERATOR *wav_next_chunk_iterator(SF_PRIVATE *psf, SF_CHUNK_ITERATOR *iterator);
-static int wav_get_chunk_size(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
+static int wav_set_chunk(SndFile *psf, const SF_CHUNK_INFO *chunk_info);
+static SF_CHUNK_ITERATOR *wav_next_chunk_iterator(SndFile *psf, SF_CHUNK_ITERATOR *iterator);
+static int wav_get_chunk_size(SndFile *psf, const SF_CHUNK_ITERATOR *iterator,
                               SF_CHUNK_INFO *chunk_info);
-static int wav_get_chunk_data(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
+static int wav_get_chunk_data(SndFile *psf, const SF_CHUNK_ITERATOR *iterator,
                               SF_CHUNK_INFO *chunk_info);
 
-int wav_open(SF_PRIVATE *psf)
+int wav_open(SndFile *psf)
 {
     WAVLIKE_PRIVATE *wpriv;
     int format, subformat, error, blockalign = 0, framesperblock = 0;
@@ -209,7 +209,7 @@ int wav_open(SF_PRIVATE *psf)
     };
 
     psf->container_close = wav_close;
-    psf->command = wav_command;
+    psf->on_command = wav_command;
 
     switch (subformat)
     {
@@ -268,7 +268,7 @@ int wav_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
+static int wav_read_header(SndFile *psf, int *blockalign, int *framesperblock)
 {
     WAVLIKE_PRIVATE *wpriv;
     WAV_FMT *wav_fmt;
@@ -745,7 +745,7 @@ static int wav_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
     return 0;
 }
 
-static int wav_write_fmt_chunk(SF_PRIVATE *psf)
+static int wav_write_fmt_chunk(SndFile *psf)
 {
     int subformat, fmt_size, add_fact_chunk = 0;
 
@@ -940,7 +940,7 @@ static int wav_write_fmt_chunk(SF_PRIVATE *psf)
     return 0;
 }
 
-static int wavex_write_fmt_chunk(SF_PRIVATE *psf)
+static int wavex_write_fmt_chunk(SndFile *psf)
 {
     WAVLIKE_PRIVATE *wpriv;
     int subformat, fmt_size;
@@ -1074,7 +1074,7 @@ static int wavex_write_fmt_chunk(SF_PRIVATE *psf)
     return 0;
 }
 
-static int wav_write_header(SF_PRIVATE *psf, int calc_length)
+static int wav_write_header(SndFile *psf, int calc_length)
 {
     sf_count_t current;
     int error, has_data = SF_FALSE;
@@ -1221,7 +1221,7 @@ static int wav_write_header(SF_PRIVATE *psf, int calc_length)
     return psf->m_error;
 }
 
-static int wav_write_tailer(SF_PRIVATE *psf)
+static int wav_write_tailer(SndFile *psf)
 {
     /* Reset the current header buffer length to zero. */
     psf->m_header.ptr[0] = 0;
@@ -1255,7 +1255,7 @@ static int wav_write_tailer(SF_PRIVATE *psf)
     return 0;
 }
 
-static int wav_close(SF_PRIVATE *psf)
+static int wav_close(SndFile *psf)
 {
     if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {
@@ -1283,7 +1283,7 @@ static int wav_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static size_t wav_command(SF_PRIVATE *psf, int command, void *UNUSED(data), size_t datasize)
+static size_t wav_command(SndFile *psf, int command, void *UNUSED(data), size_t datasize)
 {
     WAVLIKE_PRIVATE *wpriv;
 
@@ -1318,7 +1318,7 @@ static size_t wav_command(SF_PRIVATE *psf, int command, void *UNUSED(data), size
     return 0;
 }
 
-static int wav_read_smpl_chunk(SF_PRIVATE *psf, uint32_t chunklen)
+static int wav_read_smpl_chunk(SndFile *psf, uint32_t chunklen)
 {
     char buffer[512];
     uint32_t thisread, bytesread = 0, dword, sampler_data, loop_count;
@@ -1497,7 +1497,7 @@ static int wav_read_smpl_chunk(SF_PRIVATE *psf, uint32_t chunklen)
  *
  */
 
-static int wav_read_acid_chunk(SF_PRIVATE *psf, uint32_t chunklen)
+static int wav_read_acid_chunk(SndFile *psf, uint32_t chunklen)
 {
     char buffer[512];
     uint32_t bytesread = 0;
@@ -1540,17 +1540,17 @@ static int wav_read_acid_chunk(SF_PRIVATE *psf, uint32_t chunklen)
     return 0;
 }
 
-static int wav_set_chunk(SF_PRIVATE *psf, const SF_CHUNK_INFO *chunk_info)
+static int wav_set_chunk(SndFile *psf, const SF_CHUNK_INFO *chunk_info)
 {
     return psf_save_write_chunk(&psf->m_wchunks, chunk_info);
 }
 
-static SF_CHUNK_ITERATOR *wav_next_chunk_iterator(SF_PRIVATE *psf, SF_CHUNK_ITERATOR *iterator)
+static SF_CHUNK_ITERATOR *wav_next_chunk_iterator(SndFile *psf, SF_CHUNK_ITERATOR *iterator)
 {
     return psf_next_chunk_iterator(&psf->m_rchunks, iterator);
 }
 
-static int wav_get_chunk_size(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
+static int wav_get_chunk_size(SndFile *psf, const SF_CHUNK_ITERATOR *iterator,
                               SF_CHUNK_INFO *chunk_info)
 {
     int indx;
@@ -1563,7 +1563,7 @@ static int wav_get_chunk_size(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator
     return SFE_NO_ERROR;
 }
 
-static int wav_get_chunk_data(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
+static int wav_get_chunk_data(SndFile *psf, const SF_CHUNK_ITERATOR *iterator,
                               SF_CHUNK_INFO *chunk_info)
 {
     int indx;

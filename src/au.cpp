@@ -116,18 +116,18 @@ typedef struct
  * Private static functions.
  */
 
-static int au_close(SF_PRIVATE *psf);
+static int au_close(SndFile *psf);
 
 static int au_format_to_encoding(int format);
 
-static int au_write_header(SF_PRIVATE *psf, int calc_length);
-static int au_read_header(SF_PRIVATE *psf);
+static int au_write_header(SndFile *psf, int calc_length);
+static int au_read_header(SndFile *psf);
 
 /*
  * Public function.
  */
 
-int au_open(SF_PRIVATE *psf)
+int au_open(SndFile *psf)
 {
     int error = 0;
 
@@ -216,7 +216,7 @@ int au_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int au_close(SF_PRIVATE *psf)
+static int au_close(SndFile *psf)
 {
     if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
         au_write_header(psf, SF_TRUE);
@@ -224,7 +224,7 @@ static int au_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static int au_write_header(SF_PRIVATE *psf, int calc_length)
+static int au_write_header(SndFile *psf, int calc_length)
 {
     sf_count_t current = psf->ftell();
 
@@ -329,7 +329,7 @@ static int au_format_to_encoding(int format)
     return 0;
 }
 
-static int au_read_header(SF_PRIVATE *psf)
+static int au_read_header(SndFile *psf)
 {
     AU_FMT au_fmt;
     int marker;

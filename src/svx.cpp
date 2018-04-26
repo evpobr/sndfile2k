@@ -71,11 +71,11 @@ enum
     HAVE_BODY = 0x08
 };
 
-static int svx_close(SF_PRIVATE *psf);
-static int svx_write_header(SF_PRIVATE *psf, int calc_length);
-static int svx_read_header(SF_PRIVATE *psf);
+static int svx_close(SndFile *psf);
+static int svx_write_header(SndFile *psf, int calc_length);
+static int svx_read_header(SndFile *psf);
 
-int svx_open(SF_PRIVATE *psf)
+int svx_open(SndFile *psf)
 {
     int error;
 
@@ -121,7 +121,7 @@ int svx_open(SF_PRIVATE *psf)
     return 0;
 }
 
-static int svx_read_header(SF_PRIVATE *psf)
+static int svx_read_header(SndFile *psf)
 {
     VHDR_CHUNK vhdr;
     uint32_t chunk_size, marker;
@@ -347,7 +347,7 @@ static int svx_read_header(SF_PRIVATE *psf)
     return 0;
 }
 
-static int svx_close(SF_PRIVATE *psf)
+static int svx_close(SndFile *psf)
 {
     if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
         svx_write_header(psf, SF_TRUE);
@@ -355,7 +355,7 @@ static int svx_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static int svx_write_header(SF_PRIVATE *psf, int calc_length)
+static int svx_write_header(SndFile *psf, int calc_length)
 {
     static char annotation[] = "libsndfile by Erik de Castro Lopo\0\0\0";
     sf_count_t current;

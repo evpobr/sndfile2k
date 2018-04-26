@@ -83,16 +83,16 @@ typedef struct
  * Private static functions.
  */
 
-static int avr_close(SF_PRIVATE *psf);
+static int avr_close(SndFile *psf);
 
-static int avr_read_header(SF_PRIVATE *psf);
-static int avr_write_header(SF_PRIVATE *psf, int calc_length);
+static int avr_read_header(SndFile *psf);
+static int avr_write_header(SndFile *psf, int calc_length);
 
 /*
  * Public function.
  */
 
-int avr_open(SF_PRIVATE *psf)
+int avr_open(SndFile *psf)
 {
     int error = 0;
 
@@ -124,7 +124,7 @@ int avr_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int avr_read_header(SF_PRIVATE *psf)
+static int avr_read_header(SndFile *psf)
 {
     AVR_HEADER hdr;
 
@@ -197,7 +197,7 @@ static int avr_read_header(SF_PRIVATE *psf)
     return 0;
 }
 
-static int avr_write_header(SF_PRIVATE *psf, int calc_length)
+static int avr_write_header(SndFile *psf, int calc_length)
 {
     sf_count_t current;
     int sign;
@@ -246,7 +246,7 @@ static int avr_write_header(SF_PRIVATE *psf, int calc_length)
     return psf->m_error;
 }
 
-static int avr_close(SF_PRIVATE *psf)
+static int avr_close(SndFile *psf)
 {
     if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
         avr_write_header(psf, SF_TRUE);

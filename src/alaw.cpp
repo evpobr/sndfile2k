@@ -23,15 +23,15 @@
 #include "sndfile2k/sndfile2k.h"
 #include "common.h"
 
-static size_t alaw_read_alaw2s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t alaw_read_alaw2i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t alaw_read_alaw2f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t alaw_read_alaw2d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t alaw_read_alaw2s(SndFile *psf, short *ptr, size_t len);
+static size_t alaw_read_alaw2i(SndFile *psf, int *ptr, size_t len);
+static size_t alaw_read_alaw2f(SndFile *psf, float *ptr, size_t len);
+static size_t alaw_read_alaw2d(SndFile *psf, double *ptr, size_t len);
 
-static size_t alaw_write_s2alaw(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t alaw_write_i2alaw(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t alaw_write_f2alaw(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t alaw_write_d2alaw(SF_PRIVATE *psf, const double *ptr, size_t len);
+static size_t alaw_write_s2alaw(SndFile *psf, const short *ptr, size_t len);
+static size_t alaw_write_i2alaw(SndFile *psf, const int *ptr, size_t len);
+static size_t alaw_write_f2alaw(SndFile *psf, const float *ptr, size_t len);
+static size_t alaw_write_d2alaw(SndFile *psf, const double *ptr, size_t len);
 
 static void alaw2s_array(unsigned char *buffer, size_t count, short *ptr);
 static void alaw2i_array(unsigned char *buffer, size_t count, int *ptr);
@@ -43,7 +43,7 @@ static void i2alaw_array(const int *buffer, size_t count, unsigned char *ptr);
 static void f2alaw_array(const float *buffer, size_t count, unsigned char *ptr, float normfact);
 static void d2alaw_array(const double *buffer, size_t count, unsigned char *ptr, double normfact);
 
-int alaw_init(SF_PRIVATE *psf)
+int alaw_init(SndFile *psf)
 {
     if (psf->m_mode == SFM_READ || psf->m_mode == SFM_RDWR)
     {
@@ -320,7 +320,7 @@ static inline void d2alaw_array(const double *ptr, size_t count, unsigned char *
     };
 }
 
-static size_t alaw_read_alaw2s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t alaw_read_alaw2s(SndFile *psf, short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -343,7 +343,7 @@ static size_t alaw_read_alaw2s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t alaw_read_alaw2i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t alaw_read_alaw2i(SndFile *psf, int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -366,7 +366,7 @@ static size_t alaw_read_alaw2i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t alaw_read_alaw2f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t alaw_read_alaw2f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -392,7 +392,7 @@ static size_t alaw_read_alaw2f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t alaw_read_alaw2d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t alaw_read_alaw2d(SndFile *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -417,7 +417,7 @@ static size_t alaw_read_alaw2d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static size_t alaw_write_s2alaw(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t alaw_write_s2alaw(SndFile *psf, const short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -440,7 +440,7 @@ static size_t alaw_write_s2alaw(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t alaw_write_i2alaw(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t alaw_write_i2alaw(SndFile *psf, const int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -463,7 +463,7 @@ static size_t alaw_write_i2alaw(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t alaw_write_f2alaw(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t alaw_write_f2alaw(SndFile *psf, const float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -489,7 +489,7 @@ static size_t alaw_write_f2alaw(SF_PRIVATE *psf, const float *ptr, size_t len)
     return total;
 }
 
-static size_t alaw_write_d2alaw(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t alaw_write_d2alaw(SndFile *psf, const double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;

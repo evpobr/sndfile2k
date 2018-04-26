@@ -30,12 +30,12 @@
 #define SFE_HTK_BAD_FILE_LEN (1666)
 #define SFE_HTK_NOT_WAVEFORM (1667)
 
-static int htk_close(SF_PRIVATE *psf);
+static int htk_close(SndFile *psf);
 
-static int htk_write_header(SF_PRIVATE *psf, int calc_length);
-static int htk_read_header(SF_PRIVATE *psf);
+static int htk_write_header(SndFile *psf, int calc_length);
+static int htk_read_header(SndFile *psf);
 
-int htk_open(SF_PRIVATE *psf)
+int htk_open(SndFile *psf)
 {
     int subformat;
     int error = 0;
@@ -78,7 +78,7 @@ int htk_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int htk_close(SF_PRIVATE *psf)
+static int htk_close(SndFile *psf)
 {
     if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
         htk_write_header(psf, SF_TRUE);
@@ -86,7 +86,7 @@ static int htk_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static int htk_write_header(SF_PRIVATE *psf, int calc_length)
+static int htk_write_header(SndFile *psf, int calc_length)
 {
     sf_count_t current;
     int sample_count, sample_period;
@@ -167,7 +167,7 @@ static int htk_write_header(SF_PRIVATE *psf, int calc_length)
 **   _O   020000      has 0'th cepstral coef.
 */
 
-static int htk_read_header(SF_PRIVATE *psf)
+static int htk_read_header(SndFile *psf)
 {
     int sample_count, sample_period, marker;
 

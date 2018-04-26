@@ -1,40 +1,3 @@
-### test_main
-
-add_executable(test_main
-  ../src/test_main.cpp
-  ../src/test_main.h
-  ../src/test_conversions.cpp
-  ../src/test_float.cpp
-  ../src/test_endswap.cpp
-  ../src/test_audio_detect.cpp
-  ../src/test_log_printf.cpp
-  ../src/test_file_io.cpp
-  ../src/test_ima_oki_adpcm.cpp
-  ../src/test_strncpy_crlf.cpp
-  ../src/test_binheader_writef.cpp
-  ../src/test_nms_adpcm.cpp
-)
-target_link_libraries(test_main PUBLIC sndfile2k)
-if(MSVC)
-  target_compile_definitions(test_main PRIVATE _USE_MATH_DEFINES)
-endif()
-target_link_libraries(test_main PRIVATE $<$<BOOL:${LIBM_REQUIRED}>:m>)
-if(BUILD_SHARED_LIBS)
-  target_include_directories(test_main
-    PRIVATE
-      ${PROJECT_SOURCE_DIR}/src
-      ${PROJECT_BINARY_DIR}/src)
-  target_sources(test_main
-    PRIVATE
-      ../src/common.cpp
-      ../src/float32.cpp
-      ../src/double64.cpp
-      ../src/file_io.cpp
-      ../src/audio_detect.cpp
-  )
-endif()
-add_test(NAME test_main COMMAND $<TARGET_FILE:test_main>)
-
 ### sfversion_test
 
 add_executable(sfversion sfversion.cpp)
@@ -179,18 +142,6 @@ target_link_libraries(locale_test PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
 add_test(NAME locale_test COMMAND $<TARGET_FILE:locale_test>)
-
-### cpp_test
-
-add_executable(cpp_test cpp_test.cpp utils.cpp utils.h)
-target_include_directories(cpp_test
-  PRIVATE
-    ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_BINARY_DIR}/src)
-target_link_libraries(cpp_test PRIVATE
-  sndfile2k
-  $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>)
-add_test(NAME cpp_test COMMAND $<TARGET_FILE:cpp_test>)
 
 ### external_libs_test
 
@@ -577,7 +528,6 @@ set(SNDFILE_TEST_TARGETS
   headerless_test
   rdwr_test
   locale_test
-  cpp_test
   external_libs_test
   format_check_test
   channel_test

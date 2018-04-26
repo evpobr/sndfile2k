@@ -42,19 +42,19 @@
 #include "shift.h"
 #include "ima_oki_adpcm.h"
 
-static size_t vox_read_s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t vox_read_i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t vox_read_f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t vox_read_d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t vox_read_s(SndFile *psf, short *ptr, size_t len);
+static size_t vox_read_i(SndFile *psf, int *ptr, size_t len);
+static size_t vox_read_f(SndFile *psf, float *ptr, size_t len);
+static size_t vox_read_d(SndFile *psf, double *ptr, size_t len);
 
-static size_t vox_write_s(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t vox_write_i(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t vox_write_f(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t vox_write_d(SF_PRIVATE *psf, const double *ptr, size_t len);
+static size_t vox_write_s(SndFile *psf, const short *ptr, size_t len);
+static size_t vox_write_i(SndFile *psf, const int *ptr, size_t len);
+static size_t vox_write_f(SndFile *psf, const float *ptr, size_t len);
+static size_t vox_write_d(SndFile *psf, const double *ptr, size_t len);
 
-static size_t vox_read_block(SF_PRIVATE *psf, IMA_OKI_ADPCM *pvox, short *ptr, size_t len);
+static size_t vox_read_block(SndFile *psf, IMA_OKI_ADPCM *pvox, short *ptr, size_t len);
 
-static int codec_close(SF_PRIVATE *psf)
+static int codec_close(SndFile *psf)
 {
     IMA_OKI_ADPCM *p = (IMA_OKI_ADPCM *)psf->m_codec_data;
 
@@ -63,7 +63,7 @@ static int codec_close(SF_PRIVATE *psf)
     return p->errors;
 }
 
-int vox_adpcm_init(SF_PRIVATE *psf)
+int vox_adpcm_init(SndFile *psf)
 {
     IMA_OKI_ADPCM *pvox = NULL;
 
@@ -116,7 +116,7 @@ int vox_adpcm_init(SF_PRIVATE *psf)
     return 0;
 }
 
-static size_t vox_read_block(SF_PRIVATE *psf, IMA_OKI_ADPCM *pvox, short *ptr, size_t len)
+static size_t vox_read_block(SndFile *psf, IMA_OKI_ADPCM *pvox, short *ptr, size_t len)
 {
     size_t indx = 0, k;
 
@@ -144,7 +144,7 @@ static size_t vox_read_block(SF_PRIVATE *psf, IMA_OKI_ADPCM *pvox, short *ptr, s
     return indx;
 }
 
-static size_t vox_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t vox_read_s(SndFile *psf, short *ptr, size_t len)
 {
     IMA_OKI_ADPCM *pvox;
     size_t readcount, count;
@@ -169,7 +169,7 @@ static size_t vox_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t vox_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t vox_read_i(SndFile *psf, int *ptr, size_t len)
 {
     IMA_OKI_ADPCM *pvox;
     BUF_UNION ubuf;
@@ -198,7 +198,7 @@ static size_t vox_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t vox_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t vox_read_f(SndFile *psf, float *ptr, size_t len)
 {
     IMA_OKI_ADPCM *pvox;
     BUF_UNION ubuf;
@@ -230,7 +230,7 @@ static size_t vox_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t vox_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t vox_read_d(SndFile *psf, double *ptr, size_t len)
 {
     IMA_OKI_ADPCM *pvox;
     BUF_UNION ubuf;
@@ -262,7 +262,7 @@ static size_t vox_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static size_t vox_write_block(SF_PRIVATE *psf, IMA_OKI_ADPCM *pvox, const short *ptr, size_t len)
+static size_t vox_write_block(SndFile *psf, IMA_OKI_ADPCM *pvox, const short *ptr, size_t len)
 {
     size_t indx = 0, k;
 
@@ -283,7 +283,7 @@ static size_t vox_write_block(SF_PRIVATE *psf, IMA_OKI_ADPCM *pvox, const short 
     return indx;
 }
 
-static size_t vox_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t vox_write_s(SndFile *psf, const short *ptr, size_t len)
 {
     IMA_OKI_ADPCM *pvox;
     size_t writecount, count;
@@ -308,7 +308,7 @@ static size_t vox_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t vox_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t vox_write_i(SndFile *psf, const int *ptr, size_t len)
 {
     IMA_OKI_ADPCM *pvox;
     BUF_UNION ubuf;
@@ -337,7 +337,7 @@ static size_t vox_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t vox_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t vox_write_f(SndFile *psf, const float *ptr, size_t len)
 {
     IMA_OKI_ADPCM *pvox;
     BUF_UNION ubuf;
@@ -369,7 +369,7 @@ static size_t vox_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     return total;
 }
 
-static size_t vox_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t vox_write_d(SndFile *psf, const double *ptr, size_t len)
 {
     IMA_OKI_ADPCM *pvox;
     BUF_UNION ubuf;

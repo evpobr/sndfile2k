@@ -36,11 +36,11 @@
 
 #define NIST_HEADER_LENGTH (1024)
 
-static int nist_close(SF_PRIVATE *psf);
-static int nist_write_header(SF_PRIVATE *psf, int calc_length);
-static int nist_read_header(SF_PRIVATE *psf);
+static int nist_close(SndFile *psf);
+static int nist_write_header(SndFile *psf, int calc_length);
+static int nist_read_header(SndFile *psf);
 
-int nist_open(SF_PRIVATE *psf)
+int nist_open(SndFile *psf)
 {
     int error;
 
@@ -101,7 +101,7 @@ int nist_open(SF_PRIVATE *psf)
 static char bad_header[] = {'N', 'I', 'S', 'T', '_', '1', 'A',  0x0d, 0x0a, ' ',
                             ' ', ' ', '1', '0', '2', '4', 0x0d, 0x0a, 0};
 
-static int nist_read_header(SF_PRIVATE *psf)
+static int nist_read_header(SndFile *psf)
 {
     char psf_header[NIST_HEADER_LENGTH + 2];
     int bitwidth = 0, count, encoding;
@@ -276,7 +276,7 @@ static int nist_read_header(SF_PRIVATE *psf)
     return 0;
 }
 
-static int nist_close(SF_PRIVATE *psf)
+static int nist_close(SndFile *psf)
 {
     if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
         nist_write_header(psf, SF_TRUE);
@@ -284,7 +284,7 @@ static int nist_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static int nist_write_header(SF_PRIVATE *psf, int calc_length)
+static int nist_write_header(SndFile *psf, int calc_length)
 {
     const char *end_str;
     long samples;

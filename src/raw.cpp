@@ -23,7 +23,7 @@
 #include "sndfile2k/sndfile2k.h"
 #include "common.h"
 
-int raw_open(SF_PRIVATE *psf)
+int raw_open(SndFile *psf)
 {
     int subformat, error = SFE_NO_ERROR;
 

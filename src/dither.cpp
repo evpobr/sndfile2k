@@ -56,15 +56,15 @@
 #define SFE_DITHER_BAD_PTR (666)
 #define SFE_DITHER_BAD_TYPE (667)
 
-static size_t dither_read_short(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t dither_read_int(SF_PRIVATE *psf, int *ptr, size_t len);
+static size_t dither_read_short(SndFile *psf, short *ptr, size_t len);
+static size_t dither_read_int(SndFile *psf, int *ptr, size_t len);
 
-static size_t dither_write_short(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t dither_write_int(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t dither_write_float(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t dither_write_double(SF_PRIVATE *psf, const double *ptr, size_t len);
+static size_t dither_write_short(SndFile *psf, const short *ptr, size_t len);
+static size_t dither_write_int(SndFile *psf, const int *ptr, size_t len);
+static size_t dither_write_float(SndFile *psf, const float *ptr, size_t len);
+static size_t dither_write_double(SndFile *psf, const double *ptr, size_t len);
 
-int dither_init(SF_PRIVATE *psf, int mode)
+int dither_init(SndFile *psf, int mode)
 {
     DITHER_DATA *pdither;
 
@@ -189,17 +189,17 @@ static void dither_int(const int *in, int *out, int frames, int channels);
 static void dither_float(const float *in, float *out, int frames, int channels);
 static void dither_double(const double *in, double *out, int frames, int channels);
 
-static size_t dither_read_short(SF_PRIVATE *UNUSED(psf), short *UNUSED(ptr), size_t len)
+static size_t dither_read_short(SndFile *UNUSED(psf), short *UNUSED(ptr), size_t len)
 {
     return len;
 }
 
-static size_t dither_read_int(SF_PRIVATE *UNUSED(psf), int *UNUSED(ptr), size_t len)
+static size_t dither_read_int(SndFile *UNUSED(psf), int *UNUSED(ptr), size_t len)
 {
     return len;
 }
 
-static size_t dither_write_short(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t dither_write_short(SndFile *psf, const short *ptr, size_t len)
 {
     DITHER_DATA *pdither;
     size_t bufferlen, writecount, thiswrite;
@@ -243,7 +243,7 @@ static size_t dither_write_short(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t dither_write_int(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t dither_write_int(SndFile *psf, const int *ptr, size_t len)
 {
     DITHER_DATA *pdither;
     size_t bufferlen, writecount, thiswrite;
@@ -291,7 +291,7 @@ static size_t dither_write_int(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t dither_write_float(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t dither_write_float(SndFile *psf, const float *ptr, size_t len)
 {
     DITHER_DATA *pdither;
     size_t bufferlen, writecount, thiswrite;
@@ -340,7 +340,7 @@ static size_t dither_write_float(SF_PRIVATE *psf, const float *ptr, size_t len)
     return total;
 }
 
-static size_t dither_write_double(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t dither_write_double(SndFile *psf, const double *ptr, size_t len)
 {
     DITHER_DATA *pdither;
     size_t bufferlen, writecount, thiswrite;

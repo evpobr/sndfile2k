@@ -118,7 +118,7 @@ static int compare_strings_or_die(int linenum, const char *fmt, const char *s1, 
 void test_log_printf(void)
 {
     static char buffer[2048];
-    SF_PRIVATE sf_private, *psf;
+    SndFile sf_private, *psf;
     int k, errors = 0;
     int int_values[] = {0, 1, 12, 123, 1234, 123456, -1, -12, -123, -1234, -123456};
 

@@ -55,16 +55,16 @@
 #define MAT4_BE_PCM_U8 (MAKE_MARKER(0, 0, 0x04, 0x1A))
 #define MAT4_LE_PCM_U8 (MAKE_MARKER(0x32, 0, 0, 0))
 
-static int mat4_close(SF_PRIVATE *psf);
+static int mat4_close(SndFile *psf);
 
 static int mat4_format_to_encoding(int format, int endian);
 
-static int mat4_write_header(SF_PRIVATE *psf, int calc_length);
-static int mat4_read_header(SF_PRIVATE *psf);
+static int mat4_write_header(SndFile *psf, int calc_length);
+static int mat4_read_header(SndFile *psf);
 
 static const char *mat4_marker_to_str(uint32_t marker);
 
-int mat4_open(SF_PRIVATE *psf)
+int mat4_open(SndFile *psf)
 {
     int subformat, error = 0;
 
@@ -119,7 +119,7 @@ int mat4_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int mat4_close(SF_PRIVATE *psf)
+static int mat4_close(SndFile *psf)
 {
     if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
         mat4_write_header(psf, SF_TRUE);
@@ -127,7 +127,7 @@ static int mat4_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static int mat4_write_header(SF_PRIVATE *psf, int calc_length)
+static int mat4_write_header(SndFile *psf, int calc_length)
 {
     sf_count_t current;
     int encoding;
@@ -192,7 +192,7 @@ static int mat4_write_header(SF_PRIVATE *psf, int calc_length)
     return psf->m_error;
 }
 
-static int mat4_read_header(SF_PRIVATE *psf)
+static int mat4_read_header(SndFile *psf)
 {
     char buffer[256];
     uint32_t marker, namesize;

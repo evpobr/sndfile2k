@@ -120,11 +120,11 @@ enum
     HAVE_data = 0x20
 };
 
-static int w64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock);
-static int w64_write_header(SF_PRIVATE *psf, int calc_length);
-static int w64_close(SF_PRIVATE *psf);
+static int w64_read_header(SndFile *psf, int *blockalign, int *framesperblock);
+static int w64_write_header(SndFile *psf, int calc_length);
+static int w64_close(SndFile *psf);
 
-int w64_open(SF_PRIVATE *psf)
+int w64_open(SndFile *psf)
 {
     WAVLIKE_PRIVATE *wpriv;
     int subformat, error, blockalign = 0, framesperblock = 0;
@@ -221,7 +221,7 @@ int w64_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int w64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
+static int w64_read_header(SndFile *psf, int *blockalign, int *framesperblock)
 {
     WAVLIKE_PRIVATE *wpriv;
     WAV_FMT *wav_fmt;
@@ -453,7 +453,7 @@ static int w64_read_header(SF_PRIVATE *psf, int *blockalign, int *framesperblock
     return 0;
 }
 
-static int w64_write_header(SF_PRIVATE *psf, int calc_length)
+static int w64_write_header(SndFile *psf, int calc_length)
 {
     sf_count_t fmt_size, current;
     size_t fmt_pad = 0;
@@ -669,7 +669,7 @@ static int w64_write_header(SF_PRIVATE *psf, int calc_length)
     return psf->m_error;
 }
 
-static int w64_close(SF_PRIVATE *psf)
+static int w64_close(SndFile *psf)
 {
     if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
         w64_write_header(psf, SF_TRUE);

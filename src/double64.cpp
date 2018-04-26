@@ -57,30 +57,30 @@ enum
  * Prototypes for private functions.
  */
 
-static size_t host_read_d2s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t host_read_d2i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t host_read_d2f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t host_read_d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t host_read_d2s(SndFile *psf, short *ptr, size_t len);
+static size_t host_read_d2i(SndFile *psf, int *ptr, size_t len);
+static size_t host_read_d2f(SndFile *psf, float *ptr, size_t len);
+static size_t host_read_d(SndFile *psf, double *ptr, size_t len);
 
-static size_t host_write_s2d(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t host_write_i2d(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t host_write_f2d(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t host_write_d(SF_PRIVATE *psf, const double *ptr, size_t len);
+static size_t host_write_s2d(SndFile *psf, const short *ptr, size_t len);
+static size_t host_write_i2d(SndFile *psf, const int *ptr, size_t len);
+static size_t host_write_f2d(SndFile *psf, const float *ptr, size_t len);
+static size_t host_write_d(SndFile *psf, const double *ptr, size_t len);
 
-static void double64_peak_update(SF_PRIVATE *psf, const double *buffer, size_t count,
+static void double64_peak_update(SndFile *psf, const double *buffer, size_t count,
                                  size_t size_t);
 
-static int double64_get_capability(SF_PRIVATE *psf);
+static int double64_get_capability(SndFile *psf);
 
-static size_t replace_read_d2s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t replace_read_d2i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t replace_read_d2f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t replace_read_d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t replace_read_d2s(SndFile *psf, short *ptr, size_t len);
+static size_t replace_read_d2i(SndFile *psf, int *ptr, size_t len);
+static size_t replace_read_d2f(SndFile *psf, float *ptr, size_t len);
+static size_t replace_read_d(SndFile *psf, double *ptr, size_t len);
 
-static size_t replace_write_s2d(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t replace_write_i2d(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t replace_write_f2d(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t replace_write_d(SF_PRIVATE *psf, const double *ptr, size_t len);
+static size_t replace_write_s2d(SndFile *psf, const short *ptr, size_t len);
+static size_t replace_write_i2d(SndFile *psf, const int *ptr, size_t len);
+static size_t replace_write_f2d(SndFile *psf, const float *ptr, size_t len);
+static size_t replace_write_d(SndFile *psf, const double *ptr, size_t len);
 
 static void d2bd_read(double *buffer, size_t count);
 static void bd2d_write(double *buffer, size_t count);
@@ -89,7 +89,7 @@ static void bd2d_write(double *buffer, size_t count);
  * Exported functions.
  */
 
-int double64_init(SF_PRIVATE *psf)
+int double64_init(SndFile *psf)
 {
     static int double64_caps;
 
@@ -438,7 +438,7 @@ void double64_le_write(double in, unsigned char *out)
     return;
 }
 
-static void double64_peak_update(SF_PRIVATE *psf, const double *buffer, size_t count, size_t indx)
+static void double64_peak_update(SndFile *psf, const double *buffer, size_t count, size_t indx)
 {
     int chan;
     size_t k, position;
@@ -466,7 +466,7 @@ static void double64_peak_update(SF_PRIVATE *psf, const double *buffer, size_t c
     return;
 }
 
-static int double64_get_capability(SF_PRIVATE *psf)
+static int double64_get_capability(SndFile *psf)
 {
     union
     {
@@ -581,7 +581,7 @@ static inline void f2d_array(const float *src, double *dest, size_t count)
     };
 }
 
-static size_t host_read_d2s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t host_read_d2s(SndFile *psf, short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const double *, size_t, short *, double);
@@ -612,7 +612,7 @@ static size_t host_read_d2s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t host_read_d2i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t host_read_d2i(SndFile *psf, int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     void (*convert)(const double *, size_t, int *, double);
@@ -643,7 +643,7 @@ static size_t host_read_d2i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t host_read_d2f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t host_read_d2f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -670,7 +670,7 @@ static size_t host_read_d2f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t host_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t host_read_d(SndFile *psf, double *ptr, size_t len)
 {
     size_t bufferlen;
     size_t readcount, total = 0;
@@ -702,7 +702,7 @@ static size_t host_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static size_t host_write_s2d(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t host_write_s2d(SndFile *psf, const short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -735,7 +735,7 @@ static size_t host_write_s2d(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t host_write_i2d(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t host_write_i2d(SndFile *psf, const int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -767,7 +767,7 @@ static size_t host_write_i2d(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t host_write_f2d(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t host_write_f2d(SndFile *psf, const float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -797,7 +797,7 @@ static size_t host_write_f2d(SF_PRIVATE *psf, const float *ptr, size_t len)
     return total;
 }
 
-static size_t host_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t host_write_d(SndFile *psf, const double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -828,7 +828,7 @@ static size_t host_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
     return total;
 }
 
-static size_t replace_read_d2s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t replace_read_d2s(SndFile *psf, short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -859,7 +859,7 @@ static size_t replace_read_d2s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t replace_read_d2i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t replace_read_d2i(SndFile *psf, int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -890,7 +890,7 @@ static size_t replace_read_d2i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t replace_read_d2f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t replace_read_d2f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -920,7 +920,7 @@ static size_t replace_read_d2f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t replace_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t replace_read_d(SndFile *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, readcount;
@@ -951,7 +951,7 @@ static size_t replace_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static size_t replace_write_s2d(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t replace_write_s2d(SndFile *psf, const short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -985,7 +985,7 @@ static size_t replace_write_s2d(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t replace_write_i2d(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t replace_write_i2d(SndFile *psf, const int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1019,7 +1019,7 @@ static size_t replace_write_i2d(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t replace_write_f2d(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t replace_write_f2d(SndFile *psf, const float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;
@@ -1048,7 +1048,7 @@ static size_t replace_write_f2d(SF_PRIVATE *psf, const float *ptr, size_t len)
     return total;
 }
 
-static size_t replace_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t replace_write_d(SndFile *psf, const double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     size_t bufferlen, writecount;

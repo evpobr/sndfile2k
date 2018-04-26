@@ -27,17 +27,12 @@ target_link_libraries(list_formats PRIVATE
   sndfile2k
   $<$<BOOL:${LIBM_REQUIRED}>:m>)
 
-# sndfilehandle
-
-add_executable(sndfilehandle sndfilehandle.cpp)
-target_link_libraries(sndfilehandle PUBLIC sndfile2k)
-
 set(SNDFILE_EXAMPLE_TARGETS
   sndfile-to-text
   sndfile-loopify
   make_sine
   sfprocess
   list_formats
-  sndfilehandle)
+)
 
 set_target_properties(${SNDFILE_EXAMPLE_TARGETS} PROPERTIES FOLDER Examples)

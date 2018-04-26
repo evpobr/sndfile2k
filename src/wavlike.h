@@ -452,7 +452,7 @@ typedef struct
 
 #define WAVLIKE_MSADPCM_ADAPT_COEFF_COUNT (7)
 
-void wavlike_msadpcm_write_adapt_coeffs(SF_PRIVATE *psf);
+void wavlike_msadpcm_write_adapt_coeffs(SndFile *psf);
 
 /*------------------------------------------------------------------------------------
 **	Functions defined in wavlike.c
@@ -461,15 +461,15 @@ void wavlike_msadpcm_write_adapt_coeffs(SF_PRIVATE *psf);
 char const *wavlike_format_str(int k);
 
 int wavlike_srate2blocksize(int srate_chan_product);
-int wavlike_read_fmt_chunk(SF_PRIVATE *psf, int fmtsize);
-void wavlike_write_guid(SF_PRIVATE *psf, const EXT_SUBFORMAT *subformat);
-void wavlike_analyze(SF_PRIVATE *psf);
+int wavlike_read_fmt_chunk(SndFile *psf, int fmtsize);
+void wavlike_write_guid(SndFile *psf, const EXT_SUBFORMAT *subformat);
+void wavlike_analyze(SndFile *psf);
 int wavlike_gen_channel_mask(const int *chan_map, int channels);
 
-int wavlike_subchunk_parse(SF_PRIVATE *psf, int chunk, uint32_t length);
-void wavlike_write_strings(SF_PRIVATE *psf, int location);
+int wavlike_subchunk_parse(SndFile *psf, int chunk, uint32_t length);
+void wavlike_write_strings(SndFile *psf, int location);
 
-int wavlike_read_peak_chunk(SF_PRIVATE *psf, size_t chunk_size);
-void wavlike_write_peak_chunk(SF_PRIVATE *psf);
+int wavlike_read_peak_chunk(SndFile *psf, size_t chunk_size);
+void wavlike_write_peak_chunk(SndFile *psf);
 
-void wavlike_write_custom_chunks(SF_PRIVATE *psf);
+void wavlike_write_custom_chunks(SndFile *psf);

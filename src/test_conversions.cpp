@@ -29,6 +29,7 @@
 
 #include "common.h"
 #include "test_main.h"
+#include "ref_ptr.h"
 
 /*
 ** This is a bit rough, but it is the nicest way to do it.
@@ -49,7 +50,7 @@ if(ival != tval)                        \
 
 static void conversion_test(char endian)
 {
-    SF_PRIVATE sf_private, *psf;
+    std::unique_ptr<SndFile> psf;
     const char *filename = "conversion.bin";
     int64_t i64 = INT64_C(0x0123456789abcdef), t64 = 0;
     char format_str[16];
@@ -65,11 +66,8 @@ static void conversion_test(char endian)
     snprintf(test_name, sizeof(test_name), "Testing %s conversions", endian == 'e' ? "little endian" : "big endian");
     print_test_name(test_name);
 
-    psf = &sf_private;
-    memset(psf, 0, sizeof(sf_private));
-
     SF_INFO sfinfo = { 0 };
-    psf->m_mode = SFM_WRITE;
+    psf = std::make_unique<SndFile>();
     if (psf->open(filename, SFM_WRITE, &sfinfo) != 0)
     {
         printf("\n\nError : failed to open file '%s' for write.\n\n", filename);
@@ -78,11 +76,10 @@ static void conversion_test(char endian)
 
     psf->binheader_writef(format_str, i8, i16, i24, i32, i64);
     psf->fwrite(psf->m_header.ptr, 1, psf->m_header.indx);
-    sf_close(psf);
-
-    memset(psf, 0, sizeof(sf_private));
+    psf.reset();
 
     sfinfo = { 0 };
+    psf = std::make_unique<SndFile>();
     if (psf->open(filename, SFM_READ, &sfinfo) != 0)
     {
         printf("\n\nError : failed to open file '%s' for read.\n\n", filename);
@@ -90,7 +87,6 @@ static void conversion_test(char endian)
     };
 
     bytes = psf->binheader_readf(format_str, &t8, &t16, &t24, &t32, &t64);
-    sf_close(psf);
 
     if (bytes != 18)
     {

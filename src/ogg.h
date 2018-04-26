@@ -51,4 +51,4 @@ typedef struct
     (((buf[base + 3] << 24) & 0xff000000) | ((buf[base + 2] << 16) & 0xff0000) | \
      ((buf[base + 1] << 8) & 0xff00) | (buf[base] & 0xff))
 
-int ogg_read_first_page(SF_PRIVATE *, OGG_PRIVATE *);
+int ogg_read_first_page(SndFile *, OGG_PRIVATE *);

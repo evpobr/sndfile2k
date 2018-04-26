@@ -78,22 +78,22 @@ typedef struct
     int type;
 } FLAC_TAG;
 
-static sf_count_t flac_seek(SF_PRIVATE *psf, int mode, sf_count_t offset);
-static int flac_byterate(SF_PRIVATE *psf);
-static int flac_close(SF_PRIVATE *psf);
+static sf_count_t flac_seek(SndFile *psf, int mode, sf_count_t offset);
+static int flac_byterate(SndFile *psf);
+static int flac_close(SndFile *psf);
 
-static int flac_enc_init(SF_PRIVATE *psf);
-static int flac_read_header(SF_PRIVATE *psf);
+static int flac_enc_init(SndFile *psf);
+static int flac_read_header(SndFile *psf);
 
-static size_t flac_read_flac2s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t flac_read_flac2i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t flac_read_flac2f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t flac_read_flac2d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t flac_read_flac2s(SndFile *psf, short *ptr, size_t len);
+static size_t flac_read_flac2i(SndFile *psf, int *ptr, size_t len);
+static size_t flac_read_flac2f(SndFile *psf, float *ptr, size_t len);
+static size_t flac_read_flac2d(SndFile *psf, double *ptr, size_t len);
 
-static size_t flac_write_s2flac(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t flac_write_i2flac(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t flac_write_f2flac(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t flac_write_d2flac(SF_PRIVATE *psf, const double *ptr, size_t len);
+static size_t flac_write_s2flac(SndFile *psf, const short *ptr, size_t len);
+static size_t flac_write_i2flac(SndFile *psf, const int *ptr, size_t len);
+static size_t flac_write_f2flac(SndFile *psf, const float *ptr, size_t len);
+static size_t flac_write_d2flac(SndFile *psf, const double *ptr, size_t len);
 
 static void f2flac8_array(const float *src, int32_t *dest, size_t count, int normalize);
 static void f2flac16_array(const float *src, int32_t *dest, size_t count, int normalize);
@@ -108,7 +108,7 @@ static void d2flac8_clip_array(const double *src, int32_t *dest, size_t count, i
 static void d2flac16_clip_array(const double *src, int32_t *dest, size_t count, int normalize);
 static void d2flac24_clip_array(const double *src, int32_t *dest, size_t count, int normalize);
 
-static size_t flac_command(SF_PRIVATE *psf, int command, void *data, size_t datasize);
+static size_t flac_command(SndFile *psf, int command, void *data, size_t datasize);
 
 /* Decoder Callbacks */
 static FLAC__StreamDecoderReadStatus sf_flac_read_callback(const FLAC__StreamDecoder *decoder,
@@ -200,7 +200,7 @@ static void i2flac24_array(const int *src, int32_t *dest, size_t count)
     }
 }
 
-static sf_count_t flac_buffer_copy(SF_PRIVATE *psf)
+static sf_count_t flac_buffer_copy(SndFile *psf)
 {
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->m_codec_data;
     const FLAC__Frame *frame = pflac->frame;
@@ -396,7 +396,7 @@ static FLAC__StreamDecoderReadStatus
 sf_flac_read_callback(const FLAC__StreamDecoder *UNUSED(decoder), FLAC__byte buffer[],
                       size_t *bytes, void *client_data)
 {
-    SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
+    SndFile *psf = (SndFile *)client_data;
 
     *bytes = psf->fread(buffer, 1, *bytes);
     if (*bytes > 0 && psf->m_error == 0)
@@ -409,7 +409,7 @@ static FLAC__StreamDecoderSeekStatus
 sf_flac_seek_callback(const FLAC__StreamDecoder *UNUSED(decoder), FLAC__uint64 absolute_byte_offset,
                       void *client_data)
 {
-    SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
+    SndFile *psf = (SndFile *)client_data;
 
     psf->fseek(absolute_byte_offset, SEEK_SET);
     if (psf->m_error)
@@ -422,7 +422,7 @@ static FLAC__StreamDecoderTellStatus
 sf_flac_tell_callback(const FLAC__StreamDecoder *UNUSED(decoder),
                       FLAC__uint64 *absolute_byte_offset, void *client_data)
 {
-    SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
+    SndFile *psf = (SndFile *)client_data;
 
     *absolute_byte_offset = psf->ftell();
     if (psf->m_error)
@@ -435,7 +435,7 @@ static FLAC__StreamDecoderLengthStatus
 sf_flac_length_callback(const FLAC__StreamDecoder *UNUSED(decoder), FLAC__uint64 *stream_length,
                         void *client_data)
 {
-    SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
+    SndFile *psf = (SndFile *)client_data;
 
     if ((*stream_length = psf->m_filelength) == 0)
         return FLAC__STREAM_DECODER_LENGTH_STATUS_ERROR;
@@ -446,7 +446,7 @@ sf_flac_length_callback(const FLAC__StreamDecoder *UNUSED(decoder), FLAC__uint64
 static FLAC__bool sf_flac_eof_callback(const FLAC__StreamDecoder *UNUSED(decoder),
                                        void *client_data)
 {
-    SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
+    SndFile *psf = (SndFile *)client_data;
 
     if (psf->ftell() == psf->m_filelength)
         return SF_TRUE;
@@ -458,7 +458,7 @@ static FLAC__StreamDecoderWriteStatus
 sf_flac_write_callback(const FLAC__StreamDecoder *UNUSED(decoder), const FLAC__Frame *frame,
                        const int32_t *const buffer[], void *client_data)
 {
-    SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
+    SndFile *psf = (SndFile *)client_data;
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->m_codec_data;
 
     pflac->frame = frame;
@@ -471,7 +471,7 @@ sf_flac_write_callback(const FLAC__StreamDecoder *UNUSED(decoder), const FLAC__F
     return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
-static void sf_flac_meta_get_vorbiscomments(SF_PRIVATE *psf, const FLAC__StreamMetadata *metadata)
+static void sf_flac_meta_get_vorbiscomments(SndFile *psf, const FLAC__StreamMetadata *metadata)
 {
     static FLAC_TAG tags[] = {{"title", SF_STR_TITLE},
                               {"copyright", SF_STR_COPYRIGHT},
@@ -508,7 +508,7 @@ static void sf_flac_meta_get_vorbiscomments(SF_PRIVATE *psf, const FLAC__StreamM
 static void sf_flac_meta_callback(const FLAC__StreamDecoder *UNUSED(decoder),
                                   const FLAC__StreamMetadata *metadata, void *client_data)
 {
-    SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
+    SndFile *psf = (SndFile *)client_data;
     int bitwidth = 0;
 
     switch (metadata->type)
@@ -616,7 +616,7 @@ static void sf_flac_meta_callback(const FLAC__StreamDecoder *UNUSED(decoder),
 static void sf_flac_error_callback(const FLAC__StreamDecoder *UNUSED(decoder),
                                    FLAC__StreamDecoderErrorStatus status, void *client_data)
 {
-    SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
+    SndFile *psf = (SndFile *)client_data;
 
     psf->log_printf("ERROR : %s\n", FLAC__StreamDecoderErrorStatusString[status]);
 
@@ -640,7 +640,7 @@ static FLAC__StreamEncoderSeekStatus
 sf_flac_enc_seek_callback(const FLAC__StreamEncoder *UNUSED(encoder),
                           FLAC__uint64 absolute_byte_offset, void *client_data)
 {
-    SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
+    SndFile *psf = (SndFile *)client_data;
 
     psf->fseek(absolute_byte_offset, SEEK_SET);
     if (psf->m_error)
@@ -653,7 +653,7 @@ static FLAC__StreamEncoderTellStatus
 sf_flac_enc_tell_callback(const FLAC__StreamEncoder *UNUSED(encoder),
                           FLAC__uint64 *absolute_byte_offset, void *client_data)
 {
-    SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
+    SndFile *psf = (SndFile *)client_data;
 
     *absolute_byte_offset = psf->ftell();
     if (psf->m_error)
@@ -667,7 +667,7 @@ sf_flac_enc_write_callback(const FLAC__StreamEncoder *UNUSED(encoder), const FLA
                            size_t bytes, unsigned UNUSED(samples), unsigned UNUSED(current_frame),
                            void *client_data)
 {
-    SF_PRIVATE *psf = (SF_PRIVATE *)client_data;
+    SndFile *psf = (SndFile *)client_data;
 
     if (psf->fwrite(buffer, 1, bytes) == (sf_count_t)bytes && psf->m_error == 0)
         return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
@@ -675,7 +675,7 @@ sf_flac_enc_write_callback(const FLAC__StreamEncoder *UNUSED(encoder), const FLA
     return FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR;
 }
 
-static void flac_write_strings(SF_PRIVATE *psf, FLAC_PRIVATE *pflac)
+static void flac_write_strings(SndFile *psf, FLAC_PRIVATE *pflac)
 {
     FLAC__StreamMetadata_VorbisComment_Entry entry;
     int k, string_count = 0;
@@ -752,7 +752,7 @@ static void flac_write_strings(SF_PRIVATE *psf, FLAC_PRIVATE *pflac)
     return;
 }
 
-static int flac_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
+static int flac_write_header(SndFile *psf, int UNUSED(calc_length))
 {
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->m_codec_data;
     int err;
@@ -778,7 +778,7 @@ static int flac_write_header(SF_PRIVATE *psf, int UNUSED(calc_length))
     return psf->m_error;
 }
 
-int flac_open(SF_PRIVATE *psf)
+int flac_open(SndFile *psf)
 {
     int subformat;
     int error = 0;
@@ -827,7 +827,7 @@ int flac_open(SF_PRIVATE *psf)
     psf->seek_from_start = flac_seek;
     psf->byterate = flac_byterate;
 
-    psf->command = flac_command;
+    psf->on_command = flac_command;
 
     switch (subformat)
     {
@@ -844,7 +844,7 @@ int flac_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int flac_close(SF_PRIVATE *psf)
+static int flac_close(SndFile *psf)
 {
     FLAC_PRIVATE *pflac;
     int k;
@@ -877,7 +877,7 @@ static int flac_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static int flac_enc_init(SF_PRIVATE *psf)
+static int flac_enc_init(SndFile *psf)
 {
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->m_codec_data;
     unsigned bps;
@@ -947,7 +947,7 @@ static int flac_enc_init(SF_PRIVATE *psf)
     return 0;
 }
 
-static int flac_read_header(SF_PRIVATE *psf)
+static int flac_read_header(SndFile *psf)
 {
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->m_codec_data;
 
@@ -985,7 +985,7 @@ static int flac_read_header(SF_PRIVATE *psf)
     return psf->m_error;
 }
 
-static size_t flac_command(SF_PRIVATE *psf, int command, void *data, size_t datasize)
+static size_t flac_command(SndFile *psf, int command, void *data, size_t datasize)
 {
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->m_codec_data;
     double quality;
@@ -1022,7 +1022,7 @@ static size_t flac_command(SF_PRIVATE *psf, int command, void *data, size_t data
     return SF_FALSE;
 }
 
-int flac_init(SF_PRIVATE *psf)
+int flac_init(SndFile *psf)
 {
     if (psf->m_mode == SFM_RDWR)
         return SFE_BAD_MODE_RW;
@@ -1052,7 +1052,7 @@ int flac_init(SF_PRIVATE *psf)
     return 0;
 }
 
-static unsigned flac_read_loop(SF_PRIVATE *psf, size_t len)
+static unsigned flac_read_loop(SndFile *psf, size_t len)
 {
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->m_codec_data;
     FLAC__StreamDecoderState state;
@@ -1095,7 +1095,7 @@ static unsigned flac_read_loop(SF_PRIVATE *psf, size_t len)
     return pflac->pos;
 }
 
-static size_t flac_read_flac2s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t flac_read_flac2s(SndFile *psf, short *ptr, size_t len)
 {
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->m_codec_data;
     size_t total = 0, current;
@@ -1116,7 +1116,7 @@ static size_t flac_read_flac2s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t flac_read_flac2i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t flac_read_flac2i(SndFile *psf, int *ptr, size_t len)
 {
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->m_codec_data;
     size_t total = 0, current;
@@ -1137,7 +1137,7 @@ static size_t flac_read_flac2i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t flac_read_flac2f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t flac_read_flac2f(SndFile *psf, float *ptr, size_t len)
 {
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->m_codec_data;
     size_t total = 0, current;
@@ -1158,7 +1158,7 @@ static size_t flac_read_flac2f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t flac_read_flac2d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t flac_read_flac2d(SndFile *psf, double *ptr, size_t len)
 {
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->m_codec_data;
     size_t total = 0, current;
@@ -1180,7 +1180,7 @@ static size_t flac_read_flac2d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static size_t flac_write_s2flac(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t flac_write_s2flac(SndFile *psf, const short *ptr, size_t len)
 {
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->m_codec_data;
     void (*convert)(const short *, int32_t *, size_t);
@@ -1225,7 +1225,7 @@ static size_t flac_write_s2flac(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t flac_write_i2flac(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t flac_write_i2flac(SndFile *psf, const int *ptr, size_t len)
 {
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->m_codec_data;
     void (*convert)(const int *, int32_t *, size_t);
@@ -1270,7 +1270,7 @@ static size_t flac_write_i2flac(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t flac_write_f2flac(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t flac_write_f2flac(SndFile *psf, const float *ptr, size_t len)
 {
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->m_codec_data;
     void (*convert)(const float *, int32_t *, size_t, int);
@@ -1425,7 +1425,7 @@ static void f2flac24_array(const float *src, int32_t *dest, size_t count, int no
     }
 }
 
-static size_t flac_write_d2flac(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t flac_write_d2flac(SndFile *psf, const double *ptr, size_t len)
 {
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->m_codec_data;
     void (*convert)(const double *, int32_t *, size_t, int);
@@ -1581,7 +1581,7 @@ static void d2flac24_array(const double *src, int32_t *dest, size_t count, int n
     }
 }
 
-static sf_count_t flac_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offset)
+static sf_count_t flac_seek(SndFile *psf, int UNUSED(mode), sf_count_t offset)
 {
     FLAC_PRIVATE *pflac = (FLAC_PRIVATE *)psf->m_codec_data;
 
@@ -1621,7 +1621,7 @@ static sf_count_t flac_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offset
     return ((sf_count_t)-1);
 }
 
-static int flac_byterate(SF_PRIVATE *psf)
+static int flac_byterate(SndFile *psf)
 {
     if (psf->m_mode == SFM_READ)
         return (psf->m_datalength * psf->sf.samplerate) / psf->sf.frames;

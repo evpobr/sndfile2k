@@ -48,12 +48,12 @@
 
 #define SFE_MPC_NO_MARKER (666)
 
-static int mpc2k_close(SF_PRIVATE *psf);
+static int mpc2k_close(SndFile *psf);
 
-static int mpc2k_write_header(SF_PRIVATE *psf, int calc_length);
-static int mpc2k_read_header(SF_PRIVATE *psf);
+static int mpc2k_write_header(SndFile *psf, int calc_length);
+static int mpc2k_read_header(SndFile *psf);
 
-int mpc2k_open(SF_PRIVATE *psf)
+int mpc2k_open(SndFile *psf)
 {
     int error = 0;
 
@@ -83,7 +83,7 @@ int mpc2k_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int mpc2k_close(SF_PRIVATE *psf)
+static int mpc2k_close(SndFile *psf)
 {
     if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
         mpc2k_write_header(psf, SF_TRUE);
@@ -91,7 +91,7 @@ static int mpc2k_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static int mpc2k_write_header(SF_PRIVATE *psf, int calc_length)
+static int mpc2k_write_header(SndFile *psf, int calc_length)
 {
     char sample_name[HEADER_NAME_LEN + 1];
     sf_count_t current;
@@ -139,7 +139,7 @@ static int mpc2k_write_header(SF_PRIVATE *psf, int calc_length)
     return psf->m_error;
 }
 
-static int mpc2k_read_header(SF_PRIVATE *psf)
+static int mpc2k_read_header(SndFile *psf)
 {
     char sample_name[HEADER_NAME_LEN + 1];
     unsigned char bytes[4];

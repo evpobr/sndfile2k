@@ -212,43 +212,43 @@ struct AIFF_PRIVATE
  * Private static functions.
  */
 
-static int aiff_close(SF_PRIVATE *psf);
+static int aiff_close(SndFile *psf);
 
 static int tenbytefloat2int(uint8_t *bytes);
 static void uint2tenbytefloat(uint32_t num, uint8_t *bytes);
 
-static int aiff_read_comm_chunk(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt);
+static int aiff_read_comm_chunk(SndFile *psf, struct COMM_CHUNK *comm_fmt);
 
-static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt);
+static int aiff_read_header(SndFile *psf, struct COMM_CHUNK *comm_fmt);
 
-static int aiff_write_header(SF_PRIVATE *psf, int calc_length);
-static int aiff_write_tailer(SF_PRIVATE *psf);
-static void aiff_write_strings(SF_PRIVATE *psf, int location);
+static int aiff_write_header(SndFile *psf, int calc_length);
+static int aiff_write_tailer(SndFile *psf);
+static void aiff_write_strings(SndFile *psf, int location);
 
-static size_t aiff_command(SF_PRIVATE *psf, int command, void *data, size_t datasize);
+static size_t aiff_command(SndFile *psf, int command, void *data, size_t datasize);
 
 static const char *get_loop_mode_str(int16_t mode);
 
 static int16_t get_loop_mode(int16_t mode);
 
-static int aiff_read_basc_chunk(SF_PRIVATE *psf, int);
+static int aiff_read_basc_chunk(SndFile *psf, int);
 
-static int aiff_read_chanmap(SF_PRIVATE *psf, unsigned dword);
+static int aiff_read_chanmap(SndFile *psf, unsigned dword);
 
 static uint32_t marker_to_position(const struct MARK_ID_POS *m, uint16_t n, int marksize);
 
-static int aiff_set_chunk(SF_PRIVATE *psf, const SF_CHUNK_INFO *chunk_info);
-static SF_CHUNK_ITERATOR *aiff_next_chunk_iterator(SF_PRIVATE *psf, SF_CHUNK_ITERATOR *iterator);
-static int aiff_get_chunk_size(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
+static int aiff_set_chunk(SndFile *psf, const SF_CHUNK_INFO *chunk_info);
+static SF_CHUNK_ITERATOR *aiff_next_chunk_iterator(SndFile *psf, SF_CHUNK_ITERATOR *iterator);
+static int aiff_get_chunk_size(SndFile *psf, const SF_CHUNK_ITERATOR *iterator,
                                SF_CHUNK_INFO *chunk_info);
-static int aiff_get_chunk_data(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator,
+static int aiff_get_chunk_data(SndFile *psf, const SF_CHUNK_ITERATOR *iterator,
                                SF_CHUNK_INFO *chunk_info);
 
 /*
 ** Public function.
 */
 
-int aiff_open(SF_PRIVATE *psf)
+int aiff_open(SndFile *psf)
 {
     struct COMM_CHUNK comm_fmt;
     int error;
@@ -301,7 +301,7 @@ int aiff_open(SF_PRIVATE *psf)
     };
 
     psf->container_close = aiff_close;
-    psf->command = aiff_command;
+    psf->on_command = aiff_command;
 
     switch (SF_CODEC(psf->sf.format))
     {
@@ -412,7 +412,7 @@ static uint32_t marker_to_position(const struct MARK_ID_POS *m, uint16_t n, int 
     return 0;
 }
 
-static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
+static int aiff_read_header(SndFile *psf, struct COMM_CHUNK *comm_fmt)
 {
     struct SSND_CHUNK ssnd_fmt;
     BUF_UNION ubuf;
@@ -1054,7 +1054,7 @@ static int aiff_read_header(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
     return 0;
 }
 
-static int aiff_close(SF_PRIVATE *psf)
+static int aiff_close(SndFile *psf)
 {
     struct AIFF_PRIVATE *paiff = (struct AIFF_PRIVATE *)psf->m_container_data;
 
@@ -1073,7 +1073,7 @@ static int aiff_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static int aiff_read_comm_chunk(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
+static int aiff_read_comm_chunk(SndFile *psf, struct COMM_CHUNK *comm_fmt)
 {
     BUF_UNION ubuf;
     ubuf.scbuf[0] = 0;
@@ -1251,7 +1251,7 @@ static int aiff_read_comm_chunk(SF_PRIVATE *psf, struct COMM_CHUNK *comm_fmt)
     return 0;
 }
 
-static void aiff_rewrite_header(SF_PRIVATE *psf)
+static void aiff_rewrite_header(SndFile *psf)
 {
     /*
      * Assuming here that the header has already been written and just
@@ -1306,7 +1306,7 @@ static void aiff_rewrite_header(SF_PRIVATE *psf)
     return;
 }
 
-static int aiff_write_header(SF_PRIVATE *psf, int calc_length)
+static int aiff_write_header(SndFile *psf, int calc_length)
 {
     struct AIFF_PRIVATE *paiff = (struct AIFF_PRIVATE *)psf->m_container_data;
     if (!paiff)
@@ -1615,7 +1615,7 @@ static int aiff_write_header(SF_PRIVATE *psf, int calc_length)
     return psf->m_error;
 }
 
-static int aiff_write_tailer(SF_PRIVATE *psf)
+static int aiff_write_tailer(SndFile *psf)
 {
     /* Reset the current header length to zero. */
     psf->m_header.ptr[0] = 0;
@@ -1650,7 +1650,7 @@ static int aiff_write_tailer(SF_PRIVATE *psf)
     return 0;
 }
 
-static void aiff_write_strings(SF_PRIVATE *psf, int location)
+static void aiff_write_strings(SndFile *psf, int location)
 {
     for (int k = 0; k < SF_MAX_STRINGS; k++)
     {
@@ -1696,7 +1696,7 @@ static void aiff_write_strings(SF_PRIVATE *psf, int location)
     return;
 }
 
-static size_t aiff_command(SF_PRIVATE *psf, int command, void *UNUSED(data), size_t UNUSED(datasize))
+static size_t aiff_command(SndFile *psf, int command, void *UNUSED(data), size_t UNUSED(datasize))
 {
     struct AIFF_PRIVATE *paiff = (struct AIFF_PRIVATE *)psf->m_container_data;
 
@@ -1814,7 +1814,7 @@ static void uint2tenbytefloat(uint32_t num, uint8_t *bytes)
     bytes[5] = num & 0xFF;
 }
 
-static int aiff_read_basc_chunk(SF_PRIVATE *psf, int datasize)
+static int aiff_read_basc_chunk(SndFile *psf, int datasize)
 {
     const char *type_str;
     struct basc_CHUNK bc;
@@ -1885,7 +1885,7 @@ static int aiff_read_basc_chunk(SF_PRIVATE *psf, int datasize)
     return 0;
 }
 
-static int aiff_read_chanmap(SF_PRIVATE *psf, unsigned dword)
+static int aiff_read_chanmap(SndFile *psf, unsigned dword)
 {
     unsigned channel_bitmap, channel_decriptions, bytesread;
     int layout_tag;
@@ -1914,17 +1914,17 @@ static int aiff_read_chanmap(SF_PRIVATE *psf, unsigned dword)
     return 0;
 }
 
-static int aiff_set_chunk(SF_PRIVATE *psf, const SF_CHUNK_INFO *chunk_info)
+static int aiff_set_chunk(SndFile *psf, const SF_CHUNK_INFO *chunk_info)
 {
     return psf_save_write_chunk(&psf->m_wchunks, chunk_info);
 }
 
-static SF_CHUNK_ITERATOR *aiff_next_chunk_iterator(SF_PRIVATE *psf, SF_CHUNK_ITERATOR *iterator)
+static SF_CHUNK_ITERATOR *aiff_next_chunk_iterator(SndFile *psf, SF_CHUNK_ITERATOR *iterator)
 {
     return psf_next_chunk_iterator(&psf->m_rchunks, iterator);
 }
 
-static int aiff_get_chunk_size(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator, SF_CHUNK_INFO *chunk_info)
+static int aiff_get_chunk_size(SndFile *psf, const SF_CHUNK_ITERATOR *iterator, SF_CHUNK_INFO *chunk_info)
 {
     int indx = psf_find_read_chunk_iterator(&psf->m_rchunks, iterator);
     if (indx < 0)
@@ -1935,7 +1935,7 @@ static int aiff_get_chunk_size(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterato
     return SFE_NO_ERROR;
 }
 
-static int aiff_get_chunk_data(SF_PRIVATE *psf, const SF_CHUNK_ITERATOR *iterator, SF_CHUNK_INFO *chunk_info)
+static int aiff_get_chunk_data(SndFile *psf, const SF_CHUNK_ITERATOR *iterator, SF_CHUNK_INFO *chunk_info)
 {
     sf_count_t pos;
     int indx = psf_find_read_chunk_iterator(&psf->m_rchunks, iterator);

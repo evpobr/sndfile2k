@@ -36,11 +36,11 @@
 #define PSION_VERSION ((unsigned short)3856)
 #define PSION_DATAOFFSET (0x20)
 
-static int wve_read_header(SF_PRIVATE *psf);
-static int wve_write_header(SF_PRIVATE *psf, int calc_length);
-static int wve_close(SF_PRIVATE *psf);
+static int wve_read_header(SndFile *psf);
+static int wve_write_header(SndFile *psf, int calc_length);
+static int wve_close(SndFile *psf);
 
-int wve_open(SF_PRIVATE *psf)
+int wve_open(SndFile *psf)
 {
     int error = 0;
 
@@ -72,7 +72,7 @@ int wve_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int wve_read_header(SF_PRIVATE *psf)
+static int wve_read_header(SndFile *psf)
 {
     /* Set position to start of file to begin reading header. */
     uint32_t marker;
@@ -140,7 +140,7 @@ static int wve_read_header(SF_PRIVATE *psf)
     return SFE_NO_ERROR;
 }
 
-static int wve_write_header(SF_PRIVATE *psf, int calc_length)
+static int wve_write_header(SndFile *psf, int calc_length)
 {
     sf_count_t current = current = psf->ftell();
 
@@ -182,7 +182,7 @@ static int wve_write_header(SF_PRIVATE *psf, int calc_length)
     return psf->m_error;
 }
 
-static int wve_close(SF_PRIVATE *psf)
+static int wve_close(SndFile *psf)
 {
     if (psf->m_mode == SFM_WRITE || psf->m_mode == SFM_RDWR)
     {

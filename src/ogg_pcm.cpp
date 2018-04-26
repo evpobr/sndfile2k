@@ -132,7 +132,7 @@ static int opcm_close(SF_PRIVATE *UNUSED(psf))
 
 #else /* ENABLE_EXPERIMENTAL_CODE && HAVE_XIPH_CODECS */
 
-int ogg_pcm_open(SF_PRIVATE *psf)
+int ogg_pcm_open(SndFile *psf)
 {
     psf->log_printf("This version of libsndfile was compiled without Ogg/Speex support.\n");
     return SFE_UNIMPLEMENTED;

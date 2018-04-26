@@ -54,184 +54,25 @@
 #include <string>
 #include <new> // for std::nothrow
 
-namespace sf {
-
-/** SndFile class.
- *
- */
-class SndfileHandle
+struct ISndFile: public SF_OBJECT
 {
-private:
-	struct SNDFILE_ref
-	{
-		SNDFILE_ref(void);
-		~SNDFILE_ref(void);
-
-		SNDFILE *sf;
-		SF_INFO sfinfo;
-		int ref;
-	};
-
-	SNDFILE_ref *p;
-
-public:
-	/** SndFileHandle default constructor.
-	 *
-	 */
-	SndfileHandle(void) : p(NULL) {};
-
-	/** Opens the specified file using path
-	 *
-	 * @param[in] path Path to the file
-	 * @param[in] mode File open mode
-	 * @param[in] format Format
-	 * @param[in] channels Number of channels
-	 * @param[in] samplerate Samplerate
-	 *
-	 * The @p path is byte encoded, but may be utf-8 on Linux, while on
-	 * Mac OS X it will use the filesystem character set. On Windows, there is
-	 * also a Windows specific SndfileHandle(const wchar_t *, int, int, int)
-	 * that takes a @c UTF16_BE encoded filename.
-	 *
-	 * The @p mode specifies the kind of access that is requested for the
-	 * file, one of ::SF_FILEMODE values.
-	 *
-	 * When opening a file for read, the @p format field should be set to
-	 * zero before passing to constructor. The only exception to this is the
-	 * case of @c RAW files where the caller has to set the @p samplerate,
-	 * @p channels and @p format parameters to valid values.
-	 *
-	 * When opening a file for write, the caller must fill @p samplerate,
-	 * @p channels, @p format.
-	 *
-	 * @sa sf_wchar_open(), sf_open_virtual()
-	 * @sa sf_close()
-	 */
-	SndfileHandle(const char *path, SF_FILEMODE mode = SFM_READ, int format = 0, int channels = 0,
-				  int samplerate = 0);
-
-	/** Opens the specified file using path
-	 *
-	 * @param[in] path Path to the file
-	 * @param[in] mode File open mode
-	 * @param[in] format Format
-	 * @param[in] channels Number of channels
-	 * @param[in] samplerate Samplerate
-	 *
-	 * This constructor is similar to SndfileHandle(const char *, int, int, int),
-	 * but takes @c std::string as path.
-	 *
-	 * @sa sf_wchar_open(), sf_open_virtual()
-	 * @sa sf_close()
-	 */
-	SndfileHandle(std::string const &path, SF_FILEMODE mode = SFM_READ, int format = 0, int channels = 0,
-				  int samplerate = 0);
-
-	/** Opens sound file using Virtual I/O context
-	 *
-	 * @param[in] sfvirtual Virtual I/O context
-	 * @param[in] user_data User data
-	 * @param[in] mode File open mode
-	 * @param[in] format Format
-	 * @param[in] channels Number of channels
-	 * @param[in] samplerate Samplerate
-	 *
-	 * This constructor is similar to SndfileHandle(const char *, int, int, int),
-	 * but takes Virtual I/O context of already opened file instead of path.
-	 *
-	 * Care should be taken to ensure that the mode of the file represented by
-	 * the descriptor matches the @p mode argument.
-	 *
-	 * @sa sf_open(), sf_wchar_open()
-	 * @sa sf_close()
-	 */
-	SndfileHandle(SF_VIRTUAL_IO &sfvirtual, void *user_data, SF_FILEMODE mode = SFM_READ, int format = 0,
-				  int channels = 0, int samplerate = 0);
-
-#if (defined(_WIN32) || defined(__CYGWIN__))
-
-	/** Opens file using unicode filename
-	 *
-	 * @param[in] wpath Path to the file
-	 * @param[in] mode File open mode
-	 * @param[in] format Format
-	 * @param[in] channels Number of channels
-	 * @param[in] samplerate Samplerate
-	 *
-	 * This constructor is similar to SndfileHandle(const char *, int, int, int),
-	 * but takes @c wchar_t string as path.
-	 *
-	 * @note This function is Windows-specific.
-	 *
-	 * @sa sf_open(), sf_open_virtual()
-	 * @sa sf_close()
-	 */
-	SndfileHandle(const wchar_t *wpath, SF_FILEMODE mode = SFM_READ, int format = 0, int channels = 0,
-				  int samplerate = 0);
-#endif
-
-	/** SndfileHandle destructor
-	 */
-	~SndfileHandle(void);
-
-	/** SndfileHandle copy constructor
-	 */
-	SndfileHandle(const SndfileHandle &orig);
-
-	/** Assignment operator
-	 */
-	SndfileHandle &operator=(const SndfileHandle &rhs);
-
-	/** Gets number of references to this sound file
-	 */
-	int refCount(void) const
-	{
-		return (p == NULL) ? 0 : p->ref;
-	}
-
-	/** Compares sound file with NULL
-	 */
-	operator bool() const
-	{
-		return (p != NULL);
-	}
-
-	/** Compares one sound file object with other
-	 */
-	bool operator==(const SndfileHandle &rhs) const
-	{
-		return (p == rhs.p);
-	}
-
 	/** Gets number of frames
 	 */
-	sf_count_t frames(void) const
-	{
-		return p ? p->sfinfo.frames : 0;
-	}
+	virtual sf_count_t getFrames(void) const = 0;
 
 	/** Gets format
 	 *
 	 * @sa ::SF_FORMAT
 	 */
-	int format(void) const
-	{
-		return p ? p->sfinfo.format : 0;
-	}
+	virtual int getFormat(void) const = 0;
 
 	/** Gets number of channels
 	 */
-	int channels(void) const
-	{
-		return p ? p->sfinfo.channels : 0;
-	}
+	virtual int getChannels(void) const = 0;
 
 	/** Gets samplerate
 	 */
-	int samplerate(void) const
-	{
-		return p ? p->sfinfo.samplerate : 0;
-	}
+	virtual int getSamplerate(void) const = 0;
 
 	/** Gets the current error code of sound file object
 	 *
@@ -248,7 +89,7 @@ public:
 	 *
 	 * @sa strError()
 	 */
-	int error(void) const;
+	virtual int getError(void) const = 0;
 
 	/** Returns textual description of  the current error code
 	 *
@@ -256,7 +97,7 @@ public:
 	 *
 	 * @sa error()
 	 */
-	const char *strError(void) const;
+	virtual const char *getErrorString(void) const = 0;
 
 	/** Gets or sets parameters of library or sound file object.
 	 *
@@ -266,7 +107,7 @@ public:
 	 *
 	 * @return Command-specific, see particular command description.
 	 */
-	int command(int cmd, void *data, int datasize);
+	virtual int command(int cmd, void *data, int datasize) = 0;
 
 	/** Changes position of sound file
 	 *
@@ -294,7 +135,7 @@ public:
 	 * or @c -1 if an error occured (ie an attempt is made to seek beyond the
 	 * start or end of the file).
 	 */
-	sf_count_t seek(sf_count_t frames, int whence);
+	virtual sf_count_t seek(sf_count_t frames, int whence) = 0;
 
 	/** Forces writing of data to disk
 	 *
@@ -302,7 +143,7 @@ public:
 	 * to force the writing of data to disk. If the file is opened ::SFM_READ no
 	 * action is taken.
 	 */
-	void writeSync(void);
+	virtual void writeSync(void) = 0;
 
 	/** Sets string field
 	 *
@@ -319,7 +160,7 @@ public:
 	 *
 	 * @return Zero on success and non-zero value otherwise.
 	 */
-	int setString(int str_type, const char *str);
+	virtual int setString(int str_type, const char *str) = 0;
 
 	/** Gets string field
 	 *
@@ -329,19 +170,7 @@ public:
 	 * @return Zero-terminated string in utf-8 encoding on success or @c NULL
 	 * otherwise.
 	 */
-	const char *getString(int str_type) const;
-
-	/** Checks correctness of format parameters combination
-	 *
-	 * To open sound file in write mode you need to set up @p format,
-	 * @p channels and @p samplerate parameters. To be sure that combination is
-	 * correct and will be accepted you can use this method.
-	 *
-	 * @return ::SF_TRUE if format is valid, ::SF_FALSE otherwise.
-	 *
-	 * @sa sf_format_check()
-	 */
-	static int formatCheck(int format, int channels, int samplerate);
+	virtual const char *getString(int str_type) const = 0;
 
 	/** Reads short (16-bit) samples from file
 	 *
@@ -350,7 +179,7 @@ public:
 	 *
 	 * @return Number of samples actually read.
 	 */
-	sf_count_t read(short *ptr, sf_count_t items);
+	virtual sf_count_t readShortSamples(short *ptr, sf_count_t items) = 0;
 
 	/** Reads integer (32-bit) samples from file
 	 *
@@ -359,7 +188,7 @@ public:
 	 *
 	 * @return Number of samples actually read.
 	 */
-	sf_count_t read(int *ptr, sf_count_t items);
+	virtual sf_count_t readIntSamples(int *ptr, sf_count_t items) = 0;
 
 	/** Reads float (32-bit) samples from file
 	 *
@@ -368,7 +197,7 @@ public:
 	 *
 	 * @return Number of samples actually read.
 	 */
-	sf_count_t read(float *ptr, sf_count_t items);
+	virtual sf_count_t readFloatSamples(float *ptr, sf_count_t items) = 0;
 
 	/** Reads double (64-bit) samples from file
 	 *
@@ -377,7 +206,7 @@ public:
 	 *
 	 * @return Number of samples actually read.
 	 */
-	sf_count_t read(double *ptr, sf_count_t items);
+	virtual sf_count_t readDoubleSamples(double *ptr, sf_count_t items) = 0;
 
 	/** Writes short (16-bit) samples to file
 	 *
@@ -386,7 +215,7 @@ public:
 	 *
 	 * @return Number of samples actually written.
 	 */
-	sf_count_t write(const short *ptr, sf_count_t items);
+	virtual sf_count_t writeShortSamples(const short *ptr, sf_count_t items) = 0;
 
 	/** Writes integer (32-bit) samples to file
 	 *
@@ -395,7 +224,7 @@ public:
 	 *
 	 * @return Number of samples actually written.
 	 */
-	sf_count_t write(const int *ptr, sf_count_t items);
+	virtual sf_count_t writeIntSamples(const int *ptr, sf_count_t items) = 0;
 
 	/** Writes float (32-bit) samples to file
 	 *
@@ -404,7 +233,7 @@ public:
 	 *
 	 * @return Number of samples actually written.
 	 */
-	sf_count_t write(const float *ptr, sf_count_t items);
+	virtual sf_count_t writeFroatSamples(const float *ptr, sf_count_t items) = 0;
 
 	/** Writes double (64-bit) samples to file
 	 *
@@ -413,7 +242,7 @@ public:
 	 *
 	 * @return Number of samples actually written.
 	 */
-	sf_count_t write(const double *ptr, sf_count_t items);
+	virtual sf_count_t writeDoubleSamples(const double *ptr, sf_count_t items) = 0;
 
 	/** Reads short (16-bit) frames from file
 	 *
@@ -422,7 +251,7 @@ public:
 	 *
 	 * @return Number of frames actually read.
 	 */
-	sf_count_t readf(short *ptr, sf_count_t frames);
+	virtual sf_count_t readShortFrames(short *ptr, sf_count_t frames) = 0;
 
 	/** Reads integer (32-bit) frames from file
 	 *
@@ -431,7 +260,7 @@ public:
 	 *
 	 * @return Number of frames actually read.
 	 */
-	sf_count_t readf(int *ptr, sf_count_t frames);
+	virtual sf_count_t readIntFrames(int *ptr, sf_count_t frames) = 0;
 
 	/** Reads float (32-bit) frames from file
 	 *
@@ -440,7 +269,7 @@ public:
 	 *
 	 * @return Number of frames actually read.
 	 */
-	sf_count_t readf(float *ptr, sf_count_t frames);
+	virtual sf_count_t readFloatFrames(float *ptr, sf_count_t frames) = 0;
 
 	/** Reads double (64-bit) frames from file
 	 *
@@ -449,7 +278,7 @@ public:
 	 *
 	 * @return Number of frames actually read.
 	 */
-	sf_count_t readf(double *ptr, sf_count_t frames);
+	virtual sf_count_t readDoubleFrames(double *ptr, sf_count_t frames) = 0;
 
 	/** Writes short (16-bit) frames to file
 	 *
@@ -458,7 +287,7 @@ public:
 	 *
 	 * @return Number of frames actually written.
 	 */
-	sf_count_t writef(const short *ptr, sf_count_t frames);
+	virtual sf_count_t writeShortFrames(const short *ptr, sf_count_t frames) = 0;
 
 	/** Writes integer (32-bit) frames to file
 	 *
@@ -467,7 +296,7 @@ public:
 	 *
 	 * @return Number of frames actually written.
 	 */
-	sf_count_t writef(const int *ptr, sf_count_t frames);
+	virtual sf_count_t writeIntFrames(const int *ptr, sf_count_t frames) = 0;
 
 	/** Writes float (32-bit) frames to file
 	 *
@@ -476,7 +305,7 @@ public:
 	 *
 	 * @return Number of frames actually written.
 	 */
-	sf_count_t writef(const float *ptr, sf_count_t frames);
+	virtual sf_count_t writeFloatFrames(const float *ptr, sf_count_t frames) = 0;
 
 	/** Writes double (64-bit) frames to file
 	 *
@@ -485,7 +314,9 @@ public:
 	 *
 	 * @return Number of frames actually written.
 	 */
-	sf_count_t writef(const double *ptr, sf_count_t frames);
+	virtual sf_count_t writeDoubleFrames(const double *ptr, sf_count_t frames) = 0;
+
+    virtual int getCurrentByterate() const = 0;
 
 	/** Read raw bytes from sound file
 	 *
@@ -497,7 +328,7 @@ public:
 	 *
 	 * @return Number of bytes actually read.
 	 */
-	sf_count_t readRaw(void *ptr, sf_count_t bytes);
+	virtual sf_count_t readRaw(void *ptr, sf_count_t bytes) = 0;
 
 	/** Writes raw bytes to sound file
 	 *
@@ -509,329 +340,108 @@ public:
 	 *
 	 * @return Number of bytes actually written.
 	 */
-	sf_count_t writeRaw(const void *ptr, sf_count_t bytes);
+	virtual sf_count_t writeRaw(const void *ptr, sf_count_t bytes) = 0;
 
-	/** Gets ccess to the raw sound file handle
-	 */
-	SNDFILE *rawHandle(void);
+    /** Sets the specified chunk info
+     *
+     * @param[in] chunk_info Pointer to a SF_CHUNK_INFO struct
+     *
+     * Chunk info must be done before any audio data is written to the file.
+     *
+     * This will fail for format specific reserved chunks.
+     *
+     * The @c chunk_info->data pointer must be valid until the file is closed.
+     *
+     * @return Returns ::SF_ERR_NO_ERROR on success or non-zero on failure.
+     */
+    virtual int setChunk(const SF_CHUNK_INFO *chunk_info) = 0;
 
-	/** Takes ownership of handle, if reference count is 1
-	 */
-	SNDFILE *takeOwnership(void);
+    /** Gets an iterator for all chunks matching chunk_info.
+     *
+     * @param[in] chunk_info Pointer to a ::SF_CHUNK_INFO struct
+     *
+     * The iterator will point to the first chunk matching chunk_info.
+     *
+     * Chunks are matching, if (chunk_info->id) matches the first
+     *     (chunk_info->id_size) bytes of a chunk found in the SNDFILE* handle.
+     *
+     * If chunk_info is NULL, an iterator to all chunks in the SNDFILE* handle
+     *     is returned.
+     *
+     * The values of chunk_info->datalen and chunk_info->data are ignored.
+     *
+     * If no matching chunks are found in the sndfile, NULL is returned.
+     *
+     * The returned iterator will stay valid until one of the following occurs:
+     *
+     * 1. The sndfile is closed.
+     * 2. A new chunk is added using sf_set_chunk().
+     * 3. Another chunk iterator function is called on the same SNDFILE* handle
+     *    that causes the iterator to be modified.
+     *
+     * The memory for the iterator belongs to the SNDFILE* handle and is freed when
+     * sf_close() is called.
+     *
+     * @return Chunk iterator on success, @c NULL otherwise.
+     */
+    virtual SF_CHUNK_ITERATOR *getChunkIterator(const SF_CHUNK_INFO *chunk_info) = 0;
+
+    /** Iterates through chunks by incrementing the iterator.
+     *
+     * @param[in] iterator Current chunk iterator
+     *
+     * Increments the iterator and returns a handle to the new one.
+     *
+     * After this call, iterator will no longer be valid, and you must use the
+     * newly returned handle from now on.
+     *
+     * The returned handle can be used to access the next chunk matching
+     * the criteria as defined in sf_get_chunk_iterator().
+     *
+     * If iterator points to the last chunk, this will free all resources
+     * associated with iterator and return @c NULL.
+     *
+     * The returned iterator will stay valid until sf_get_chunk_iterator_next
+     * is called again, the sndfile is closed or a new chunk us added.
+     *
+     * @return Next chunk interator on success, @c NULL otherwise.
+     */
+    virtual SF_CHUNK_ITERATOR *getNextChunkIterator(SF_CHUNK_ITERATOR *iterator) = 0;
+
+    /** Gets the size of the specified chunk
+     *
+     * @param[in] it Chunk iterafor
+     * @param[out] chunk_info Pointer to a ::SF_CHUNK_INFO struct
+     *
+     * If the specified chunk exists, the size will be returned in the
+     * ::SF_CHUNK_INFO::datalen field of the ::SF_CHUNK_INFO struct.
+     *
+     * Additionally, the id of the chunk will be copied to the @c id
+     * field of the SF_CHUNK_INFO struct and it's @c id_size field will
+     * be updated accordingly.
+     *
+     * If the chunk doesn't exist @c chunk_info->datalen will be zero, and the
+     * @c id and @c id_size fields will be undefined.
+     *
+     * @return ::SF_ERR_NO_ERROR on success, negative error code otherwise.
+     */
+    virtual int getChunkSize(const SF_CHUNK_ITERATOR *it, SF_CHUNK_INFO *chunk_info) = 0;
+
+    /** Gets the specified chunk data
+     *
+     * @param[in] it Chunk iterafor
+     * @param[out] chunk_info Pointer to a ::SF_CHUNK_INFO struct
+     *
+     * If the specified chunk exists, up to @c chunk_info->datalen bytes of
+     * the chunk data will be copied into the @c chunk_info->data buffer
+     * (allocated by the caller) and the @c chunk_info->datalen field
+     * updated to reflect the size of the data. The @c id and @c id_size
+     * field will be updated according to the retrieved chunk.
+     *
+     * If the chunk doesn't exist @c chunk_info->datalen will be zero, and the
+     * @c id and @c id_size fields will be undefined.
+     *
+     * @return ::SF_ERR_NO_ERROR on success, negative error code otherwise.
+     */
+    virtual int getChunkData(const SF_CHUNK_ITERATOR *it, SF_CHUNK_INFO *chunk_info) = 0;
 };
-
-/*==============================================================================
-**	Nothing but implementation below.
-*/
-
-inline SndfileHandle::SNDFILE_ref::SNDFILE_ref(void) : sf(NULL), sfinfo(), ref(1)
-{
-}
-
-inline SndfileHandle::SNDFILE_ref::~SNDFILE_ref(void)
-{
-	if (sf != NULL)
-		sf_close(sf);
-}
-
-inline SndfileHandle::SndfileHandle(const char *path, SF_FILEMODE mode, int fmt, int chans, int srate)
-	: p(NULL)
-{
-	p = new (std::nothrow) SNDFILE_ref();
-
-	if (p != NULL)
-	{
-		p->ref = 1;
-
-		p->sfinfo.frames = 0;
-		p->sfinfo.channels = chans;
-		p->sfinfo.format = fmt;
-		p->sfinfo.samplerate = srate;
-		p->sfinfo.sections = 0;
-		p->sfinfo.seekable = 0;
-
-		sf_open(path, mode, &p->sfinfo, &p->sf);
-	};
-
-	return;
-} /* SndfileHandle const char * constructor */
-
-inline SndfileHandle::SndfileHandle(std::string const &path, SF_FILEMODE mode, int fmt, int chans,
-									int srate)
-	: p(NULL)
-{
-	p = new (std::nothrow) SNDFILE_ref();
-
-	if (p != NULL)
-	{
-		p->ref = 1;
-
-		p->sfinfo.frames = 0;
-		p->sfinfo.channels = chans;
-		p->sfinfo.format = fmt;
-		p->sfinfo.samplerate = srate;
-		p->sfinfo.sections = 0;
-		p->sfinfo.seekable = 0;
-
-		sf_open(path.c_str(), mode, &p->sfinfo, &p->sf);
-	};
-
-	return;
-} /* SndfileHandle std::string constructor */
-
-inline SndfileHandle::SndfileHandle(SF_VIRTUAL_IO &sfvirtual, void *user_data, SF_FILEMODE mode, int fmt,
-									int chans, int srate)
-	: p(NULL)
-{
-	p = new (std::nothrow) SNDFILE_ref();
-
-	if (p != NULL)
-	{
-		p->ref = 1;
-
-		p->sfinfo.frames = 0;
-		p->sfinfo.channels = chans;
-		p->sfinfo.format = fmt;
-		p->sfinfo.samplerate = srate;
-		p->sfinfo.sections = 0;
-		p->sfinfo.seekable = 0;
-
-		sf_open_virtual(&sfvirtual, mode, &p->sfinfo, user_data, &p->sf);
-	};
-
-	return;
-} /* SndfileHandle std::string constructor */
-
-inline SndfileHandle::~SndfileHandle(void)
-{
-	if (p != NULL && --p->ref == 0)
-		delete p;
-} /* SndfileHandle destructor */
-
-inline SndfileHandle::SndfileHandle(const SndfileHandle &orig) : p(orig.p)
-{
-	if (p != NULL)
-		++p->ref;
-} /* SndfileHandle copy constructor */
-
-inline SndfileHandle &SndfileHandle::operator=(const SndfileHandle &rhs)
-{
-	if (&rhs == this)
-		return *this;
-	if (p != NULL && --p->ref == 0)
-		delete p;
-
-	p = rhs.p;
-	if (p != NULL)
-		++p->ref;
-
-	return *this;
-} /* SndfileHandle assignment operator */
-
-inline int SndfileHandle::error(void) const
-{
-	return sf_error(p->sf);
-}
-
-inline const char *SndfileHandle::strError(void) const
-{
-	return sf_strerror(p->sf);
-}
-
-inline int SndfileHandle::command(int cmd, void *data, int datasize)
-{
-	return sf_command(p->sf, cmd, data, datasize);
-}
-
-inline sf_count_t SndfileHandle::seek(sf_count_t frame_count, int whence)
-{
-	return sf_seek(p->sf, frame_count, whence);
-}
-
-inline void SndfileHandle::writeSync(void)
-{
-	sf_write_sync(p->sf);
-}
-
-/** Sets string field
- *
- * @param[in] str_type Type of field to set, one of ::SF_STR_FIELD values
- * @param[in] str Pointer to a null-terminated string with data to set
- *
- * @note Strings passed to this function is assumed to be utf-8. However, while
- * formats like Ogg/Vorbis and FLAC fully support utf-8, others like WAV and
- * AIFF officially only support ASCII. Current policy is to write such string
- * as it is without conversion. Such tags can be read back with SndFile2K
- * without problems, but other programs may fail to decode and display data
- * correctly. If you want to write strings in ASCII, perform reencoding before
- * passing data to setString().
- *
- * @return Zero on success and non-zero value otherwise.
- */
-inline int SndfileHandle::setString(int str_type, const char *str)
-{
-	return sf_set_string(p->sf, str_type, str);
-}
-
-/** Gets string field
- *
- * @param[in] str_type Type of field to retrieve, one of ::SF_STR_FIELD values
- *
- * @return Zero-terminated string in utf-8 encoding on success or @c NULL
- * otherwise.
- */
-inline const char *SndfileHandle::getString(int str_type) const
-{
-	return sf_get_string(p->sf, str_type);
-}
-
-inline int SndfileHandle::formatCheck(int fmt, int chans, int srate)
-{
-	SF_INFO sfinfo;
-
-	sfinfo.frames = 0;
-	sfinfo.channels = chans;
-	sfinfo.format = fmt;
-	sfinfo.samplerate = srate;
-	sfinfo.sections = 0;
-	sfinfo.seekable = 0;
-
-	return sf_format_check(&sfinfo);
-}
-
-/*---------------------------------------------------------------------*/
-
-inline sf_count_t SndfileHandle::read(short *ptr, sf_count_t items)
-{
-	return sf_read_short(p->sf, ptr, items);
-}
-
-inline sf_count_t SndfileHandle::read(int *ptr, sf_count_t items)
-{
-	return sf_read_int(p->sf, ptr, items);
-}
-
-inline sf_count_t SndfileHandle::read(float *ptr, sf_count_t items)
-{
-	return sf_read_float(p->sf, ptr, items);
-}
-
-inline sf_count_t SndfileHandle::read(double *ptr, sf_count_t items)
-{
-	return sf_read_double(p->sf, ptr, items);
-}
-
-inline sf_count_t SndfileHandle::write(const short *ptr, sf_count_t items)
-{
-	return sf_write_short(p->sf, ptr, items);
-}
-
-inline sf_count_t SndfileHandle::write(const int *ptr, sf_count_t items)
-{
-	return sf_write_int(p->sf, ptr, items);
-}
-
-inline sf_count_t SndfileHandle::write(const float *ptr, sf_count_t items)
-{
-	return sf_write_float(p->sf, ptr, items);
-}
-
-inline sf_count_t SndfileHandle::write(const double *ptr, sf_count_t items)
-{
-	return sf_write_double(p->sf, ptr, items);
-}
-
-inline sf_count_t SndfileHandle::readf(short *ptr, sf_count_t frame_count)
-{
-	return sf_readf_short(p->sf, ptr, frame_count);
-}
-
-inline sf_count_t SndfileHandle::readf(int *ptr, sf_count_t frame_count)
-{
-	return sf_readf_int(p->sf, ptr, frame_count);
-}
-
-inline sf_count_t SndfileHandle::readf(float *ptr, sf_count_t frame_count)
-{
-	return sf_readf_float(p->sf, ptr, frame_count);
-}
-
-inline sf_count_t SndfileHandle::readf(double *ptr, sf_count_t frame_count)
-{
-	return sf_readf_double(p->sf, ptr, frame_count);
-}
-
-inline sf_count_t SndfileHandle::writef(const short *ptr, sf_count_t frame_count)
-{
-	return sf_writef_short(p->sf, ptr, frame_count);
-}
-
-inline sf_count_t SndfileHandle::writef(const int *ptr, sf_count_t frame_count)
-{
-	return sf_writef_int(p->sf, ptr, frame_count);
-}
-
-inline sf_count_t SndfileHandle::writef(const float *ptr, sf_count_t frame_count)
-{
-	return sf_writef_float(p->sf, ptr, frame_count);
-}
-
-inline sf_count_t SndfileHandle::writef(const double *ptr, sf_count_t frame_count)
-{
-	return sf_writef_double(p->sf, ptr, frame_count);
-}
-
-inline sf_count_t SndfileHandle::readRaw(void *ptr, sf_count_t bytes)
-{
-	return sf_read_raw(p->sf, ptr, bytes);
-}
-
-inline sf_count_t SndfileHandle::writeRaw(const void *ptr, sf_count_t bytes)
-{
-	return sf_write_raw(p->sf, ptr, bytes);
-}
-
-inline SNDFILE *SndfileHandle::rawHandle(void)
-{
-	return (p ? p->sf : NULL);
-}
-
-inline SNDFILE *SndfileHandle::takeOwnership(void)
-{
-	if (p == NULL || (p->ref != 1))
-		return NULL;
-
-	SNDFILE *sf = p->sf;
-	p->sf = NULL;
-	delete p;
-	p = NULL;
-	return sf;
-}
-
-#if (defined(_WIN32) || defined(__CYGWIN__))
-
-inline SndfileHandle::SndfileHandle(const wchar_t *wpath, SF_FILEMODE mode, int fmt, int chans, int srate)
-	: p(NULL)
-{
-	p = new (std::nothrow) SNDFILE_ref();
-
-	if (p != NULL)
-	{
-		p->ref = 1;
-
-		p->sfinfo.frames = 0;
-		p->sfinfo.channels = chans;
-		p->sfinfo.format = fmt;
-		p->sfinfo.samplerate = srate;
-		p->sfinfo.sections = 0;
-		p->sfinfo.seekable = 0;
-
-		sf_wchar_open(wpath, mode, &p->sfinfo, &p->sf);
-	};
-
-	return;
-} /* SndfileHandle const wchar_t * constructor */
-
-#endif
-
-}

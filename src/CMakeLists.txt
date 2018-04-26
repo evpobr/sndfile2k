@@ -258,3 +258,46 @@ if(ENABLE_PKGCONFIG_FILE)
       COMPONENT DEV
     )
   endif()
+
+
+  ### test_main
+
+add_executable(test_main
+  test_main.cpp
+  test_main.h
+  test_conversions.cpp
+  test_float.cpp
+  test_endswap.cpp
+  test_audio_detect.cpp
+  test_log_printf.cpp
+  test_file_io.cpp
+  test_ima_oki_adpcm.cpp
+  test_strncpy_crlf.cpp
+  test_binheader_writef.cpp
+  test_nms_adpcm.cpp
+  ${libsndfile2k_SOURCES}
+)
+target_include_directories(test_main
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/src>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    $<$<AND:$<BOOL:${HAVE_XIPH_CODECS}>,$<BOOL:${ENABLE_EXPERIMENTAL}>>:${SPEEX_INCLUDE_DIRS}>
+)
+
+target_sources(test_main PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/sndfile2k_export.h)
+target_link_libraries(test_main PRIVATE
+  $<$<BOOL:${LIBM_REQUIRED}>:${M_LIBRARY}>
+  $<$<BOOL:${HAVE_XIPH_CODECS}>:VorbisEnc>
+  $<$<BOOL:${HAVE_XIPH_CODECS}>:FLAC>
+  $<$<AND:$<BOOL:${HAVE_XIPH_CODECS}>,$<BOOL:${ENABLE_EXPERIMENTAL}>>:${SPEEX_LIBRARIES}>
+)
+
+if(MSVC)
+  target_compile_definitions(test_main PRIVATE _USE_MATH_DEFINES)
+endif()
+target_link_libraries(test_main PRIVATE $<$<BOOL:${LIBM_REQUIRED}>:m>)
+
+add_test(NAME test_main COMMAND $<TARGET_FILE:test_main>)

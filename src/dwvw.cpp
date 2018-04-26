@@ -50,32 +50,32 @@ typedef struct
     } b;
 } DWVW_PRIVATE;
 
-static size_t dwvw_read_s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t dwvw_read_i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t dwvw_read_f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t dwvw_read_d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t dwvw_read_s(SndFile *psf, short *ptr, size_t len);
+static size_t dwvw_read_i(SndFile *psf, int *ptr, size_t len);
+static size_t dwvw_read_f(SndFile *psf, float *ptr, size_t len);
+static size_t dwvw_read_d(SndFile *psf, double *ptr, size_t len);
 
-static size_t dwvw_write_s(SF_PRIVATE *psf, const short *ptr, size_t len);
-static size_t dwvw_write_i(SF_PRIVATE *psf, const int *ptr, size_t len);
-static size_t dwvw_write_f(SF_PRIVATE *psf, const float *ptr, size_t len);
-static size_t dwvw_write_d(SF_PRIVATE *psf, const double *ptr, size_t len);
+static size_t dwvw_write_s(SndFile *psf, const short *ptr, size_t len);
+static size_t dwvw_write_i(SndFile *psf, const int *ptr, size_t len);
+static size_t dwvw_write_f(SndFile *psf, const float *ptr, size_t len);
+static size_t dwvw_write_d(SndFile *psf, const double *ptr, size_t len);
 
-static sf_count_t dwvw_seek(SF_PRIVATE *psf, int mode, sf_count_t offset);
-static int dwvw_close(SF_PRIVATE *psf);
-static int dwvw_byterate(SF_PRIVATE *psf);
+static sf_count_t dwvw_seek(SndFile *psf, int mode, sf_count_t offset);
+static int dwvw_close(SndFile *psf);
+static int dwvw_byterate(SndFile *psf);
 
-static size_t dwvw_decode_data(SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int *ptr, size_t len);
-static int dwvw_decode_load_bits(SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int bit_count);
+static size_t dwvw_decode_data(SndFile *psf, DWVW_PRIVATE *pdwvw, int *ptr, size_t len);
+static int dwvw_decode_load_bits(SndFile *psf, DWVW_PRIVATE *pdwvw, int bit_count);
 
-static size_t dwvw_encode_data(SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, const int *ptr, size_t len);
-static void dwvw_encode_store_bits(SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int data, int new_bits);
+static size_t dwvw_encode_data(SndFile *psf, DWVW_PRIVATE *pdwvw, const int *ptr, size_t len);
+static void dwvw_encode_store_bits(SndFile *psf, DWVW_PRIVATE *pdwvw, int data, int new_bits);
 static void dwvw_read_reset(DWVW_PRIVATE *pdwvw);
 
 /*
  * DWVW initialisation function.
  */
 
-int dwvw_init(SF_PRIVATE *psf, int bitwidth)
+int dwvw_init(SndFile *psf, int bitwidth)
 {
     DWVW_PRIVATE *pdwvw;
 
@@ -127,7 +127,7 @@ int dwvw_init(SF_PRIVATE *psf, int bitwidth)
     return 0;
 }
 
-static int dwvw_close(SF_PRIVATE *psf)
+static int dwvw_close(SndFile *psf)
 {
     DWVW_PRIVATE *pdwvw;
 
@@ -152,7 +152,7 @@ static int dwvw_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static sf_count_t dwvw_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offset)
+static sf_count_t dwvw_seek(SndFile *psf, int UNUSED(mode), sf_count_t offset)
 {
     DWVW_PRIVATE *pdwvw;
 
@@ -175,7 +175,7 @@ static sf_count_t dwvw_seek(SF_PRIVATE *psf, int UNUSED(mode), sf_count_t offset
     return PSF_SEEK_ERROR;
 }
 
-static int dwvw_byterate(SF_PRIVATE *psf)
+static int dwvw_byterate(SndFile *psf)
 {
     if (psf->m_mode == SFM_READ)
         return (psf->m_datalength * psf->sf.samplerate) / psf->sf.frames;
@@ -183,7 +183,7 @@ static int dwvw_byterate(SF_PRIVATE *psf)
     return -1;
 }
 
-static size_t dwvw_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t dwvw_read_s(SndFile *psf, short *ptr, size_t len)
 {
     DWVW_PRIVATE *pdwvw;
     BUF_UNION ubuf;
@@ -213,7 +213,7 @@ static size_t dwvw_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t dwvw_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t dwvw_read_i(SndFile *psf, int *ptr, size_t len)
 {
     DWVW_PRIVATE *pdwvw;
     size_t readcount, count;
@@ -239,7 +239,7 @@ static size_t dwvw_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t dwvw_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t dwvw_read_f(SndFile *psf, float *ptr, size_t len)
 {
     DWVW_PRIVATE *pdwvw;
     BUF_UNION ubuf;
@@ -272,7 +272,7 @@ static size_t dwvw_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t dwvw_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t dwvw_read_d(SndFile *psf, double *ptr, size_t len)
 {
     DWVW_PRIVATE *pdwvw;
     BUF_UNION ubuf;
@@ -305,7 +305,7 @@ static size_t dwvw_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static size_t dwvw_decode_data(SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int *ptr, size_t len)
+static size_t dwvw_decode_data(SndFile *psf, DWVW_PRIVATE *pdwvw, int *ptr, size_t len)
 {
     size_t count;
     int delta_width_modifier, delta_width, delta_negative, delta, sample;
@@ -364,7 +364,7 @@ static size_t dwvw_decode_data(SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int *ptr, s
     return count;
 }
 
-static int dwvw_decode_load_bits(SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int bit_count)
+static int dwvw_decode_load_bits(SndFile *psf, DWVW_PRIVATE *pdwvw, int bit_count)
 {
     int output = 0, get_dwm = SF_FALSE;
 
@@ -436,7 +436,7 @@ static void dwvw_read_reset(DWVW_PRIVATE *pdwvw)
     pdwvw->span = 1 << bitwidth;
 }
 
-static void dwvw_encode_store_bits(SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int data, int new_bits)
+static void dwvw_encode_store_bits(SndFile *psf, DWVW_PRIVATE *pdwvw, int data, int new_bits)
 {
     int byte;
 
@@ -499,7 +499,7 @@ static void dump_bits(DWVW_PRIVATE *pdwvw)
         };                    \
     };
 
-static size_t dwvw_encode_data(SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, const int *ptr, size_t len)
+static size_t dwvw_encode_data(SndFile *psf, DWVW_PRIVATE *pdwvw, const int *ptr, size_t len)
 {
     size_t count;
     int delta_width_modifier, delta, delta_negative, delta_width, extra_bit;
@@ -580,7 +580,7 @@ static size_t dwvw_encode_data(SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, const int *
     return count;
 }
 
-static size_t dwvw_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
+static size_t dwvw_write_s(SndFile *psf, const short *ptr, size_t len)
 {
     DWVW_PRIVATE *pdwvw;
     BUF_UNION ubuf;
@@ -610,7 +610,7 @@ static size_t dwvw_write_s(SF_PRIVATE *psf, const short *ptr, size_t len)
     return total;
 }
 
-static size_t dwvw_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
+static size_t dwvw_write_i(SndFile *psf, const int *ptr, size_t len)
 {
     DWVW_PRIVATE *pdwvw;
     size_t writecount, count;
@@ -636,7 +636,7 @@ static size_t dwvw_write_i(SF_PRIVATE *psf, const int *ptr, size_t len)
     return total;
 }
 
-static size_t dwvw_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
+static size_t dwvw_write_f(SndFile *psf, const float *ptr, size_t len)
 {
     DWVW_PRIVATE *pdwvw;
     BUF_UNION ubuf;
@@ -669,7 +669,7 @@ static size_t dwvw_write_f(SF_PRIVATE *psf, const float *ptr, size_t len)
     return total;
 }
 
-static size_t dwvw_write_d(SF_PRIVATE *psf, const double *ptr, size_t len)
+static size_t dwvw_write_d(SndFile *psf, const double *ptr, size_t len)
 {
     DWVW_PRIVATE *pdwvw;
     BUF_UNION ubuf;
