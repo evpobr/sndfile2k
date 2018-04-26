@@ -31,6 +31,8 @@
 
 #include "utils.h"
 
+#include "ref_ptr.h"
+
 static void vio_test(const char *fname, int format);
 
 int main(void)
@@ -46,96 +48,113 @@ int main(void)
 /*==============================================================================
 */
 
-typedef struct
+bool flush_done = false;
+
+class MemoryStream: public SF_STREAM
 {
-    sf_count_t offset, length;
-    unsigned char data[16 * 1024];
-} VIO_DATA;
+    unsigned long m_ref = 0;
 
-static sf_count_t vfget_filelen(void *user_data)
-{
-    VIO_DATA *vf = (VIO_DATA *)user_data;
+    sf_count_t m_offset = 0;
+    sf_count_t m_length = 0;
+    unsigned char m_data[16 * 1024] = {0};
 
-    return vf->length;
-} /* vfget_filelen */
+public:
 
-static sf_count_t vfseek(void *user_data, sf_count_t offset, int whence)
-{
-    VIO_DATA *vf = (VIO_DATA *)user_data;
-
-    switch (whence)
+    unsigned long ref() override
     {
-    case SEEK_SET:
-        vf->offset = offset;
-        break;
+        unsigned long ref_counter = 0;
 
-    case SEEK_CUR:
-        vf->offset = vf->offset + offset;
-        break;
+        ref_counter = ++m_ref;
 
-    case SEEK_END:
-        vf->offset = vf->length + offset;
-        break;
-    default:
-        break;
-    };
+        return ref_counter;
+    }
 
-    return vf->offset;
-} /* vfseek */
+    void unref() override
+    {
+        m_ref--;
+        if (m_ref == 0)
+            delete this;
+    }
 
-static sf_count_t vfread(void *user_data, void *ptr, sf_count_t count)
-{
-    VIO_DATA *vf = (VIO_DATA *)user_data;
+    sf_count_t get_filelen() override
+    {
+        return m_length;
+    }
 
-    /*
-	**	This will brack badly for files over 2Gig in length, but
-	**	is sufficient for testing.
-	*/
-    if (vf->offset + count > vf->length)
-        count = vf->length - vf->offset;
+    sf_count_t seek(sf_count_t offset, int whence) override
+    {
+        switch (whence)
+        {
+        case SEEK_SET:
+            m_offset = offset;
+            break;
 
-    memcpy(ptr, vf->data + vf->offset, count);
-    vf->offset += count;
+        case SEEK_CUR:
+            m_offset = m_offset + offset;
+            break;
 
-    return count;
-} /* vfread */
+        case SEEK_END:
+            m_offset = m_length + offset;
+            break;
+        default:
+            break;
+        };
 
-static sf_count_t vfwrite(void *user_data, const void *ptr, sf_count_t count)
-{
-    VIO_DATA *vf = (VIO_DATA *)user_data;
+        return m_offset;
+    }
 
-    /*
-	**	This will break badly for files over 2Gig in length, but
-	**	is sufficient for testing.
-	*/
-    if (vf->offset >= SIGNED_SIZEOF(vf->data))
+    sf_count_t read(void *ptr, sf_count_t count) override
+    {
+        /*
+        **	This will brack badly for files over 2Gig in length, but
+        **	is sufficient for testing.
+        */
+        if (m_offset + count > m_length)
+            count = m_length - m_offset;
+
+        memcpy(ptr, m_data + m_offset, count);
+        m_offset += count;
+
+        return count;
+    }
+
+    sf_count_t write(const void *ptr, sf_count_t count) override
+    {
+        /*
+        **	This will break badly for files over 2Gig in length, but
+        **	is sufficient for testing.
+        */
+        if (m_offset >= SIGNED_SIZEOF(m_data))
+            return 0;
+
+        if (m_offset + count > SIGNED_SIZEOF(m_data))
+            count = sizeof(m_data) - m_offset;
+
+        memcpy(m_data + m_offset, ptr, (size_t)count);
+        m_offset += count;
+
+        if (m_offset > m_length)
+            m_length = m_offset;
+
+        return count;
+    }
+
+    sf_count_t tell() override
+    {
+        return m_offset;
+    }
+
+    void flush() override
+    {
+        flush_done = true;
+    }
+
+    int set_filelen(sf_count_t len) override
+    {
         return 0;
+    }
 
-    if (vf->offset + count > SIGNED_SIZEOF(vf->data))
-        count = sizeof(vf->data) - vf->offset;
-
-    memcpy(vf->data + vf->offset, ptr, (size_t)count);
-    vf->offset += count;
-
-    if (vf->offset > vf->length)
-        vf->length = vf->offset;
-
-    return count;
-} /* vfwrite */
-
-static sf_count_t vftell(void *user_data)
-{
-    VIO_DATA *vf = (VIO_DATA *)user_data;
-
-    return vf->offset;
-} /* vftell */
-
-int flush_done = 0;
-
-static void vflush(void *user_data)
-{
-    flush_done = 1;
-}
+};
 
 /*==============================================================================
 */
@@ -166,36 +185,25 @@ static void check_short_data(short *data, int len, int start, int line)
 
 static void vio_test(const char *fname, int format)
 {
-    static VIO_DATA vio_data;
     static short data[256];
 
-    SF_VIRTUAL_IO vio;
+    sf::ref_ptr<SF_STREAM> vio;
     SNDFILE *file;
     SF_INFO sfinfo;
 
     print_test_name("virtual i/o test", fname);
-
-    /* Set up pointers to the locally defined functions. */
-    vio.get_filelen = vfget_filelen;
-    vio.set_filelen = nullptr;
-    vio.seek = vfseek;
-    vio.read = vfread;
-    vio.write = vfwrite;
-    vio.tell = vftell;
-    vio.flush = vflush;
-    vio.ref = nullptr;
-    vio.unref = nullptr;
-
-    /* Set virtual file offset and length to zero. */
-    vio_data.offset = 0;
-    vio_data.length = 0;
 
     memset(&sfinfo, 0, sizeof(sfinfo));
     sfinfo.format = format;
     sfinfo.channels = 2;
     sfinfo.samplerate = 44100;
 
-    if (sf_open_virtual(&vio, SFM_WRITE, &sfinfo, &vio_data, &file) != SF_ERR_NO_ERROR)
+    MemoryStream *ms = new MemoryStream();
+    vio.copy(ms);
+    vio->ref();
+
+    int error = sf_open_stream(vio.get(), SFM_WRITE, &sfinfo, &file);
+    if (error != SF_ERR_NO_ERROR)
     {
         printf("\n\nLine %d : sf_open_write failed with error : ", __LINE__);
         fflush(stdout);
@@ -203,7 +211,7 @@ static void vio_test(const char *fname, int format)
         exit(1);
     };
 
-    if (vfget_filelen(&vio_data) < 0)
+    if (vio->get_filelen() < 0)
     {
         printf("\n\nLine %d : vfget_filelen returned negative length.\n\n",
                __LINE__);
@@ -227,17 +235,16 @@ static void vio_test(const char *fname, int format)
 
 
     /* Now test read. */
+    vio->seek(SF_SEEK_SET, 0);
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    vio_data.offset = 0;
-
-    if (sf_open_virtual(&vio, SFM_READ, &sfinfo, &vio_data, &file) != SF_ERR_NO_ERROR)
+    error = sf_open_stream(vio.get(), SFM_READ, &sfinfo, &file);
+    if (error != SF_ERR_NO_ERROR)
     {
         printf("\n\nLine %d : sf_open_write failed with error : ", __LINE__);
         fflush(stdout);
         puts(sf_strerror(NULL));
 
-        dump_data_to_file(fname, vio_data.data, vio_data.length);
         exit(1);
     };
 
@@ -251,6 +258,7 @@ static void vio_test(const char *fname, int format)
     check_short_data(data, ARRAY_LEN(data), 2, __LINE__);
 
     sf_close(file);
+    vio->unref();
 
     puts("ok");
 } /* vio_test */

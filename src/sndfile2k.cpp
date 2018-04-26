@@ -544,65 +544,255 @@ int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sndfi
     };
 }
 
-int sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data, SNDFILE **sndfile)
+int sf_open_stream(SF_STREAM *stream, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sndfile)
 {
- //   if (!sndfile)
- //   {
- //       sf_errno = SFE_BAD_FILE_PTR;
- //       return sf_errno;
- //   }
+    if (!stream)
+        return SFE_BAD_FILE_PTR;
+   // Input parameters check
 
- //   *sndfile = nullptr;
+    if (mode != SFM_READ && mode != SFM_WRITE && mode != SFM_RDWR)
+    {
+        sf_errno = SFE_BAD_OPEN_MODE;
+        return sf_errno;
+    };
 
-	//SF_PRIVATE *psf;
+    if (!sfinfo)
+    {
+        sf_errno = SFE_BAD_SF_INFO_PTR;
+        return sf_errno;
+    };
 
-	///* Make sure we have a valid set ot virtual pointers. */
-	//if (sfvirtual->get_filelen == NULL || sfvirtual->seek == NULL || sfvirtual->tell == NULL)
-	//{
-	//	sf_errno = SFE_BAD_VIRTUAL_IO;
-	//	snprintf(sf_parselog, sizeof(sf_parselog),
-	//			 "Bad vio_get_filelen / "
-	//			 "vio_seek / vio_tell in "
-	//			 "SF_VIRTUAL_IO struct.\n");
-	//	return NULL;
-	//};
+    if (!sndfile)
+    {
+        sf_errno = SFE_BAD_FILE_PTR;
+        return sf_errno;
+    }
+    *sndfile = nullptr;
 
-	//if ((mode == SFM_READ || mode == SFM_RDWR) && sfvirtual->read == NULL)
-	//{
-	//	sf_errno = SFE_BAD_VIRTUAL_IO;
-	//	snprintf(sf_parselog, sizeof(sf_parselog), "Bad vio_read in SF_VIRTUAL_IO struct.\n");
-	//	return NULL;
-	//};
+    // Handle open modes
 
-	//if ((mode == SFM_WRITE || mode == SFM_RDWR) && sfvirtual->write == NULL)
-	//{
-	//	sf_errno = SFE_BAD_VIRTUAL_IO;
-	//	snprintf(sf_parselog, sizeof(sf_parselog), "Bad vio_write in SF_VIRTUAL_IO struct.\n");
-	//	return NULL;
-	//};
+    // Read mode
+    if (mode == SFM_READ)
+    {
+        // For RAW files sfinfo parameter must be properly set
+        if ((SF_CONTAINER(sfinfo->format)) == SF_FORMAT_RAW)
+        {
+            if (sf_format_check(sfinfo) == 0)
+            {
+                sf_errno = SFE_RAW_BAD_FORMAT;
+                return sf_errno;
+            };
+        }
+        // For any other format in read mode sfinfo parameter is
+        // ignored, set its fields to zero.
+        else
+        {
+            memset(sfinfo, 0, sizeof(SF_INFO));
+        }
+    };
+    
+    SndFile *psf = nullptr;
+    try
+    {
+        psf = new SndFile();
 
-	//if ((psf = psf_allocate()) == NULL)
-	//{
-	//	sf_errno = SFE_MALLOC_FAILED;
-	//	return NULL;
-	//};
+        sf::ref_ptr<SF_STREAM> s;
+        s.copy(stream);
 
-	//psf->vio = sfvirtual;
+        // Need this to detect if we create new file (filelength = 0).
+        sf_count_t filelength = s->get_filelen();
 
-	//psf->vio_user_data = user_data;
+        if (mode == SFM_WRITE || (mode == SFM_RDWR && filelength == 0))
+        {
+            // If the file is being opened for write or RDWR and the file is currently
+            // empty, then the SF_INFO struct must contain valid data.
+            if ((SF_CONTAINER(sfinfo->format)) == 0)
+                throw sf::sndfile_error(SFE_ZERO_MAJOR_FORMAT);
 
-	//psf->file_mode = mode;
+            if ((SF_CODEC(sfinfo->format)) == 0)
+                throw sf::sndfile_error(SFE_ZERO_MINOR_FORMAT);
 
- //   if (psf->open_file(sfinfo))
- //   {
- //       *sndfile = psf;
- //       return SF_ERR_NO_ERROR;
- //   }
- //   else
- //   {
- //       return sf_errno;
- //   }
-    return SFE_BAD_FILE_PTR;
+            if (sf_format_check(sfinfo) == 0)
+                throw sf::sndfile_error(SFE_BAD_OPEN_FORMAT);
+        }
+        else if ((SF_CONTAINER(sfinfo->format)) != SF_FORMAT_RAW)
+        {
+            // If type RAW has not been specified then need to figure out file type.
+            if (!guess_file_type(s, sfinfo))
+            {
+                throw sf::sndfile_error(SFE_BAD_OPEN_FORMAT);
+            }
+        };
+
+        // Here we have format detected
+
+            //psf = new SF_PRIVATE(&file->vio, mode, sfinfo, reinterpret_cast<void *>(file));
+
+        psf->open(s, mode, sfinfo);
+        if (!psf->is_open())
+            throw sf::sndfile_error(psf->m_error);
+
+        int error = SFE_NO_ERROR;
+        /* Call the initialisation function for the relevant file type. */
+        switch (SF_CONTAINER(psf->sf.format))
+        {
+        case SF_FORMAT_WAV:
+        case SF_FORMAT_WAVEX:
+            error = wav_open(psf);
+            break;
+
+        case SF_FORMAT_AIFF:
+            error = aiff_open(psf);
+            break;
+
+        case SF_FORMAT_AU:
+            error = au_open(psf);
+            break;
+
+        case SF_FORMAT_RAW:
+            error = raw_open(psf);
+            break;
+
+        case SF_FORMAT_W64:
+            error = w64_open(psf);
+            break;
+
+        case SF_FORMAT_RF64:
+            error = rf64_open(psf);
+            break;
+
+        case SF_FORMAT_PAF:
+            error = paf_open(psf);
+            break;
+
+        case SF_FORMAT_SVX:
+            error = svx_open(psf);
+            break;
+
+        case SF_FORMAT_NIST:
+            error = nist_open(psf);
+            break;
+
+        case SF_FORMAT_IRCAM:
+            error = ircam_open(psf);
+            break;
+
+        case SF_FORMAT_VOC:
+            error = voc_open(psf);
+            break;
+
+        case SF_FORMAT_SDS:
+            error = sds_open(psf);
+            break;
+
+        case SF_FORMAT_OGG:
+            error = ogg_open(psf);
+            break;
+
+        case SF_FORMAT_TXW:
+            error = txw_open(psf);
+            break;
+
+        case SF_FORMAT_WVE:
+            error = wve_open(psf);
+            break;
+
+        case SF_FORMAT_DWD:
+            error = dwd_open(psf);
+            break;
+
+        case SF_FORMAT_MAT4:
+            error = mat4_open(psf);
+            break;
+
+        case SF_FORMAT_MAT5:
+            error = mat5_open(psf);
+            break;
+
+        case SF_FORMAT_PVF:
+            error = pvf_open(psf);
+            break;
+
+        case SF_FORMAT_XI:
+            error = xi_open(psf);
+            break;
+
+        case SF_FORMAT_HTK:
+            error = htk_open(psf);
+            break;
+
+        case SF_FORMAT_REX2:
+            error = rx2_open(psf);
+            break;
+
+        case SF_FORMAT_AVR:
+            error = avr_open(psf);
+            break;
+
+        case SF_FORMAT_FLAC:
+            error = flac_open(psf);
+            break;
+
+        case SF_FORMAT_CAF:
+            error = caf_open(psf);
+            break;
+
+        case SF_FORMAT_MPC2K:
+            error = mpc2k_open(psf);
+            break;
+
+        default:
+            error = SF_ERR_UNRECOGNISED_FORMAT;
+        };
+
+        if (error != SFE_NO_ERROR)
+            throw sf::sndfile_error(error);
+
+        if (mode == SFM_RDWR && sf_format_check(&psf->sf) == 0)
+            throw sf::sndfile_error(SFE_BAD_MODE_RW);
+
+        if (validate_sfinfo(&psf->sf) == 0)
+        {
+            psf->log_SF_INFO();
+            save_header_info(psf);
+            throw sf::sndfile_error(SFE_BAD_SF_INFO);
+        };
+
+        if (validate_psf(psf) == 0)
+        {
+            save_header_info(psf);
+            throw sf::sndfile_error(SFE_INTERNAL);
+        };
+
+        psf->m_read_current = 0;
+        psf->m_write_current = 0;
+        if (mode == SFM_RDWR)
+        {
+            psf->m_write_current = psf->sf.frames;
+            psf->m_have_written = psf->sf.frames > 0 ? true : false;
+        };
+
+        memcpy(sfinfo, &psf->sf, sizeof(SF_INFO));
+
+        if (mode == SFM_WRITE)
+        {
+            /* Zero out these fields. */
+            sfinfo->frames = 0;
+            sfinfo->sections = 0;
+            sfinfo->seekable = 0;
+        };
+
+        *sndfile = static_cast<SNDFILE *>(psf);
+        psf->ref();
+
+        return SF_ERR_NO_ERROR;
+    }
+    catch (sf::sndfile_error &e)
+    {
+        delete psf;
+
+        return e.error();
+    };
 } /* sf_open_virtual */
 
 int sf_close(SNDFILE *sndfile)

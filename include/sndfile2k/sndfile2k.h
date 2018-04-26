@@ -1139,6 +1139,27 @@ typedef struct SF_LOOP_INFO
     int future[6];
 } SF_LOOP_INFO;
 
+#ifdef __cplusplus
+
+struct SF_OBJECT
+{
+    virtual unsigned long ref() = 0;
+    virtual void unref() = 0;
+};
+
+struct SF_STREAM: public SF_OBJECT
+{
+    virtual sf_count_t get_filelen() = 0;
+    virtual sf_count_t seek(sf_count_t offset, int whence) = 0;
+    virtual sf_count_t read(void *ptr, sf_count_t count) = 0;
+    virtual sf_count_t write(const void *ptr, sf_count_t count) = 0;
+    virtual sf_count_t tell() = 0;
+    virtual void flush() = 0;
+    virtual int set_filelen(sf_count_t len) = 0;
+};
+
+#else
+
 /** Type of user defined function that increases reference count
  *
  * @param[in] user_data User defined value.
@@ -1263,27 +1284,6 @@ typedef struct SF_VIRTUAL_IO
 	sf_vio_set_filelen set_filelen;
 } SF_VIRTUAL_IO;
 
-#ifdef __cplusplus
-
-struct SF_OBJECT
-{
-    virtual unsigned long ref() = 0;
-    virtual void unref() = 0;
-};
-
-struct SF_STREAM: public SF_OBJECT
-{
-    virtual sf_count_t get_filelen() = 0;
-    virtual sf_count_t seek(sf_count_t offset, int whence) = 0;
-    virtual sf_count_t read(void *ptr, sf_count_t count) = 0;
-    virtual sf_count_t write(const void *ptr, sf_count_t count) = 0;
-    virtual sf_count_t tell() = 0;
-    virtual void flush() = 0;
-    virtual int set_filelen(sf_count_t len) = 0;
-};
-
-#else
-
 typedef struct SF_STREAM
 {
     SF_VIRTUAL_IO *vio;
@@ -1373,7 +1373,7 @@ SNDFILE2K_EXPORT int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo
  * @sa sf_open(), sf_wchar_open()
  * @sa sf_close()
  */
-SNDFILE2K_EXPORT int sf_open_virtual(SF_VIRTUAL_IO *sfvirtual, SF_FILEMODE mode, SF_INFO *sfinfo, void *user_data, SNDFILE **sndfile);
+SNDFILE2K_EXPORT int sf_open_stream(SF_STREAM *stream, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sndfile);
 
 /** @}*/
 

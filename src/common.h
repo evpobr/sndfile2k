@@ -839,7 +839,6 @@ int macos_guess_file_type(SndFile *psf, const char *filename);
 
 static void psf_log_syserr(SndFile *psf, int error);
 
-SF_VIRTUAL_IO *psf_get_vio();
 int psf_open_file_stream(const char *filename, SF_FILEMODE mode, SF_STREAM **stream);
 #ifdef _WIN32
 int psf_open_file_stream(const wchar_t *filename, SF_FILEMODE mode, SF_STREAM **stream);
