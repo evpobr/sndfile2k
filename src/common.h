@@ -309,6 +309,18 @@ typedef union
 struct DITHER_DATA;
 struct INTERLEAVE_DATA;
 
+struct parselog_buffer
+{
+    char buf[SF_PARSELOG_LEN];
+    int indx;
+};
+
+struct header_storage
+{
+    unsigned char *ptr;
+    sf_count_t indx, end, len;
+};
+
 class SndFile: public ISndFile
 {
 public:
@@ -370,14 +382,6 @@ public:
 
     ~SndFile();
 
-    /* Canary in a coal mine. */
-    union canary
-    {
-        /* Place a double here to encourage double alignment. */
-        double d[2];
-        char c[16];
-    } m_canary = {0};
-
     char m_path[FILENAME_MAX] = {0};
     SF_FILEMODE m_mode = SFM_READ;
     sf::ref_ptr<SF_STREAM> m_stream;
@@ -387,17 +391,9 @@ public:
     /* parselog and indx should only be changed within the logging functions
 	** of common.c
 	*/
-    struct parselog_buffer
-    {
-        char buf[SF_PARSELOG_LEN];
-        int indx;
-    } m_parselog = {0};
+    parselog_buffer m_parselog = {0};
 
-    struct header_storage
-    {
-        unsigned char *ptr;
-        sf_count_t indx, end, len;
-    } m_header = {0};
+    header_storage m_header = {0};
 
     int m_rwf_endian = SF_ENDIAN_LITTLE; /* Header endian-ness flag. */
 
