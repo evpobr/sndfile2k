@@ -3572,7 +3572,8 @@ sf_count_t SndFile::writeRaw(const void *ptr, sf_count_t bytes)
 
     if (!m_have_written && write_header)
     {
-        if (m_error = write_header(this, SF_FALSE))
+        m_error = write_header(this, SF_FALSE);
+        if (m_error != SFE_NO_ERROR)
             return 0;
     };
     m_have_written = true;
