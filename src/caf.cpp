@@ -160,7 +160,7 @@ int caf_open(SndFile *psf)
         if (psf->m_mode == SFM_WRITE &&
             (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
         {
-            psf->m_peak_info = std::make_unique<PEAK_INFO>(psf->sf.channels);
+            psf->m_peak_info = std::unique_ptr<PEAK_INFO>(new PEAK_INFO(psf->sf.channels));
         };
 
         if ((error = caf_write_header(psf, SF_FALSE)) != 0)
@@ -437,7 +437,7 @@ static int caf_read_header(SndFile *psf)
                 return SFE_CAF_BAD_PEAK;
             };
 
-            psf->m_peak_info = std::make_unique<PEAK_INFO>(psf->sf.channels);
+            psf->m_peak_info = std::unique_ptr<PEAK_INFO>(new PEAK_INFO(psf->sf.channels));
 
             /* read in rest of PEAK chunk. */
             psf->binheader_readf("E4", &(psf->m_peak_info->edit_number));

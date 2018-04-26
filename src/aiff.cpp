@@ -280,7 +280,7 @@ int aiff_open(SndFile *psf)
         if (psf->m_mode == SFM_WRITE &&
             (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
         {
-            psf->m_peak_info = std::make_unique<PEAK_INFO>(psf->sf.channels);
+            psf->m_peak_info = std::unique_ptr<PEAK_INFO>(new PEAK_INFO(psf->sf.channels));
         };
 
         if (psf->m_mode != SFM_RDWR || psf->m_filelength < 40)
@@ -522,7 +522,7 @@ static int aiff_read_header(SndFile *psf, struct COMM_CHUNK *comm_fmt)
                 return SFE_WAV_BAD_PEAK;
             };
 
-            psf->m_peak_info = std::make_unique<PEAK_INFO>(psf->sf.channels);
+            psf->m_peak_info = std::unique_ptr<PEAK_INFO>(new PEAK_INFO(psf->sf.channels));
 
             /* read in rest of PEAK chunk. */
             psf->binheader_readf("E44", &(psf->m_peak_info->version),

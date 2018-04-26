@@ -201,7 +201,7 @@ int wav_open(SndFile *psf)
         if (psf->m_mode == SFM_WRITE &&
             (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
         {
-            psf->m_peak_info = std::make_unique<PEAK_INFO>(psf->sf.channels);
+            psf->m_peak_info = std::unique_ptr<PEAK_INFO>(new PEAK_INFO(psf->sf.channels));
         };
 
         psf->write_header = wav_write_header;

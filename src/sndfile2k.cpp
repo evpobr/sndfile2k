@@ -2039,7 +2039,7 @@ int SndFile::command(int command, void *data, int datasize)
     }
     else if (!m_peak_info)
     {
-        m_peak_info = std::make_unique<PEAK_INFO>(sf.channels);
+        m_peak_info = std::unique_ptr<PEAK_INFO>(new PEAK_INFO(sf.channels));
     };
 
     if (write_header)

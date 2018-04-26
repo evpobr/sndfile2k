@@ -67,7 +67,7 @@ static void conversion_test(char endian)
     print_test_name(test_name);
 
     SF_INFO sfinfo = { 0 };
-    psf = std::make_unique<SndFile>();
+    psf = std::unique_ptr<SndFile>(new SndFile());
     if (psf->open(filename, SFM_WRITE, &sfinfo) != 0)
     {
         printf("\n\nError : failed to open file '%s' for write.\n\n", filename);
@@ -79,7 +79,7 @@ static void conversion_test(char endian)
     psf.reset();
 
     sfinfo = { 0 };
-    psf = std::make_unique<SndFile>();
+    psf = std::unique_ptr<SndFile>(new SndFile());
     if (psf->open(filename, SFM_READ, &sfinfo) != 0)
     {
         printf("\n\nError : failed to open file '%s' for read.\n\n", filename);

@@ -1060,7 +1060,7 @@ int wavlike_read_peak_chunk(SndFile *psf, size_t chunk_size)
         return SFE_WAV_BAD_PEAK;
     };
 
-    psf->m_peak_info = std::make_unique<PEAK_INFO>(psf->sf.channels);
+    psf->m_peak_info = std::unique_ptr<PEAK_INFO>(new PEAK_INFO(psf->sf.channels));
 
     /* read in rest of PEAK chunk. */
     psf->binheader_readf("44", &(psf->m_peak_info->version), &(psf->m_peak_info->timestamp));
