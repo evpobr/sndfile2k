@@ -38,4 +38,4 @@ install:
   - true
 
 script:
-  - mkdir cmake-build && (cd cmake-build && cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON && make VERBOSE=1 && ctest -V)
+  - mkdir cmake-build && (cd cmake-build && cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=ON && make VERBOSE=1 && ctest -V)
