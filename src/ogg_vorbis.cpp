@@ -1202,7 +1202,7 @@ static sf_count_t vorbis_length(SndFile *psf)
 
 #else /* HAVE_XIPH_CODECS */
 
-int ogg_vorbis_open(SF_PRIVATE *psf)
+int ogg_vorbis_open(SndFile *psf)
 {
     psf->log_printf("This version of libsndfile was compiled without "
                         "Ogg/Vorbis support.\n");

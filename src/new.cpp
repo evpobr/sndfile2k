@@ -29,7 +29,7 @@
 
 #if (ENABLE_EXPERIMENTAL_CODE == 0)
 
-int new_open(SF_PRIVATE *psf)
+int new_open(SndFile *psf)
 {
     if (psf)
         return SFE_UNIMPLEMENTED;
@@ -50,13 +50,13 @@ int new_open(SF_PRIVATE *psf)
 ** Private static functions.
 */
 
-static int new_read_header(SF_PRIVATE *psf);
+static int new_read_header(SndFile *psf);
 
 /*------------------------------------------------------------------------------
 ** Public function.
 */
 
-int new_open(SF_PRIVATE *psf)
+int new_open(SndFile *psf)
 {
     int subformat, error = 0;
 
@@ -77,7 +77,7 @@ int new_open(SF_PRIVATE *psf)
 /*------------------------------------------------------------------------------
 */
 
-static int new_read_header(SF_PRIVATE *psf)
+static int new_read_header(SndFile *psf)
 {
     int marker;
 

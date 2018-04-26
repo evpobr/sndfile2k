@@ -309,7 +309,7 @@ static sf_count_t psf_get_filelen_fd(int fd)
 #endif
 }
 
-static void psf_log_syserr(SF_PRIVATE *psf, int error)
+static void psf_log_syserr(SndFile *psf, int error)
 {
 	/* Only log an error if no error has been set yet. */
 	if (psf->m_error == 0)

@@ -73,7 +73,7 @@ static ErrorStruct SndfileErrors[] = {
     {SFE_OPEN_FAILED, "Could not open file."},
     {SFE_BAD_SNDFILE_PTR, "Not a valid SNDFILE* pointer."},
     {SFE_BAD_SF_INFO_PTR, "NULL SF_INFO pointer passed to libsndfile."},
-    {SFE_BAD_SF_INCOMPLETE, "SF_PRIVATE struct incomplete and end of header parsing."},
+    {SFE_BAD_SF_INCOMPLETE, "SndFile class incomplete and end of header parsing."},
     {SFE_BAD_FILE_PTR, "Bad FILE pointer."},
     {SFE_BAD_INT_PTR, "Internal error, Bad pointer."},
     {SFE_BAD_STAT_SIZE, "Error : software was misconfigured at compile time "
@@ -373,8 +373,6 @@ int sf_open(const char *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE **sndfi
 
         // Here we have format detected
 
-            //psf = new SF_PRIVATE(&file->vio, mode, sfinfo, reinterpret_cast<void *>(file));
-
         psf->log_printf("File : %s\n", path);
         strcpy(psf->m_path, path);
 
@@ -625,8 +623,6 @@ int sf_open_stream(SF_STREAM *stream, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFILE
         };
 
         // Here we have format detected
-
-            //psf = new SF_PRIVATE(&file->vio, mode, sfinfo, reinterpret_cast<void *>(file));
 
         psf->open(s, mode, sfinfo);
         if (!psf->is_open())
@@ -1780,17 +1776,17 @@ int validate_psf(SndFile *psf)
 {
     if (psf->m_datalength < 0)
     {
-        psf->log_printf("Invalid SF_PRIVATE field : datalength == %D.\n", psf->m_datalength);
+        psf->log_printf("Invalid SndFile field : m_datalength == %D.\n", psf->m_datalength);
         return 0;
     };
     if (psf->m_dataoffset < 0)
     {
-        psf->log_printf("Invalid SF_PRIVATE field : dataoffset == %D.\n", psf->m_dataoffset);
+        psf->log_printf("Invalid SndFile field : m_dataoffset == %D.\n", psf->m_dataoffset);
         return 0;
     };
     if (psf->m_blockwidth && psf->m_blockwidth != psf->sf.channels * psf->m_bytewidth)
     {
-        psf->log_printf("Invalid SF_PRIVATE field : channels * bytewidth == %d.\n",
+        psf->log_printf("Invalid SndFile field : sf.channels * m_bytewidth == %d.\n",
                        psf->sf.channels * psf->m_bytewidth);
         return 0;
     };
@@ -1801,329 +1797,6 @@ void save_header_info(SndFile *psf)
 {
     snprintf(sf_parselog, sizeof(sf_parselog), "%s", psf->m_parselog.buf);
 }
-
-//SNDFILE *SF_PRIVATE::open_file(SF_INFO *sfinfo)
-//{
-//    int _error, format;
-//
-//    sf_errno = _error = 0;
-//    sf_parselog[0] = 0;
-//
-//    if (error)
-//    {
-//        _error = error;
-//        goto error_exit;
-//    };
-//
-//    if (file_mode != SFM_READ && file_mode != SFM_WRITE && file_mode != SFM_RDWR)
-//    {
-//        _error = SFE_BAD_OPEN_MODE;
-//        goto error_exit;
-//    };
-//
-//    if (sfinfo == NULL)
-//    {
-//        _error = SFE_BAD_SF_INFO_PTR;
-//        goto error_exit;
-//    };
-//
-//    if (file_mode == SFM_READ)
-//    {
-//        if ((SF_CONTAINER(sfinfo->format)) == SF_FORMAT_RAW)
-//        {
-//            if (sf_format_check(sfinfo) == 0)
-//            {
-//                _error = SFE_RAW_BAD_FORMAT;
-//                goto error_exit;
-//            };
-//        }
-//        else
-//        {
-//            memset(sfinfo, 0, sizeof(SF_INFO));
-//        }
-//    };
-//
-//    memcpy(&sf, sfinfo, sizeof(SF_INFO));
-//
-//    Magick = SNDFILE_MAGICK;
-//    norm_float = SF_TRUE;
-//    norm_double = SF_TRUE;
-//    dataoffset = -1;
-//    datalength = -1;
-//    read_current = -1;
-//    write_current = -1;
-//    auto_header = SF_FALSE;
-//    rwf_endian = SF_ENDIAN_LITTLE;
-//    seek = psf_default_seek;
-//    float_int_mult = 0;
-//    float_max = -1.0;
-//
-//    /* An attempt at a per SF_PRIVATE unique id. */
-//    unique_id = psf_rand_int32();
-//
-//    sf.sections = 1;
-//
-//    sf.seekable = SF_TRUE;
-//
-//        /* File is open, so get the length. */
-//    filelength = get_filelen();
-//
-//    if (filelength == SF_COUNT_MAX)
-//        log_printf("Length : unknown\n");
-//    else
-//        log_printf("Length : %D\n", filelength);
-//
-//    if (file_mode == SFM_WRITE || (file_mode == SFM_RDWR && filelength == 0))
-//    {
-//        /* If the file is being opened for write or RDWR and the file is currently
-//		** empty, then the SF_INFO struct must contain valid data.
-//		*/
-//        if ((SF_CONTAINER(sf.format)) == 0)
-//        {
-//            _error = SFE_ZERO_MAJOR_FORMAT;
-//            goto error_exit;
-//        };
-//        if ((SF_CODEC(sf.format)) == 0)
-//        {
-//            _error = SFE_ZERO_MINOR_FORMAT;
-//            goto error_exit;
-//        };
-//
-//        if (sf_format_check(&sf) == 0)
-//        {
-//            _error = SFE_BAD_OPEN_FORMAT;
-//            goto error_exit;
-//        };
-//    }
-//    else if ((SF_CONTAINER(sf.format)) != SF_FORMAT_RAW)
-//    {
-//        /* If type RAW has not been specified then need to figure out file type. */
-//        sf.format = guess_file_type(this);
-//
-//        if (sf.format == 0)
-//            sf.format = format_from_extension(this);
-//    };
-//
-//    /* Prevent unnecessary seeks */
-//    last_op = file_mode;
-//
-//    /* Set bytewidth if known. */
-//    switch (SF_CODEC(sf.format))
-//    {
-//    case SF_FORMAT_PCM_S8:
-//    case SF_FORMAT_PCM_U8:
-//    case SF_FORMAT_ULAW:
-//    case SF_FORMAT_ALAW:
-//    case SF_FORMAT_DPCM_8:
-//        bytewidth = 1;
-//        break;
-//
-//    case SF_FORMAT_PCM_16:
-//    case SF_FORMAT_DPCM_16:
-//        bytewidth = 2;
-//        break;
-//
-//    case SF_FORMAT_PCM_24:
-//        bytewidth = 3;
-//        break;
-//
-//    case SF_FORMAT_PCM_32:
-//    case SF_FORMAT_FLOAT:
-//        bytewidth = 4;
-//        break;
-//
-//    case SF_FORMAT_DOUBLE:
-//        bytewidth = 8;
-//        break;
-//    };
-//
-//    /* Call the initialisation function for the relevant file type. */
-//    switch (SF_CONTAINER(sf.format))
-//    {
-//    case SF_FORMAT_WAV:
-//    case SF_FORMAT_WAVEX:
-//        _error = wav_open(this);
-//        break;
-//
-//    case SF_FORMAT_AIFF:
-//        _error = aiff_open(this);
-//        break;
-//
-//    case SF_FORMAT_AU:
-//        _error = au_open(this);
-//        break;
-//
-//    case SF_FORMAT_RAW:
-//        _error = raw_open(this);
-//        break;
-//
-//    case SF_FORMAT_W64:
-//        _error = w64_open(this);
-//        break;
-//
-//    case SF_FORMAT_RF64:
-//        _error = rf64_open(this);
-//        break;
-//
-//    /* Lite remove start */
-//    case SF_FORMAT_PAF:
-//        _error = paf_open(this);
-//        break;
-//
-//    case SF_FORMAT_SVX:
-//        _error = svx_open(this);
-//        break;
-//
-//    case SF_FORMAT_NIST:
-//        _error = nist_open(this);
-//        break;
-//
-//    case SF_FORMAT_IRCAM:
-//        _error = ircam_open(this);
-//        break;
-//
-//    case SF_FORMAT_VOC:
-//        _error = voc_open(this);
-//        break;
-//
-//    case SF_FORMAT_SDS:
-//        _error = sds_open(this);
-//        break;
-//
-//    case SF_FORMAT_OGG:
-//        _error = ogg_open(this);
-//        break;
-//
-//    case SF_FORMAT_TXW:
-//        _error = txw_open(this);
-//        break;
-//
-//    case SF_FORMAT_WVE:
-//        _error = wve_open(this);
-//        break;
-//
-//    case SF_FORMAT_DWD:
-//        _error = dwd_open(this);
-//        break;
-//
-//    case SF_FORMAT_MAT4:
-//        _error = mat4_open(this);
-//        break;
-//
-//    case SF_FORMAT_MAT5:
-//        _error = mat5_open(this);
-//        break;
-//
-//    case SF_FORMAT_PVF:
-//        _error = pvf_open(this);
-//        break;
-//
-//    case SF_FORMAT_XI:
-//        _error = xi_open(this);
-//        break;
-//
-//    case SF_FORMAT_HTK:
-//        _error = htk_open(this);
-//        break;
-//
-//    case SF_FORMAT_REX2:
-//        _error = rx2_open(this);
-//        break;
-//
-//    case SF_FORMAT_AVR:
-//        _error = avr_open(this);
-//        break;
-//
-//    case SF_FORMAT_FLAC:
-//        _error = flac_open(this);
-//        break;
-//
-//    case SF_FORMAT_CAF:
-//        _error = caf_open(this);
-//        break;
-//
-//    case SF_FORMAT_MPC2K:
-//        _error = mpc2k_open(this);
-//        break;
-//
-//        /* Lite remove end */
-//
-//    default:
-//        _error = SF_ERR_UNRECOGNISED_FORMAT;
-//    };
-//
-//    if (_error)
-//        goto error_exit;
-//
-//    if (file_mode == SFM_RDWR && sf_format_check(&sf) == 0)
-//    {
-//        _error = SFE_BAD_MODE_RW;
-//        goto error_exit;
-//    };
-//
-//    if (validate_sfinfo(&sf) == 0)
-//    {
-//        log_SF_INFO();
-//        save_header_info(this);
-//        _error = SFE_BAD_SF_INFO;
-//        goto error_exit;
-//    };
-//
-//    if (validate_psf(this) == 0)
-//    {
-//        save_header_info(this);
-//        _error = SFE_INTERNAL;
-//        goto error_exit;
-//    };
-//
-//    read_current = 0;
-//    write_current = 0;
-//    if (file_mode == SFM_RDWR)
-//    {
-//        write_current = sf.frames;
-//        have_written = sf.frames > 0 ? true : false;
-//    };
-//
-//    memcpy(sfinfo, &sf, sizeof(SF_INFO));
-//
-//    if (file_mode == SFM_WRITE)
-//    {
-//        /* Zero out these fields. */
-//        sfinfo->frames = 0;
-//        sfinfo->sections = 0;
-//        sfinfo->seekable = 0;
-//    };
-//
-//    return (SNDFILE *)this;
-//
-//error_exit:
-//    sf_errno = _error;
-//
-//    if (_error == SFE_SYSTEM)
-//        snprintf(sf_syserr, sizeof(sf_syserr), "%s", syserr);
-//    snprintf(sf_parselog, sizeof(sf_parselog), "%s", parselog.buf);
-//
-//    switch (_error)
-//    {
-//    case SF_ERR_SYSTEM:
-//    case SF_ERR_UNSUPPORTED_ENCODING:
-//    case SFE_UNIMPLEMENTED:
-//        break;
-//
-//    case SFE_RAW_BAD_FORMAT:
-//        break;
-//
-//    default:
-//        if (file_mode == SFM_READ)
-//        {
-//            log_printf("Parse error : %s\n", sf_error_number(_error));
-//            _error = SF_ERR_MALFORMED_FILE;
-//        };
-//    };
-//
-//    close();
-//    return NULL;
-//}
 
 /*==============================================================================
 ** Chunk getting and setting.

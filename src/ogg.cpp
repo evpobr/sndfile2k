@@ -271,7 +271,7 @@ static int ogg_page_classify(SndFile *psf, const ogg_page *og)
 
 #else /* HAVE_XIPH_CODECS */
 
-int ogg_open(SF_PRIVATE *psf)
+int ogg_open(SndFile *psf)
 {
     psf->log_printf("This version of libsndfile was compiled without "
                         "Ogg/Vorbis support.\n");

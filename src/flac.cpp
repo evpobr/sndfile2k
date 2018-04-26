@@ -1631,7 +1631,7 @@ static int flac_byterate(SndFile *psf)
 
 #else /* HAVE_XIPH_CODECS */
 
-int flac_open(SF_PRIVATE *psf)
+int flac_open(SndFileE *psf)
 {
     psf->log_printf("This version of libsndfile was compiled without FLAC support.\n");
     return SFE_UNIMPLEMENTED;

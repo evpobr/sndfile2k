@@ -83,7 +83,6 @@ static int ima_close(SndFile *psf);
 static int wavlike_ima_decode_block(SndFile *psf, IMA_ADPCM_PRIVATE *pima);
 static int wavlike_ima_encode_block(SndFile *psf, IMA_ADPCM_PRIVATE *pima);
 
-/*-static int aiff_ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock) ;-*/
 static int aiff_ima_decode_block(SndFile *psf, IMA_ADPCM_PRIVATE *pima);
 static int aiff_ima_encode_block(SndFile *psf, IMA_ADPCM_PRIVATE *pima);
 

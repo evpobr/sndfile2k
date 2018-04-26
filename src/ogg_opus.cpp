@@ -43,10 +43,10 @@ typedef struct
     void *state;
 } OPUS_PRIVATE;
 
-static int ogg_opus_read_header(SF_PRIVATE *psf);
-static int ogg_opus_close(SF_PRIVATE *psf);
+static int ogg_opus_read_header(SndFile *psf);
+static int ogg_opus_close(SndFile *psf);
 
-int ogg_opus_open(SF_PRIVATE *psf)
+int ogg_opus_open(SndFile *psf)
 {
     OGG_PRIVATE *odata = psf->container_data;
     OPUS_PRIVATE *oopus = calloc(1, sizeof(OPUS_PRIVATE));
@@ -120,12 +120,12 @@ int ogg_opus_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int ogg_opus_read_header(SF_PRIVATE *UNUSED(psf))
+static int ogg_opus_read_header(SndFile *UNUSED(psf))
 {
     return 0;
 }
 
-static int ogg_opus_close(SF_PRIVATE *UNUSED(psf))
+static int ogg_opus_close(SndFile *UNUSED(psf))
 {
     return 0;
 }

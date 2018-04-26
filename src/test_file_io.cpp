@@ -103,7 +103,7 @@ static void file_open_test(const char *filename)
 //    static int data_out[512];
 //    static int data_in[512];
 //
-//    SF_PRIVATE sf_data, *psf;
+//    SndFile sf_data, *psf;
 //    sf_count_t retval;
 //
 //    /*
@@ -211,7 +211,7 @@ static void file_open_test(const char *filename)
 
 //static void file_truncate_test(const char *filename)
 //{
-//    SF_PRIVATE sf_data, *psf;
+//    SndFile sf_data, *psf;
 //    unsigned char buffer[256];
 //    int k;
 //
@@ -273,7 +273,7 @@ static void file_open_test(const char *filename)
 //    puts("ok");
 //}
 
-//static void test_open_or_die(SF_PRIVATE *psf, int linenum)
+//static void test_open_or_die(SndFile *psf, int linenum)
 //{
 //    int error;
 //

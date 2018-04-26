@@ -43,10 +43,10 @@ typedef struct
     void *state;
 } OPCM_PRIVATE;
 
-static int opcm_read_header(SF_PRIVATE *psf);
-static int opcm_close(SF_PRIVATE *psf);
+static int opcm_read_header(SndFile *psf);
+static int opcm_close(SndFile *psf);
 
-int ogg_pcm_open(SF_PRIVATE *psf)
+int ogg_pcm_open(SndFile *psf)
 {
     OGG_PRIVATE *odata = psf->container_data;
     OPCM_PRIVATE *opcm = calloc(1, sizeof(OPCM_PRIVATE));
@@ -120,12 +120,12 @@ int ogg_pcm_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int opcm_read_header(SF_PRIVATE *UNUSED(psf))
+static int opcm_read_header(SndFile *UNUSED(psf))
 {
     return 0;
 }
 
-static int opcm_close(SF_PRIVATE *UNUSED(psf))
+static int opcm_close(SndFile *UNUSED(psf))
 {
     return 0;
 }

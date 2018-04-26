@@ -75,19 +75,19 @@ static const char *voc_encoding2str(int encoding);
  * segment. Not sure whether to bother implementing this.
  */
 
-static int voc_multi_init(SF_PRIVATE *psf, VOC_DATA *pvoc);
+static int voc_multi_init(SndFile *psf, VOC_DATA *pvoc);
 
-static int voc_multi_read_uc2s(SF_PRIVATE *psf, short *ptr, int len);
-static int voc_multi_read_les2s(SF_PRIVATE *psf, short *ptr, int len);
+static int voc_multi_read_uc2s(SndFile *psf, short *ptr, int len);
+static int voc_multi_read_les2s(SndFile *psf, short *ptr, int len);
 
-static int voc_multi_read_uc2i(SF_PRIVATE *psf, int *ptr, int len);
-static int voc_multi_read_les2i(SF_PRIVATE *psf, int *ptr, int len);
+static int voc_multi_read_uc2i(SndFile *psf, int *ptr, int len);
+static int voc_multi_read_les2i(SndFile *psf, int *ptr, int len);
 
-static int voc_multi_read_uc2f(SF_PRIVATE *psf, float *ptr, int len);
-static int voc_multi_read_les2f(SF_PRIVATE *psf, float *ptr, int len);
+static int voc_multi_read_uc2f(SndFile *psf, float *ptr, int len);
+static int voc_multi_read_les2f(SndFile *psf, float *ptr, int len);
 
-static int voc_multi_read_uc2d(SF_PRIVATE *psf, double *ptr, int len);
-static int voc_multi_read_les2d(SF_PRIVATE *psf, double *ptr, int len);
+static int voc_multi_read_uc2d(SndFile *psf, double *ptr, int len);
+static int voc_multi_read_les2d(SndFile *psf, double *ptr, int len);
 #endif
 
 int voc_open(SndFile *psf)
@@ -603,7 +603,7 @@ static const char *voc_encoding2str(int encoding)
 }
 
 #if 0
-static int voc_multi_init(SF_PRIVATE *psf, VOC_DATA *pvoc)
+static int voc_multi_init(SndFile *psf, VOC_DATA *pvoc)
 {
 	psf->sf.frames = 0;
 
@@ -630,45 +630,45 @@ static int voc_multi_init(SF_PRIVATE *psf, VOC_DATA *pvoc)
 	return SFE_UNIMPLEMENTED;
 }
 
-static int voc_multi_read_uc2s(SF_PRIVATE *psf, short *ptr, int len)
+static int voc_multi_read_uc2s(SndFile *psf, short *ptr, int len)
 {
 	return 0;
 }
 
-static int voc_multi_read_les2s(SF_PRIVATE *psf, short *ptr, int len)
-{
-	return 0;
-}
-
-
-static int voc_multi_read_uc2i(SF_PRIVATE *psf, int *ptr, int len)
-{
-	return 0;
-}
-
-static int voc_multi_read_les2i(SF_PRIVATE *psf, int *ptr, int len)
+static int voc_multi_read_les2s(SndFile *psf, short *ptr, int len)
 {
 	return 0;
 }
 
 
-static int voc_multi_read_uc2f(SF_PRIVATE *psf, float *ptr, int len)
+static int voc_multi_read_uc2i(SndFile *psf, int *ptr, int len)
 {
 	return 0;
 }
 
-static int voc_multi_read_les2f(SF_PRIVATE *psf, float *ptr, int len)
+static int voc_multi_read_les2i(SndFile *psf, int *ptr, int len)
 {
 	return 0;
 }
 
 
-static int voc_multi_read_uc2d(SF_PRIVATE *psf, double *ptr, int len)
+static int voc_multi_read_uc2f(SndFile *psf, float *ptr, int len)
 {
 	return 0;
 }
 
-static int voc_multi_read_les2d(SF_PRIVATE *psf, double *ptr, int len)
+static int voc_multi_read_les2f(SndFile *psf, float *ptr, int len)
+{
+	return 0;
+}
+
+
+static int voc_multi_read_uc2d(SndFile *psf, double *ptr, int len)
+{
+	return 0;
+}
+
+static int voc_multi_read_les2d(SndFile *psf, double *ptr, int len)
 {
 	return 0;
 }

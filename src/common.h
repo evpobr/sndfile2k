@@ -837,8 +837,8 @@ int psf_open_file_stream(const wchar_t *filename, SF_FILEMODE mode, SF_STREAM **
 #endif
 
 /*
-void psf_fclearerr (SF_PRIVATE *psf) ;
-int psf_ferror (SF_PRIVATE *psf) ;
+void psf_fclearerr (SndFile *psf) ;
+int psf_ferror (SndFile *psf) ;
 */
 
 /*------------------------------------------------------------------------------------

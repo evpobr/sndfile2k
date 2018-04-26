@@ -59,13 +59,13 @@ typedef struct
     void *state;
 } SPX_PRIVATE;
 
-static int spx_read_header(SF_PRIVATE *psf);
-static int spx_close(SF_PRIVATE *psf);
-static void *spx_header_read(SF_PRIVATE *psf, ogg_packet *op, spx_int32_t enh_enabled,
+static int spx_read_header(SndFile *psf);
+static int spx_close(SndFile *psf);
+static void *spx_header_read(SndFile *psf, ogg_packet *op, spx_int32_t enh_enabled,
                              int force_mode);
 static void spx_print_comments(const char *comments, int length);
 
-int ogg_speex_open(SF_PRIVATE *psf)
+int ogg_speex_open(SndFile *psf)
 {
     OGG_PRIVATE *odata = psf->container_data;
     SPX_PRIVATE *spx = calloc(1, sizeof(SPX_PRIVATE));
@@ -141,7 +141,7 @@ int ogg_speex_open(SF_PRIVATE *psf)
 
 #define le_short (x)(x)
 
-static int spx_read_header(SF_PRIVATE *psf)
+static int spx_read_header(SndFile *psf)
 {
     static SpeexStereoState STEREO_INIT = SPEEX_STEREO_STATE_INIT;
 
@@ -246,7 +246,7 @@ static int spx_read_header(SF_PRIVATE *psf)
     return 0;
 }
 
-static int spx_close(SF_PRIVATE *psf)
+static int spx_close(SndFile *psf)
 {
     SPX_PRIVATE *spx = psf->codec_data;
 
@@ -259,7 +259,7 @@ static int spx_close(SF_PRIVATE *psf)
     return 0;
 }
 
-static void *spx_header_read(SF_PRIVATE *psf, ogg_packet *op, spx_int32_t enh_enabled,
+static void *spx_header_read(SndFile *psf, ogg_packet *op, spx_int32_t enh_enabled,
                              int force_mode)
 {
     SPX_PRIVATE *spx = psf->codec_data;

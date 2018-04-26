@@ -59,15 +59,15 @@ int dwd_open(SndFile *psf)
  * Private static functions.
  */
 
-static int dwd_read_header(SF_PRIVATE *psf);
+static int dwd_read_header(SndFile *psf);
 
-static int dwd_close(SF_PRIVATE *psf);
+static int dwd_close(SndFile *psf);
 
 /*
  * Public function.
  */
 
-int dwd_open(SF_PRIVATE *psf)
+int dwd_open(SndFile *psf)
 {
     int error = 0;
 
@@ -102,7 +102,7 @@ int dwd_open(SF_PRIVATE *psf)
     return error;
 }
 
-static int dwd_close(SF_PRIVATE *UNUSED(psf))
+static int dwd_close(SndFile *UNUSED(psf))
 {
     return 0;
 }
@@ -118,7 +118,7 @@ typedef struct
     unsigned int id, datalen, frames, offset;
 } DWD_HEADER;
 
-static int dwd_read_header(SF_PRIVATE *psf)
+static int dwd_read_header(SndFile *psf)
 {
     BUF_UNION ubuf;
     DWD_HEADER dwdh;

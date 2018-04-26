@@ -120,8 +120,6 @@ int sf_wchar_open(const wchar_t *path, SF_FILEMODE mode, SF_INFO *sfinfo, SNDFIL
 
         // Here we have format detected
 
-        //psf = new SF_PRIVATE(&file->vio, mode, sfinfo, reinterpret_cast<void *>(file));
-
         psf->log_printf("File : %s\n", ansi_path);
         strcpy(psf->m_path, ansi_path);
 

@@ -54,14 +54,14 @@ int txw_open(SndFile *psf)
 #define TXW_LOOPED (0x49)
 #define TXW_NO_LOOP (0xC9)
 
-static int txw_read_header(SF_PRIVATE *psf);
+static int txw_read_header(SndFile *psf);
 
-static size_t txw_read_s(SF_PRIVATE *psf, short *ptr, size_t len);
-static size_t txw_read_i(SF_PRIVATE *psf, int *ptr, size_t len);
-static size_t txw_read_f(SF_PRIVATE *psf, float *ptr, size_t len);
-static size_t txw_read_d(SF_PRIVATE *psf, double *ptr, size_t len);
+static size_t txw_read_s(SndFile *psf, short *ptr, size_t len);
+static size_t txw_read_i(SndFile *psf, int *ptr, size_t len);
+static size_t txw_read_f(SndFile *psf, float *ptr, size_t len);
+static size_t txw_read_d(SndFile *psf, double *ptr, size_t len);
 
-static sf_count_t txw_seek(SF_PRIVATE *psf, int mode, sf_count_t offset);
+static sf_count_t txw_seek(SndFile *psf, int mode, sf_count_t offset);
 
 /*
  * ftp://ftp.t0.or.at/pub/sound/tx16w/samples.yamaha
@@ -89,7 +89,7 @@ typedef struct
 
 #define ERROR_666 (666)
 
-int txw_open(SF_PRIVATE *psf)
+int txw_open(SndFile *psf)
 {
     int error;
 
@@ -112,7 +112,7 @@ int txw_open(SF_PRIVATE *psf)
     return 0;
 }
 
-static int txw_read_header(SF_PRIVATE *psf)
+static int txw_read_header(SndFile *psf)
 {
     BUF_UNION ubuf;
     TXW_HEADER txwh;
@@ -227,7 +227,7 @@ static int txw_read_header(SF_PRIVATE *psf)
     return 0;
 }
 
-static size_t txw_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
+static size_t txw_read_s(SndFile *psf, short *ptr, size_t len)
 {
     BUF_UNION ubuf;
     unsigned char *ucptr;
@@ -258,7 +258,7 @@ static size_t txw_read_s(SF_PRIVATE *psf, short *ptr, size_t len)
     return total;
 }
 
-static size_t txw_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
+static size_t txw_read_i(SndFile *psf, int *ptr, size_t len)
 {
     BUF_UNION ubuf;
     unsigned char *ucptr;
@@ -289,7 +289,7 @@ static size_t txw_read_i(SF_PRIVATE *psf, int *ptr, size_t len)
     return total;
 }
 
-static size_t txw_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
+static size_t txw_read_f(SndFile *psf, float *ptr, size_t len)
 {
     BUF_UNION ubuf;
     unsigned char *ucptr;
@@ -326,7 +326,7 @@ static size_t txw_read_f(SF_PRIVATE *psf, float *ptr, size_t len)
     return total;
 }
 
-static size_t txw_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
+static size_t txw_read_d(SndFile *psf, double *ptr, size_t len)
 {
     BUF_UNION ubuf;
     unsigned char *ucptr;
@@ -363,7 +363,7 @@ static size_t txw_read_d(SF_PRIVATE *psf, double *ptr, size_t len)
     return total;
 }
 
-static sf_count_t txw_seek(SF_PRIVATE *psf, int mode, sf_count_t offset)
+static sf_count_t txw_seek(SndFile *psf, int mode, sf_count_t offset)
 {
     if (psf && mode)
         return offset;

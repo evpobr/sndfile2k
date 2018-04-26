@@ -214,7 +214,7 @@ int SndFile::bump_header_allocation(sf_count_t needed)
  * psf_log_printf allows libsndfile internal functions to print to an internal parselog which
  * can later be displayed.
  * The format specifiers are as for printf but without the field width and other modifiers.
- * Printing is performed to the parselog char array of the SF_PRIVATE struct.
+ * Printing is performed to the parselog char array of the SndFile class.
  * Printing is done in such a way as to guarantee that the log never overflows the end of the
  * parselog array.
  */
@@ -611,7 +611,7 @@ void SndFile::header_put_byte(char x)
 }
 
 #if (CPU_IS_BIG_ENDIAN == 1)
-void SF_PRIVATE::header_put_marker(int x)
+void SndFile::header_put_marker(int x)
 {
     header.ptr[header.indx++] = (x >> 24);
     header.ptr[header.indx++] = (x >> 16);
@@ -1505,7 +1505,7 @@ int u_bitwidth_to_subformat(int bits)
 /*
 **	psf_rand_int32 : Not crypto quality, but more than adequate for things
 **	like stream serial numbers in Ogg files or the unique_id field of the
-**	SF_PRIVATE struct.
+**	SndFile class.
 */
 
 int32_t psf_rand_int32(void)

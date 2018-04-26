@@ -55,9 +55,9 @@ int rx2_open(SndFile *psf)
 #define SINF_MARKER (MAKE_MARKER('S', 'I', 'N', 'F'))
 #define SDAT_MARKER (MAKE_MARKER('S', 'D', 'A', 'T'))
 
-static int rx2_close(SF_PRIVATE *psf);
+static int rx2_close(SndFile *psf);
 
-int rx2_open(SF_PRIVATE *psf)
+int rx2_open(SndFile *psf)
 {
     static const char *marker_type[4] = {"Original Enabled", "Enabled Hidden",
                                          "Additional/PencilTool", "Disabled"};
@@ -292,7 +292,7 @@ int rx2_open(SF_PRIVATE *psf)
     return 0;
 }
 
-static int rx2_close(SF_PRIVATE *psf)
+static int rx2_close(SndFile *psf)
 {
     if (psf->file_mode == SFM_WRITE)
     {
