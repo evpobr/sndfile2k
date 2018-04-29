@@ -1322,7 +1322,7 @@ static int wav_read_smpl_chunk(SndFile *psf, uint32_t chunklen)
 {
     char buffer[512];
     uint32_t thisread, bytesread = 0, dword, sampler_data, loop_count;
-    uint32_t note, start, end, type = -1, count;
+    uint32_t note, pitch, start, end, type = -1, count;
     int j, k;
 
     chunklen += (chunklen & 1);
@@ -1339,14 +1339,16 @@ static int wav_read_smpl_chunk(SndFile *psf, uint32_t chunklen)
     bytesread += psf->binheader_readf("4", &note);
     psf->log_printf("  Midi Note    : %u\n", note);
 
-    bytesread += psf->binheader_readf("4", &dword);
-    if (dword != 0)
+    bytesread += psf->binheader_readf("4", &pitch);
+    if (pitch != 0)
     {
-        snprintf(buffer, sizeof(buffer), "%f", (1.0 * 0x80000000) / ((uint32_t)dword));
+        snprintf(buffer, sizeof(buffer), "%f", (1.0 * 0x80000000) / ((uint32_t)pitch));
         psf->log_printf("  Pitch Fract. : %s\n", buffer);
     }
     else
+    {
         psf->log_printf("  Pitch Fract. : 0\n");
+    }
 
     bytesread += psf->binheader_readf("4", &dword);
     psf->log_printf("  SMPTE Format : %u\n", dword);
@@ -1459,6 +1461,7 @@ static int wav_read_smpl_chunk(SndFile *psf, uint32_t chunklen)
     };
 
     psf->m_instrument->basenote = note;
+    psf->m_instrument->detune = (int8_t)(pitch / (0x40000000 / 25.0) + 0.5);
     psf->m_instrument->gain = 1;
     psf->m_instrument->velocity_lo = psf->m_instrument->key_lo = 0;
     psf->m_instrument->velocity_hi = psf->m_instrument->key_hi = 127;
